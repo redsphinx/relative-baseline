@@ -1,2 +1,6 @@
-print('hello world!')
-print('darwin says hi')
+"""
+decide how many aog blocks
+generate aognet description
+from aognet description, generate network
+"""
+

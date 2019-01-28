@@ -1,0 +1,40 @@
+---
+batch_size: 64
+num_epoch: 300
+network:
+  num_stages: 3
+  units:
+  - 1
+  - 1
+  - 1
+  filter_list:
+  - 41
+  - 165
+  - 331
+  - 664
+  dropout: 0.0
+AOG:
+  dims:
+  - 4
+  - 4
+  - 4
+  or_node_op: 'sum'
+  TURN_OFF_UNIT_OR_NODE: True
+  Tnode_basic_unit: 'Bottleneck_ResNet'
+  Anode_basic_unit: 'Bottleneck_ResNet'
+  Onode_basic_unit: 'Bottleneck_ResNet'
+train:
+  bn_mom: 0.9
+  lr: 0.1
+  mom: 0.9
+  wd: 0.0001
+  workspace: 512
+  lr_steps:
+  - 150
+  - 225
+dataset:
+  data_type: 'cifar10'
+  data_dir: './data/cifar10'
+  num_classes: 10
+  num_examples: 50000
+  aug_level: 1
