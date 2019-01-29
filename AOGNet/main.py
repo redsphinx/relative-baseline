@@ -28,7 +28,7 @@ def main():
         aog = get_aog(dim=cfg.AOG.dims[i], min_size=1, tnode_max_size=cfg.AOG.dims[i],
                       turn_off_unit_or_node=cfg.AOG.TURN_OFF_UNIT_OR_NODE)
         aogs.append(aog)
-
+    # TODO: symbol is the network
     symbol = AOGNet.get_symbol(aogs=aogs, cfg=cfg)
 
     # check shapes
@@ -81,48 +81,68 @@ def main():
     else:
         begin_epoch = 0
 
-    # iterator
-    train, val = eval(cfg.dataset.data_type + "_iterator")(cfg, kv)
+    # MOD: save model
+    # model.save_checkpoint saves a json file, but no checkpoint file and throws "AssertionError"
+    # symbol.save saves the network definition to a json-file
+    SAVE = True
+    if SAVE:
+        path = '/home/gabras/deployed/relative-baseline/AOGNet/testing_testing'
+        symbol.save(path)
 
-    initializer = mx.init.Xavier(rnd_type='gaussian', factor_type="in", magnitude=2)
-    lr_scheduler = multi_factor_scheduler(begin_epoch, epoch_size, step=cfg.train.lr_steps, factor=0.1)
+    VIZ = True
+    if VIZ:
+        grp = mx.viz.plot_network(symbol, node_attrs={"shape": "oval", "fixedsize": "false"})
+        grp.save('graph_file.dot', '/home/gabras/deployed/relative-baseline/AOGNet/')
 
-    optimizer_params = {
-        'learning_rate': cfg.train.lr,
-        'momentum': cfg.train.mom,
-        'wd': cfg.train.wd,
-        'lr_scheduler': lr_scheduler
-    }
+    # TODO: save symbol before this
 
-    model = mx.mod.Module(
-        context             = devs,
-        symbol              = symbol)
+    TRAIN = False
+    if TRAIN:
+        # iterator
+        train, val = eval(cfg.dataset.data_type + "_iterator")(cfg, kv)
 
-    if cfg.dataset.data_type in ["cifar10", "cifar100"]:
-        eval_metric = ['acc', 'ce']
-    elif cfg.dataset.data_type == 'imagenet':
-        eval_metric = ['acc', mx.metric.create('top_k_accuracy', top_k = 5)]
+        initializer = mx.init.Xavier(rnd_type='gaussian', factor_type="in", magnitude=2)
+        lr_scheduler = multi_factor_scheduler(begin_epoch, epoch_size, step=cfg.train.lr_steps, factor=0.1)
 
-    model.fit(
-        train,
-        begin_epoch        = begin_epoch,
-        num_epoch          = cfg.num_epoch,
-        eval_data          = val,
-        eval_metric        = eval_metric,
-        kvstore            = kv,
-        optimizer          = 'sgd',  # ['sgd', 'nag']
-        optimizer_params   = optimizer_params,
-        arg_params         = arg_params,
-        aux_params         = aux_params,
-        initializer        = initializer,
-        allow_missing      = True,
-        batch_end_callback = mx.callback.Speedometer(cfg.batch_size, args.frequent),
-        epoch_end_callback = checkpoint)
+        optimizer_params = {
+            'learning_rate': cfg.train.lr,
+            'momentum': cfg.train.mom,
+            'wd': cfg.train.wd,
+            'lr_scheduler': lr_scheduler
+        }
+
+        model = mx.mod.Module(
+            context             = devs,
+            symbol              = symbol)
+
+        if cfg.dataset.data_type in ["cifar10", "cifar100"]:
+            eval_metric = ['acc', 'ce']
+        elif cfg.dataset.data_type == 'imagenet':
+            eval_metric = ['acc', mx.metric.create('top_k_accuracy', top_k = 5)]
+
+        model.fit(
+            train,
+            begin_epoch        = begin_epoch,
+            num_epoch          = cfg.num_epoch,
+            eval_data          = val,
+            eval_metric        = eval_metric,
+            kvstore            = kv,
+            optimizer          = 'sgd',  # ['sgd', 'nag']
+            optimizer_params   = optimizer_params,
+            arg_params         = arg_params,
+            aux_params         = aux_params,
+            initializer        = initializer,
+            allow_missing      = True,
+            batch_end_callback = mx.callback.Speedometer(cfg.batch_size, args.frequent),
+            epoch_end_callback = checkpoint)
+
+        # TODO: after this model can be saved, because binded and params_initialized can be asserted
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="command for training aognet")
-    parser.add_argument('--cfg', help='experiment configure file name', required=True, type=str)
-    parser.add_argument('--gpus', help='the gpus will be used', type=str, default='0')
+    # parser.add_argument('--cfg', help='experiment configure file name', required=True, type=str)
+    parser.add_argument('--cfg', help='experiment configure file name', default='cfgs/cifar10/aognet_cifar10_ps_4_bottleneck_1M.yaml', type=str)
+    parser.add_argument('--gpus', help='the gpus will be used', type=str, default='1')
     parser.add_argument('--modeldir', help='the location to save model checkpoints', default='./model', type=str)
     parser.add_argument('--kv-store', help='kv-store', type=str, default='device')
     parser.add_argument('--memonger', action='store_true', default=False, help='use memonger to save gpu memory')

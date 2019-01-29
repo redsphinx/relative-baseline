@@ -613,7 +613,7 @@ if __name__ == '__main__':
     aog = get_aog(dim=n, min_size=1, use_root_tnode=True, tnode_max_size=4, turn_off_unit_or_node=False)
     print(aog.matrix_form)
 
-    save_here = '/home/gabi/AOGNet/plots'
+    # save_here = '/home/gabi/AOGNet/plots'
     filename = aog.Visualize(save_here, "plot-1d_%d" % n)
     # filename = aog.Visualize("plot-1d")
 

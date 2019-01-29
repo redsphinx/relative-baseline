@@ -46,7 +46,7 @@ def aog_block(data, cfg, aog, units, in_channels, out_channels, stage, bn_mom=0.
                         workspace=workspace, name=name + 'unit_{}_'.format(i))
     return data
 
-
+# TODO: this goes from aog to architecture
 def get_symbol(aogs, cfg):
     '''
     :param units: list of aog sizes
