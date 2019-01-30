@@ -8,6 +8,10 @@ from random import shuffle
 import time
 
 
+# TODO: how to not use an iterator ?: mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
+# TODO: how to .Module data_names=['data'] ?
+# TODO: how to .Module label_names=['softmax_label'] ?
+
 print('Initializing')
 
 # fetch data TODO
@@ -31,7 +35,7 @@ def run(module, steps, which_labels, frames, which='train', ordered=False, twost
         labels_selected = _labs[s * which_batch_size:(s + 1) * which_batch_size]
         assert (len(labels_selected) == which_batch_size)
         labels_face, face_data, _ = D.load_data(labels_selected, which_labels, frames, which_data='face', resize=True,
-                                             ordered=ordered, twostream=twostream, frame_num=frame_num, same_frame=same_frame)
+                                             ordered=ordered, twostream=twostream, same_frame=same_frame)
 
         # shuffle data and labels in same order
         if which != 'test':
