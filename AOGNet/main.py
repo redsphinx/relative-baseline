@@ -28,7 +28,7 @@ def main():
         aog = get_aog(dim=cfg.AOG.dims[i], min_size=1, tnode_max_size=cfg.AOG.dims[i],
                       turn_off_unit_or_node=cfg.AOG.TURN_OFF_UNIT_OR_NODE)
         aogs.append(aog)
-    # TODO: symbol is the network
+
     symbol = AOGNet.get_symbol(aogs=aogs, cfg=cfg)
 
     # check shapes
@@ -81,7 +81,7 @@ def main():
     else:
         begin_epoch = 0
 
-    # MOD: save model
+    # MOD: save network description + visualization of graph
     # model.save_checkpoint saves a json file, but no checkpoint file and throws "AssertionError"
     # symbol.save saves the network definition to a json-file
     SAVE = True
