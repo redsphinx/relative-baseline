@@ -8,13 +8,9 @@ from random import shuffle
 import time
 
 
-# TODO: how to not use an iterator ?: mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
-# TODO: how to .Module data_names=['data'] ?
-# TODO: how to .Module label_names=['softmax_label'] ?
-
 print('Initializing')
 
-# fetch data TODO
+# fetch data
 train_labels = h5.File(P.CHALEARN_TRAIN_LABELS_20, 'r')
 training_steps = len(train_labels) // C.TRAIN_BATCH_SIZE
 id_frames = h5.File(P.NUM_FRAMES, 'r')
@@ -44,15 +40,14 @@ def run(module, steps, which_labels, frames, which='train', ordered=False, twost
             face_data = face_data[shuf]
             labels_face = labels_face[shuf]
 
-        # MOD: put mxnet training here
         # -----------------------------------------------------------
         metric.reset()
         module.forward(face_data, is_train=True)  # compute predictions
         module.update_metric(metric, labels_face)  # accumulate prediction accuracy
         module.backward()  # compute gradients
         module.update()  # update parameters
-
         # -----------------------------------------------------------
+
     print('Epoch %d, Training %s' % (epoch, metric.get()))
 
 
@@ -66,12 +61,11 @@ sym = mx.symbol.load(path)
 
 # symbol to module
 mod = mx.mod.Module(symbol=sym,
-                    context=mx.cpu(),
-                    data_names=[], #['data'], TODO
-                    label_names=[]) #['softmax_label']) TODO
+                    context=mx.cpu())
 
 # training
-mod.bind() # TODO
+mod.bind(data_shapes=[],
+         label_shapes=[])
 mod.init_params(initializer=mx.init.Xavier())
 mod.init_optimizer(optimizer='sgd', optimizer_params=(('learning_rate', 0.1),))
 metric = mx.metric.create('mse')
