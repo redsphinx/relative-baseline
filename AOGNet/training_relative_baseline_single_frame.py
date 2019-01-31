@@ -16,6 +16,9 @@ training_steps = len(train_labels) // C.TRAIN_BATCH_SIZE
 id_frames = h5.File(P.NUM_FRAMES, 'r')
 
 
+
+# data iterator
+
 def run(module, steps, which_labels, frames, which='train', ordered=False, twostream=False, same_frame=False):
     print('steps: ', steps)
     assert(which in ['train', 'test', 'val'])
@@ -70,9 +73,7 @@ mod.init_params(initializer=mx.init.Xavier())
 mod.init_optimizer(optimizer='sgd', optimizer_params=(('learning_rate', 0.1),))
 metric = mx.metric.create('mse')
 
+
 for epoch in range(5):
-    run(module=mod, steps=training_steps, which_labels=train_labels, )
-
-
-
+    run(module=mod, steps=training_steps, which_labels=train_labels, frames=id_frames)
 
