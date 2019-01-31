@@ -47,8 +47,7 @@ def video_to_frames(dataset, path, extract='participant', format='jpg', num_fram
         mp4_arr = skvideo.io.vread(p + '/' + mp4, num_frames=num_frames)
 
         # for each number of frames, in video
-        if num_frames is None:
-            num_frames = mp4_arr.shape()[0]
+        num_frames = mp4_arr.shape[0]
 
         for i in range(num_frames):
             frame = mp4_arr[i]
@@ -65,5 +64,5 @@ def video_to_frames(dataset, path, extract='participant', format='jpg', num_fram
 path_to_data = '/scratch/users/gabras/data/omg_empathy'
 
 video_to_frames(dataset='Validation', path=path_to_data, dims=(640, 360))
-# video_to_frames(dataset='Training', path=path_to_data, dims=(640, 360))
+video_to_frames(dataset='Training', path=path_to_data, dims=(640, 360))
 
