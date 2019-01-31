@@ -2,33 +2,18 @@ import os
 import skvideo.io
 from PIL import Image
 
-# paths
-path_to_data = '/scratch/users/gabras/data/omg_empathy'
 
-path_test = path_to_data + '/Test'
-path_train = path_to_data + '/Training'
-path_val = path_to_data + '/Validation'
-
-path_test_videos = path_test + '/Videos'
-path_train_videos = path_train + '/Videos'
-path_val_videos = path_val + '/Videos'
-
-path_test_labels = path_test + '/Annotations'
-path_train_labels = path_train + '/Annotations'
-path_val_labels = path_val + '/Annotations'
-
-
-def video_to_frames(dataset, extract='participant', path=path_to_data, format='jpg', num_frames=None, dims=None):
+def video_to_frames(dataset, path, extract='participant', format='jpg', num_frames=None, dims=None):
     assert dataset in ['Training', 'Validation', 'Test']  # which part of the dataset
     assert extract in ['participant', 'storyteller', 'all']  # which person to extract
     assert format in ['jpg', 'png']  # what format to save frames in
     if num_frames is not None:  # number of frames to extract, if None > extract all frames
-        assert num_frames is int
+        assert type(num_frames) is int
     if dims is not None:  # what final dimensions to save frame in, if None > same as original
-        assert dims is tuple
+        assert type(dims) is tuple
 
     p = path + '/' + dataset + '/Videos'
-    save_location = path + '/' + dataset + '/' + format + '_' + extract
+    save_location = path + '/' + dataset + '/' + format + '_' + extract + '_' + str(dims[0]) + '_' + str(dims[1])
 
     if not os.path.exists(save_location):
         os.mkdir(save_location)
@@ -43,7 +28,7 @@ def video_to_frames(dataset, extract='participant', path=path_to_data, format='j
         cut = None
 
     if dims is None:
-        # TODO: h x w ?
+        # h x w
         dims = (cut[1]-cut[0], 720)
 
 
@@ -56,8 +41,10 @@ def video_to_frames(dataset, extract='participant', path=path_to_data, format='j
         if not os.path.exists(jpg_folder):
             os.mkdir(jpg_folder)
 
-        # read in video
-        mp4_arr = skvideo.io.vread(path_to_data + '/' + mp4)
+        # read in video, shape: (8675, 720, 2560, 3)
+        if num_frames is None:
+            num_frames = 0
+        mp4_arr = skvideo.io.vread(p + '/' + mp4, num_frames=num_frames)
 
         # for each number of frames, in video
         if num_frames is None:
@@ -69,8 +56,14 @@ def video_to_frames(dataset, extract='participant', path=path_to_data, format='j
 
             # save frame as format in size dims
             frame_img = Image.fromarray(frame)
+            # frame_img.size = (2560, 720)
             frame_img = frame_img.crop((cut[0], 0, cut[1], 720)) # left, upper, right, and lower
             frame_img = frame_img.resize((dims[0], dims[1]))
-            # TODO: to uint8
-            frame_img.save(name_img)
+            frame_img.save(name_img, mode='RGB')
+
+
+path_to_data = '/scratch/users/gabras/data/omg_empathy'
+
+video_to_frames(dataset='Validation', path=path_to_data, dims=(640, 360))
+# video_to_frames(dataset='Training', path=path_to_data, dims=(640, 360))
 
