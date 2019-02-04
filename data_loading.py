@@ -113,7 +113,7 @@ def get_left_right_pair(val_idx):
     random.shuffle(zips)
     left_imgs, right_imgs = zip(*zips)
 
-    
+
     # TODO: get frames
 
 
