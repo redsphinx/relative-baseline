@@ -2,6 +2,7 @@ import numpy as np
 import os
 import subprocess
 import random
+from deepimpression2.chalearn20 import poisson_disc as pd
 
 # assume we have 2 matrices, one val one train
 # each cell is a story-subject indicating number of frames
@@ -26,9 +27,9 @@ def make_frame_matrix():
     _shape = (10, 8)  # story, subject
     frame_matrix = np.zeros(_shape, dtype=int)
 
-    valid_story_idx_train = [2-1, 4-1, 5-1, 8-1]
-    valid_story_idx_val = [1-1]
-    valid_story_idx_test = [3-1, 6-1, 7-1]
+    valid_story_idx_train = [2, 4, 5, 8]
+    valid_story_idx_val = [1]
+    valid_story_idx_test = [3, 6, 7]
 
     data_folders = os.listdir(path)
     for f in data_folders:
@@ -61,6 +62,11 @@ def dummy_load_data():
 
 # TODO
 def load_data(which, frame_matrix, val_idx):
+    pass
+
+
+def get_left_right_pair(val_idx):
+
     '''
     generate 32 points from val_idx using poisson disk
     for each point:
@@ -68,12 +74,58 @@ def load_data(which, frame_matrix, val_idx):
 
     data_left = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
     data_right = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
-    labels =
-
+    labels = fetch_labels(which, list_subj_story, frames) -> shape = (batchsize, 1, 1)
     '''
+    batch_size = 32
+
+    if len(val_idx) == 4:
+        _r = 4.6
+    elif len(val_idx) == 1:
+        _r = 1
+
+    _len = 0
+    while _len not in range(batch_size, batch_size+3):
+        samples = pd.poisson_disc_samples(10*len(val_idx), 10*len(val_idx), r=_r)
+        _len = len(samples)
+
+    if _len != batch_size:
+        samples = samples[:batch_size]
+
+    def convert(p):
+        p1, p2 = p
+        subj_1 = p1 / len(val_idx) + 1
+        subj_2 = p2 / len(val_idx) + 1
+        story_1 = val_idx[p1 % len(val_idx)]
+        story_2 = val_idx[p2 % len(val_idx)]
+        name_1 = 'Subject_%d_Story_%d' % (subj_1, story_1)
+        name_2 = 'Subject_%d_Story_%d' % (subj_2, story_2)
+        return name_1, name_2
+
+    left_imgs = []
+    right_imgs = []
+
+    for i in samples:
+        left, right= convert(i)
+        left_imgs.append(left)
+        right_imgs.append(right)
+
+    zips = list(zip(left_imgs, right_imgs))
+    random.shuffle(zips)
+    left_imgs, right_imgs = zip(*zips)
+
+    
+    # TODO: get frames
 
 
-    pass
+    return left_imgs, right_imgs
+
+
+
+
+
+
+
+
 
 
 # TODO
@@ -88,5 +140,4 @@ def update_step_logs(which, loss, experiment_number):
         raise NotImplemented
 
 
-
-
+# get_left_right_pair([1])

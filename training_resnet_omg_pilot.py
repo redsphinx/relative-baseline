@@ -54,9 +54,7 @@ def run(which, model, optimizer):
     elif which == 'test':
         raise NotImplemented
 
-
     print('steps: ', steps)
-
 
     for s in range(steps):
         # labels, data = L.load_data(which, frame_matrix, val_idx)
