@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import subprocess
+import random
 
 # assume we have 2 matrices, one val one train
 # each cell is a story-subject indicating number of frames
@@ -10,7 +11,6 @@ import subprocess
 # fetch 2 jpgs
 
 
-# TODO: add frames for testing
 
 def wc_l(file_name):
     command = "cat %s | wc -l" % file_name
@@ -21,6 +21,7 @@ def wc_l(file_name):
 
 
 def make_frame_matrix():
+    # TODO: add frames for testing
     path = '/scratch/users/gabras/data/omg_empathy/'
     _shape = (10, 8)  # story, subject
     frame_matrix = np.zeros(_shape, dtype=int)
@@ -46,3 +47,13 @@ def make_frame_matrix():
     return frame_matrix, valid_story_idx
 
 
+def dummy_load_data():
+    #  data = np.zeros((len(keys), 3, C2.H, C2.W), dtype=np.float32)
+    num_samples = 10
+    label = np.array([random.randint(-1, 1) for i in range(num_samples)], dtype=np.float32)
+    label = np.expand_dims(label, -1)
+
+    img_left = np.random.randint(low=0, high=255, size=(num_samples, 3, 320, 640)).astype(np.float32)
+    img_right = np.random.randint(low=0, high=255, size=(num_samples, 3, 320, 640)).astype(np.float32)
+
+    return label, np.array([img_left, img_right], dtype=np.float32)

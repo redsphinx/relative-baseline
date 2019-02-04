@@ -134,7 +134,8 @@ class Siamese(chainer.Chain):
             self.b1 = ResNet18()
             # self.fc = Linear(in_size=512, out_size=10) # wrong way of making predictions
             # self.fc = Linear(in_size=512, out_size=5) # right way with 5 traits
-            self.fc = Linear(in_size=512, out_size=1)  # with collapsed traits
+            # self.fc = Linear(in_size=512, out_size=1)  # with collapsed traits
+            self.fc = Linear(in_size=512, out_size=1)
 
     def __call__(self, x1, x2):
         _1 = self.b1(x1)  # (32, 256, 1, 1)
@@ -142,5 +143,5 @@ class Siamese(chainer.Chain):
 
         h = concat((_1, _2))
         h = self.fc(h)
-        # TODO: thresholding to 0, 1 or -1
+        h = chainer.functions.tanh(h)
         return h

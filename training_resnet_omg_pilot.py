@@ -59,7 +59,7 @@ def run(which, model, optimizer):
 
 
     for s in range(steps):
-        labels, data = L.load_data(which, frame_matrix, val_idx)
+        # labels, data = L.load_data(which, frame_matrix, val_idx)
         labels, data = L.dummy_load_data()  # for debugging purposes only
 
         if C.ON_GPU:
@@ -75,16 +75,17 @@ def run(which, model, optimizer):
             with chainer.using_config('train', config):
                 if which == 'train':
                     model.cleargrads()
-                prediction = model(data)
+                prediction = model(data[0], data[1])
 
                 loss = mean_absolute_error(prediction, labels)
 
                 if which == 'train':
                     loss.backward()
                     optimizer.update()
-
+        # TODO: implement
         L.update_step_logs(which, float(loss.data))
 
+    # TODO: implement
     L.update_epoch_logs(which)
     L.make_epoch_plot(which)
 
@@ -119,5 +120,6 @@ for e in range(0, epochs):
 
     # save model
     # if ((e + 1) % 10) == 0:
-    name = os.path.join(P.MODELS, 'epoch_%d_0' % e)
+    save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+    name = os.path.join(save_location, 'epoch_%d_0' % e)
     chainer.serializers.save_npz(name, my_model)
