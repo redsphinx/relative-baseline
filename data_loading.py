@@ -57,3 +57,36 @@ def dummy_load_data():
     img_right = np.random.randint(low=0, high=255, size=(num_samples, 3, 320, 640)).astype(np.float32)
 
     return label, np.array([img_left, img_right], dtype=np.float32)
+
+
+# TODO
+def load_data(which, frame_matrix, val_idx):
+    '''
+    generate 32 points from val_idx using poisson disk
+    for each point:
+        s1, s2 sample from frames
+
+    data_left = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
+    data_right = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
+    labels =
+
+    '''
+
+
+    pass
+
+
+# TODO
+def update_step_logs(which, loss, experiment_number):
+    if which == 'train':
+        path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/train/steps'
+
+    elif which == 'val':
+        path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/steps'
+
+    elif which == 'test':
+        raise NotImplemented
+
+
+
+
