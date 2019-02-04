@@ -22,15 +22,6 @@ from random import shuffle
 
 my_model = Siamese()
 
-load_model = False
-if load_model:
-    p = os.path.join(P.MODELS, 'epoch_9_53')
-    chainer.serializers.load_npz(p, my_model)
-    print('model loaded')
-    continuefrom = 0
-else:
-    continuefrom = 0
-
 my_optimizer = Adam(alpha=0.0002, beta1=0.5, beta2=0.999, eps=10e-8, weight_decay_rate=0.0001)
 # my_optimizer = Adam(alpha=0.0002, beta1=0.5, beta2=0.999, eps=10e-8)
 my_optimizer.setup(my_model)
@@ -41,78 +32,33 @@ if C.ON_GPU:
 print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
-epochs = C.EPOCHS
-# epochs = 1
+epochs = 100
 
-# TODO: make labels
-train_labels = h5.File(P.CHALEARN_TRAIN_LABELS_20, 'r')
-val_labels = h5.File(P.CHALEARN_VAL_LABELS_20, 'r')
-test_labels = h5.File(P.CHALEARN_TEST_LABELS_20, 'r')
+frame_matrix, valid_story_idx = L.make_frame_matrix()
 
-train_loss = []
-pred_diff_train = np.zeros((epochs, 5), float)
-
-val_loss = []
-pred_diff_val = np.zeros((epochs, 5), float)
-
-test_loss = []
-pred_diff_test = np.zeros((epochs, 5), float)
-
-training_steps = len(train_labels) // C.TRAIN_BATCH_SIZE
-val_steps = len(val_labels) // C.VAL_BATCH_SIZE
-test_steps = len(test_labels) // C.TEST_BATCH_SIZE
-# training_steps = 10
-# val_steps = 10
-
-id_frames = h5.File(P.NUM_FRAMES, 'r')
+train_total_steps = 1600  # we have 40**2 possible pairs of id-stories in training
+val_total_steps = 100  # we have 10**2 possible pairs of id-stories in validation
 
 
-# run(which='train', steps=training_steps, model=my_model, optimizer=my_optimizer, pred_diff=pred_diff_train, loss_saving=train_loss)
-
-def run_new(which, steps, model, optimizer, pred_diff, loss_saving):
-    print('steps: ', steps)
+def run(which, model, optimizer):
     assert (which in ['train', 'test', 'val'])
+    val_idx = None
+    steps = None
     if which == 'train':
-        which_batch_size = C.TRAIN_BATCH_SIZE
+        val_idx = valid_story_idx[0]
+        steps = train_total_steps
     elif which == 'val':
-        which_batch_size = C.VAL_BATCH_SIZE
+        val_idx = valid_story_idx[1]
+        steps = val_total_steps
     elif which == 'test':
-        which_batch_size = C.TEST_BATCH_SIZE
+        raise NotImplemented
 
 
-
-
-    pass
-
-
-def run(which, steps, which_labels, frames, model, optimizer, pred_diff, loss_saving, which_data, ordered=False,
-        save_all_results=False, twostream=False):
     print('steps: ', steps)
-    assert(which in ['train', 'test', 'val'])
-    assert(which_data in ['all', 'bg', 'face'])
 
-    if which == 'train':
-        which_batch_size = C.TRAIN_BATCH_SIZE
-    elif which == 'val':
-        which_batch_size = C.VAL_BATCH_SIZE
-    elif which == 'test':
-        which_batch_size = C.TEST_BATCH_SIZE
 
-    loss_tmp = []
-    pd_tmp = np.zeros((steps, 5), dtype=float)
-    _labs = list(which_labels)
-    if not ordered:
-        shuffle(_labs)
-
-    ts = time.time()
     for s in range(steps):
-        # HERE
-        print(s)
-        # HERE
-        labels_selected = _labs[s * which_batch_size:(s + 1) * which_batch_size]
-        assert (len(labels_selected) == which_batch_size)
-        labels, data = D.load_data(labels_selected, which_labels, frames, which_data, resize=True, ordered=ordered,
-                                   twostream=twostream)
+        labels, data = L.load_data(which, frame_matrix, val_idx)
 
         if C.ON_GPU:
             data = to_gpu(data, device=C.DEVICE)
@@ -135,36 +81,23 @@ def run(which, steps, which_labels, frames, model, optimizer, pred_diff, loss_sa
                     loss.backward()
                     optimizer.update()
 
-        loss_tmp.append(float(loss.data))
+        L.update_step_logs(which, float(loss.data))
 
-        pd_tmp[s] = U.pred_diff_trait(to_cpu(prediction.data), to_cpu(labels))
-
-    pred_diff[e] = np.mean(pd_tmp, axis=0)
-    loss_tmp_mean = np.mean(loss_tmp, axis=0)
-    loss_saving.append(loss_tmp_mean)
-    print('E %d. %s loss: ' %(e, which), loss_tmp_mean,
-          ' pred diff OCEAS: ', pred_diff[e],
-          ' time: ', time.time() - ts)
-
-    U.record_loss_sanity(which, loss_tmp_mean, pred_diff[e])
-
-    if which == 'test' and save_all_results:
-        U.record_loss_all_test(loss_tmp)
+    L.update_epoch_logs(which)
+    L.make_epoch_plot(which)
 
 
 print('Enter training loop with validation')
-for e in range(continuefrom, epochs):
+for e in range(0, epochs):
+
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    run(which='train', steps=training_steps, model=my_model, optimizer=my_optimizer, pred_diff=pred_diff_train,
-        loss_saving=train_loss)
+    run(which='train', model=my_model, optimizer=my_optimizer)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    # run(which='val', steps=val_steps, which_labels=val_labels, frames=id_frames,
-    #     model=my_model, optimizer=my_optimizer, pred_diff=pred_diff_val,
-    #     loss_saving=val_loss, which_data=validate_on, twostream=True)
+    run(which='val', model=my_model, optimizer=my_optimizer)
     # ----------------------------------------------------------------------------
     # test
     # ----------------------------------------------------------------------------
@@ -183,6 +116,6 @@ for e in range(continuefrom, epochs):
     #         twostream=True)
 
     # save model
-    if ((e + 1) % 10) == 0:
-        name = os.path.join(P.MODELS, 'epoch_%d_0' % e)
-        chainer.serializers.save_npz(name, my_model)
+    # if ((e + 1) % 10) == 0:
+    name = os.path.join(P.MODELS, 'epoch_%d_0' % e)
+    chainer.serializers.save_npz(name, my_model)
