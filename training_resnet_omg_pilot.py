@@ -33,6 +33,7 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
+batches = 32
 
 frame_matrix, valid_story_idx = L.make_frame_matrix()
 
@@ -59,6 +60,7 @@ def run(which, model, optimizer):
 
     for s in range(steps):
         labels, data = L.load_data(which, frame_matrix, val_idx)
+        labels, data = L.dummy_load_data()  # for debugging purposes only
 
         if C.ON_GPU:
             data = to_gpu(data, device=C.DEVICE)

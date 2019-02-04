@@ -11,10 +11,10 @@ import subprocess
 
 
 # TODO: add frames for testing
+
 def wc_l(file_name):
-    # command = "cat %s | wc -l" % file_name
-    # subprocess.call(command, shell=True)
-    frames = subprocess.check_output(['cat', file_name, '|', 'wc', 'l']).decode('utf-8')
+    command = "cat %s | wc -l" % file_name
+    frames = subprocess.check_output(command, shell=True).decode('utf-8')
     frames = int(frames)
     return frames - 1
     # return subprocess.check_output(['du', '-sh', path]).split()[0].decode('utf-8')
@@ -25,9 +25,9 @@ def make_frame_matrix():
     _shape = (10, 8)  # story, subject
     frame_matrix = np.zeros(_shape, dtype=int)
 
-    valid_story_idx_train = [2, 4, 5, 8]
-    valid_story_idx_val = [1]
-    valid_story_idx_test = [3, 6, 7]
+    valid_story_idx_train = [2-1, 4-1, 5-1, 8-1]
+    valid_story_idx_val = [1-1]
+    valid_story_idx_test = [3-1, 6-1, 7-1]
 
     data_folders = os.listdir(path)
     for f in data_folders:
@@ -38,7 +38,7 @@ def make_frame_matrix():
                 csv_path = os.path.join(annotation_path, csv_file)
                 subject = int(csv_file.split('_')[1]) - 1  # -1 because array idx at 0
                 story = int(csv_file.split('_')[-1].split('.')[0]) - 1
-                frames = wc_l(csv_file)
+                frames = wc_l(csv_path)
                 frame_matrix[subject][story] = frames
 
     valid_story_idx = [valid_story_idx_train, valid_story_idx_val, valid_story_idx_test]
