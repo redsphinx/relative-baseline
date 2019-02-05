@@ -39,6 +39,7 @@ batches = 32
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training
+# train_total_steps = int(100 / batches)  # we have 40**2 possible pairs of id-stories in training
 val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
@@ -56,7 +57,7 @@ def run(which, model, optimizer):
     elif which == 'test':
         raise NotImplemented
 
-    print('%s, steps: %d' % (which, steps))
+    # print('%s, steps: %d' % (which, steps))
 
 
     for s in tqdm(range(steps)):
@@ -92,23 +93,21 @@ def run(which, model, optimizer):
         # TODO: implement
         # L.update_step_logs(which, float(loss.data))
 
-    # TODO: implement
-    # L.update_epoch_logs(which)
-    # L.make_epoch_plot(which)
-
 
 print('Enter training loop with validation')
 for e in range(0, epochs):
-
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer)
+    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=0)
+    # L.make_epoch_plot(which)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
     loss_val = run(which='val', model=my_model, optimizer=my_optimizer)
-
+    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=0)
+    
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------
     # test

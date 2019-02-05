@@ -94,8 +94,8 @@ def get_left_right_pair(val_idx, frame_matrix, batch_size=32):
         left_num_frames = frame_matrix[left[1]][left[2]]
         right_num_frames = frame_matrix[right[1]][right[2]]
         # grab a random frame
-        left_frame = random.randint(0, left_num_frames)
-        right_frame = random.randint(0, right_num_frames)
+        left_frame = random.randint(0, left_num_frames - 1) # jpgs start at 0.jpg
+        right_frame = random.randint(0, right_num_frames - 1)
 
         left_all.append('%s/%d.jpg' % (left[0], left_frame))
         right_all.append('%s/%d.jpg' % (right[0], right_frame))
@@ -115,7 +115,7 @@ def cat_head_tail(fname, frame_num):
 
 def get_valence(which, full_name):
     name = full_name.split('/')[0]
-    frame = int(full_name.split('/')[-1].split('.jpg')[0]) + 1
+    frame = int(full_name.split('/')[-1].split('.jpg')[0]) + 2 # lines start at 1 + skip first line
 
     if which == 'train':
         csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/Annotations', name + '.csv')
@@ -128,6 +128,7 @@ def get_valence(which, full_name):
         valence = float(cat_head_tail(csv_path, frame))
     except ValueError:
         print(name, frame)
+        print(ValueError)
 
 
     return valence
@@ -154,7 +155,11 @@ def load_data(which, frame_matrix, val_idx, batch_size):
         _tmp_labels = np.zeros(2)
         # get left data
         jpg_path = os.path.join(path, left_all[i])
-        jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+        try:
+            jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+        except FileNotFoundError:
+            print(jpg_path)
+            print(FileNotFoundError)
         left_data[i] = jpg
         # left valence
         _tmp_labels[0] = get_valence(which, left_all[i])
@@ -178,17 +183,12 @@ def load_data(which, frame_matrix, val_idx, batch_size):
     return left_data, right_data, labels
 
 
-# TODO
-def update_step_logs(which, loss, experiment_number):
-    if which == 'train':
-        path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/train/steps'
+def update_logs(which, loss, epoch, model_num, experiment_number):
+    path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' \
+           % (which, model_num, experiment_number)
 
-    elif which == 'val':
-        path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/steps'
-
-    elif which == 'test':
-        raise NotImplemented
+    with open(path, 'a') as my_file:
+        line = '%d,%f\n' % (epoch, loss)
+        my_file.write(line)
 
 
-# f_mat, valid_idx_all = make_frame_matrix()
-# load_data('train', f_mat, valid_idx_all[0], 32)
