@@ -35,7 +35,7 @@ print('model initialized with %d parameters' % my_model.count_params())
 epochs = 100
 batches = 32
 
-frame_matrix, valid_story_idx = L.make_frame_matrix()
+frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 train_total_steps = 1600  # we have 40**2 possible pairs of id-stories in training
 val_total_steps = 100  # we have 10**2 possible pairs of id-stories in validation
@@ -46,10 +46,10 @@ def run(which, model, optimizer):
     val_idx = None
     steps = None
     if which == 'train':
-        val_idx = valid_story_idx[0]
+        val_idx = valid_story_idx_all[0]
         steps = train_total_steps
     elif which == 'val':
-        val_idx = valid_story_idx[1]
+        val_idx = valid_story_idx_all[1]
         steps = val_total_steps
     elif which == 'test':
         raise NotImplemented
@@ -57,8 +57,8 @@ def run(which, model, optimizer):
     print('steps: ', steps)
 
     for s in range(steps):
-        # labels, data = L.load_data(which, frame_matrix, val_idx)
-        labels, data = L.dummy_load_data()  # for debugging purposes only
+        labels, data = L.load_data(which, frame_matrix, val_idx, batches)
+        # labels, data = L.dummy_load_data()  # for debugging purposes only
 
         if C.ON_GPU:
             data = to_gpu(data, device=C.DEVICE)

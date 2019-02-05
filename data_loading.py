@@ -3,6 +3,7 @@ import os
 import subprocess
 import random
 from deepimpression2.chalearn20 import poisson_disc as pd
+from PIL import Image
 
 # assume we have 2 matrices, one val one train
 # each cell is a story-subject indicating number of frames
@@ -24,7 +25,7 @@ def wc_l(file_name):
 def make_frame_matrix():
     # TODO: add frames for testing
     path = '/scratch/users/gabras/data/omg_empathy/'
-    _shape = (10, 8)  # story, subject
+    _shape = (10, 8)  # subject, story
     frame_matrix = np.zeros(_shape, dtype=int)
 
     valid_story_idx_train = [2, 4, 5, 8]
@@ -60,24 +61,7 @@ def dummy_load_data():
     return label, np.array([img_left, img_right], dtype=np.float32)
 
 
-# TODO
-def load_data(which, frame_matrix, val_idx):
-    pass
-
-
-def get_left_right_pair(val_idx):
-
-    '''
-    generate 32 points from val_idx using poisson disk
-    for each point:
-        s1, s2 sample from frames
-
-    data_left = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
-    data_right = fetch_data(which, list_subj_story, frames) -> shape = (batchsize, 3, 320, 640)
-    labels = fetch_labels(which, list_subj_story, frames) -> shape = (batchsize, 1, 1)
-    '''
-    batch_size = 32
-
+def get_left_right_pair(val_idx, frame_matrix, batch_size=32):
     if len(val_idx) == 4:
         _r = 4.6
     elif len(val_idx) == 1:
@@ -99,33 +83,94 @@ def get_left_right_pair(val_idx):
         story_2 = val_idx[p2 % len(val_idx)]
         name_1 = 'Subject_%d_Story_%d' % (subj_1, story_1)
         name_2 = 'Subject_%d_Story_%d' % (subj_2, story_2)
-        return name_1, name_2
+        return [name_1, int(subj_1)-1, story_1-1], [name_2, int(subj_2)-1, story_2-1]
 
-    left_imgs = []
-    right_imgs = []
+    left_all = []
+    right_all = []
 
     for i in samples:
-        left, right= convert(i)
-        left_imgs.append(left)
-        right_imgs.append(right)
+        left, right,= convert(i)
+        # get total frames
+        left_num_frames = frame_matrix[left[1]][left[2]]
+        right_num_frames = frame_matrix[right[1]][right[2]]
+        # grab a random frame
+        left_frame = random.randint(0, left_num_frames)
+        right_frame = random.randint(0, right_num_frames)
 
-    zips = list(zip(left_imgs, right_imgs))
+        left_all.append('%s/%d.jpg' % (left[0], left_frame))
+        right_all.append('%s/%d.jpg' % (right[0], right_frame))
+
+    zips = list(zip(left_all, right_all))
     random.shuffle(zips)
-    left_imgs, right_imgs = zip(*zips)
+    left_all, right_all = zip(*zips)
+
+    return left_all, right_all
 
 
-    # TODO: get frames
+def cat_head_tail(fname, frame_num):
+    command = "cat %s | head -n %d | tail -n 1" % (fname, frame_num)
+    value = subprocess.check_output(command, shell=True).decode('utf-8')
+    return value
 
 
-    return left_imgs, right_imgs
+def get_valence(which, full_name):
+    name = full_name.split('/')[0]
+    frame = int(full_name.split('/')[-1].split('.jpg')[0]) + 1
+
+    if which == 'train':
+        csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/Annotations', name + '.csv')
+    elif which == 'val':
+        csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/Annotations', name + '.csv')
+    elif which == 'test':
+        raise NotImplemented
+
+    valence = float(cat_head_tail(csv_path, frame))
+
+    return valence
 
 
 
+def load_data(which, frame_matrix, val_idx, batch_size):
+    if which == 'train':
+        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
+    elif which == 'val':
+        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_640_360'
+    elif which == 'test':
+        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
+    left_all, right_all = get_left_right_pair(val_idx, frame_matrix, batch_size)
 
+    left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
+    right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
 
+    labels = np.zeros((batch_size, 1), dtype=np.float32)
 
+    assert len(left_all) == len(right_all)
+    for i in range(len(left_all)):
+        _tmp_labels = np.zeros(2)
+        # get left data
+        jpg_path = os.path.join(path, left_all[i])
+        jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+        left_data[i] = jpg
+        # left valence
+        _tmp_labels[0] = get_valence(which, left_all[i])
 
+        # get right data
+        jpg_path = os.path.join(path, right_all[i])
+        jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+        right_data[i] = jpg
+        # right valence
+        _tmp_labels[1] = get_valence(which, right_all[i])
+
+        diff = _tmp_labels[0] - _tmp_labels[1]
+        if diff == 0:
+            labels[i] = 0
+        elif diff < 0:
+            labels[i] = 1
+        else:
+            labels[i] = -1
+
+    return left_data, right_data, labels
 
 
 # TODO
@@ -140,4 +185,5 @@ def update_step_logs(which, loss, experiment_number):
         raise NotImplemented
 
 
-# get_left_right_pair([1])
+f_mat, valid_idx_all = make_frame_matrix()
+load_data('train', f_mat, valid_idx_all[0], 32)
