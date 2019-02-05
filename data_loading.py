@@ -124,7 +124,11 @@ def get_valence(which, full_name):
     elif which == 'test':
         raise NotImplemented
 
-    valence = float(cat_head_tail(csv_path, frame))
+    try:
+        valence = float(cat_head_tail(csv_path, frame))
+    except ValueError:
+        print(name, frame)
+
 
     return valence
 
@@ -170,6 +174,7 @@ def load_data(which, frame_matrix, val_idx, batch_size):
         else:
             labels[i] = -1
 
+    # labels = np.expand_dims(labels, -1)
     return left_data, right_data, labels
 
 
@@ -185,5 +190,5 @@ def update_step_logs(which, loss, experiment_number):
         raise NotImplemented
 
 
-f_mat, valid_idx_all = make_frame_matrix()
-load_data('train', f_mat, valid_idx_all[0], 32)
+# f_mat, valid_idx_all = make_frame_matrix()
+# load_data('train', f_mat, valid_idx_all[0], 32)

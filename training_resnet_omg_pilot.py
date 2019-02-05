@@ -5,7 +5,7 @@ from model_0 import Siamese
 import data_loading as L
 
 import deepimpression2.constants as C
-from chainer.functions import sigmoid_cross_entropy, mean_absolute_error, softmax_cross_entropy
+from chainer.functions import sigmoid_cross_entropy, mean_absolute_error, softmax_cross_entropy, mean_squared_error
 from chainer.optimizers import Adam
 import h5py as h5
 import deepimpression2.paths as P
@@ -18,6 +18,7 @@ import os
 import cupy as cp
 from chainer.functions import expand_dims
 from random import shuffle
+from tqdm import tqdm
 
 
 my_model = Siamese()
@@ -37,11 +38,12 @@ batches = 32
 
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
-train_total_steps = 1600  # we have 40**2 possible pairs of id-stories in training
-val_total_steps = 100  # we have 10**2 possible pairs of id-stories in validation
+train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training
+val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
 def run(which, model, optimizer):
+    _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     val_idx = None
     steps = None
@@ -54,14 +56,17 @@ def run(which, model, optimizer):
     elif which == 'test':
         raise NotImplemented
 
-    print('steps: ', steps)
+    print('%s, steps: %d' % (which, steps))
 
-    for s in range(steps):
-        labels, data = L.load_data(which, frame_matrix, val_idx, batches)
+
+    for s in tqdm(range(steps)):
+        data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches)
+
         # labels, data = L.dummy_load_data()  # for debugging purposes only
 
         if C.ON_GPU:
-            data = to_gpu(data, device=C.DEVICE)
+            data_left = to_gpu(data_left, device=C.DEVICE)
+            data_right = to_gpu(data_right, device=C.DEVICE)
             labels = to_gpu(labels, device=C.DEVICE)
 
         with cp.cuda.Device(C.DEVICE):
@@ -73,19 +78,23 @@ def run(which, model, optimizer):
             with chainer.using_config('train', config):
                 if which == 'train':
                     model.cleargrads()
-                prediction = model(data[0], data[1])
+                prediction = model(data_left, data_right)
 
-                loss = mean_absolute_error(prediction, labels)
+                loss = mean_squared_error(prediction, labels)
+                _loss_steps.append(float(loss.data))
 
                 if which == 'train':
                     loss.backward()
                     optimizer.update()
+
+    return _loss_steps
+
         # TODO: implement
-        L.update_step_logs(which, float(loss.data))
+        # L.update_step_logs(which, float(loss.data))
 
     # TODO: implement
-    L.update_epoch_logs(which)
-    L.make_epoch_plot(which)
+    # L.update_epoch_logs(which)
+    # L.make_epoch_plot(which)
 
 
 print('Enter training loop with validation')
@@ -94,11 +103,13 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    run(which='train', model=my_model, optimizer=my_optimizer)
+    loss_train = run(which='train', model=my_model, optimizer=my_optimizer)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    run(which='val', model=my_model, optimizer=my_optimizer)
+    loss_val = run(which='val', model=my_model, optimizer=my_optimizer)
+
+    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------
     # test
     # ----------------------------------------------------------------------------
@@ -118,6 +129,6 @@ for e in range(0, epochs):
 
     # save model
     # if ((e + 1) % 10) == 0:
-    save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-    name = os.path.join(save_location, 'epoch_%d_0' % e)
-    chainer.serializers.save_npz(name, my_model)
+    # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+    # name = os.path.join(save_location, 'epoch_%d_0' % e)
+    # chainer.serializers.save_npz(name, my_model)
