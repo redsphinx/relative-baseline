@@ -37,6 +37,8 @@ mx.viz.plot_network(net, node_attrs={"shape":"oval","fixedsize":"false"})
 #---------------------------------------------------------------------------------------
 # SYMBOL TO MODULE
 #---------------------------------------------------------------------------------------
+# MOD: save json file here
+# net.save('my_model-symbol.json')
 
 mod = mx.mod.Module(symbol=net,
                     context=mx.cpu(),
@@ -57,6 +59,7 @@ if intermediate:
     # use accuracy as the metric
     metric = mx.metric.create('acc')
     # train 5 epochs, i.e. going over the data iter one pass
+    model_prefix = 'my_model'
     for epoch in range(5):
         train_iter.reset()
         metric.reset()
@@ -66,6 +69,13 @@ if intermediate:
             mod.backward()                          # compute gradients
             mod.update()                            # update parameters
         print('Epoch %d, Training %s' % (epoch, metric.get()))
+        mod.save_checkpoint(model_prefix, epoch)
+
+
+# # construct a callback function to save checkpoints
+# mod.fit(train_iter, num_epoch=5, epoch_end_callback=checkpoint)
+
+
 
 #---------------------------------------------------------------------------------------
 # TRAINING -- HIGH LEVEL
@@ -111,7 +121,7 @@ if high:
 # #---------------------------------------------------------------------------------------
 # # SAVE AND LOAD
 # #---------------------------------------------------------------------------------------
-#
+
 # sym, arg_params, aux_params = mx.model.load_checkpoint(model_prefix, 3)
 # assert sym.tojson() == net.tojson()
 #

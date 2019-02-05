@@ -86,8 +86,9 @@ def main():
     # symbol.save saves the network definition to a json-file
     SAVE = True
     if SAVE:
-        path = '/home/gabras/deployed/relative-baseline/AOGNet/testing_testing'
+        path = 'large_model-symbol.json'
         symbol.save(path)
+
 
     VIZ = True
     if VIZ:
