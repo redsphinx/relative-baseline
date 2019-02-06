@@ -5,14 +5,6 @@ import random
 from deepimpression2.chalearn20 import poisson_disc as pd
 from PIL import Image
 
-# assume we have 2 matrices, one val one train
-# each cell is a story-subject indicating number of frames
-# generate 2 pairs of story-sunjects
-# for the number in each cell, generate a number between 0 and num_frames
-# create label
-# fetch 2 jpgs
-
-
 
 def wc_l(file_name):
     command = "cat %s | wc -l" % file_name
@@ -61,7 +53,8 @@ def dummy_load_data():
     return label, np.array([img_left, img_right], dtype=np.float32)
 
 
-def get_left_right_pair(val_idx, frame_matrix, batch_size=32):
+# makes pairs with 2 random people across different stories
+def get_left_right_pair_random_person(val_idx, frame_matrix, batch_size=32):
     if len(val_idx) == 4:
         _r = 4.6
     elif len(val_idx) == 1:
@@ -107,6 +100,43 @@ def get_left_right_pair(val_idx, frame_matrix, batch_size=32):
     return left_all, right_all
 
 
+# makes pairs with the same person across different stories
+def get_left_right_pair_same_person(val_idx, frame_matrix, batch_size=32):
+    num_subjects = 10
+    sample_per_person = int(batch_size / num_subjects)
+
+    left_all = []
+    right_all = []
+
+    def make_pairs(subject_number, left, right, spp):
+
+        sample_idx = [random.randint(0, 3) for i in range(2 * spp)]
+        stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
+        frames = [random.randint(0, frame_matrix[sub][stories[i]] - 1) for i in range(len(sample_idx))]
+        sample_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, frames[i]) for i in range(len(sample_idx))]
+        for i in range(len(sample_names)//2):
+            left.append(sample_names[i])
+        for i in range(len(sample_names) // 2, len(sample_names)):
+            right.append(sample_names[i])
+        return left, right
+
+    for sub in range(num_subjects):
+        left_all, right_all = make_pairs(sub, left_all, right_all, sample_per_person)
+
+    # add 2 extras to reach batchsize 32
+    leftovers = batch_size - num_subjects * sample_per_person
+
+    for _l in range(leftovers):
+        sub = random.randint(0, 9)
+        left_all, right_all = make_pairs(sub, left_all, right_all, spp=1)
+
+    zips = list(zip(left_all, right_all))
+    random.shuffle(zips)
+    left_all, right_all = zip(*zips)
+
+    return left_all, right_all
+
+
 def cat_head_tail(fname, frame_num):
     command = "cat %s | head -n %d | tail -n 1" % (fname, frame_num)
     value = subprocess.check_output(command, shell=True).decode('utf-8')
@@ -130,9 +160,7 @@ def get_valence(which, full_name):
         print(name, frame)
         print(ValueError)
 
-
     return valence
-
 
 
 def load_data(which, frame_matrix, val_idx, batch_size):
@@ -143,7 +171,8 @@ def load_data(which, frame_matrix, val_idx, batch_size):
     elif which == 'test':
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
-    left_all, right_all = get_left_right_pair(val_idx, frame_matrix, batch_size)
+    # left_all, right_all = get_left_right_pair_random_person(val_idx, frame_matrix, batch_size)
+    left_all, right_all = get_left_right_pair_same_person(val_idx, frame_matrix, batch_size)
 
     left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
@@ -192,3 +221,5 @@ def update_logs(which, loss, epoch, model_num, experiment_number):
         my_file.write(line)
 
 
+f_mat, v_idx = make_frame_matrix()
+l, r, lab = load_data('train', f_mat, v_idx[0], 32)

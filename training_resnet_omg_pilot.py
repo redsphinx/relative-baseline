@@ -59,7 +59,6 @@ def run(which, model, optimizer):
 
     # print('%s, steps: %d' % (which, steps))
 
-
     for s in tqdm(range(steps)):
         data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches)
 
