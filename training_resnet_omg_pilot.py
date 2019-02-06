@@ -38,9 +38,14 @@ batches = 32
 
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
-train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training
-# train_total_steps = int(100 / batches)  # we have 40**2 possible pairs of id-stories in training
-val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
+train_total_steps = 400
+val_total_steps = 10
+
+# TODO: decide on principled approach to steps
+# train_total_steps = int(160 / batches)  # we have 10 * 4**2 possible pairs of id-stories in training using same person
+# train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training using random people
+# train_total_steps = int(100 / batches)  # for debugging
+# val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
 def run(which, model, optimizer):

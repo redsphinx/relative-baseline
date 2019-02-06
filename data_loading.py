@@ -222,4 +222,4 @@ def update_logs(which, loss, epoch, model_num, experiment_number):
 
 
 f_mat, v_idx = make_frame_matrix()
-l, r, lab = load_data('train', f_mat, v_idx[0], 32)
+l, r, lab = load_data('val', f_mat, v_idx[0], 32)
