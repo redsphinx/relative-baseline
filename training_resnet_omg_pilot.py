@@ -38,8 +38,8 @@ batches = 32
 
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
-train_total_steps = 400
-val_total_steps = 10
+train_total_steps = 50
+val_total_steps = 5
 
 # TODO: decide on principled approach to steps
 # train_total_steps = int(160 / batches)  # we have 10 * 4**2 possible pairs of id-stories in training using same person
@@ -104,13 +104,13 @@ for e in range(0, epochs):
     # training
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=0)
+    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=1)
     # L.make_epoch_plot(which)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
     loss_val = run(which='val', model=my_model, optimizer=my_optimizer)
-    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=0)
+    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=1)
     
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------
