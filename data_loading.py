@@ -101,7 +101,12 @@ def get_left_right_pair_random_person(val_idx, frame_matrix, batch_size=32):
 
 
 # makes pairs with the same person across different stories
-def get_left_right_pair_same_person(val_idx, frame_matrix, batch_size=32):
+def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32):
+    if which != 'train':
+        random.seed(42)
+    else:
+        random.seed()
+
     num_subjects = 10
     sample_per_person = int(batch_size / num_subjects)
 
@@ -109,8 +114,11 @@ def get_left_right_pair_same_person(val_idx, frame_matrix, batch_size=32):
     right_all = []
 
     def make_pairs(subject_number, left, right, spp):
-
-        sample_idx = [random.randint(0, 3) for i in range(2 * spp)]
+        if which != 'train':
+            num = 0
+        else:
+            num = 3
+        sample_idx = [random.randint(0, num) for i in range(2 * spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
         frames = [random.randint(0, frame_matrix[sub][stories[i]] - 1) for i in range(len(sample_idx))]
         sample_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, frames[i]) for i in range(len(sample_idx))]
@@ -130,9 +138,10 @@ def get_left_right_pair_same_person(val_idx, frame_matrix, batch_size=32):
         sub = random.randint(0, 9)
         left_all, right_all = make_pairs(sub, left_all, right_all, spp=1)
 
-    zips = list(zip(left_all, right_all))
-    random.shuffle(zips)
-    left_all, right_all = zip(*zips)
+    if which == 'train':
+        zips = list(zip(left_all, right_all))
+        random.shuffle(zips)
+        left_all, right_all = zip(*zips)
 
     return left_all, right_all
 
@@ -172,7 +181,7 @@ def load_data(which, frame_matrix, val_idx, batch_size):
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
     # left_all, right_all = get_left_right_pair_random_person(val_idx, frame_matrix, batch_size)
-    left_all, right_all = get_left_right_pair_same_person(val_idx, frame_matrix, batch_size)
+    left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
 
     left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
@@ -222,4 +231,5 @@ def update_logs(which, loss, epoch, model_num, experiment_number):
 
 
 f_mat, v_idx = make_frame_matrix()
-l, r, lab = load_data('val', f_mat, v_idx[0], 32)
+l, r, lab = load_data('train', f_mat, v_idx[0], 32)
+
