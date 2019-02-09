@@ -2,13 +2,14 @@ import os
 import skvideo.io
 from PIL import Image
 from tqdm import tqdm
+import utils as U
 
 
-def video_to_frames(dataset, path, extract='participant', body_part='full_body_background', format='jpg', num_frames=None, dims=None):
-    assert dataset in ['Training', 'Validation', 'Test']  # which part of the dataset
+def video_to_frames(which, path, extract='participant', body_part='full_body_background', extension='jpg', num_frames=None, dims=None):
+    assert which in ['Training', 'Validation', 'Test']  # which part of the which
     assert extract in ['participant', 'storyteller', 'all']  # which person to extract
     assert body_part in ['full_body_background', 'full_body_closeup', 'face']  # how to extract part of body
-    assert format in ['jpg', 'png']  # what format to save frames in
+    assert extension in ['jpg', 'png']  # what extension to save frames in
     if num_frames is not None:  # number of frames to extract, if None > extract all frames
         assert type(num_frames) is int
     if dims is not None:  # what final dimensions to save frame in, if None > same as original
@@ -16,7 +17,7 @@ def video_to_frames(dataset, path, extract='participant', body_part='full_body_b
 
     if body_part == 'full_body_background':
         if extract == 'participant':
-            cut = (1280, 2560)
+            cut = (1280, 2560)  # x1 to x2
         elif extract == 'storyteller':
             cut = (0, 1280)
         elif extract == 'all':
@@ -24,7 +25,9 @@ def video_to_frames(dataset, path, extract='participant', body_part='full_body_b
         else:
             cut = None
     elif body_part == 'full_body_closeup':
-        pass
+        avg_bbox = U.get_avg_body_bbox()
+        if extract == 'participant':
+            cut = avg_bbox[0], avg_bbox[2]
     elif body_part == 'face':
         pass
     else:
@@ -32,10 +35,13 @@ def video_to_frames(dataset, path, extract='participant', body_part='full_body_b
 
     if dims is None:
         # h x w
-        dims = (cut[1]-cut[0], 720)
+        if body_part == 'full_body_background':
+            dims = (cut[1]-cut[0], 720)
+        elif body_part == 'full_body_closeup':
+            dims = (cut[1]-cut[0], U.avg_body_bbox[3]-U.avg_body_bbox[1])
 
-    p = path + '/' + dataset + '/Videos'
-    save_location = path + '/' + dataset + '/' + format + '_' + extract + '_' + str(dims[0]) + '_' + str(dims[1])
+    p = path + '/' + which + '/Videos'
+    save_location = path + '/' + which + '/' + extension + '_' + extract + '_' + str(dims[0]) + '_' + str(dims[1])
 
     if not os.path.exists(save_location):
         os.mkdir(save_location)
@@ -67,9 +73,9 @@ def video_to_frames(dataset, path, extract='participant', body_part='full_body_b
 
             for i in tqdm(range(num_frames)):
                 frame = mp4_arr[i]
-                name_img = jpg_folder + '/' + str(i) + '.' + format
+                name_img = jpg_folder + '/' + str(i) + '.' + extension
 
-                # save frame as format in size dims
+                # save frame as extension in size dims
                 frame_img = Image.fromarray(frame)
                 # frame_img.size = (2560, 720)
                 frame_img = frame_img.crop((cut[0], 0, cut[1], 720))  # left, upper, right, and lower
@@ -82,9 +88,11 @@ def video_to_frames(dataset, path, extract='participant', body_part='full_body_b
 
 path_to_data = '/scratch/users/gabras/data/omg_empathy'
 
-# video_to_frames(dataset='Validation', path=path_to_data, dims=(640, 360))
-# video_to_frames(dataset='Training', path=path_to_data, dims=(640, 360))
+# video_to_frames(which='Validation', path=path_to_data, dims=(640, 360))
+# video_to_frames(which='Training', path=path_to_data, dims=(640, 360))
 
-# video_to_frames(dataset='Validation', path=path_to_data)
-# video_to_frames(dataset='Training', path=path_to_data)
+# video_to_frames(which='Validation', path=path_to_data)
+# video_to_frames(which='Training', path=path_to_data)
 
+video_to_frames(which='Validation', path=path_to_data, body_part='full_body_closeup')
+video_to_frames(which='Training', path=path_to_data, body_part='full_body_closeup')
