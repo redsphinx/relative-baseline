@@ -15,6 +15,9 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
     if dims is not None:  # what final dimensions to save frame in, if None > same as original
         assert type(dims) is tuple
 
+    if body_part == 'full_body_closeup':
+        avg_bbox = U.get_avg_body_bbox()
+
     if body_part == 'full_body_background':
         if extract == 'participant':
             cut = (1280, 2560)  # x1 to x2
@@ -25,7 +28,6 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
         else:
             cut = None
     elif body_part == 'full_body_closeup':
-        avg_bbox = U.get_avg_body_bbox()
         if extract == 'participant':
             cut = avg_bbox[0], avg_bbox[2]
     elif body_part == 'face':
@@ -38,7 +40,16 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
         if body_part == 'full_body_background':
             dims = (cut[1]-cut[0], 720)
         elif body_part == 'full_body_closeup':
-            dims = (cut[1]-cut[0], U.avg_body_bbox[3]-U.avg_body_bbox[1])
+            # TODO: fix this
+            '''
+            dims
+Out[2]: (106, -40)
+cut
+Out[3]: (128, 234)
+avg_bbox
+Out[4]: [128, 755, 234, 715]
+'''
+            dims = (cut[1]-cut[0], avg_bbox[3]-avg_bbox[1])
 
     p = path + '/' + which + '/Videos'
     save_location = path + '/' + which + '/' + extension + '_' + extract + '_' + str(dims[0]) + '_' + str(dims[1])
@@ -95,4 +106,4 @@ path_to_data = '/scratch/users/gabras/data/omg_empathy'
 # video_to_frames(which='Training', path=path_to_data)
 
 video_to_frames(which='Validation', path=path_to_data, body_part='full_body_closeup')
-video_to_frames(which='Training', path=path_to_data, body_part='full_body_closeup')
+# video_to_frames(which='Training', path=path_to_data, body_part='full_body_closeup')
