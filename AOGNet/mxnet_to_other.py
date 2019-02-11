@@ -8,5 +8,3 @@ mxnet_model = '/home/gabi/PycharmProjects/deployed-schmidhuber/relative-baseline
 pythorch_model = ''
 command = 'python -m mmdnn.conversion._script.convertToIR -f mxnet -n %s -w' % mxnet_model
 subprocess.call(command, shell=True)
-
-

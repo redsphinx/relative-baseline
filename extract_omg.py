@@ -16,40 +16,39 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
         assert type(dims) is tuple
 
     if body_part == 'full_body_closeup':
-        avg_bbox = U.get_avg_body_bbox()
+        # avg_bbox = U.get_avg_body_bbox()
+        avg_bbox = (132, 184, 132+652, 184+535)
 
-    if body_part == 'full_body_background':
-        if extract == 'participant':
-            cut = (1280, 2560)  # x1 to x2
-        elif extract == 'storyteller':
-            cut = (0, 1280)
-        elif extract == 'all':
-            cut = (0, 2560)
-        else:
-            cut = None
-    elif body_part == 'full_body_closeup':
-        if extract == 'participant':
-            cut = avg_bbox[0], avg_bbox[2]
-    elif body_part == 'face':
-        pass
-    else:
-        pass
+    cut = None  # indicates the width to cut
+
+    if extract == 'participant':
+        cut = (1280, 2560)  # x1 to x2
+    elif extract == 'storyteller':
+        cut = (0, 1280)
+    elif extract == 'all':
+        cut = (0, 2560)
+
+
+    # if body_part == 'full_body_background':
+    #     if extract == 'participant':
+    #         cut = (1280, 2560)  # x1 to x2
+    #     elif extract == 'storyteller':
+    #         cut = (0, 1280)
+    #     elif extract == 'all':
+    #         cut = (0, 2560)
+    # elif body_part == 'full_body_closeup':
+    #     if extract == 'participant':
+    #         cut = avg_bbox[0], avg_bbox[2]
+    # elif body_part == 'face':
+    #     raise NotImplemented
 
     if dims is None:
         # h x w
         if body_part == 'full_body_background':
             dims = (cut[1]-cut[0], 720)
         elif body_part == 'full_body_closeup':
-            # TODO: fix this
-            '''
-            dims
-Out[2]: (106, -40)
-cut
-Out[3]: (128, 234)
-avg_bbox
-Out[4]: [128, 755, 234, 715]
-'''
-            dims = (cut[1]-cut[0], avg_bbox[3]-avg_bbox[1])
+            # dims = None
+            dims = (avg_bbox[2]-avg_bbox[0], avg_bbox[3]-avg_bbox[1])
 
     p = path + '/' + which + '/Videos'
     save_location = path + '/' + which + '/' + extension + '_' + extract + '_' + str(dims[0]) + '_' + str(dims[1])
@@ -82,16 +81,24 @@ Out[4]: [128, 755, 234, 715]
             # for each number of frames, in video
             num_frames = mp4_arr.shape[0]
 
-            for i in tqdm(range(num_frames)):
+            _num = 100
+            for i in tqdm(range(_num)):
+            # for i in tqdm(range(num_frames)):
                 frame = mp4_arr[i]
                 name_img = jpg_folder + '/' + str(i) + '.' + extension
 
                 # save frame as extension in size dims
                 frame_img = Image.fromarray(frame)
                 # frame_img.size = (2560, 720)
+
+                # crop image
                 frame_img = frame_img.crop((cut[0], 0, cut[1], 720))  # left, upper, right, and lower
-                if dims is not None:
-                    frame_img = frame_img.resize((dims[0], dims[1]))
+
+                # crop further
+                if body_part == 'full_body_closeup':
+                    frame_img = frame_img.crop((avg_bbox[0], avg_bbox[1], avg_bbox[2], avg_bbox[3]))  # left, upper, right, and lower
+
+                frame_img = frame_img.resize((dims[0], dims[1]))
                 frame_img.save(name_img, mode='RGB')
 
             num_frames = None
