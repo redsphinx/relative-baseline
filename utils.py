@@ -34,6 +34,7 @@ def pose_to_bbox(txt_path):
     return [min_x, max_x, min_y, max_y]
 
 
+# TODO: fix the x, y, v stuff
 def get_avg_body_bbox():
 
     poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses'
@@ -50,6 +51,7 @@ def get_avg_body_bbox():
 
         for txt in txt_files:
             txt_path = os.path.join(folder_path, txt)
+            # MOD: add the fix here such that pose_to_bbox can remain unchanged
             bbox = pose_to_bbox(txt_path)
 
             if bbox is not None:
@@ -82,7 +84,7 @@ def draw_points(grid, all_x, all_y, all_v, save_path, names):
     img.save(img_save_path)
     # canvas.save(img_save_path)
     
-
+# TODO: repeat this with the new poses
 def save_bbox_image():
     img_folder = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_1280_720/Subject_10_Story_1'
     poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses/Validation/Subject_10_Story_1.txt'
