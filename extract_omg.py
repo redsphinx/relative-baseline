@@ -16,8 +16,10 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
         assert type(dims) is tuple
 
     if body_part == 'full_body_closeup':
-        # avg_bbox = U.get_avg_body_bbox()
-        avg_bbox = (132, 184, 132+652, 184+535)
+        avg_bbox = U.get_avg_body_bbox()
+        if avg_bbox[3] > 720:
+            avg_bbox[3] = 720
+        # avg_bbox = (132, 184, 132+652, 184+535)
 
     cut = None  # indicates the width to cut
 
@@ -81,9 +83,9 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
             # for each number of frames, in video
             num_frames = mp4_arr.shape[0]
 
-            _num = 100
-            for i in tqdm(range(_num)):
-            # for i in tqdm(range(num_frames)):
+            # _num = 100
+            # for i in tqdm(range(_num)):
+            for i in tqdm(range(num_frames)):
                 frame = mp4_arr[i]
                 name_img = jpg_folder + '/' + str(i) + '.' + extension
 

@@ -2,11 +2,14 @@ import os
 import numpy as np
 from PIL import Image
 import cv2
+import sys
 
 
-def pose_to_bbox(txt_path):
+# use when txt_path only contains (x, y) poses
+def pose_to_bbox_old(txt_path):
     try:
         poses_array = np.genfromtxt(txt_path, 'str')
+        # poses_array = np.genfromtxt(txt_path, 'str')
     except UnicodeDecodeError:
         print(txt_path)
         return None
@@ -34,10 +37,81 @@ def pose_to_bbox(txt_path):
     return [min_x, max_x, min_y, max_y]
 
 
-# TODO: fix the x, y, v stuff
+def single_pose_to_bbox(person_pose):
+    unit_length = 80
+
+    top_joint_priority = [4, 5, 6, 12, 16, 7, 13, 17, 8, 10, 14, 9, 11, 15, 2, 3, 0, 1, sys.maxsize]
+    bottom_joint_priority = [9, 6, 7, 14, 16, 8, 15, 17, 4, 2, 0, 5, 3, 1, 10, 11, 12, 13, sys.maxsize]
+
+    top_joint_index = len(top_joint_priority) - 1
+    bottom_joint_index = len(bottom_joint_priority) - 1
+    left_joint_index = 0
+    right_joint_index = 0
+    top_pos = sys.maxsize
+    bottom_pos = 0
+    left_pos = sys.maxsize
+    right_pos = 0
+
+    for i, joint in enumerate(person_pose):
+        joint = [int(float(joint[0])), int(float(joint[1])), int(float(joint[2]))]
+
+        if joint[2] > 0:
+            if top_joint_priority[i] < top_joint_priority[top_joint_index]:
+                top_joint_index = i
+            elif bottom_joint_priority[i] < bottom_joint_priority[bottom_joint_index]:
+                bottom_joint_index = i
+            if joint[1] < top_pos:
+                top_pos = joint[1]
+            elif joint[1] > bottom_pos:
+                bottom_pos = joint[1]
+
+            if joint[0] < left_pos:
+                left_pos = joint[0]
+                left_joint_index = i
+            elif joint[0] > right_pos:
+                right_pos = joint[0]
+                right_joint_index = i
+
+    top_padding_radio = [0.9, 1.9, 1.9, 2.9, 3.7, 1.9, 2.9, 3.7, 4.0, 5.5, 7.0, 4.0, 5.5, 7.0, 0.7, 0.8, 0.7, 0.8]
+    bottom_padding_radio = [6.9, 5.9, 5.9, 4.9, 4.1, 5.9, 4.9, 4.1, 3.8, 2.3, 0.8, 3.8, 2.3, 0.8, 7.1, 7.0, 7.1, 7.0]
+
+    left = int(left_pos - 0.3 * unit_length)
+    right = int(right_pos + 0.3 * unit_length)
+    top = int(top_pos - top_padding_radio[top_joint_index] * unit_length)
+    bottom = int(bottom_pos + bottom_padding_radio[bottom_joint_index] * unit_length)
+    bbox = (left, top, right, bottom)
+
+    return bbox
+
+
+def max_bbox(txt_path):
+    try:
+        poses_array = np.genfromtxt(txt_path, 'str', delimiter=',')
+    except UnicodeDecodeError:
+        print(txt_path)
+        return None
+    
+    bbox = [10000, 10000, 0, 0]
+    
+    all_names = poses_array[:, 0]
+
+    person_pose = poses_array[:, 1:].reshape((300, 18, 3))
+    
+    for f in range(person_pose.shape[0]):
+        single_pose = person_pose[f]
+        single_bbox = single_pose_to_bbox(single_pose)
+        if single_bbox[0] < bbox[0]: bbox[0] = single_bbox[0]  # x1
+        if single_bbox[1] < bbox[1]: bbox[1] = single_bbox[1]  # y1
+        if single_bbox[2] > bbox[2]: bbox[2] = single_bbox[2]  # x2
+        if single_bbox[3] > bbox[3]: bbox[3] = single_bbox[3]  # y2
+
+    return bbox
+    
+
 def get_avg_body_bbox():
 
-    poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses'
+    # poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses'
+    poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses_fixed'
 
     which = ['Training', 'Validation']
 
@@ -51,8 +125,8 @@ def get_avg_body_bbox():
 
         for txt in txt_files:
             txt_path = os.path.join(folder_path, txt)
-            # MOD: add the fix here such that pose_to_bbox can remain unchanged
-            bbox = pose_to_bbox(txt_path)
+            bbox = max_bbox(txt_path)
+            # bbox = pose_to_bbox(txt_path)
 
             if bbox is not None:
                 if bbox[0] < body_bbox[0]: body_bbox[0] = bbox[0]  # x1
@@ -83,8 +157,8 @@ def draw_points(grid, all_x, all_y, all_v, save_path, names):
     img_save_path = os.path.join(save_path, names)
     img.save(img_save_path)
     # canvas.save(img_save_path)
-    
-# TODO: repeat this with the new poses
+
+
 def save_bbox_image():
     img_folder = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_1280_720/Subject_10_Story_1'
     poses_path = '/scratch/users/gabras/data/omg_empathy/saving_data/poses/Validation/Subject_10_Story_1.txt'
@@ -123,3 +197,5 @@ def save_bbox_image():
 
 
 # save_bbox_image()
+
+# get_avg_body_bbox()
