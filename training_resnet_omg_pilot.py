@@ -73,7 +73,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
         for s in tqdm(range(steps)):
             # data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches) # deprecated
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
-                                                                 label_mode='difference', validation_mode='random')
+                                                                 label_mode='difference')
 
             # labels, data = L.dummy_load_data()  # for debugging purposes only
 
@@ -100,8 +100,8 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                         loss.backward()
                         optimizer.update()
     else:
-        # for each person in val
         for subject in range(10):
+            previous_prediction = 0
             all_predictions = []
 
             name = 'Subject_%d_Story_1' % (subject+1)
@@ -136,10 +136,12 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
 
                         with chainer.using_config('train', False):
                             prediction = model(data_left, data_right)
+                            prediction = previous_prediction + prediction
 
                             loss = mean_squared_error(prediction, labels)
                             _loss_steps.append(float(loss.data))
 
+                previous_prediction = prediction
                 all_predictions.append(prediction)
 
             # save graph
@@ -169,7 +171,7 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=0, experiment_number=2, epoch=e)
+    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=0, experiment_number=2, epoch=e, validation_mode='sequential')
     L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=2)
     
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
