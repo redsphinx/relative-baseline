@@ -208,8 +208,10 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
     # left_all, right_all = get_left_right_pair_random_person(val_idx, frame_matrix, batch_size)
     left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
 
-    left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
-    right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
+    # left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
+    # right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
+    left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
+    right_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
 
     if label_mode == 'difference':
         labels = np.zeros((batch_size, 1), dtype=np.float32)
@@ -238,9 +240,9 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         _tmp_labels[1] = get_valence(which, right_all[i])
 
         if label_mode == 'difference':
-            labels[i]= _tmp_labels[0] - _tmp_labels[1]
+            labels[i]= _tmp_labels[1] - _tmp_labels[0]
         elif label_mode == 'stepwise':
-            # [-1, 0, 1]
+            # [-1, 0, 1] = right is lower, same, right is higher
             diff = _tmp_labels[0] - _tmp_labels[1]
             if diff == 0:
                 labels[i] = [0, 1, 0]

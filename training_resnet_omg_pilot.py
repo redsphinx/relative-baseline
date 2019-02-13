@@ -39,8 +39,8 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
-batches = 32
-
+# batches = 32
+batches = 10
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 train_total_steps = 50
@@ -117,15 +117,16 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                     with cp.cuda.Device(C.DEVICE):
 
                         with chainer.using_config('train', False):
-                            # TODO: fix shape
-                            prediction = 0.0  # baseline
-                            labels = all_labels[f]
+                            prediction = np.array([0.0], dtype=np.float32)  # baseline
+                            labels = np.array([all_labels[f]])
 
                             loss = mean_squared_error(prediction, labels)
                             _loss_steps.append(float(loss.data))
                 else:
                     data_left, data_right = L.get_left_right_consecutively(which, name, f)
-                    labels = all_labels[f]
+                    data_left = np.expand_dims(data_left, 0)
+                    data_right = np.expand_dims(data_right, 0)
+                    labels = np.array([all_labels[f]])
 
                     if C.ON_GPU:
                         data_left = to_gpu(data_left, device=C.DEVICE)
@@ -136,6 +137,8 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
 
                         with chainer.using_config('train', False):
                             prediction = model(data_left, data_right)
+
+                            # TODO: issue here, mixing np array with cupy and variables.
                             prediction = previous_prediction + prediction
 
                             loss = mean_squared_error(prediction, labels)
@@ -166,15 +169,15 @@ for e in range(0, epochs):
     # training
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer, epoch=e)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=2)
+    # L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=2)
     # L.make_epoch_plot(which)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
     loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=0, experiment_number=2, epoch=e, validation_mode='sequential')
-    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=2)
+    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=2)
     
-    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
+    # print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------
     # test
     # ----------------------------------------------------------------------------
