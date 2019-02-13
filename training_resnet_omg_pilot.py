@@ -1,8 +1,13 @@
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+
 import chainer
 import numpy as np
 # from deepimpression2.model_53 import Deepimpression
 from model_0 import Siamese
 import data_loading as L
+# import plotting
 
 import deepimpression2.constants as C
 from chainer.functions import sigmoid_cross_entropy, mean_absolute_error, softmax_cross_entropy, mean_squared_error
@@ -48,7 +53,7 @@ val_total_steps = 5
 # val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
-def run(which, model, optimizer):
+def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=None, experiment_number=None):
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     val_idx = None
@@ -64,38 +69,93 @@ def run(which, model, optimizer):
 
     # print('%s, steps: %d' % (which, steps))
 
-    for s in tqdm(range(steps)):
-        data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches)
+    if not which == 'val' and validation_mode == 'sequential':
+        for s in tqdm(range(steps)):
+            # data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches) # deprecated
+            data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
+                                                                 label_mode='difference', validation_mode='random')
 
-        # labels, data = L.dummy_load_data()  # for debugging purposes only
+            # labels, data = L.dummy_load_data()  # for debugging purposes only
 
-        if C.ON_GPU:
-            data_left = to_gpu(data_left, device=C.DEVICE)
-            data_right = to_gpu(data_right, device=C.DEVICE)
-            labels = to_gpu(labels, device=C.DEVICE)
+            if C.ON_GPU:
+                data_left = to_gpu(data_left, device=C.DEVICE)
+                data_right = to_gpu(data_right, device=C.DEVICE)
+                labels = to_gpu(labels, device=C.DEVICE)
 
-        with cp.cuda.Device(C.DEVICE):
-            if which == 'train':
-                config = True
-            else:
-                config = False
-
-            with chainer.using_config('train', config):
+            with cp.cuda.Device(C.DEVICE):
                 if which == 'train':
-                    model.cleargrads()
-                prediction = model(data_left, data_right)
+                    config = True
+                else:
+                    config = False
 
-                loss = mean_squared_error(prediction, labels)
-                _loss_steps.append(float(loss.data))
+                with chainer.using_config('train', config):
+                    if which == 'train':
+                        model.cleargrads()
+                    prediction = model(data_left, data_right)
 
-                if which == 'train':
-                    loss.backward()
-                    optimizer.update()
+                    loss = mean_squared_error(prediction, labels)
+                    _loss_steps.append(float(loss.data))
+
+                    if which == 'train':
+                        loss.backward()
+                        optimizer.update()
+    else:
+        # for each person in val
+        for subject in range(10):
+            all_predictions = []
+
+            name = 'Subject_%d_Story_1' % (subject+1)
+            path = '/scratch/users/gabras/data/omg_empathy/Validation'
+            subject_folder = os.path.join(path, 'jpg_participant_662_542', name)
+            all_frames = os.listdir(subject_folder)
+
+            full_name = os.path.join(path, 'Annotations', name + '.csv')
+            all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+
+            for f in range(len(all_frames)):
+                if f == 0:
+                    with cp.cuda.Device(C.DEVICE):
+
+                        with chainer.using_config('train', False):
+                            # TODO: fix shape
+                            prediction = 0.0  # baseline
+                            labels = all_labels[f]
+
+                            loss = mean_squared_error(prediction, labels)
+                            _loss_steps.append(float(loss.data))
+                else:
+                    data_left, data_right = L.get_left_right_consecutively(which, name, f)
+                    labels = all_labels[f]
+
+                    if C.ON_GPU:
+                        data_left = to_gpu(data_left, device=C.DEVICE)
+                        data_right = to_gpu(data_right, device=C.DEVICE)
+                        labels = to_gpu(labels, device=C.DEVICE)
+
+                    with cp.cuda.Device(C.DEVICE):
+
+                        with chainer.using_config('train', False):
+                            prediction = model(data_left, data_right)
+
+                            loss = mean_squared_error(prediction, labels)
+                            _loss_steps.append(float(loss.data))
+
+                all_predictions.append(prediction)
+
+            # save graph
+            p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
+            plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+            plot_path = os.path.join(p, plots_folder)
+            if not os.path.exists(plot_path):
+                os.mkdir(plot_path)
+
+            x = range(len(all_frames))
+            plt.plot(x, all_labels, 'g')
+            plt.plot(x, all_predictions, 'b')
+            plt.savefig(os.path.join(plot_path, 'epoch_%d.png' % epoch))
 
     return _loss_steps
 
-        # TODO: implement
-        # L.update_step_logs(which, float(loss.data))
 
 
 print('Enter training loop with validation')
@@ -103,14 +163,14 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    loss_train = run(which='train', model=my_model, optimizer=my_optimizer)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=1)
+    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, epoch=e)
+    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=0, experiment_number=2)
     # L.make_epoch_plot(which)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    loss_val = run(which='val', model=my_model, optimizer=my_optimizer)
-    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=1)
+    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=0, experiment_number=2, epoch=e)
+    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=0, experiment_number=2)
     
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------

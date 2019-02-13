@@ -146,6 +146,27 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32)
     return left_all, right_all
 
 
+def get_left_right_consecutively(which, subject, current_frame):
+    if which == 'train':
+        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
+    elif which == 'val':
+        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
+    elif which == 'test':
+        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
+    
+    if current_frame != 0:
+        left_path = os.path.join(path, subject, '%d.jpg' % (current_frame - 1))
+        right_path = os.path.join(path, subject, '%d.jpg' % (current_frame))
+        jpg_left = np.array(Image.open(left_path), dtype=np.float32).transpose((2, 0, 1))
+        jpg_right = np.array(Image.open(right_path), dtype=np.float32).transpose((2, 0, 1))
+    else:
+        print('Something is wrong, frame with value %d should not be passed here' % current_frame)
+        jpg_left = None
+        jpg_right = None
+
+    return jpg_left, jpg_right
+
+
 def cat_head_tail(fname, frame_num):
     command = "cat %s | head -n %d | tail -n 1" % (fname, frame_num)
     value = subprocess.check_output(command, shell=True).decode('utf-8')
@@ -172,13 +193,17 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data(which, frame_matrix, val_idx, batch_size):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference'):
+    assert label_mode in ['difference', 'stepwise']
     if which == 'train':
-        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
+        # path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
+        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
     elif which == 'val':
-        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_640_360'
+        # path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_640_360'
+        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
     elif which == 'test':
-        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
+        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
+        # path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
     # left_all, right_all = get_left_right_pair_random_person(val_idx, frame_matrix, batch_size)
     left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
@@ -186,7 +211,10 @@ def load_data(which, frame_matrix, val_idx, batch_size):
     left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
 
-    labels = np.zeros((batch_size, 1), dtype=np.float32)
+    if label_mode == 'difference':
+        labels = np.zeros((batch_size, 1), dtype=np.float32)
+    elif label_mode == 'stepwise':
+        labels = np.zeros((batch_size, 3), dtype=np.float32)
 
     assert len(left_all) == len(right_all)
     for i in range(len(left_all)):
@@ -209,13 +237,17 @@ def load_data(which, frame_matrix, val_idx, batch_size):
         # right valence
         _tmp_labels[1] = get_valence(which, right_all[i])
 
-        diff = _tmp_labels[0] - _tmp_labels[1]
-        if diff == 0:
-            labels[i] = 0
-        elif diff < 0:
-            labels[i] = 1
-        else:
-            labels[i] = -1
+        if label_mode == 'difference':
+            labels[i]= _tmp_labels[0] - _tmp_labels[1]
+        elif label_mode == 'stepwise':
+            # [-1, 0, 1]
+            diff = _tmp_labels[0] - _tmp_labels[1]
+            if diff == 0:
+                labels[i] = [0, 1, 0]
+            elif diff < 0:
+                labels[i] = [0, 0, 1]
+            else:
+                labels[i] = [1, 0, 0]
 
     # labels = np.expand_dims(labels, -1)
     return left_data, right_data, labels
@@ -230,6 +262,6 @@ def update_logs(which, loss, epoch, model_num, experiment_number):
         my_file.write(line)
 
 
-f_mat, v_idx = make_frame_matrix()
-l, r, lab = load_data('train', f_mat, v_idx[0], 32)
+# f_mat, v_idx = make_frame_matrix()
+# l, r, lab = load_data('train', f_mat, v_idx[0], 32)
 
