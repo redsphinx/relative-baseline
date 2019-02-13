@@ -103,7 +103,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                         optimizer.update()
     else:
         for subject in range(10):
-        # for subject in range(1):
+            _loss_steps_subject = []
             previous_prediction = np.array([0.], dtype=np.float32)
             all_predictions = []
 
@@ -127,7 +127,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                             labels = np.array([all_labels[f]])
 
                             loss = mean_squared_error(prediction, labels)
-                            _loss_steps.append(float(loss.data))
+                            _loss_steps_subject.append(float(loss.data))
                 else:
                     data_left, data_right = L.get_left_right_consecutively(which, name, f)
                     data_left = np.expand_dims(data_left, 0)
@@ -148,7 +148,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                             prediction = previous_prediction + prediction
 
                             loss = mean_squared_error(prediction.data[0], labels)
-                            _loss_steps.append(float(loss.data))
+                            _loss_steps_subject.append(float(loss.data))
 
                             prediction = float(prediction.data)
 
@@ -157,6 +157,9 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                 previous_prediction[0] = float(prediction)
                 all_predictions.append(prediction)
 
+            print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
+            _loss_steps.append(np.mean(_loss_steps_subject))
+
             # save graph
             p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
             plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
@@ -164,10 +167,11 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
             if not os.path.exists(plot_path):
                 os.mkdir(plot_path)
 
+            fig = plt.figure()
             x = range(num_frames)
             plt.plot(x, all_labels[:num_frames], 'g')
             plt.plot(x, all_predictions, 'b')
-            plt.savefig(os.path.join(plot_path, 'epoch_%d.png' % epoch))
+            plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
             # save model
             save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
