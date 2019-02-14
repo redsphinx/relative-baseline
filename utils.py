@@ -196,6 +196,30 @@ def save_bbox_image():
         draw_points(img_arr, all_x, all_y, all_v, save_path, jpg_name)
 
 
-# save_bbox_image()
+def find_change_points(which, subject, story):
+    name = 'Subject_%d_Story_%d' % (subject, story)
+    path = '/scratch/users/gabras/data/omg_empathy/%s' % which
 
-# get_avg_body_bbox()
+    full_name = os.path.join(path, 'Annotations', name + '.csv')
+    all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+
+    change_points = []
+
+    for l in range(len(all_labels)-1):
+
+        f1 = all_labels[l]
+        f2 = all_labels[l+1]
+
+        if f2 - f1 != 0:
+            change_points.append([l, l+1])
+
+    print('number of change_points in %s: %d' % (name, len(change_points)))
+
+    return change_points
+
+
+for i in range(1, 11):
+    cp = find_change_points('Training', i, 2)
+    cp = find_change_points('Training', i, 4)
+    cp = find_change_points('Training', i, 5)
+    cp = find_change_points('Training', i, 8)
