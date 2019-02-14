@@ -56,7 +56,7 @@ val_total_steps = 5
 # val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
-def run(which, model, optimizer, epoch, training_mode='both', validation_mode='sequential', model_num=None, experiment_number=None):
+def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None, experiment_number=None):
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
@@ -189,7 +189,7 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
 
 print('Enter training loop with validation')
 for e in range(0, epochs):
-    exp_number = 4
+    exp_number = 5
     mod_num = 1
     # ----------------------------------------------------------------------------
     # training
