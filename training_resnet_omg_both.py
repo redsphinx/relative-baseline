@@ -78,7 +78,7 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
     if not which == 'val' and validation_mode == 'sequential':
         for s in tqdm(range(steps)):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
-                                                                 label_mode='difference', training_mode=training_mode)
+                                                                 label_mode='difference', data_mix=training_mode)
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)

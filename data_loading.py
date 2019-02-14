@@ -143,7 +143,7 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32)
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
 
-    return left_all, right_all
+    return list(left_all), list(right_all)
 
 
 def get_left_right_consecutively(which, subject, current_frame):
@@ -193,11 +193,11 @@ def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, ba
         left_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, left_frames[i]) for i in range(len(sample_idx))]
         right_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, right_frames[i]) for i in range(len(sample_idx))]
 
-        for i in range(len(left_names) // 2):
+        for i in range(len(left_names)):
             left.append(left_names[i])
             right.append(right_names[i])
             
-        return left, right
+        return list(left), list(right)
 
 
     for sub in range(num_subjects):
