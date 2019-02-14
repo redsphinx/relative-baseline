@@ -173,6 +173,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
+            # TODO: move this at the end of training loop
             # save model
             save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
             model_folder = os.path.join(save_location, plots_folder)
