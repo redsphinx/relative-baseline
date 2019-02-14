@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import chainer
 import numpy as np
 # from deepimpression2.model_53 import Deepimpression
-from model_0 import Siamese
+from model_1 import Siamese
 import data_loading as L
 # import plotting
 
@@ -40,7 +40,7 @@ print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
 batches = 32
-# batches = 2
+# batches = 16
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 train_total_steps = 50
@@ -101,6 +101,16 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                     if which == 'train':
                         loss.backward()
                         optimizer.update()
+
+        # save model
+        plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+        save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+        model_folder = os.path.join(save_location, plots_folder)
+        if not os.path.exists(model_folder):
+            os.mkdir(model_folder)
+        name = os.path.join(model_folder, 'epoch_%d' % e)
+        chainer.serializers.save_npz(name, my_model)
+
     else:
         for subject in range(10):
             _loss_steps_subject = []
@@ -173,26 +183,17 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
-            # TODO: move this at the end of training loop
-            # save model
-            save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-            model_folder = os.path.join(save_location, plots_folder)
-            if not os.path.exists(model_folder):
-                os.mkdir(model_folder)
-            name = os.path.join(model_folder, 'epoch_%d' % e)
-            chainer.serializers.save_npz(name, my_model)
-
     return _loss_steps
 
 
 print('Enter training loop with validation')
 for e in range(0, epochs):
-    exp_number = 2
-    mod_num = 0
+    exp_number = 3
+    mod_num = 1
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, epoch=e)
+    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e)
     L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num, experiment_number=exp_number)
     # L.make_epoch_plot(which)
     # ----------------------------------------------------------------------------
