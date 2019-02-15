@@ -197,10 +197,10 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e, validation_mode='sequential')
-    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
-    
-    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
+    # loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e, validation_mode='sequential')
+    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
+    #
+    # print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
     # ----------------------------------------------------------------------------
     # test
     # ----------------------------------------------------------------------------
