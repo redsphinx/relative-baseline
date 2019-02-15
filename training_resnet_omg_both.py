@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
@@ -25,7 +26,6 @@ from chainer.functions import expand_dims
 from random import shuffle
 from tqdm import tqdm
 
-
 my_model = Siamese()
 
 my_optimizer = Adam(alpha=0.0002, beta1=0.5, beta2=0.999, eps=10e-8, weight_decay_rate=0.0001)
@@ -48,6 +48,7 @@ train_total_steps = 50
 
 val_total_steps = 5
 
+
 # TODO: decide on principled approach to steps
 # train_total_steps = int(160 / batches)  # we have 10 * 4**2 possible pairs of id-stories in training using same person
 # train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training using random people
@@ -55,9 +56,12 @@ val_total_steps = 5
 # val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
-def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=None, experiment_number=None):
+def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None, experiment_number=None):
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
+    assert validation_mode in ['sequential', 'random']
+    assert training_mode in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
+
     val_idx = None
     steps = None
     if which == 'train':
@@ -73,11 +77,8 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
 
     if not which == 'val' and validation_mode == 'sequential':
         for s in tqdm(range(steps)):
-            # data_left, data_right, labels = L.load_data(which, frame_matrix, val_idx, batches) # deprecated
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
-                                                                 label_mode='difference')
-
-            # labels, data = L.dummy_load_data()  # for debugging purposes only
+                                                                 label_mode='difference', data_mix=training_mode)
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)
@@ -117,7 +118,7 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
             previous_prediction = np.array([0.], dtype=np.float32)
             all_predictions = []
 
-            name = 'Subject_%d_Story_1' % (subject+1)
+            name = 'Subject_%d_Story_1' % (subject + 1)
             path = '/scratch/users/gabras/data/omg_empathy/Validation'
             subject_folder = os.path.join(path, 'jpg_participant_662_542', name)
             all_frames = os.listdir(subject_folder)
@@ -188,40 +189,20 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
 
 print('Enter training loop with validation')
 for e in range(0, epochs):
-    exp_number = 3
+    exp_number = 5
     mod_num = 1
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num, experiment_number=exp_number)
-    # L.make_epoch_plot(which)
+    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num,
+                     experiment_number=exp_number, epoch=e)
+    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
+                  experiment_number=exp_number)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    # loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e, validation_mode='sequential')
-    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
-    #
-    # print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
-    # ----------------------------------------------------------------------------
-    # test
-    # ----------------------------------------------------------------------------
-    # times = 1
-    # for i in range(1):
-    #     if times == 1:
-    #         ordered = True
-    #         save_all_results = True
-    #     else:
-    #         ordered = False
-    #         save_all_results = False
-    #
-    #     run(which='test', steps=test_steps, which_labels=test_labels, frames=id_frames,
-    #         model=my_model, optimizer=my_optimizer, pred_diff=pred_diff_test,
-    #         loss_saving=test_loss, which_data=test_on, ordered=ordered, save_all_results=save_all_results,
-    #         twostream=True)
+    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number,
+                   epoch=e, validation_mode='sequential')
+    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
 
-    # save model
-    # if ((e + 1) % 10) == 0:
-    # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-    # name = os.path.join(save_location, 'epoch_%d_0' % e)
-    # chainer.serializers.save_npz(name, my_model)
+    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))

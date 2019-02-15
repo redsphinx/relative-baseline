@@ -143,7 +143,7 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32)
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
 
-    return left_all, right_all
+    return list(left_all), list(right_all)
 
 
 def get_left_right_consecutively(which, subject, current_frame):
@@ -165,6 +165,57 @@ def get_left_right_consecutively(which, subject, current_frame):
         jpg_right = None
 
     return jpg_left, jpg_right
+
+
+# makes random pairs with the same person with 2 consecutive frames
+def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=32):
+    if which != 'train':
+        random.seed(42)
+    else:
+        random.seed()
+
+    num_subjects = 10
+    sample_per_person = int(batch_size / num_subjects)
+
+    left_all = []
+    right_all = []
+    
+    def make_pairs(subject_number, left, right, spp):
+        if which != 'train':
+            num = 0
+        else:
+            num = 3
+        sample_idx = [random.randint(0, num) for i in range(spp)]
+        stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
+        left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - 2) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
+        right_frames = [left_frames[i] + 1 for i in range(len(left_frames))]
+        
+        left_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, left_frames[i]) for i in range(len(sample_idx))]
+        right_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, right_frames[i]) for i in range(len(sample_idx))]
+
+        for i in range(len(left_names)):
+            left.append(left_names[i])
+            right.append(right_names[i])
+            
+        return list(left), list(right)
+
+
+    for sub in range(num_subjects):
+        left_all, right_all = make_pairs(sub, left_all, right_all, sample_per_person)
+
+    # add extras to reach batchsize
+    leftovers = batch_size - num_subjects * sample_per_person
+
+    for _l in range(leftovers):
+        sub = random.randint(0, 9)
+        left_all, right_all = make_pairs(sub, left_all, right_all, spp=1)
+
+    if which == 'train':
+        zips = list(zip(left_all, right_all))
+        random.shuffle(zips)
+        left_all, right_all = zip(*zips)
+
+    return left_all, right_all
 
 
 def cat_head_tail(fname, frame_num):
@@ -193,8 +244,10 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference'):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference', data_mix='far'):
     assert label_mode in ['difference', 'stepwise']
+    assert data_mix in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
+
     if which == 'train':
         # path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
@@ -206,7 +259,18 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         # path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
     # left_all, right_all = get_left_right_pair_random_person(val_idx, frame_matrix, batch_size)
-    left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
+    if data_mix == 'far':
+        left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
+    elif data_mix == 'close':
+        left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size)
+    elif data_mix == 'both':
+        left_all_1, right_all_1 = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=batch_size//2)
+        left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=batch_size//2)
+        left_all_1.extend(left_all_2)
+        right_all_1.extend(right_all_2)
+        zips = list(zip(left_all_1, right_all_1))
+        random.shuffle(zips)
+        left_all, right_all = zip(*zips)
 
     # left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     # right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
