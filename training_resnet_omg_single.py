@@ -141,12 +141,12 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
                         prediction = model(data)
 
                         loss = mean_squared_error(prediction.data[0], labels)
-                        _loss_steps_subject.append(loss.data)
+                        _loss_steps_subject.append(float(loss.data))
 
                 all_predictions.append(float(prediction.data))
 
             print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
-            _loss_steps.append(np.mean(_loss_steps_subject))
+            _loss_steps.append(float(np.mean(_loss_steps_subject)))
 
             # save graph
             p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
