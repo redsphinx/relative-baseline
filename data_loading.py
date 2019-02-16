@@ -357,11 +357,11 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
     data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
     labels = np.zeros((batch_size, 1), dtype=np.float32)
 
-    for i in range(len(data)):
+    for i in range(len(names)):
         _tmp_labels = np.zeros(1)
 
         # get left data
-        jpg_path = os.path.join(path, data[i])
+        jpg_path = os.path.join(path, names[i])
         try:
             jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
         except FileNotFoundError:
@@ -371,7 +371,7 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
         data[i] = jpg
 
         # get valence
-        labels[i] = get_valence(which, data[i])
+        labels[i] = get_valence(which, names[i])
 
     # labels = np.expand_dims(labels, -1)
     return data, labels

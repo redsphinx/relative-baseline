@@ -132,10 +132,7 @@ class Resnet(chainer.Chain):
         super(Resnet, self).__init__()
         with self.init_scope():
             self.b1 = ResNet18()
-            # self.fc = Linear(in_size=512, out_size=10) # wrong way of making predictions
-            # self.fc = Linear(in_size=512, out_size=5) # right way with 5 traits
-            # self.fc = Linear(in_size=512, out_size=1)  # with collapsed traits
-            self.fc = Linear(in_size=512, out_size=1)
+            self.fc = Linear(in_size=256, out_size=1)
 
     def __call__(self, x):
         h = self.b1(x)
