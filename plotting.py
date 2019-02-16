@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
+
 def plot_labels_for_subject(which, subject, story):
     name = 'Subject_%d_Story_%d' % (subject, story)
     path = '/scratch/users/gabras/data/omg_empathy/%s' % which
@@ -24,3 +25,24 @@ def plot_labels_for_subject(which, subject, story):
 
 # for i in range(1, 11):
 #     plot_labels_for_subject('Validation', i, 1)
+
+
+def plot_loss(which, model, experiment):
+    assert which in ['train', 'val', 'test']
+    path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' % (which, model, experiment)
+    save_path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/loss_plots/model_%d_experiment_%d.png' % (which, model, experiment)
+
+    loss = np.genfromtxt(path, delimiter=',')[:, 1]
+
+    fig = plt.figure()
+    x = range(len(loss))
+    plt.plot(x, loss, 'b')
+    plt.title('%s loss model %d experiment %d' % (which, model, experiment))
+    plt.xlabel('epoch')
+    plt.ylabel('mean squared difference')
+
+    plt.savefig(save_path)
+
+
+# plot_loss('val', 1, 5)
+# plot_loss('train', 1, 5)

@@ -319,6 +319,14 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
     return left_data, right_data, labels
 
 
+def data_loading_single(which, frame_matrix, val_idx, batches):
+    pass
+
+
+def get_single_consecutively(which, name, f):
+    pass
+
+
 def update_logs(which, loss, epoch, model_num, experiment_number):
     path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' \
            % (which, model_num, experiment_number)
