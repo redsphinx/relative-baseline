@@ -319,8 +319,62 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
     return left_data, right_data, labels
 
 
-def data_loading_single(which, frame_matrix, val_idx, batches):
-    pass
+def load_data_single(which, frame_matrix, val_idx, batch_size):
+    if which == 'train':
+        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
+    elif which == 'val':
+        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
+    elif which == 'test':
+        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
+
+    num_subjects = 10
+    sample_per_person = batch_size // num_subjects
+    names = []
+
+    def get_names(subject_number, spp):
+        if which != 'train':
+            num = 0
+        else:
+            num = 3
+        sample_idx = [random.randint(0, num) for i in range(spp)]
+        stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
+        frames = [random.randint(0, frame_matrix[sub][stories[i]] - 1) for i in range(len(sample_idx))]
+        sample_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, frames[i]) for i in range(len(sample_idx))]
+        return sample_names
+
+    for sub in range(num_subjects):
+        names.extend(get_names(sub, sample_per_person))
+
+    leftovers = batch_size - num_subjects * sample_per_person
+
+    for _l in range(leftovers):
+        sub = random.randint(0, 9)
+        names.extend(get_names(sub, spp=1))
+
+    if which == 'train':
+        random.shuffle(names)
+
+    data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
+    labels = np.zeros((batch_size, 1), dtype=np.float32)
+
+    for i in range(len(data)):
+        _tmp_labels = np.zeros(1)
+
+        # get left data
+        jpg_path = os.path.join(path, data[i])
+        try:
+            jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+        except FileNotFoundError:
+            print(jpg_path)
+            print(FileNotFoundError)
+
+        data[i] = jpg
+
+        # get valence
+        labels[i] = get_valence(which, data[i])
+
+    # labels = np.expand_dims(labels, -1)
+    return data, labels
 
 
 def get_single_consecutively(which, name, f):
