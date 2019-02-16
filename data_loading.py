@@ -377,8 +377,18 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
     return data, labels
 
 
-def get_single_consecutively(which, name, f):
-    pass
+def get_single_consecutively(which, subject, current_frame):
+    if which == 'train':
+        path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
+    elif which == 'val':
+        path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
+    elif which == 'test':
+        path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
+
+    jpg_path = os.path.join(path, subject, '%d.jpg' % current_frame)
+    jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+
+    return jpg
 
 
 def update_logs(which, loss, epoch, model_num, experiment_number):

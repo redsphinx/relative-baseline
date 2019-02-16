@@ -127,7 +127,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
             num_frames = 1000
 
             for f in tqdm(range(num_frames)):
-                data = L.get_single_consecutively(which, name, f)
+                data = L.get_single_consecutively(which, subject, f)
                 data = np.expand_dims(data, 0)
                 labels = np.array([all_labels[f]])
 
