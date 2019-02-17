@@ -8,6 +8,7 @@ import deepimpression2.constants as C
 from chainer.backends.cuda import to_gpu, to_cpu
 from model_1 import Siamese
 from model_2 import Resnet
+import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import data_loading as L
@@ -15,6 +16,7 @@ from scipy.stats import pearsonr
 import math
 
 
+# TODO:debug
 # predicts the difference between two random pairs
 def predict_valence_difference_relative(which, steps, batches, data_mix, model_number, experiment_number, epoch):
     assert data_mix in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
@@ -26,6 +28,8 @@ def predict_valence_difference_relative(which, steps, batches, data_mix, model_n
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (model_number, experiment_number), 'epoch_%d' % epoch)
     chainer.serializers.load_npz(p, model)
+    if C.ON_GPU:
+        model = model.to_gpu(device=C.DEVICE)
 
     frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
@@ -78,12 +82,15 @@ def calculate_ccc(predictions, labels):
 # predicts difference two consecutive pairs for first 1000 frame pairs
 def predict_valence_sequential_relative(which, experiment_number, epoch):
     _loss_steps = []
+    _all_ccc = []
 
     model_number = 1
     model = Siamese()
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (model_number, experiment_number), 'epoch_%d' % epoch)
     chainer.serializers.load_npz(p, model)
+    if C.ON_GPU:
+        model = model.to_gpu(device=C.DEVICE)
 
     for subject in range(10):
         _loss_steps_subject = []
@@ -100,8 +107,9 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
 
         # num_frames = len(all_frames)
         num_frames = 1000
+        # num_frames = 10
 
-        for f in tqdm(range(num_frames)):
+        for f in range(num_frames):
             if f == 0:
                 with cp.cuda.Device(C.DEVICE):
 
@@ -140,7 +148,10 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
             previous_prediction[0] = float(prediction)
             all_predictions.append(prediction)
 
-        print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
+        ccc_subject = calculate_ccc(all_predictions, all_labels[:num_frames])
+        _all_ccc.append(ccc_subject)
+
+        print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
         _loss_steps.append(np.mean(_loss_steps_subject))
 
         # save graph
@@ -158,21 +169,26 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
-    ccc = calculate_ccc(all_predictions, all_labels)
+    print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
+                                                                      float(np.mean(_loss_steps)),
+                                                                      float(np.mean(_all_ccc))))
 
-    print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number,
-                                                             epoch, float(np.mean(_loss_steps)), ccc))
+
+# predict_valence_sequential_relative('val', 4, 29)
 
 
 # predicts valence value first 1000 frames
 def predict_valence_sequential_single(which, experiment_number, epoch):
     _loss_steps = []
+    _all_ccc = []
 
     model_number = 2
     model = Resnet()
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (model_number, experiment_number), 'epoch_%d' % epoch)
     chainer.serializers.load_npz(p, model)
+    if C.ON_GPU:
+        model = model.to_gpu(device=C.DEVICE)
 
     for subject in range(10):
         _loss_steps_subject = []
@@ -189,7 +205,7 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
         # num_frames = len(all_frames)
         num_frames = 1000
 
-        for f in tqdm(range(num_frames)):
+        for f in range(num_frames):
             data = L.get_single_consecutively(which, name, f)
             data = np.expand_dims(data, 0)
             labels = np.array([all_labels[f]])
@@ -208,7 +224,10 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
 
             all_predictions.append(float(prediction.data))
 
-        print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
+        ccc_subject = calculate_ccc(all_predictions, all_labels[:num_frames])
+        _all_ccc.append(ccc_subject)
+
+        print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
         _loss_steps.append(float(np.mean(_loss_steps_subject)))
 
         # save graph
@@ -226,8 +245,9 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
-    ccc = calculate_ccc(all_predictions, all_labels)
+    print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
+                                                                      float(np.mean(_loss_steps)),
+                                                                      float(np.mean(_all_ccc))))
 
-    print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number,
-                                                                      epoch, float(np.mean(_loss_steps)), ccc))
 
+# predict_valence_sequential_single('val', 6, 99)
