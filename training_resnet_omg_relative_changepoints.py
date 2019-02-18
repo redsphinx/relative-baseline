@@ -78,11 +78,11 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
 
     # print('%s, steps: %d' % (which, steps))
 
-    if not which == 'val' and validation_mode == 'sequential':
+    if which == 'train':
         for s in tqdm(range(steps)):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='difference', data_mix=training_mode)
-            data_left, data_right, labels = L.load_data_change_points(which, s, )
+            data_left, data_right, labels = L.load_data_change_points(s, train_change_points)
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)

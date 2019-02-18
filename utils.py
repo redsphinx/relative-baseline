@@ -213,7 +213,7 @@ def find_change_points(which, subject, story):
         if f2 - f1 != 0:
             change_points.append([l, l+1])
 
-    print('number of change_points in %s: %d' % (name, len(change_points)))
+    # print('number of change_points in %s: %d' % (name, len(change_points)))
 
     return change_points
 
@@ -242,3 +242,18 @@ def get_all_change_points(which, val_idx_all):
         everything.append(subject_list)
 
     return everything
+
+
+total = 0
+all_cp = get_all_change_points('Training', [[2, 4, 5, 8]])
+for i in range(0, 10):
+    total_s = 0
+    for j in range(4):
+        try:
+            total_s += len(all_cp[i][j][0])
+        except IndexError:
+            print('here')
+
+    print('subject %d change points: %d' % (i, total_s))
+    total += total_s
+print('total number change points: %d' % total)

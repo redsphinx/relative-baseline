@@ -246,7 +246,7 @@ def get_valence(which, full_name):
 
 def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference', data_mix='far'):
     assert label_mode in ['difference', 'stepwise']
-    assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
+    assert data_mix in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
 
     if which == 'train':
         # path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
@@ -270,11 +270,6 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         zips = list(zip(left_all_1, right_all_1))
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
-    elif data_mix == 'change_points':
-        left_all_1, right_all_1 = sample_change_points(which, val_idx)
-        left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
-                                                                              batch_size=batch_size // 2)
-
 
     # left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     # right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
@@ -379,6 +374,11 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
 
     # labels = np.expand_dims(labels, -1)
     return data, labels
+
+
+def load_data_change_points(current_step, change_points):
+
+    pass
 
 
 def get_single_consecutively(which, subject, current_frame):
