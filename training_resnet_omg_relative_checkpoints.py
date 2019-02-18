@@ -25,6 +25,7 @@ import cupy as cp
 from chainer.functions import expand_dims
 from random import shuffle
 from tqdm import tqdm
+import utils as U
 
 my_model = Siamese()
 
@@ -48,12 +49,14 @@ train_total_steps = 50
 
 val_total_steps = 5
 
-
 # TODO: decide on principled approach to steps
 # train_total_steps = int(160 / batches)  # we have 10 * 4**2 possible pairs of id-stories in training using same person
 # train_total_steps = int(1600 / batches)  # we have 40**2 possible pairs of id-stories in training using random people
 # train_total_steps = int(100 / batches)  # for debugging
 # val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
+
+
+train_change_points = U.get_all_change_points('Training', valid_story_idx_all) # (10, 4, 2, ?) list that holds lists
 
 
 def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None, experiment_number=None):
@@ -79,6 +82,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
         for s in tqdm(range(steps)):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='difference', data_mix=training_mode)
+            data_left, data_right, labels = L.load_data_change_points(which, s, )
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)

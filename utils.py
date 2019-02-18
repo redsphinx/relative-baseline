@@ -218,8 +218,27 @@ def find_change_points(which, subject, story):
     return change_points
 
 
-for i in range(1, 11):
-    cp = find_change_points('Training', i, 2)
-    cp = find_change_points('Training', i, 4)
-    cp = find_change_points('Training', i, 5)
-    cp = find_change_points('Training', i, 8)
+def get_all_change_points(which, val_idx_all):
+    l = ['Training', 'Validation', 'Test']
+    assert which in l
+    val_idx = val_idx_all[l.index(which)]
+
+    everything = []
+
+    for i in range(1, 11):
+        subject_list = []
+        for j in range(len(val_idx)):
+            stories_left = []
+            stories_right = []
+            cp = find_change_points(which, i, val_idx[j])
+            for xy in range(len(cp)):
+                name_left = 'Subject_%d_Story_%d/%d.jpg' % (i, val_idx[j], cp[xy][0])
+                name_right = 'Subject_%d_Story_%d/%d.jpg' % (i, val_idx[j], cp[xy][1])
+                stories_left.append(name_left)
+                stories_right.append(name_right)
+
+            subject_list.append([stories_left, stories_right])
+
+        everything.append(subject_list)
+
+    return everything
