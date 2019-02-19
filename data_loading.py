@@ -102,9 +102,9 @@ def get_left_right_pair_random_person(val_idx, frame_matrix, batch_size=32):
 
 
 # makes pairs with the same person across different stories
-def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32):
+def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32, seed=42):
     if which != 'train':
-        random.seed(42)
+        random.seed(seed)
     else:
         random.seed()
 
@@ -244,9 +244,11 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference', data_mix='far'):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_mode='difference', data_mix='far',
+                       label_ouput='single'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
+    assert label_ouput in ['single', 'double']
 
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
@@ -256,7 +258,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
 
     if data_mix == 'far':
-        left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
+        left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size, seed)
     elif data_mix == 'close':
         left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size)
     elif data_mix == 'both':
@@ -281,10 +283,15 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
     left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
 
-    if label_mode == 'difference':
-        labels = np.zeros((batch_size, 1), dtype=np.float32)
-    elif label_mode == 'stepwise':
-        labels = np.zeros((batch_size, 3), dtype=np.float32)
+    if label_ouput == 'single':
+        if label_mode == 'difference':
+            labels = np.zeros((batch_size, 1), dtype=np.float32)
+        elif label_mode == 'stepwise':
+            labels = np.zeros((batch_size, 3), dtype=np.float32)
+    elif label_ouput == 'double':
+        labels_1 = np.zeros((batch_size, 2), dtype=np.float32)  # classifications
+        labels_2 = np.zeros((batch_size, 1), dtype=np.float32)  # regression
+
 
     assert len(left_all) == len(right_all)
     for i in range(len(left_all)):
@@ -307,17 +314,32 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         # right valence
         _tmp_labels[1] = get_valence(which, right_all[i])
 
-        if label_mode == 'difference':
-            labels[i]= _tmp_labels[1] - _tmp_labels[0]
-        elif label_mode == 'stepwise':
-            # [-1, 0, 1] = right is lower, same, right is higher
+        if label_ouput == 'single':
+            if label_mode == 'difference':
+                labels[i]= _tmp_labels[1] - _tmp_labels[0]
+            elif label_mode == 'stepwise':
+                # [-1, 0, 1] = right is lower, same, right is higher
+                diff = _tmp_labels[0] - _tmp_labels[1]
+                if diff == 0:
+                    labels[i] = [0, 1, 0]
+                elif diff < 0:
+                    labels[i] = [0, 0, 1]
+                else:
+                    labels[i] = [1, 0, 0]
+        elif label_ouput == 'double':
             diff = _tmp_labels[0] - _tmp_labels[1]
+            # [a, b] where a = no change and b = change
+            # [0, 1] = change
+            # [1, 0] = no change
             if diff == 0:
-                labels[i] = [0, 1, 0]
-            elif diff < 0:
-                labels[i] = [0, 0, 1]
+                labels_1[i] = [1, 0]
             else:
-                labels[i] = [1, 0, 0]
+                labels_1[i] = [0, 1]
+
+            labels_2[i] = _tmp_labels[1] - _tmp_labels[0]
+
+    if label_ouput == 'double':
+        labels = [labels_1, labels_2]
 
     # labels = np.expand_dims(labels, -1)
     return left_data, right_data, labels
