@@ -40,11 +40,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
-batches = 32
-# batches = 16
+# batches = 32
+batches = 20
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
-train_total_steps = 50
+# train_total_steps = 50
+train_total_steps = 80
 # train_total_steps = 2
 
 val_total_steps = 5
@@ -109,13 +110,13 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                         optimizer.update()
 
         # save model
-        # plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
-        # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-        # model_folder = os.path.join(save_location, plots_folder)
-        # if not os.path.exists(model_folder):
-        #     os.mkdir(model_folder)
-        # name = os.path.join(model_folder, 'epoch_%d' % e)
-        # chainer.serializers.save_npz(name, my_model)
+        plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+        save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+        model_folder = os.path.join(save_location, plots_folder)
+        if not os.path.exists(model_folder):
+            os.mkdir(model_folder)
+        name = os.path.join(model_folder, 'epoch_%d' % e)
+        chainer.serializers.save_npz(name, my_model)
 
     else:
         for subject in range(10):

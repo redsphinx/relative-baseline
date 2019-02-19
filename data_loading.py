@@ -407,7 +407,7 @@ def get_left_right_pair_change_points(which, change_points, batch_size):
 
             assert len(pairs_left) == len(pairs_right)
 
-            random_pair_num = random.randint(0, len(pairs_left))
+            random_pair_num = random.randint(0, len(pairs_left)-1)
             left.append(pairs_left[random_pair_num])
             right.append(pairs_right[random_pair_num])
 
