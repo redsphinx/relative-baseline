@@ -44,5 +44,5 @@ def plot_loss(which, model, experiment):
     plt.savefig(save_path)
 
 
-# plot_loss('val', 2, 6)
-# plot_loss('train', 2, 6)
+plot_loss('val', 1, 7)
+plot_loss('train', 1, 7)
