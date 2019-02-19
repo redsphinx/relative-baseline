@@ -4,6 +4,7 @@ import subprocess
 import random
 from deepimpression2.chalearn20 import poisson_disc as pd
 from PIL import Image
+import utils as U
 
 
 def wc_l(file_name):
@@ -199,7 +200,6 @@ def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, ba
             
         return list(left), list(right)
 
-
     for sub in range(num_subjects):
         left_all, right_all = make_pairs(sub, left_all, right_all, sample_per_person)
 
@@ -246,17 +246,14 @@ def get_valence(which, full_name):
 
 def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='difference', data_mix='far'):
     assert label_mode in ['difference', 'stepwise']
-    assert data_mix in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
+    assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
 
     if which == 'train':
-        # path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_640_360'
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
     elif which == 'val':
-        # path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_640_360'
         path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
     elif which == 'test':
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
-        # path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_640_360'
 
     if data_mix == 'far':
         left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size)
@@ -270,9 +267,18 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         zips = list(zip(left_all_1, right_all_1))
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
+    elif data_mix == 'change_points':
+        change_points = U.get_all_change_points('Training', val_idx)
+        left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2)
+        left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
+                                                                              batch_size=batch_size // 2)
+        # TODO: check zeroness of all_2
+        left_all_1.extend(left_all_2)
+        right_all_1.extend(right_all_2)
+        zips = list(zip(left_all_1, right_all_1))
+        random.shuffle(zips)
+        left_all, right_all = zip(*zips)
 
-    # left_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
-    # right_data = np.zeros((batch_size, 3, 360, 640), dtype=np.float32)
     left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
 
@@ -376,9 +382,54 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
     return data, labels
 
 
-def load_data_change_points(current_step, change_points):
+def get_left_right_pair_change_points(which, change_points, batch_size):
+    if which != 'train':
+        random.seed(42)
+    else:
+        random.seed()
 
-    pass
+    # shape = np.shape(change_points)  # (10, 4, 2)
+
+    num_subjects = 10
+    sample_per_person = int(batch_size / num_subjects)
+    left_all = []
+    right_all = []
+
+    def make_pairs(subject_number, left, right, spp):
+        if which != 'train':
+            num = 0
+        else:
+            num = 3
+        sample_idx = [random.randint(0, num) for i in range(spp)]
+
+        for story in range(len(sample_idx)):
+            pairs_left = change_points[subject_number][story][0]
+            pairs_right = change_points[subject_number][story][1]
+
+            assert len(pairs_left) == len(pairs_right)
+
+            random_pair_num = random.randint(0, len(pairs_left))
+            left.append(pairs_left[random_pair_num])
+            right.append(pairs_right[random_pair_num])
+
+        return list(left), list(right)
+
+    for sub in range(num_subjects):
+        left_all, right_all = make_pairs(sub, left_all, right_all, sample_per_person)
+
+    # add extras to reach batch_size
+    leftovers = batch_size - num_subjects * sample_per_person
+
+    for _l in range(leftovers):
+        sub = random.randint(0, 9)
+        left_all, right_all = make_pairs(sub, left_all, right_all, spp=1)
+
+    if which == 'train':
+        zips = list(zip(left_all, right_all))
+        random.shuffle(zips)
+        left_all, right_all = zip(*zips)
+
+    return left_all, right_all
 
 
 def get_single_consecutively(which, subject, current_frame):

@@ -218,10 +218,9 @@ def find_change_points(which, subject, story):
     return change_points
 
 
-def get_all_change_points(which, val_idx_all):
+def get_all_change_points(which, val_idx):
     l = ['Training', 'Validation', 'Test']
     assert which in l
-    val_idx = val_idx_all[l.index(which)]
 
     everything = []
 
@@ -244,16 +243,20 @@ def get_all_change_points(which, val_idx_all):
     return everything
 
 
-total = 0
-all_cp = get_all_change_points('Training', [[2, 4, 5, 8]])
-for i in range(0, 10):
-    total_s = 0
-    for j in range(4):
-        try:
-            total_s += len(all_cp[i][j][0])
-        except IndexError:
-            print('here')
+def print_all_change_points():
+    total = 0
+    all_cp = get_all_change_points('Training', [[2, 4, 5, 8]])
+    for i in range(0, 10):
+        total_s = 0
+        for j in range(4):
+            try:
+                total_s += len(all_cp[i][j][0])
+            except IndexError:
+                print('here')
 
-    print('subject %d change points: %d' % (i, total_s))
-    total += total_s
-print('total number change points: %d' % total)
+        print('subject %d change points: %d' % (i, total_s))
+        total += total_s
+    print('total number change points: %d' % total)
+
+
+print_all_change_points()

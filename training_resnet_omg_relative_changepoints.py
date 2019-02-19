@@ -40,12 +40,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
-batches = 32
-# batches = 16
+# batches = 32
+batches = 16
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
-train_total_steps = 50
-# train_total_steps = 2
+# train_total_steps = 50
+train_total_steps = 2
 
 val_total_steps = 5
 
@@ -56,10 +56,11 @@ val_total_steps = 5
 # val_total_steps = int(100 / batches)  # we have 10**2 possible pairs of id-stories in validation
 
 
-train_change_points = U.get_all_change_points('Training', valid_story_idx_all) # (10, 4, 2, ?) list that holds lists
+# train_change_points = U.get_all_change_points('Training', valid_story_idx_all) # (10, 4, 2, ?) list that holds lists
 
 
-def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None, experiment_number=None):
+def run(which, model, optimizer, epoch, training_mode='change_points', validation_mode='sequential', model_num=None,
+        experiment_number=None):
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
@@ -82,7 +83,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
         for s in tqdm(range(steps)):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='difference', data_mix=training_mode)
-            data_left, data_right, labels = L.load_data_change_points(s, train_change_points)
+            # data_left, data_right, labels = L.load_data_change_points(s, train_change_points)
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)
@@ -108,13 +109,13 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
                         optimizer.update()
 
         # save model
-        plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
-        save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-        model_folder = os.path.join(save_location, plots_folder)
-        if not os.path.exists(model_folder):
-            os.mkdir(model_folder)
-        name = os.path.join(model_folder, 'epoch_%d' % e)
-        chainer.serializers.save_npz(name, my_model)
+        # plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+        # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+        # model_folder = os.path.join(save_location, plots_folder)
+        # if not os.path.exists(model_folder):
+        #     os.mkdir(model_folder)
+        # name = os.path.join(model_folder, 'epoch_%d' % e)
+        # chainer.serializers.save_npz(name, my_model)
 
     else:
         for subject in range(10):
@@ -176,17 +177,17 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
             _loss_steps.append(np.mean(_loss_steps_subject))
 
             # save graph
-            p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
-            plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
-            plot_path = os.path.join(p, plots_folder)
-            if not os.path.exists(plot_path):
-                os.mkdir(plot_path)
-
-            fig = plt.figure()
-            x = range(num_frames)
-            plt.plot(x, all_labels[:num_frames], 'g')
-            plt.plot(x, all_predictions, 'b')
-            plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
+            # p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
+            # plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+            # plot_path = os.path.join(p, plots_folder)
+            # if not os.path.exists(plot_path):
+            #     os.mkdir(plot_path)
+            #
+            # fig = plt.figure()
+            # x = range(num_frames)
+            # plt.plot(x, all_labels[:num_frames], 'g')
+            # plt.plot(x, all_predictions, 'b')
+            # plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
     return _loss_steps
 
@@ -200,13 +201,13 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num,
                      experiment_number=exp_number, epoch=e)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
-                  experiment_number=exp_number)
+    # L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
+    #               experiment_number=exp_number)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
     loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number,
                    epoch=e, validation_mode='sequential')
-    L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
+    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
 
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
