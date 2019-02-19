@@ -64,7 +64,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
-    assert training_mode in ['far', 'close', 'both']  # far = frames are >1 apart, close = frames are 1 apart
+    assert training_mode in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
 
     val_idx = None
     steps = None
@@ -132,7 +132,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
 
             # num_frames = len(all_frames)
-            num_frames = 1000
+            # num_frames = 1000
+            num_frames = 10
 
             for f in tqdm(range(num_frames)):
                 if f == 0:

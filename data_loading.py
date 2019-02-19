@@ -272,7 +272,6 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_mode='dif
         left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2)
         left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
                                                                               batch_size=batch_size // 2)
-        # TODO: check zeroness of all_2
         left_all_1.extend(left_all_2)
         right_all_1.extend(right_all_2)
         zips = list(zip(left_all_1, right_all_1))
@@ -429,7 +428,7 @@ def get_left_right_pair_change_points(which, change_points, batch_size):
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
 
-    return left_all, right_all
+    return list(left_all), list(right_all)
 
 
 def get_single_consecutively(which, subject, current_frame):

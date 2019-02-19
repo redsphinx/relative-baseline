@@ -259,4 +259,4 @@ def print_all_change_points():
     print('total number change points: %d' % total)
 
 
-print_all_change_points()
+# print_all_change_points()
