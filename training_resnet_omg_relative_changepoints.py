@@ -54,11 +54,11 @@ print('model initialized with %d parameters' % my_model.count_params())
 
 epochs = 100
 # batches = 32
-batches = 20
+batches = 25
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 # train_total_steps = 50
-train_total_steps = 80
+train_total_steps = 64
 # train_total_steps = 2
 
 val_total_steps = 5
