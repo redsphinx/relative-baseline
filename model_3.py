@@ -147,6 +147,7 @@ class Triplet(chainer.Chain):
         # TODO: is this correct?
         # binary is there change or not classification
         h1 = self.fc1(h)
+        h1 = relu(h1)
         h1 = chainer.functions.softmax(h1)
 
         # value difference regression

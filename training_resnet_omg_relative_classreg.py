@@ -120,7 +120,6 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                     pred_1, pred_2 = model(data_left, data_right)
 
                     # TODO: make better compound loss
-                    chainer.functions.
                     classification_loss = softmax_cross_entropy(pred_1, labels_1)
                     regression_loss = mean_squared_error(pred_2, labels_2)
                     loss = classification_loss + regression_loss
@@ -165,6 +164,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                         with chainer.using_config('train', False):
                             pred_1, pred_2 = np.array([0.0], dtype=np.float32)  # baseline
 
+                            # TODO: fix this after the training one is fixed
                             # [a, b] where a = no change and b = change
                             # [0, 1] = change
                             # [1, 0] = no change
