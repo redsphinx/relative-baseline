@@ -201,7 +201,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
                                                                           float(np.mean(_all_pearson))))
 
 
-predict_valence_sequential_relative('val', 7, 74)
+predict_valence_sequential_relative('val', 7, 99)
 
 
 # predicts valence value first 1000 frames

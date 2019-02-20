@@ -244,11 +244,10 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_mode='difference', data_mix='far',
-                       label_ouput='single'):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference', data_mix='far'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
-    assert label_ouput in ['single', 'double']
+    assert label_output in ['single', 'double']
 
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
@@ -283,15 +282,14 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_
     left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
 
-    if label_ouput == 'single':
+    if label_output == 'single':
         if label_mode == 'difference':
             labels = np.zeros((batch_size, 1), dtype=np.float32)
         elif label_mode == 'stepwise':
             labels = np.zeros((batch_size, 3), dtype=np.float32)
-    elif label_ouput == 'double':
-        labels_1 = np.zeros((batch_size, 2), dtype=np.float32)  # classifications
+    elif label_output == 'double':
+        labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
         labels_2 = np.zeros((batch_size, 1), dtype=np.float32)  # regression
-
 
     assert len(left_all) == len(right_all)
     for i in range(len(left_all)):
@@ -314,7 +312,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_
         # right valence
         _tmp_labels[1] = get_valence(which, right_all[i])
 
-        if label_ouput == 'single':
+        if label_output == 'single':
             if label_mode == 'difference':
                 labels[i]= _tmp_labels[1] - _tmp_labels[0]
             elif label_mode == 'stepwise':
@@ -326,7 +324,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_
                     labels[i] = [0, 0, 1]
                 else:
                     labels[i] = [1, 0, 0]
-        elif label_ouput == 'double':
+        elif label_output == 'double':
             diff = _tmp_labels[0] - _tmp_labels[1]
             # [a, b] where a = no change and b = change
             # [0, 1] = change
@@ -338,7 +336,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, seed=42, label_
 
             labels_2[i] = _tmp_labels[1] - _tmp_labels[0]
 
-    if label_ouput == 'double':
+    if label_output == 'double':
         labels = [labels_1, labels_2]
 
     # labels = np.expand_dims(labels, -1)
