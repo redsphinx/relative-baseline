@@ -112,3 +112,6 @@ def make_annotations(which):
 
 
 # make_annotations('Test')
+
+# TODO: convert mp4s to jpgs
+# TODO: extract bbox around person

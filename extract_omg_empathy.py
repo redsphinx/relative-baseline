@@ -116,3 +116,4 @@ path_to_data = '/scratch/users/gabras/data/omg_empathy'
 
 # video_to_frames(which='Validation', path=path_to_data, body_part='full_body_closeup')
 # video_to_frames(which='Training', path=path_to_data, body_part='full_body_closeup')
+video_to_frames(which='Test', path=path_to_data, body_part='full_body_closeup')

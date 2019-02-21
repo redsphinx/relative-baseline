@@ -16,7 +16,6 @@ def wc_l(file_name):
 
 
 def make_frame_matrix():
-    # TODO: add frames for testing
     path = '/scratch/users/gabras/data/omg_empathy/'
     _shape = (10, 8)  # subject, story
     frame_matrix = np.zeros(_shape, dtype=int)
@@ -115,10 +114,14 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32,
     right_all = []
 
     def make_pairs(subject_number, left, right, spp):
-        if which != 'train':
+        if which == 'val':
             num = 0
-        else:
+        elif which == 'train':
             num = 3
+        elif which == 'test':
+            num = 2
+        else:
+            num = None
         sample_idx = [random.randint(0, num) for i in range(2 * spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
         frames = [random.randint(0, frame_matrix[sub][stories[i]] - 1) for i in range(len(sample_idx))]
@@ -182,10 +185,14 @@ def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, ba
     right_all = []
     
     def make_pairs(subject_number, left, right, spp):
-        if which != 'train':
+        if which == 'val':
             num = 0
-        else:
+        elif which == 'train':
             num = 3
+        elif which == 'test':
+            num = 2
+        else:
+            num = None
         sample_idx = [random.randint(0, num) for i in range(spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
         left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - 2) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
@@ -269,7 +276,8 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
     elif data_mix == 'change_points':
-        change_points = U.get_all_change_points('Training', val_idx)
+        # TODO: should "Training" be which? -- changed to which
+        change_points = U.get_all_change_points(which, val_idx)
         left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2)
         left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
                                                                               batch_size=batch_size // 2)
@@ -356,10 +364,15 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
     names = []
 
     def get_names(subject_number, spp):
-        if which != 'train':
+        if which == 'val':
             num = 0
-        else:
+        elif which == 'train':
             num = 3
+        elif which == 'test':
+            num = 2
+        else:
+            num = None
+
         sample_idx = [random.randint(0, num) for i in range(spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
         frames = [random.randint(0, frame_matrix[sub][stories[i]] - 1) for i in range(len(sample_idx))]
@@ -415,10 +428,14 @@ def get_left_right_pair_change_points(which, change_points, batch_size):
     right_all = []
 
     def make_pairs(subject_number, left, right, spp):
-        if which != 'train':
+        if which == 'val':
             num = 0
-        else:
+        elif which == 'train':
             num = 3
+        elif which == 'test':
+            num = 2
+        else:
+            num = None
         sample_idx = [random.randint(0, num) for i in range(spp)]
 
         for story in range(len(sample_idx)):
@@ -479,5 +496,6 @@ def update_logs(which, loss, epoch, model_num, experiment_number):
 
 
 # f_mat, v_idx = make_frame_matrix()
+# print('e')
 # l, r, lab = load_data('train', f_mat, v_idx[0], 32)
 
