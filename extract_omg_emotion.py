@@ -77,4 +77,38 @@ def check_for_overlap_in_splits():
 
 
 def make_annotations(which):
-    pass
+    annotation_base = '/home/gabras/deployed/relative-baseline/OMGEmotionChallenge'
+
+    if which == 'Training':
+        _p = 'omg_TrainVideos.csv'
+    elif which == 'Validation':
+        _p = 'omg_ValidationVideos.csv'
+    else:
+        _p = 'omg_TestVideos_WithLabels.csv'
+
+    path_annotation = os.path.join(annotation_base, _p)
+
+    all_annotations = np.genfromtxt(path_annotation, delimiter=',', dtype=str, skip_header=True)
+
+    video_path = '/scratch/users/gabras/data/omg_emotion/%s/Videos' % which
+    videos = os.listdir(video_path)
+
+    video_names = all_annotations[:, 3]
+    utterances = all_annotations[:, 4]
+    arousals = all_annotations[:, 5]
+    valences = all_annotations[:, 6]
+    emotion = all_annotations[:, 7]
+
+    for i in range(len(video_names)):
+        if video_names[i] in videos:
+            utters = os.listdir(os.path.join(video_path, video_names[i]))
+
+            if utterances[i] in utters:
+                l = '%s,%s,%s,%s,%s\n' % (video_names[i], utterances[i], arousals[i], valences[i], emotion[i])
+
+                save_path = '/scratch/users/gabras/data/omg_emotion/%s/Annotations/annotations.csv' % which
+                with open(save_path, 'a') as my_file:
+                    my_file.write(l)
+
+
+# make_annotations('Test')
