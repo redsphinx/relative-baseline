@@ -53,12 +53,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 # --------------------------------------------------------------------------------------------
 if DEBUG:
-    batches = 16
-    train_total_steps = 2
-    epochs = 5
+    batches = 32
+    train_total_steps = 1600 // batches
+    epochs = 10
 else:
     batches = 32
     train_total_steps = 1600 // batches
@@ -100,7 +100,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
     # print('%s, steps: %d' % (which, steps))
 
     if which == 'train':
-        for s in tqdm(range(steps)):
+        # for s in tqdm(range(steps)):
+        for s in range(steps):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='difference',
                                                                  data_mix=training_mode,
@@ -125,10 +126,23 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                     pred_1, pred_2 = model(data_left, data_right)
 
                     # TODO: make better compound loss
+                    # TODO: make a ratio 10* one
                     # classification_loss = softmax_cross_entropy(pred_1, labels_1)
-                    classification_loss = sigmoid_cross_entropy(pred_1, labels_1)
-                    regression_loss = mean_squared_error(pred_2, labels_2)
-                    loss = classification_loss + regression_loss
+                    classification_loss = sigmoid_cross_entropy(pred_1, labels_1)  # big one
+                    regression_loss = mean_squared_error(pred_2, labels_2)  # small one
+
+                    upper = 10
+                    lower = 2
+
+                    if classification_loss.data / regression_loss.data >= upper:
+                        loss = classification_loss
+                    elif classification_loss.data / regression_loss.data < lower:
+                        loss = regression_loss
+                    else:
+                        loss = classification_loss + regression_loss
+
+                    print('classification loss: %f, regression loss: %f, loss: %f' % (float(to_cpu(classification_loss.data)),
+                                                                            float(to_cpu(regression_loss.data)), float(to_cpu(loss.data))))
 
                     _loss_steps.append(float(loss.data))
 
@@ -167,7 +181,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             else:
                 num_frames = 1000
 
-            for f in tqdm(range(num_frames)):
+            # for f in tqdm(range(num_frames)):
+            for f in range(num_frames):
                 if f == 0:
                     with cp.cuda.Device(C.DEVICE):
 
