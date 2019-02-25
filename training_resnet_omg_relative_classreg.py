@@ -52,14 +52,18 @@ if C.ON_GPU:
 print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
-epochs = 100
-# batches = 32
-batches = 16
-frame_matrix, valid_story_idx_all = L.make_frame_matrix()
+# --------------------------------------------------------------------------------------------
+DEBUG = True
+# --------------------------------------------------------------------------------------------
+if DEBUG:
+    batches = 16
+    train_total_steps = 2
+else:
+    batches = 32
+    train_total_steps = 1600 // batches
 
-# train_total_steps = 50
-# train_total_steps = 64
-train_total_steps = 2
+epochs = 100
+frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 val_total_steps = 5
 
@@ -131,13 +135,14 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                         optimizer.update()
 
         # save model
-        # plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
-        # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-        # model_folder = os.path.join(save_location, plots_folder)
-        # if not os.path.exists(model_folder):
-        #     os.mkdir(model_folder)
-        # name = os.path.join(model_folder, 'epoch_%d' % e)
-        # chainer.serializers.save_npz(name, my_model)
+        if not DEBUG:
+            plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+            save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+            model_folder = os.path.join(save_location, plots_folder)
+            if not os.path.exists(model_folder):
+                os.mkdir(model_folder)
+            name = os.path.join(model_folder, 'epoch_%d' % e)
+            chainer.serializers.save_npz(name, my_model)
 
     else:
         for subject in range(10):
@@ -213,17 +218,18 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             _loss_steps.append(np.mean(_loss_steps_subject))
 
             # save graph
-            # p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
-            # plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
-            # plot_path = os.path.join(p, plots_folder)
-            # if not os.path.exists(plot_path):
-            #     os.mkdir(plot_path)
-            #
-            # fig = plt.figure()
-            # x = range(num_frames)
-            # plt.plot(x, all_labels[:num_frames], 'g')
-            # plt.plot(x, all_predictions, 'b')
-            # plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
+            if not DEBUG:
+                p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
+                plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+                plot_path = os.path.join(p, plots_folder)
+                if not os.path.exists(plot_path):
+                    os.mkdir(plot_path)
+
+                fig = plt.figure()
+                x = range(num_frames)
+                plt.plot(x, all_labels[:num_frames], 'g')
+                plt.plot(x, all_predictions, 'b')
+                plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
     return _loss_steps
 
@@ -237,13 +243,15 @@ for e in range(0, epochs):
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num,
                      experiment_number=exp_number, epoch=e)
-    # L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
-    #               experiment_number=exp_number)
+    if not DEBUG:
+        L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
+                      experiment_number=exp_number)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
     loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number,
                    epoch=e, validation_mode='sequential')
-    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
+    if not DEBUG:
+        L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
 
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
