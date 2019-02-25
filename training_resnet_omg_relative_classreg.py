@@ -28,19 +28,19 @@ from tqdm import tqdm
 import utils as U
 
 
-load_model = False
+load_model = True
 
 my_model = Triplet()
 
 if load_model:
     m_num = 3
-    e_num = 8
-    ep = 0
+    e_num = 9
+    ep = 2
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
 else:
-    ep = 0
+    ep = -1
 
 my_optimizer = Adam(alpha=0.0002, beta1=0.5, beta2=0.999, eps=10e-8, weight_decay_rate=0.0001)
 # my_optimizer = Adam(alpha=0.0002, beta1=0.5, beta2=0.999, eps=10e-8)
@@ -243,12 +243,13 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                 plt.plot(x, all_labels[:num_frames], 'g')
                 plt.plot(x, all_predictions, 'b')
                 plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
+                del fig
 
     return _loss_steps
 
 
 print('Enter training loop with validation')
-for e in range(0, epochs):
+for e in range(ep+1, epochs):
     exp_number = 9
     mod_num = 3
     # ----------------------------------------------------------------------------
