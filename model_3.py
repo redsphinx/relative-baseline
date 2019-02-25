@@ -135,7 +135,8 @@ class Triplet(chainer.Chain):
             # self.fc = Linear(in_size=512, out_size=10) # wrong way of making predictions
             # self.fc = Linear(in_size=512, out_size=5) # right way with 5 traits
             # self.fc = Linear(in_size=512, out_size=1)  # with collapsed traits
-            self.fc1 = Linear(in_size=512, out_size=2)
+            # self.fc1 = Linear(in_size=512, out_size=2)
+            self.fc1 = Linear(in_size=512, out_size=1)
             self.fc2 = Linear(in_size=512, out_size=1)
 
     def __call__(self, x1, x2):
@@ -147,8 +148,7 @@ class Triplet(chainer.Chain):
         # TODO: is this correct?
         # binary is there change or not classification
         h1 = self.fc1(h)
-        h1 = relu(h1)
-        h1 = chainer.functions.softmax(h1)
+        # h1 = chainer.functions.sigmoid(h1)  # do sigmoid later
 
         # value difference regression
         h2 = self.fc2(h)

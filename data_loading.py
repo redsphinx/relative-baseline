@@ -276,7 +276,6 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
         random.shuffle(zips)
         left_all, right_all = zip(*zips)
     elif data_mix == 'change_points':
-        # TODO: should "Training" be which? -- changed to which
         change_points = U.get_all_change_points(which, val_idx)
         left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2)
         left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
@@ -296,7 +295,8 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
         elif label_mode == 'stepwise':
             labels = np.zeros((batch_size, 3), dtype=np.float32)
     elif label_output == 'double':
-        labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
+        # labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
+        labels_1 = np.zeros((batch_size, 1), dtype=int)  # classifications
         labels_2 = np.zeros((batch_size, 1), dtype=np.float32)  # regression
 
     assert len(left_all) == len(right_all)
@@ -338,9 +338,11 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
             # [0, 1] = change
             # [1, 0] = no change
             if diff == 0:
-                labels_1[i] = [1, 0]
+                # labels_1[i] = [1, 0]
+                labels_1[i] = 0
             else:
-                labels_1[i] = [0, 1]
+                # labels_1[i] = [0, 1]
+                labels_1[i] = 1
 
             labels_2[i] = _tmp_labels[1] - _tmp_labels[0]
 

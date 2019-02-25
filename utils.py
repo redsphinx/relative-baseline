@@ -219,8 +219,15 @@ def find_change_points(which, subject, story):
 
 
 def get_all_change_points(which, val_idx):
-    l = ['Training', 'Validation', 'Test']
+    l = ['train', 'val', 'test']
     assert which in l
+
+    if which == 'train':
+         which = 'Training'
+    elif which == 'val':
+        which = 'Validation'
+    else:
+        which = 'Test'
 
     everything = []
 
