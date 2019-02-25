@@ -267,3 +267,19 @@ def print_all_change_points():
 
 
 # print_all_change_points()
+
+
+def threshold(value, t=0.5):
+    if value >= t:
+        return 1
+    else:
+        return 0
+
+
+def threshold_all(list_values, t=0.5):
+    t_values = np.zeros((len(list_values), 1), dtype=int)
+
+    for i, n in enumerate(list_values):
+        t_values[i] = threshold(n)
+
+    return t_values

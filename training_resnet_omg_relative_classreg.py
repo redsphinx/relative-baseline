@@ -53,7 +53,7 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = False
+DEBUG = True
 # --------------------------------------------------------------------------------------------
 if DEBUG:
     batches = 16
@@ -194,7 +194,11 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                         with chainer.using_config('train', False):
                             pred_1, pred_2 = model(data_left, data_right)
 
-                            prediction = chainer.functions.sigmoid(pred_1) * pred_2
+                            pred_1 = chainer.functions.sigmoid(pred_1)
+
+                            pred_1 = U.threshold_all(to_cpu(pred_1.data))
+
+                            prediction = to_gpu(pred_1, device=C.DEVICE) * pred_2
 
                             prediction = previous_prediction + prediction
 
@@ -230,7 +234,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
 print('Enter training loop with validation')
 for e in range(0, epochs):
-    exp_number = 8
+    exp_number = 9
     mod_num = 3
     # ----------------------------------------------------------------------------
     # training
