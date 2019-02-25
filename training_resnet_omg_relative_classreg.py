@@ -53,16 +53,17 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 # --------------------------------------------------------------------------------------------
 if DEBUG:
     batches = 16
     train_total_steps = 2
+    epochs = 5
 else:
     batches = 32
     train_total_steps = 1600 // batches
+    epochs = 100
 
-epochs = 100
 frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 
 val_total_steps = 5
@@ -160,32 +161,21 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
 
             # num_frames = len(all_frames)
-            num_frames = 1000
-            # num_frames = 10
+
+            if DEBUG:
+                num_frames = 10
+            else:
+                num_frames = 1000
 
             for f in tqdm(range(num_frames)):
                 if f == 0:
                     with cp.cuda.Device(C.DEVICE):
 
                         with chainer.using_config('train', False):
-                            pred_1, pred_2 = np.array([0.0], dtype=np.float32)  # baseline
+                            prediction = np.array([0.0], dtype=np.float32)
+                            labels = np.array([all_labels[f]])
 
-                            # TODO: fix this after the training one is fixed
-                            # TODO: do sigmoid for the multiplication
-                            # [a, b] where a = no change and b = change
-                            # [0, 1] = change
-                            # [1, 0] = no change
-                            prediction = pred_1[1] * pred_2
-
-                            labels_2 = np.array([all_labels[f]])
-                            labels_1 = [[1, 0] if labels_2[i] == 0 else [0, 1] for i in range(len(labels_2))]
-                            labels_1 = np.array(labels_1, dtype=np.float32)
-
-                            classification_loss = softmax_cross_entropy(pred_1, labels_1)
-                            regression_loss = mean_squared_error(pred_2, labels_2)
-                            loss = classification_loss + regression_loss
-
-                            # loss = mean_squared_error(prediction, labels)
+                            loss = mean_squared_error(prediction, labels)
                             _loss_steps_subject.append(float(loss.data))
                 else:
                     data_left, data_right = L.get_left_right_consecutively(which, name, f)
@@ -202,7 +192,9 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                     with cp.cuda.Device(C.DEVICE):
 
                         with chainer.using_config('train', False):
-                            prediction = model(data_left, data_right)
+                            pred_1, pred_2 = model(data_left, data_right)
+
+                            prediction = chainer.functions.sigmoid(pred_1) * pred_2
 
                             prediction = previous_prediction + prediction
 
