@@ -293,4 +293,4 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
                                                                           float(np.mean(_all_pearson))))
 
 
-# predict_valence_sequential_single('val', 6, 99)
+predict_valence_sequential_single('val', 6, 99)
