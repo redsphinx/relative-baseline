@@ -93,8 +93,8 @@ def calculate_pearson(predictions, labels):
 
 # predicts difference two consecutive pairs for first 1000 frame pairs
 def predict_valence_sequential_relative(which, experiment_number, epoch):
-    use_ccc = False
-    use_pearson = True
+    use_ccc = True
+    use_pearson = False
     _loss_steps = []
     _all_ccc = []
     _all_pearson = []
@@ -293,4 +293,4 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
                                                                           float(np.mean(_all_pearson))))
 
 
-predict_valence_sequential_single('val', 6, 99)
+# predict_valence_sequential_single('val', 6, 99)
