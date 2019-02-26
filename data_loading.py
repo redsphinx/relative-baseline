@@ -353,13 +353,18 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
     return left_data, right_data, labels
 
 
-def load_data_single(which, frame_matrix, val_idx, batch_size):
+def load_data_single(which, frame_matrix, val_idx, batch_size, step=0):
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
     elif which == 'val':
         path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
     elif which == 'test':
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
+
+    if which != 'train':
+        random.seed(42+step)
+    else:
+        random.seed()
 
     num_subjects = 10
     sample_per_person = batch_size // num_subjects
@@ -397,9 +402,7 @@ def load_data_single(which, frame_matrix, val_idx, batch_size):
     labels = np.zeros((batch_size, 1), dtype=np.float32)
 
     for i in range(len(names)):
-        _tmp_labels = np.zeros(1)
-
-        # get left data
+        # get data
         jpg_path = os.path.join(path, names[i])
         try:
             jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
