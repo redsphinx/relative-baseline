@@ -278,9 +278,9 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
         left_all, right_all = zip(*zips)
     elif data_mix == 'change_points':
         change_points = U.get_all_change_points(which, val_idx)
-        left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2)
+        left_all_1, right_all_1 = get_left_right_pair_change_points(which, change_points, batch_size=batch_size // 2, step=step)
         left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
-                                                                              batch_size=batch_size // 2)
+                                                                              batch_size=batch_size // 2, step=step)
         left_all_1.extend(left_all_2)
         right_all_1.extend(right_all_2)
         zips = list(zip(left_all_1, right_all_1))
@@ -434,9 +434,9 @@ def load_data_single(which, frame_matrix, val_idx, batch_size, step=0):
     return data, labels
 
 
-def get_left_right_pair_change_points(which, change_points, batch_size):
+def get_left_right_pair_change_points(which, change_points, batch_size, step=0):
     if which != 'train':
-        random.seed(42)
+        random.seed(42+step)
     else:
         random.seed()
 
