@@ -172,9 +172,9 @@ def get_left_right_consecutively(which, subject, current_frame):
 
 
 # makes random pairs with the same person with 2 consecutive frames
-def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=32):
+def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=32, step=0):
     if which != 'train':
-        random.seed(42)
+        random.seed(42+step)
     else:
         random.seed()
 
@@ -251,10 +251,11 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference', data_mix='far'):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference', data_mix='far', step=0, mode='default'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
     assert label_output in ['single', 'double']
+    assert mode in ['default', 'single']  # single=for validation on the same images using single frames (to compare with relative)
 
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
@@ -266,7 +267,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
     if data_mix == 'far':
         left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size, seed)
     elif data_mix == 'close':
-        left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size)
+        left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size, step)
     elif data_mix == 'both':
         left_all_1, right_all_1 = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=batch_size//2)
         left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=batch_size//2)
@@ -289,65 +290,79 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
     left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
     right_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
 
-    if label_output == 'single':
-        if label_mode == 'difference':
-            labels = np.zeros((batch_size, 1), dtype=np.float32)
-        elif label_mode == 'stepwise':
-            labels = np.zeros((batch_size, 3), dtype=np.float32)
-    elif label_output == 'double':
-        # labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
-        labels_1 = np.zeros((batch_size, 1), dtype=int)  # classifications
-        labels_2 = np.zeros((batch_size, 1), dtype=np.float32)  # regression
-
-    assert len(left_all) == len(right_all)
-    for i in range(len(left_all)):
-        _tmp_labels = np.zeros(2)
-        # get left data
-        jpg_path = os.path.join(path, left_all[i])
-        try:
-            jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
-        except FileNotFoundError:
-            print(jpg_path)
-            print(FileNotFoundError)
-        left_data[i] = jpg
-        # left valence
-        _tmp_labels[0] = get_valence(which, left_all[i])
-
-        # get right data
-        jpg_path = os.path.join(path, right_all[i])
-        jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
-        right_data[i] = jpg
-        # right valence
-        _tmp_labels[1] = get_valence(which, right_all[i])
-
+    if mode == 'default':
         if label_output == 'single':
             if label_mode == 'difference':
-                labels[i]= _tmp_labels[1] - _tmp_labels[0]
+                labels = np.zeros((batch_size, 1), dtype=np.float32)
             elif label_mode == 'stepwise':
-                # [-1, 0, 1] = right is lower, same, right is higher
-                diff = _tmp_labels[0] - _tmp_labels[1]
-                if diff == 0:
-                    labels[i] = [0, 1, 0]
-                elif diff < 0:
-                    labels[i] = [0, 0, 1]
-                else:
-                    labels[i] = [1, 0, 0]
+                labels = np.zeros((batch_size, 3), dtype=np.float32)
         elif label_output == 'double':
-            diff = _tmp_labels[0] - _tmp_labels[1]
-            # [a, b] where a = no change and b = change
-            # [0, 1] = change
-            # [1, 0] = no change
-            if diff == 0:
-                # labels_1[i] = [1, 0]
-                labels_1[i] = 0
-            else:
-                # labels_1[i] = [0, 1]
-                labels_1[i] = 1
+            # labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
+            labels_1 = np.zeros((batch_size, 1), dtype=int)  # classifications
+            labels_2 = np.zeros((batch_size, 1), dtype=np.float32)  # regression
 
-            labels_2[i] = _tmp_labels[1] - _tmp_labels[0]
+        assert len(left_all) == len(right_all)
+        for i in range(len(left_all)):
+            _tmp_labels = np.zeros(2)
+            # get left data
+            jpg_path = os.path.join(path, left_all[i])
+            try:
+                jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+            except FileNotFoundError:
+                print(jpg_path)
+                print(FileNotFoundError)
+            left_data[i] = jpg
+            # left valence
+            _tmp_labels[0] = get_valence(which, left_all[i])
 
-    if label_output == 'double':
-        labels = [labels_1, labels_2]
+            # get right data
+            jpg_path = os.path.join(path, right_all[i])
+            jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+            right_data[i] = jpg
+            # right valence
+            _tmp_labels[1] = get_valence(which, right_all[i])
+
+            if label_output == 'single':
+                if label_mode == 'difference':
+                    labels[i]= _tmp_labels[1] - _tmp_labels[0]
+                elif label_mode == 'stepwise':
+                    # [-1, 0, 1] = right is lower, same, right is higher
+                    diff = _tmp_labels[0] - _tmp_labels[1]
+                    if diff == 0:
+                        labels[i] = [0, 1, 0]
+                    elif diff < 0:
+                        labels[i] = [0, 0, 1]
+                    else:
+                        labels[i] = [1, 0, 0]
+            elif label_output == 'double':
+                diff = _tmp_labels[0] - _tmp_labels[1]
+                # [a, b] where a = no change and b = change
+                # [0, 1] = change
+                # [1, 0] = no change
+                if diff == 0:
+                    # labels_1[i] = [1, 0]
+                    labels_1[i] = 0
+                else:
+                    # labels_1[i] = [0, 1]
+                    labels_1[i] = 1
+
+                labels_2[i] = _tmp_labels[1] - _tmp_labels[0]
+
+        if label_output == 'double':
+            labels = [labels_1, labels_2]
+
+    # for comparison with relative when using single frames
+    else:
+        labels = np.zeros((batch_size, 1), dtype=np.float32)
+
+        for i in range(len(left_all)):
+            # get only right data
+            jpg_path = os.path.join(path, right_all[i])
+            jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
+            right_data[i] = jpg
+            # right valence
+            labels[i] = get_valence(which, right_all[i])
+
 
     # labels = np.expand_dims(labels, -1)
     return left_data, right_data, labels

@@ -88,7 +88,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
 
     # print('%s, steps: %d' % (which, steps))
 
-    if which == 'train' or (which == 'val' and validation_mode == 'random'):
+    if which == 'train':
         for s in tqdm(range(steps)):
             data, labels = L.load_data_single(which, frame_matrix, val_idx, batches, s)
 
@@ -174,6 +174,44 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
             plt.plot(x, all_labels[:num_frames], 'g')
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
+
+    elif which == 'val' and validation_mode == 'random':
+        for s in tqdm(range(steps)):
+            _, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
+                                                                 label_mode='difference', data_mix='close',
+                                                                 step=s, mode='single')
+
+            if C.ON_GPU:
+                data = to_gpu(data_right, device=C.DEVICE)
+                labels = to_gpu(labels, device=C.DEVICE)
+
+            with cp.cuda.Device(C.DEVICE):
+                if which == 'train':
+                    config = True
+                else:
+                    config = False
+
+                with chainer.using_config('train', config):
+                    if which == 'train':
+                        model.cleargrads()
+                    prediction = model(data)
+
+                    loss = mean_squared_error(prediction, labels)
+                    _loss_steps.append(float(loss.data))
+
+                    if which == 'train':
+                        loss.backward()
+                        optimizer.update()
+
+        # save model
+        if which == 'train':
+            plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
+            save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+            model_folder = os.path.join(save_location, plots_folder)
+            if not os.path.exists(model_folder):
+                os.mkdir(model_folder)
+            name = os.path.join(model_folder, 'epoch_%d' % e)
+            chainer.serializers.save_npz(name, my_model)
 
     return _loss_steps
 
