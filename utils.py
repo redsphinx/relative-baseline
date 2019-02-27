@@ -283,3 +283,27 @@ def threshold_all(list_values, t=0.5):
         t_values[i] = threshold(n)
 
     return t_values
+
+
+def to_ternary(label_list):
+    t0 = 1
+    new_labels = [t0]
+    for i in range(1, len(label_list)):
+        diff = label_list[i] - label_list[i-1]
+        if diff == 0:
+            new_labels.append(1)
+        elif diff < 0:
+            new_labels.append(0)
+        else:
+            new_labels.append(2)
+
+    return new_labels
+
+
+def threshold_ternary(prediction):
+    # [0, 1, 2] = right is lower, same, right is higher
+    prediction = list(prediction)
+    return prediction.index(max(prediction))
+
+
+

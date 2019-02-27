@@ -295,7 +295,8 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
             if label_mode == 'difference':
                 labels = np.zeros((batch_size, 1), dtype=np.float32)
             elif label_mode == 'stepwise':
-                labels = np.zeros((batch_size, 3), dtype=np.float32)
+                # labels = np.zeros((batch_size, 3), dtype=int)
+                labels = np.zeros((batch_size), dtype=int)
         elif label_output == 'double':
             # labels_1 = np.zeros((batch_size, 2), dtype=int)  # classifications
             labels_1 = np.zeros((batch_size, 1), dtype=int)  # classifications
@@ -329,11 +330,14 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
                     # [-1, 0, 1] = right is lower, same, right is higher
                     diff = _tmp_labels[0] - _tmp_labels[1]
                     if diff == 0:
-                        labels[i] = [0, 1, 0]
+                        # labels[i] = [0, 1, 0]
+                        labels[i] = 1
                     elif diff < 0:
-                        labels[i] = [0, 0, 1]
+                        # labels[i] = [0, 0, 1]
+                        labels[i] = 2
                     else:
-                        labels[i] = [1, 0, 0]
+                        # labels[i] = [1, 0, 0]
+                        labels[i] = 0
             elif label_output == 'double':
                 diff = _tmp_labels[0] - _tmp_labels[1]
                 # [a, b] where a = no change and b = change

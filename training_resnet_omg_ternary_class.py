@@ -56,8 +56,8 @@ print('model initialized with %d parameters' % my_model.count_params())
 DEBUG = False
 # --------------------------------------------------------------------------------------------
 if DEBUG:
-    batches = 32
-    train_total_steps = 1600 // batches
+    batches = 16
+    train_total_steps = 5
     epochs = 10
 else:
     batches = 32
@@ -80,7 +80,7 @@ val_total_steps = 50
 
 def run(which, model, optimizer, epoch, training_mode='change_points', validation_mode='sequential', model_num=None,
         experiment_number=None, label_output='single'):
-    _loss_steps = []
+    _loss_steps = []  # or for holding accuracy in the validation step
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
     assert training_mode in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
@@ -100,8 +100,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
     # print('%s, steps: %d' % (which, steps))
 
     if which == 'train':
-        # for s in tqdm(range(steps)):
-        for s in range(steps):
+        for s in tqdm(range(steps)):
+        # for s in range(steps):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='stepwise',
                                                                  data_mix=training_mode,
@@ -125,14 +125,13 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
                     loss = softmax_cross_entropy(prediction, labels)
 
-                    # print('classification loss: %f' % (float(to_cpu(loss.data))))
-
                     _loss_steps.append(float(loss.data))
 
                     if which == 'train':
                         loss.backward()
                         optimizer.update()
 
+        print('classification loss: ', np.mean(_loss_steps))
         # save model
         if not DEBUG:
             plots_folder = 'model_%d_experiment_%d' % (model_num, experiment_number)
@@ -145,8 +144,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
     else:
         for subject in range(10):
-            _loss_steps_subject = []
-            previous_prediction = np.array([0.], dtype=np.float32)
+            accuracy = 0
+            # previous_prediction = np.array([0.], dtype=np.float32)
             all_predictions = []
 
             name = 'Subject_%d_Story_1' % (subject + 1)
@@ -156,32 +155,30 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
             full_name = os.path.join(path, 'Annotations', name + '.csv')
             all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+            all_labels = U.to_ternary(all_labels)
+            all_labels = np.array(all_labels)
 
             # num_frames = len(all_frames)
 
             if DEBUG:
-                num_frames = 10
+                num_frames = 100
             else:
                 num_frames = 1000
 
             # for f in tqdm(range(num_frames)):
             for f in range(num_frames):
                 if f == 0:
-                    with cp.cuda.Device(C.DEVICE):
-
-                        with chainer.using_config('train', False):
-                            prediction = np.array([0.0], dtype=np.float32)
-                            _loss_steps_subject.append(0.0)
+                    all_predictions.append(1)
+                    accuracy += 1
                 else:
                     data_left, data_right = L.get_left_right_consecutively(which, name, f)
                     data_left = np.expand_dims(data_left, 0)
                     data_right = np.expand_dims(data_right, 0)
 
-                    # TODO: turn into ternary labels
-                    labels = np.array([all_labels[f]])
+                    labels = all_labels[f]
 
                     if C.ON_GPU:
-                        previous_prediction = to_gpu(previous_prediction, device=C.DEVICE)
+                        # previous_prediction = to_gpu(previous_prediction, device=C.DEVICE)
                         data_left = to_gpu(data_left, device=C.DEVICE)
                         data_right = to_gpu(data_right, device=C.DEVICE)
                         labels = to_gpu(labels, device=C.DEVICE)
@@ -191,8 +188,11 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                         with chainer.using_config('train', False):
                             prediction = model(data_left, data_right)
                             prediction = chainer.functions.softmax(prediction)
-                            prediction = U.threshold_all(to_cpu(prediction.data))
+                            prediction = U.threshold_ternary(to_cpu(prediction.data))
+                            prediction = np.array(prediction)
                             prediction = to_gpu(prediction, device=C.DEVICE)
+
+                            all_predictions.append(int(prediction))
 
                             # TODO
                             # accuracy will be high because model will learn to predict not changing
@@ -202,17 +202,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
                             if prediction == labels:
                                 accuracy += 1
 
-                            _loss_steps_subject.append(float(loss.data))
-
-                            prediction = float(prediction.data)
-
-                previous_prediction = to_cpu(previous_prediction)
-
-                previous_prediction[0] = float(prediction)
-                all_predictions.append(prediction)
-
-            print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
-            _loss_steps.append(np.mean(_loss_steps_subject))
+            print('accuracy %s: %d' % (name, accuracy))
+            _loss_steps.append(accuracy)
 
             # save graph
             if not DEBUG:
@@ -234,8 +225,8 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
 print('Enter training loop with validation')
 for e in range(ep+1, epochs):
-    exp_number = 9
-    mod_num = 3
+    exp_number = 10
+    mod_num = 4
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
@@ -252,4 +243,4 @@ for e in range(ep+1, epochs):
     if not DEBUG:
         L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
 
-    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
+    print('epoch %d, train_loss: %f, val_accuracy: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
