@@ -161,7 +161,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             # num_frames = len(all_frames)
 
             if DEBUG:
-                num_frames = 100
+                num_frames = 50
             else:
                 num_frames = 1000
 

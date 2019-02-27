@@ -302,7 +302,7 @@ def to_ternary(label_list):
 
 def threshold_ternary(prediction):
     # [0, 1, 2] = right is lower, same, right is higher
-    prediction = list(prediction)
+    prediction = list(prediction[0])
     return prediction.index(max(prediction))
 
 
