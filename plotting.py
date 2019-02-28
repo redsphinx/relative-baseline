@@ -27,7 +27,7 @@ def plot_labels_for_subject(which, subject, story):
 #     plot_labels_for_subject('Validation', i, 1)
 
 
-def plot_loss(which, model, experiment):
+def plot_loss(which, model, experiment, loss_name):
     assert which in ['train', 'val', 'test']
     path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' % (which, model, experiment)
     save_path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/loss_plots/model_%d_experiment_%d.png' % (which, model, experiment)
@@ -37,12 +37,13 @@ def plot_loss(which, model, experiment):
     fig = plt.figure()
     x = range(len(loss))
     plt.plot(x, loss, 'b')
-    plt.title('%s loss model %d experiment %d' % (which, model, experiment))
+    plt.title('%s %s model %d experiment %d' % (which, loss_name, model, experiment))
     plt.xlabel('epoch')
-    plt.ylabel('mean squared difference')
+
+    plt.ylabel('%s' % loss_name)
 
     plt.savefig(save_path)
 
 
-plot_loss('val', 1, 7)
-plot_loss('train', 1, 7)
+plot_loss('val', 4, 10, 'accuracy')
+plot_loss('train', 4, 10, 'softmax crossentropy loss')

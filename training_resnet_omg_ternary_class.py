@@ -53,12 +53,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = False
+DEBUG = True
 # --------------------------------------------------------------------------------------------
 if DEBUG:
-    batches = 16
-    train_total_steps = 5
-    epochs = 10
+    batches = 32
+    train_total_steps = 1600//batches
+    epochs = 100
 else:
     batches = 32
     train_total_steps = 1600 // batches
@@ -161,7 +161,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
             # num_frames = len(all_frames)
 
             if DEBUG:
-                num_frames = 50
+                num_frames = 500
             else:
                 num_frames = 1000
 
