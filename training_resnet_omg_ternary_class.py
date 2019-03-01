@@ -58,7 +58,7 @@ DEBUG = True
 if DEBUG:
     batches = 32
     train_total_steps = 1600//batches
-    epochs = 100
+    epochs = 1000
 else:
     batches = 32
     train_total_steps = 1600 // batches
@@ -194,11 +194,6 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
                             all_predictions.append(int(prediction))
 
-                            # TODO
-                            # accuracy will be high because model will learn to predict not changing
-                            # not sure if accuracy like this is a good measure
-                            # DO i add up the ups and downs to visualize the curve?
-                            # what about the ground truth? do i add it up as well to visualize?
                             if prediction == labels:
                                 accuracy += 1
 

@@ -5,6 +5,7 @@ import random
 from deepimpression2.chalearn20 import poisson_disc as pd
 from PIL import Image
 import utils as U
+import deepimpression2.constants as C
 
 
 def wc_l(file_name):
@@ -150,14 +151,21 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32,
     return list(left_all), list(right_all)
 
 
-def get_left_right_consecutively(which, subject, current_frame):
+def get_left_right_consecutively(which, subject, current_frame, time_gap=0):
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
     elif which == 'val':
         path = '/scratch/users/gabras/data/omg_empathy/Validation/jpg_participant_662_542'
     elif which == 'test':
         path = '/scratch/users/gabras/data/omg_empathy/Test/jpg_participant_662_542'
-    
+    # time_gap in milliseconds
+    _r = time_gap % (1/C.OMG_EMPATHY_FRAME_RATE * 1000)
+    try:
+        assert _r == 0
+    except AssertionError:
+        print('Error: time_gap value must be a multiplicity of %d. time_gap is in milliseconds.'
+              % int(1/C.OMG_EMPATHY_FRAME_RATE * 1000))
+
     if current_frame != 0:
         left_path = os.path.join(path, subject, '%d.jpg' % (current_frame - 1))
         right_path = os.path.join(path, subject, '%d.jpg' % (current_frame))
@@ -251,7 +259,8 @@ def get_valence(which, full_name):
     return valence
 
 
-def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference', data_mix='far', step=0, mode='default'):
+def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference',
+                       data_mix='far', step=0, mode='default'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
     assert label_output in ['single', 'double']
