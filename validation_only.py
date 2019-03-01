@@ -94,7 +94,7 @@ def calculate_pearson(predictions, labels):
 # predicts difference two consecutive pairs for first 1000 frame pairs
 def predict_valence_sequential_relative(which, experiment_number, epoch):
     use_ccc = True
-    use_pearson = False
+    use_pearson = True
     _loss_steps = []
     _all_ccc = []
     _all_pearson = []
@@ -124,7 +124,17 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
         num_frames = 1000
         # num_frames = 10
 
-        for f in range(num_frames):
+        time_gap = 1000
+
+        if time_gap > 0:
+            _b = C.OMG_EMPATHY_FRAME_RATE
+            _e = _b + num_frames
+        else:
+            _b = 0
+            _e = num_frames
+
+        # for f in tqdm(range(_b, _e)):
+        for f in range(_b, _e):
             if f == 0:
                 with cp.cuda.Device(C.DEVICE):
 
@@ -135,7 +145,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
                         loss = mean_squared_error(prediction, labels)
                         _loss_steps_subject.append(float(loss.data))
             else:
-                data_left, data_right = L.get_left_right_consecutively(which, name, f)
+                data_left, data_right = L.get_left_right_consecutively(which, name, f, time_gap=time_gap)
                 data_left = np.expand_dims(data_left, 0)
                 data_right = np.expand_dims(data_right, 0)
                 labels = np.array([all_labels[f]])
@@ -168,8 +178,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
             _all_ccc.append(ccc_subject)
             print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
 
-
-        elif use_pearson:
+        if use_pearson:
             pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[:num_frames])
             _all_pearson.append(pearson_subject)
             print('%s, loss: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), pearson_subject))
@@ -201,7 +210,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
                                                                           float(np.mean(_all_pearson))))
 
 
-predict_valence_sequential_relative('val', 7, 99)
+predict_valence_sequential_relative('val', 11, 35)
 
 
 # predicts valence value first 1000 frames

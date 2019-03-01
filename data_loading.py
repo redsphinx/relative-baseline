@@ -182,11 +182,20 @@ def get_left_right_consecutively(which, subject, current_frame, time_gap=1):
 
 
 # makes random pairs with the same person with 2 consecutive frames
-def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=32, step=0):
+def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=32, step=0, time_gap=1):
     if which != 'train':
         random.seed(42+step)
     else:
         random.seed()
+
+    _r = time_gap % (1 / C.OMG_EMPATHY_FRAME_RATE * 1000)
+    try:
+        assert _r == 0
+        time_gap = C.OMG_EMPATHY_FRAME_RATE
+    except AssertionError:
+        if time_gap != 1:
+            print('Error: time_gap value must be a multiplicity of %d. time_gap is in milliseconds.'
+                  % int(1 / C.OMG_EMPATHY_FRAME_RATE * 1000))
 
     num_subjects = 10
     sample_per_person = int(batch_size / num_subjects)
@@ -206,7 +215,8 @@ def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, ba
         sample_idx = [random.randint(0, num) for i in range(spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
         left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - 2) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
-        right_frames = [left_frames[i] + 1 for i in range(len(left_frames))]
+        # right_frames = [left_frames[i] + 1 for i in range(len(left_frames))]
+        right_frames = [left_frames[i] + time_gap for i in range(len(left_frames))]
         
         left_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, left_frames[i]) for i in range(len(sample_idx))]
         right_names = ['Subject_%d_Story_%d/%d.jpg' % (subject_number+1, stories[i]+1, right_frames[i]) for i in range(len(sample_idx))]
@@ -262,7 +272,7 @@ def get_valence(which, full_name):
 
 
 def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference',
-                       data_mix='far', step=0, mode='default'):
+                       data_mix='far', step=0, mode='default', time_gap=1):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
     assert label_output in ['single', 'double']
@@ -278,10 +288,12 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
     if data_mix == 'far':
         left_all, right_all = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size, seed)
     elif data_mix == 'close':
-        left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size, step)
+        left_all, right_all = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size,
+                                                                          step, time_gap=time_gap)
     elif data_mix == 'both':
         left_all_1, right_all_1 = get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=batch_size//2)
-        left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, batch_size=batch_size//2)
+        left_all_2, right_all_2 = get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix,
+                                                                              batch_size=batch_size//2, time_gap=time_gap)
         left_all_1.extend(left_all_2)
         right_all_1.extend(right_all_2)
         zips = list(zip(left_all_1, right_all_1))
