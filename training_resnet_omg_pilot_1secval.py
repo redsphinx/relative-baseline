@@ -52,12 +52,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 # --------------------------------------------------------------------------------------------
 if DEBUG:
     batches = 16
     train_total_steps = 2
-    epochs = 2
+    epochs = ep + 1 + 2
 else:
     batches = 32
     train_total_steps = 1600 // batches
@@ -136,17 +136,21 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
                 full_name = os.path.join(path, 'Annotations', name + '.csv')
                 all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
 
-                # num_frames = len(all_frames)
-                num_frames = 1000
+                if DEBUG:
+                    num_frames = 10
+                else:
+                    # num_frames = len(all_frames)
+                    num_frames = 1000
 
                 if time_gap > 0:
-                    b = C.OMG_EMPATHY_FRAME_RATE
-                    e = b + num_frames
+                    _b = C.OMG_EMPATHY_FRAME_RATE
+                    _e = _b + num_frames
                 else:
-                    b = 0
-                    e = num_frames
+                    _b = 0
+                    _e = num_frames
 
-                for f in tqdm(range(b, e)):
+                # for f in tqdm(range(_b, _e)):
+                for f in range(_b, _e):
                     if f == 0:
                         with cp.cuda.Device(C.DEVICE):
 
@@ -207,41 +211,20 @@ def run(which, model, optimizer, epoch, validation_mode='sequential', model_num=
 
 
 print('Enter training loop with validation')
-for e in range(0, epochs):
-    exp_number = 3
+for e in range(ep+1, epochs):
+    exp_number = 11
     mod_num = 1
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
     loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e)
-    L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num, experiment_number=exp_number)
-    # L.make_epoch_plot(which)
+    if not DEBUG:
+        L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num, experiment_number=exp_number)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    # loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e, validation_mode='sequential')
-    # L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
+    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number, epoch=e, validation_mode='sequential')
+    if not DEBUG:
+        L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num, experiment_number=exp_number)
     #
-    # print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
-    # ----------------------------------------------------------------------------
-    # test
-    # ----------------------------------------------------------------------------
-    # times = 1
-    # for i in range(1):
-    #     if times == 1:
-    #         ordered = True
-    #         save_all_results = True
-    #     else:
-    #         ordered = False
-    #         save_all_results = False
-    #
-    #     run(which='test', steps=test_steps, which_labels=test_labels, frames=id_frames,
-    #         model=my_model, optimizer=my_optimizer, pred_diff=pred_diff_test,
-    #         loss_saving=test_loss, which_data=test_on, ordered=ordered, save_all_results=save_all_results,
-    #         twostream=True)
-
-    # save model
-    # if ((e + 1) % 10) == 0:
-    # save_location = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
-    # name = os.path.join(save_location, 'epoch_%d_0' % e)
-    # chainer.serializers.save_npz(name, my_model)
+    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))

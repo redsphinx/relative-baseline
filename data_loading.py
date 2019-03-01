@@ -151,7 +151,7 @@ def get_left_right_pair_same_person(which, val_idx, frame_matrix, batch_size=32,
     return list(left_all), list(right_all)
 
 
-def get_left_right_consecutively(which, subject, current_frame, time_gap=0):
+def get_left_right_consecutively(which, subject, current_frame, time_gap=1):
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
     elif which == 'val':
@@ -162,13 +162,15 @@ def get_left_right_consecutively(which, subject, current_frame, time_gap=0):
     _r = time_gap % (1/C.OMG_EMPATHY_FRAME_RATE * 1000)
     try:
         assert _r == 0
+        time_gap = C.OMG_EMPATHY_FRAME_RATE
     except AssertionError:
-        print('Error: time_gap value must be a multiplicity of %d. time_gap is in milliseconds.'
-              % int(1/C.OMG_EMPATHY_FRAME_RATE * 1000))
+        if time_gap != 1:
+            print('Error: time_gap value must be a multiplicity of %d. time_gap is in milliseconds.'
+                  % int(1/C.OMG_EMPATHY_FRAME_RATE * 1000))
 
     if current_frame != 0:
-        left_path = os.path.join(path, subject, '%d.jpg' % (current_frame - 1))
-        right_path = os.path.join(path, subject, '%d.jpg' % (current_frame))
+        left_path = os.path.join(path, subject, '%d.jpg' % (current_frame - time_gap))
+        right_path = os.path.join(path, subject, '%d.jpg' % current_frame)
         jpg_left = np.array(Image.open(left_path), dtype=np.float32).transpose((2, 0, 1))
         jpg_right = np.array(Image.open(right_path), dtype=np.float32).transpose((2, 0, 1))
     else:
