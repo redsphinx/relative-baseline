@@ -214,7 +214,9 @@ def get_left_right_pair_same_person_consecutive(which, val_idx, frame_matrix, ba
             num = None
         sample_idx = [random.randint(0, num) for i in range(spp)]
         stories = [val_idx[sample_idx[i]] - 1 for i in range(len(sample_idx))]
-        left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - 2) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
+
+        # left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - 2) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
+        left_frames = [random.randint(0, frame_matrix[sub][stories[i]] - (time_gap+1)) for i in range(len(sample_idx))] # -2 because of randint and we do +1 for right_frame
         # right_frames = [left_frames[i] + 1 for i in range(len(left_frames))]
         right_frames = [left_frames[i] + time_gap for i in range(len(left_frames))]
         
