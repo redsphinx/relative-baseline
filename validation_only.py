@@ -8,6 +8,8 @@ import deepimpression2.constants as C
 from chainer.backends.cuda import to_gpu, to_cpu
 from model_1 import Siamese
 from model_2 import Resnet
+from model_3 import Triplet
+from model_4 import TernaryClassifier
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -15,6 +17,7 @@ import data_loading as L
 from scipy.stats import pearsonr
 import math
 from scipy import stats
+import utils as U
 
 
 # TODO:debug
@@ -92,15 +95,19 @@ def calculate_pearson(predictions, labels):
 
 
 # predicts difference two consecutive pairs for first 1000 frame pairs
-def predict_valence_sequential_relative(which, experiment_number, epoch):
+def predict_valence_sequential_relative(which, experiment_number, epoch, time_gap=1, model_number=1):
     use_ccc = True
     use_pearson = True
     _loss_steps = []
     _all_ccc = []
     _all_pearson = []
 
-    model_number = 1
-    model = Siamese()
+    if model_number == 1:
+        model = Siamese()
+    elif model_number == 3:
+        model = Triplet()
+    elif model_number == 4:
+        model = TernaryClassifier()
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (model_number, experiment_number), 'epoch_%d' % epoch)
     chainer.serializers.load_npz(p, model)
@@ -124,9 +131,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
         num_frames = 1000
         # num_frames = 10
 
-        time_gap = 1000
-
-        if time_gap > 0:
+        if time_gap > 1:
             _b = C.OMG_EMPATHY_FRAME_RATE
             _e = _b + num_frames
         else:
@@ -159,14 +164,30 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
                 with cp.cuda.Device(C.DEVICE):
 
                     with chainer.using_config('train', False):
-                        prediction = model(data_left, data_right)
+                        if model_number == 3:
+                            pred_1, pred_2 = model(data_left, data_right)
 
-                        prediction = previous_prediction + prediction
+                            pred_1 = chainer.functions.sigmoid(pred_1)
 
-                        loss = mean_squared_error(prediction.data[0], labels)
-                        _loss_steps_subject.append(float(loss.data))
+                            pred_1 = U.threshold_all(to_cpu(pred_1.data))
 
-                        prediction = float(prediction.data)
+                            prediction = to_gpu(pred_1, device=C.DEVICE) * pred_2
+
+                            prediction = previous_prediction + prediction
+
+                            loss = mean_squared_error(prediction.data[0], labels)
+                            _loss_steps_subject.append(float(loss.data))
+
+                            prediction = float(prediction.data)
+                        else:
+                            prediction = model(data_left, data_right)
+
+                            prediction = previous_prediction + prediction
+
+                            loss = mean_squared_error(prediction.data[0], labels)
+                            _loss_steps_subject.append(float(loss.data))
+
+                            prediction = float(prediction.data)
 
             previous_prediction = to_cpu(previous_prediction)
 
@@ -174,12 +195,12 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
             all_predictions.append(prediction)
 
         if use_ccc:
-            ccc_subject = calculate_ccc(all_predictions, all_labels[:num_frames])
+            ccc_subject = calculate_ccc(all_predictions, all_labels[_b:_e])
             _all_ccc.append(ccc_subject)
             print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
 
         if use_pearson:
-            pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[:num_frames])
+            pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[_b:_e])
             _all_pearson.append(pearson_subject)
             print('%s, loss: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), pearson_subject))
 
@@ -204,13 +225,14 @@ def predict_valence_sequential_relative(which, experiment_number, epoch):
         print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
                                                                           float(np.mean(_loss_steps)),
                                                                           float(np.mean(_all_ccc))))
-    elif use_pearson:
+    if use_pearson:
         print('model_%d_experiment_%d_epoch_%d, val_loss: %f, pearson: %f' % (model_number, experiment_number, epoch,
                                                                           float(np.mean(_loss_steps)),
                                                                           float(np.mean(_all_pearson))))
 
 
-predict_valence_sequential_relative('val', 11, 35)
+# for i in range(100):
+#     predict_valence_sequential_relative('val', 9, 99, time_gap=1, model_number=3)
 
 
 # predicts valence value first 1000 frames

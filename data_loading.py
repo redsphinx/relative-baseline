@@ -251,16 +251,24 @@ def cat_head_tail(fname, frame_num):
     return value
 
 
-def get_valence(which, full_name):
+def get_valence(which, full_name, label_type='discrete'):
     name = full_name.split('/')[0]
     frame = int(full_name.split('/')[-1].split('.jpg')[0]) + 2 # lines start at 1 + skip first line
 
-    if which == 'train':
-        csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/Annotations', name + '.csv')
-    elif which == 'val':
-        csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/Annotations', name + '.csv')
-    elif which == 'test':
-        raise NotImplemented
+    if label_type == 'discrete':
+        if which == 'train':
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/Annotations', name + '.csv')
+        elif which == 'val':
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/Annotations', name + '.csv')
+        elif which == 'test':
+            raise NotImplemented
+    elif label_type == 'smooth':
+        if which == 'train':
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/AnnotationsSmooth_75_3',
+                                    name + '.csv')
+        elif which == 'val':
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/AnnotationsSmooth_75_3',
+                                    name + '.csv')
 
     try:
         valence = float(cat_head_tail(csv_path, frame))
@@ -272,11 +280,12 @@ def get_valence(which, full_name):
 
 
 def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference',
-                       data_mix='far', step=0, mode='default', time_gap=1):
+                       data_mix='far', step=0, mode='default', time_gap=1, label_type='discrete'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
     assert label_output in ['single', 'double']
     assert mode in ['default', 'single']  # single=for validation on the same images using single frames (to compare with relative)
+    assert label_type in ['discrete', 'smooth']
 
     if which == 'train':
         path = '/scratch/users/gabras/data/omg_empathy/Training/jpg_participant_662_542'
@@ -337,14 +346,14 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
                 print(FileNotFoundError)
             left_data[i] = jpg
             # left valence
-            _tmp_labels[0] = get_valence(which, left_all[i])
+            _tmp_labels[0] = get_valence(which, left_all[i], label_type)
 
             # get right data
             jpg_path = os.path.join(path, right_all[i])
             jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
             right_data[i] = jpg
             # right valence
-            _tmp_labels[1] = get_valence(which, right_all[i])
+            _tmp_labels[1] = get_valence(which, right_all[i], label_type)
 
             if label_output == 'single':
                 if label_mode == 'difference':
@@ -388,7 +397,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
             jpg = np.array(Image.open(jpg_path), dtype=np.float32).transpose((2, 0, 1))
             right_data[i] = jpg
             # right valence
-            labels[i] = get_valence(which, right_all[i])
+            labels[i] = get_valence(which, right_all[i], label_type)
 
 
     # labels = np.expand_dims(labels, -1)
@@ -529,16 +538,18 @@ def get_single_consecutively(which, subject, current_frame):
     return jpg
 
 
-def update_logs(which, loss, epoch, model_num, experiment_number):
+def update_logs(which, loss, epoch, model_num, experiment_number, ccc=None, pearson=None):
     path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' \
            % (which, model_num, experiment_number)
 
-    with open(path, 'a') as my_file:
-        line = '%d,%f\n' % (epoch, loss)
-        my_file.write(line)
-
-
-
+    if ccc is None and pearson is None:
+        with open(path, 'a') as my_file:
+            line = '%d,%f\n' % (epoch, loss)
+            my_file.write(line)
+    else:
+        with open(path, 'a') as my_file:
+            line = '%d,%f,%f,%f\n' % (epoch, loss, ccc, pearson)
+            my_file.write(line)
 
 
 

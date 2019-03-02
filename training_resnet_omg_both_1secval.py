@@ -25,15 +25,16 @@ import cupy as cp
 from chainer.functions import expand_dims
 from random import shuffle
 from tqdm import tqdm
+import validation_only as V
 
-load_model = True
+load_model = False
 
 my_model = Siamese()
 
 if load_model:
     m_num = 1
-    e_num = 4
-    ep = 29
+    e_num = 12
+    ep = 87
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
@@ -68,8 +69,8 @@ frame_matrix, valid_story_idx_all = L.make_frame_matrix()
 val_total_steps = 50
 
 
-def run(which, model, optimizer, epoch, training_mode='both', validation_mode='sequential', model_num=None,
-        experiment_number=None, time_gap=1):
+def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None,
+        experiment_number=None, time_gap=1000):
     _loss_steps = []
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
@@ -90,7 +91,7 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
         for s in tqdm(range(steps)):
             data_left, data_right, labels = L.load_data_relative(which, frame_matrix, val_idx, batches,
                                                                  label_mode='difference', data_mix=training_mode,
-                                                                 step=s, time_gap=time_gap)
+                                                                 step=s, time_gap=time_gap, label_type='smooth')
 
             if C.ON_GPU:
                 data_left = to_gpu(data_left, device=C.DEVICE)
@@ -125,7 +126,13 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
             name = os.path.join(model_folder, 'epoch_%d' % epoch)
             chainer.serializers.save_npz(name, my_model)
 
+        _all_ccc = None
+        _all_pearson = None
+
     else:
+        _all_ccc = []
+        _all_pearson = []
+
         for subject in range(10):
             _loss_steps_subject = []
             previous_prediction = np.array([0.], dtype=np.float32)
@@ -145,7 +152,7 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
                 # num_frames = len(all_frames)
                 num_frames = 1000
 
-            if time_gap > 0:
+            if time_gap > 1:
                 _b = C.OMG_EMPATHY_FRAME_RATE
                 _e = _b + num_frames
             else:
@@ -192,7 +199,14 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
                 previous_prediction[0] = float(prediction)
                 all_predictions.append(prediction)
 
-            print('loss %s: %f' % (name, float(np.mean(_loss_steps_subject))))
+            # ccc and pearson
+            ccc_subject = V.calculate_ccc(all_predictions, all_labels[_b:_e])
+            _all_ccc.append(ccc_subject)
+            pearson_subject, p_vals = V.calculate_pearson(all_predictions, all_labels[_b:_e])
+            _all_pearson.append(pearson_subject)
+
+            print('loss %s: %f, ccc: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject,
+                                                         pearson_subject))
             _loss_steps.append(np.mean(_loss_steps_subject))
 
             # save graph
@@ -210,31 +224,29 @@ def run(which, model, optimizer, epoch, training_mode='both', validation_mode='s
                 plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
                 del fig
 
-    return _loss_steps
+    return _loss_steps, _all_ccc, _all_pearson
 
 
 print('Enter training loop with validation')
 for e in range(ep+1, epochs):
-    exp_number = 12
+    exp_number = 13
     mod_num = 1
     # ----------------------------------------------------------------------------
     # training
     # ----------------------------------------------------------------------------
-    loss_train = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num,
-                     experiment_number=exp_number, epoch=e)
+    loss_train, _, _ = run(which='train', model=my_model, optimizer=my_optimizer, model_num=mod_num,
+                                   experiment_number=exp_number, epoch=e)
     if not DEBUG:
         L.update_logs(which='train', loss=float(np.mean(loss_train)), epoch=e, model_num=mod_num,
                       experiment_number=exp_number)
     # ----------------------------------------------------------------------------
     # validation
     # ----------------------------------------------------------------------------
-    loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number,
-                   epoch=e, validation_mode='sequential')
-    # loss_val = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num, experiment_number=exp_number,
-    #                epoch=e, validation_mode='random')
+    loss_val, ccc, pearson = run(which='val', model=my_model, optimizer=my_optimizer, model_num=mod_num,
+                                 experiment_number=exp_number, epoch=e, validation_mode='sequential')
 
     if not DEBUG:
         L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num,
-                      experiment_number=exp_number)
+                      experiment_number=exp_number, ccc=float(np.mean(ccc)), pearson=float(np.mean(pearson)))
 
     print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
