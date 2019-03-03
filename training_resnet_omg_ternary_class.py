@@ -29,14 +29,14 @@ import utils as U
 import validation_only as V
 
 
-load_model = False
+load_model = True
 
 my_model = TernaryClassifier()
 
 if load_model:
     m_num = 4
-    e_num = 10
-    ep = 99
+    e_num = 14
+    ep = 14
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
@@ -81,6 +81,7 @@ val_total_steps = 50
 
 def run(which, model, optimizer, epoch, training_mode='close', validation_mode='sequential', model_num=None,
         experiment_number=None, time_gap=1000, label_type='smooth'):
+
     _loss_steps = []  # or for holding accuracy in the validation step
     assert (which in ['train', 'test', 'val'])
     assert validation_mode in ['sequential', 'random']
@@ -202,7 +203,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
                     all_predictions.append(1)
                     mean_directional_accuracy += 1
                 else:
-                    data_left, data_right = L.get_left_right_consecutively(which, name, f)
+                    data_left, data_right = L.get_left_right_consecutively(which, name, f, time_gap=time_gap)
                     data_left = np.expand_dims(data_left, 0)
                     data_right = np.expand_dims(data_right, 0)
 

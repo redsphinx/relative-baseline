@@ -102,6 +102,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
     _loss_steps = []
     _all_ccc = []
     _all_pearson = []
+    _all_mad = []
 
     if model_number == 1:
         model = Siamese()
@@ -116,6 +117,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
         model = model.to_gpu(device=C.DEVICE)
 
     for subject in range(10):
+        mean_directional_accuracy = 0
         _loss_steps_subject = []
         previous_prediction = np.array([0.], dtype=np.float32)
         all_predictions = []
@@ -130,6 +132,11 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
         elif label_type == 'smooth':
             full_name = os.path.join(path, C.SMOOTH_ANNOTATIONS_PATH, name + '.csv')
         all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+
+        if model_number == 4:
+            all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+            all_labels = U.to_ternary(all_labels, time_gap=time_gap)
+            all_labels = np.array(all_labels)
 
         # num_frames = len(all_frames)
         # num_frames = 1000
@@ -186,32 +193,59 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
                         else:
                             prediction = model(data_left, data_right)
 
-                            prediction = previous_prediction + prediction
+                            if model_number == 4:
+                                prediction = chainer.functions.softmax(prediction)
+                                prediction = U.threshold_ternary(to_cpu(prediction.data))
+                                prediction = np.array(prediction)
+                                prediction = to_gpu(prediction, device=C.DEVICE)
 
-                            loss = mean_squared_error(prediction.data[0], labels)
-                            _loss_steps_subject.append(float(loss.data))
+                                all_predictions.append(int(prediction))
 
-                            prediction = float(prediction.data)
+                                if prediction == labels:
+                                    mean_directional_accuracy += 1
+                            else:
 
-            previous_prediction = to_cpu(previous_prediction)
+                                prediction = previous_prediction + prediction
 
-            previous_prediction[0] = float(prediction)
-            all_predictions.append(prediction)
+                                loss = mean_squared_error(prediction.data[0], labels)
+                                _loss_steps_subject.append(float(loss.data))
 
-        if use_ccc:
+                                prediction = float(prediction.data)
+
+            if model_number == 4:
+                pass
+                # mad_subject = mean_directional_accuracy / num_frames
+                # _all_mad.append(mad_subject)
+            else:
+                previous_prediction = to_cpu(previous_prediction)
+
+                previous_prediction[0] = float(prediction)
+                all_predictions.append(prediction)
+
+        if model_number == 4:
             ccc_subject = calculate_ccc(all_predictions, all_labels[_b:_e])
             _all_ccc.append(ccc_subject)
-            print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
-
-        if use_pearson:
             pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[_b:_e])
             _all_pearson.append(pearson_subject)
-            print('%s, loss: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), pearson_subject))
 
-        _loss_steps.append(np.mean(_loss_steps_subject))
+            mad_subject = mean_directional_accuracy / num_frames
+            _all_mad.append(mad_subject)
+            print('mean_directional_accuracy %s: %f, ccc: %f, pearson: %f' % (name, mad_subject, ccc_subject, pearson_subject))
+
+        else:
+            if use_ccc:
+                ccc_subject = calculate_ccc(all_predictions, all_labels[_b:_e])
+                _all_ccc.append(ccc_subject)
+                print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
+
+            if use_pearson:
+                pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[_b:_e])
+                _all_pearson.append(pearson_subject)
+                print('%s, loss: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), pearson_subject))
+            _loss_steps.append(np.mean(_loss_steps_subject))
 
         # save graph
-        save_graph = True
+        save_graph = False
         if save_graph:
             p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
             plots_folder = 'model_%d_experiment_%d_VO' % (model_number, experiment_number)
@@ -225,19 +259,26 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
-    if use_ccc:
-        print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
-                                                                          float(np.mean(_loss_steps)),
-                                                                          float(np.mean(_all_ccc))))
-    if use_pearson:
-        print('model_%d_experiment_%d_epoch_%d, val_loss: %f, pearson: %f' % (model_number, experiment_number, epoch,
-                                                                          float(np.mean(_loss_steps)),
-                                                                          float(np.mean(_all_pearson))))
+    if model_number == 4:
+        print('model_%d_experiment_%d_epoch_%d, val_mad: %f, ccc: %f, pearson: %f' % (model_number, experiment_number, epoch,
+                                                                              float(np.mean(_all_mad)),
+                                                                              float(np.mean(_all_ccc)),
+                                                                              float(np.mean(_all_pearson))))
+    else:
+        if use_ccc:
+            print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
+                                                                              float(np.mean(_loss_steps)),
+                                                                              float(np.mean(_all_ccc))))
+        if use_pearson:
+            print('model_%d_experiment_%d_epoch_%d, val_loss: %f, pearson: %f' % (model_number, experiment_number, epoch,
+                                                                              float(np.mean(_loss_steps)),
+                                                                              float(np.mean(_all_pearson))))
+
 
 
 # for i in range(100):
 #     predict_valence_sequential_relative('val', 9, 99, time_gap=1, model_number=3)
-# predict_valence_sequential_relative('val', 7, 99, time_gap=1, model_number=1)
+# predict_valence_sequential_relative('val', 14, 14, time_gap=1000, model_number=4, label_type='smooth')
 
 
 # predicts valence value first 1000 frames
