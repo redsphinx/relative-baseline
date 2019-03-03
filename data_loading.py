@@ -266,10 +266,10 @@ def get_valence(which, full_name, label_type='discrete'):
             raise NotImplemented
     elif label_type == 'smooth':
         if which == 'train':
-            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/AnnotationsSmooth_75_3',
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Training/%s' % C.SMOOTH_ANNOTATIONS_PATH,
                                     name + '.csv')
         elif which == 'val':
-            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/AnnotationsSmooth_75_3',
+            csv_path = os.path.join('/scratch/users/gabras/data/omg_empathy/Validation/%s' % C.SMOOTH_ANNOTATIONS_PATH,
                                     name + '.csv')
 
     try:
@@ -285,7 +285,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
                        data_mix='far', step=0, mode='default', time_gap=1, label_type='discrete'):
     assert label_mode in ['difference', 'stepwise']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
-    assert label_output in ['single', 'double']
+    assert label_output in ['single', 'double']  # double=for classreg only
     assert mode in ['default', 'single']  # single=for validation on the same images using single frames (to compare with relative)
     assert label_type in ['discrete', 'smooth']
 
@@ -540,18 +540,28 @@ def get_single_consecutively(which, subject, current_frame):
     return jpg
 
 
-def update_logs(which, loss, epoch, model_num, experiment_number, ccc=None, pearson=None):
+def update_logs(which, epoch, model_num, experiment_number, loss=None, ccc=None, pearson=None, accuracy=None):
     path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' \
            % (which, model_num, experiment_number)
 
-    if ccc is None and pearson is None:
-        with open(path, 'a') as my_file:
-            line = '%d,%f\n' % (epoch, loss)
-            my_file.write(line)
+    if experiment_number == 14:
+        if which == 'train':
+            with open(path, 'a') as my_file:
+                line = '%d,%f,%f\n' % (epoch, loss, accuracy)
+                my_file.write(line)
+        elif which == 'val':
+            with open(path, 'a') as my_file:
+                line = '%d,%f,%f,%f\n' % (epoch, accuracy, ccc, pearson)
+                my_file.write(line)
     else:
-        with open(path, 'a') as my_file:
-            line = '%d,%f,%f,%f\n' % (epoch, loss, ccc, pearson)
-            my_file.write(line)
+        if ccc is None and pearson is None:
+            with open(path, 'a') as my_file:
+                line = '%d,%f\n' % (epoch, loss)
+                my_file.write(line)
+        else:
+            with open(path, 'a') as my_file:
+                line = '%d,%f,%f,%f\n' % (epoch, loss, ccc, pearson)
+                my_file.write(line)
 
 
 

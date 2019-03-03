@@ -33,9 +33,9 @@ def plot_labels_for_subject(which, subject, story, window_size=None, order=None,
     del fig
 
 
-for i in range(1, 11):
-    plot_labels_for_subject('Validation', i, 1)
-    plot_labels_for_subject('Validation', i, 1, window_size=75, order=2, label_type='smooth')
+# for i in range(1, 11):
+#     plot_labels_for_subject('Validation', i, 1)
+#     plot_labels_for_subject('Validation', i, 1, window_size=75, order=2, label_type='smooth')
 
 
 def plot_loss(which, model, experiment, loss_name):
@@ -43,7 +43,9 @@ def plot_loss(which, model, experiment, loss_name):
     path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/epochs/model_%d_experiment_%d.txt' % (which, model, experiment)
     save_path = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/%s/loss_plots/model_%d_experiment_%d.png' % (which, model, experiment)
 
-    loss = np.genfromtxt(path, delimiter=',')[:, 1]
+    # 1 = mse, 2 = ccc, 3 = pearson
+    # if exp=14; train 1=softmaxXE, 2=accuracy; val 1=accuracy, 2=ccc, 3=pearson
+    loss = np.genfromtxt(path, delimiter=',')[:, 3]
 
     fig = plt.figure()
     x = range(len(loss))
@@ -55,6 +57,8 @@ def plot_loss(which, model, experiment, loss_name):
 
     plt.savefig(save_path)
 
+    del fig
 
-# plot_loss('val', 1, 12, 'MSE loss')
-# plot_loss('train', 1, 12, 'MSE loss')
+
+# plot_loss('val', 1, 13, 'pearson')
+# plot_loss('train', 1, 13, 'MSE loss')

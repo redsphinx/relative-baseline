@@ -95,7 +95,8 @@ def calculate_pearson(predictions, labels):
 
 
 # predicts difference two consecutive pairs for first 1000 frame pairs
-def predict_valence_sequential_relative(which, experiment_number, epoch, time_gap=1, model_number=1):
+def predict_valence_sequential_relative(which, experiment_number, epoch, time_gap=1, model_number=1,
+                                        label_type='discrete'):
     use_ccc = True
     use_pearson = True
     _loss_steps = []
@@ -124,12 +125,15 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
         subject_folder = os.path.join(path, 'jpg_participant_662_542', name)
         all_frames = os.listdir(subject_folder)
 
-        full_name = os.path.join(path, 'Annotations', name + '.csv')
+        if label_type == 'discrete':
+            full_name = os.path.join(path, 'Annotations', name + '.csv')
+        elif label_type == 'smooth':
+            full_name = os.path.join(path, C.SMOOTH_ANNOTATIONS_PATH, name + '.csv')
         all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
 
         # num_frames = len(all_frames)
-        num_frames = 1000
-        # num_frames = 10
+        # num_frames = 1000
+        num_frames = 50
 
         if time_gap > 1:
             _b = C.OMG_EMPATHY_FRAME_RATE
@@ -207,7 +211,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
         _loss_steps.append(np.mean(_loss_steps_subject))
 
         # save graph
-        save_graph = False
+        save_graph = True
         if save_graph:
             p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/epochs'
             plots_folder = 'model_%d_experiment_%d_VO' % (model_number, experiment_number)
@@ -233,6 +237,7 @@ def predict_valence_sequential_relative(which, experiment_number, epoch, time_ga
 
 # for i in range(100):
 #     predict_valence_sequential_relative('val', 9, 99, time_gap=1, model_number=3)
+# predict_valence_sequential_relative('val', 7, 99, time_gap=1, model_number=1)
 
 
 # predicts valence value first 1000 frames
@@ -313,7 +318,6 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
             plt.plot(x, all_predictions, 'b')
             plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
 
-
     if use_ccc:
         print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
                                                                           float(np.mean(_loss_steps)),
@@ -325,3 +329,178 @@ def predict_valence_sequential_single(which, experiment_number, epoch):
 
 
 # predict_valence_sequential_single('val', 6, 99)
+
+
+def make_pred_vs_y_plot(experiment_number, epoch, which='val', time_gap=1, model_number=1, label_type='discrete'):
+    use_ccc = True
+    use_pearson = True
+    _loss_steps = []
+    _all_ccc = []
+    _all_pearson = []
+
+    if model_number == 1:
+        model = Siamese()
+    elif model_number == 3:
+        model = Triplet()
+    elif model_number == 4:
+        model = TernaryClassifier()
+
+    models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
+    p = os.path.join(models_path, 'model_%d_experiment_%d' % (model_number, experiment_number), 'epoch_%d' % epoch)
+    chainer.serializers.load_npz(p, model)
+    if C.ON_GPU:
+        model = model.to_gpu(device=C.DEVICE)
+
+    for subject in range(10):
+        _loss_steps_subject = []
+        previous_prediction = np.array([0.], dtype=np.float32)
+        all_predictions = []
+
+        name = 'Subject_%d_Story_1' % (subject + 1)
+        path = '/scratch/users/gabras/data/omg_empathy/Validation'
+        subject_folder = os.path.join(path, 'jpg_participant_662_542', name)
+        all_frames = os.listdir(subject_folder)
+
+        if label_type == 'discrete':
+            full_name = os.path.join(path, 'Annotations', name + '.csv')
+        elif label_type == 'smooth':
+            full_name = os.path.join(path, C.SMOOTH_ANNOTATIONS_PATH, name + '.csv')
+        all_labels = np.genfromtxt(full_name, dtype=np.float32, skip_header=True)
+
+        # num_frames = len(all_frames)
+        num_frames = 50
+        # num_frames = 10
+
+        if time_gap > 1:
+            _b = C.OMG_EMPATHY_FRAME_RATE
+            _e = _b + num_frames
+        else:
+            _b = 0
+            _e = num_frames
+
+        # for f in tqdm(range(_b, _e)):
+        for f in range(_b, _e):
+            if f == 0:
+                with cp.cuda.Device(C.DEVICE):
+
+                    with chainer.using_config('train', False):
+                        prediction = np.array([0.0], dtype=np.float32)  # baseline
+                        labels = np.array([all_labels[f]])
+
+                        loss = mean_squared_error(prediction, labels)
+                        _loss_steps_subject.append(float(loss.data))
+            else:
+                data_left, data_right = L.get_left_right_consecutively(which, name, f, time_gap=time_gap)
+                data_left = np.expand_dims(data_left, 0)
+                data_right = np.expand_dims(data_right, 0)
+                labels = np.array([all_labels[f]])
+
+                if C.ON_GPU:
+                    previous_prediction = to_gpu(previous_prediction, device=C.DEVICE)
+                    data_left = to_gpu(data_left, device=C.DEVICE)
+                    data_right = to_gpu(data_right, device=C.DEVICE)
+                    labels = to_gpu(labels, device=C.DEVICE)
+
+                with cp.cuda.Device(C.DEVICE):
+
+                    with chainer.using_config('train', False):
+                        if model_number == 3:
+                            pred_1, pred_2 = model(data_left, data_right)
+
+                            pred_1 = chainer.functions.sigmoid(pred_1)
+
+                            pred_1 = U.threshold_all(to_cpu(pred_1.data))
+
+                            prediction = to_gpu(pred_1, device=C.DEVICE) * pred_2
+
+                            prediction = previous_prediction + prediction
+
+                            loss = mean_squared_error(prediction.data[0], labels)
+                            _loss_steps_subject.append(float(loss.data))
+
+                            prediction = float(prediction.data)
+                        else:
+                            prediction = model(data_left, data_right)
+
+                            prediction = previous_prediction + prediction
+
+                            loss = mean_squared_error(prediction.data[0], labels)
+                            _loss_steps_subject.append(float(loss.data))
+
+                            prediction = float(prediction.data)
+
+            previous_prediction = to_cpu(previous_prediction)
+
+            previous_prediction[0] = float(prediction)
+            all_predictions.append(prediction)
+
+        # if use_ccc:
+        #     ccc_subject = calculate_ccc(all_predictions, all_labels[_b:_e])
+        #     _all_ccc.append(ccc_subject)
+        #     print('%s, loss: %f, ccc: %f' % (name, float(np.mean(_loss_steps_subject)), ccc_subject))
+        #
+        # if use_pearson:
+        #     pearson_subject, p_vals = calculate_pearson(all_predictions, all_labels[_b:_e])
+        #     _all_pearson.append(pearson_subject)
+        #     print('%s, loss: %f, pearson: %f' % (name, float(np.mean(_loss_steps_subject)), pearson_subject))
+        #
+        # _loss_steps.append(np.mean(_loss_steps_subject))
+
+        # save graph
+        save_graph = True
+        if save_graph:
+            labs = all_labels[_b:_e]
+            diff_arr = labs - all_predictions
+
+            diff_matrix = np.zeros((num_frames, num_frames))
+
+            for i in range(num_frames):
+                diff_matrix[i, i] = diff_arr[i]
+
+            p = '/scratch/users/gabras/data/omg_empathy/saving_data/logs/val/pred_vs_y'
+            plots_folder = 'model_%d_experiment_%d' % (model_number, experiment_number)
+            plot_path = os.path.join(p, plots_folder)
+
+            if not os.path.exists(plot_path):
+                os.mkdir(plot_path)
+
+            fig = plt.figure()
+
+            # assert len(labs) == len(all_predictions)
+            # plt.scatter(labs, all_predictions)
+
+            fig, ax = plt.subplots()
+            im = ax.imshow(diff_matrix)
+
+            # We want to show all ticks...
+            ax.set_xticks(np.arange(len(diff_arr)))
+            ax.set_yticks(np.arange(len(diff_arr)))
+            # ... and label them with the respective list entries
+            # ax.set_xticklabels(farmers)
+            # ax.set_yticklabels(vegetables)
+
+            # Rotate the tick labels and set their alignment.
+            # plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+            #          rotation_mode="anchor")
+
+            # Loop over data dimensions and create text annotations.
+            # for i in range(len(diff_arr)):
+            #     for j in range(len(diff_arr)):
+            #         text = ax.text(j, i, str(diff_matrix[i, j])[0:7], ha="center", va="center", color="w")
+
+            ax.set_title('difference: labels - predictions')
+            fig.tight_layout()
+
+            plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
+
+    # if use_ccc:
+    #     print('model_%d_experiment_%d_epoch_%d, val_loss: %f, CCC: %f' % (model_number, experiment_number, epoch,
+    #                                                                       float(np.mean(_loss_steps)),
+    #                                                                       float(np.mean(_all_ccc))))
+    # if use_pearson:
+    #     print('model_%d_experiment_%d_epoch_%d, val_loss: %f, pearson: %f' % (model_number, experiment_number, epoch,
+    #                                                                           float(np.mean(_loss_steps)),
+    #                                                                           float(np.mean(_all_pearson))))
+
+
+# make_pred_vs_y_plot(experiment_number=7, epoch=99, time_gap=1, model_number=1, label_type='discrete')

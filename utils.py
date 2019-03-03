@@ -285,11 +285,13 @@ def threshold_all(list_values, t=0.5):
     return t_values
 
 
-def to_ternary(label_list):
-    t0 = 1
-    new_labels = [t0]
-    for i in range(1, len(label_list)):
-        diff = label_list[i] - label_list[i-1]
+def to_ternary(label_list, time_gap=1):
+    if time_gap > 1:
+        time_gap = 25
+
+    new_labels = [42] * time_gap
+    for i in range(time_gap, len(label_list)):
+        diff = label_list[i] - label_list[i-time_gap]
         if diff == 0:
             new_labels.append(1)
         elif diff < 0:
@@ -305,5 +307,28 @@ def threshold_ternary(prediction):
     prediction = list(prediction[0])
     return prediction.index(max(prediction))
 
+
+def threshold_ternary_train(prediction):
+    # [0, 1, 2] = right is lower, same, right is higher
+    prediction_ternary = []
+
+    for i in range(len(prediction)):
+        p = list(prediction[i])
+        prediction_ternary.append(p.index(max(p)))
+
+    return prediction_ternary
+
+
+def get_mad(pred, labs):
+    mad = 0
+    assert len(pred) == len(labs)
+
+    for i in range(len(pred)):
+        if pred[i] == labs[i]:
+            mad += 1
+
+    mad /= len(pred)
+
+    return mad
 
 

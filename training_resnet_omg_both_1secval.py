@@ -27,14 +27,14 @@ from random import shuffle
 from tqdm import tqdm
 import validation_only as V
 
-load_model = False
+load_model = True
 
 my_model = Siamese()
 
 if load_model:
     m_num = 1
-    e_num = 12
-    ep = 87
+    e_num = 13
+    ep = 91
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
@@ -249,4 +249,7 @@ for e in range(ep+1, epochs):
         L.update_logs(which='val', loss=float(np.mean(loss_val)), epoch=e, model_num=mod_num,
                       experiment_number=exp_number, ccc=float(np.mean(ccc)), pearson=float(np.mean(pearson)))
 
-    print('epoch %d, train_loss: %f, val_loss: %f' % (e, float(np.mean(loss_train)), float(np.mean(loss_val))))
+    print('epoch %d, train_loss: %f, val_loss: %f, ccc: %f, pearson: %f' % (e, float(np.mean(loss_train)),
+                                                                            float(np.mean(loss_val)),
+                                                                            float(np.mean(ccc)),
+                                                                            float(np.mean(pearson))))
