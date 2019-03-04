@@ -283,7 +283,7 @@ def get_valence(which, full_name, label_type='discrete'):
 
 def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='single', seed=42, label_mode='difference',
                        data_mix='far', step=0, mode='default', time_gap=1, label_type='discrete'):
-    assert label_mode in ['difference', 'stepwise']
+    assert label_mode in ['difference', 'stepwise', 'value']
     assert data_mix in ['far', 'close', 'both', 'change_points']  # far = frames are >1 apart, close = frames are 1 apart
     assert label_output in ['single', 'double']  # double=for classreg only
     assert mode in ['default', 'single']  # single=for validation on the same images using single frames (to compare with relative)
@@ -326,7 +326,7 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
 
     if mode == 'default':
         if label_output == 'single':
-            if label_mode == 'difference':
+            if label_mode == 'difference' or label_mode == 'value':
                 labels = np.zeros((batch_size, 1), dtype=np.float32)
             elif label_mode == 'stepwise':
                 # labels = np.zeros((batch_size, 3), dtype=int)
@@ -360,6 +360,8 @@ def load_data_relative(which, frame_matrix, val_idx, batch_size, label_output='s
             if label_output == 'single':
                 if label_mode == 'difference':
                     labels[i]= _tmp_labels[1] - _tmp_labels[0]
+                elif label_mode == 'value':
+                    labels[i] = _tmp_labels[1]
                 elif label_mode == 'stepwise':
                     # [-1, 0, 1] = right is lower, same, right is higher
                     diff = _tmp_labels[0] - _tmp_labels[1]

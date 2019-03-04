@@ -36,7 +36,7 @@ my_model = TernaryClassifier()
 if load_model:
     m_num = 4
     e_num = 14
-    ep = 14
+    ep = 68
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
@@ -255,7 +255,7 @@ def run(which, model, optimizer, epoch, training_mode='close', validation_mode='
 
                 fig = plt.figure()
                 x = range(num_frames)
-                plt.plot(x, all_labels[:num_frames], 'g')
+                plt.plot(x, all_labels[_b:_e], 'g')
                 plt.plot(x, all_predictions, 'b')
                 plt.savefig(os.path.join(plot_path, '%s_epoch_%d_.png' % (name, epoch)))
                 del fig
