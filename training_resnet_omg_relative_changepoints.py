@@ -30,14 +30,14 @@ import utils as U
 import validation_only as V
 
 
-load_model = False
+load_model = True
 
 my_model = Siamese()
 
 if load_model:
-    m_num = 1
-    e_num = 7
-    ep = 99
+    m_num = 0
+    e_num = 15
+    ep = 0
     models_path = '/scratch/users/gabras/data/omg_empathy/saving_data/models'
     p = os.path.join(models_path, 'model_%d_experiment_%d' % (m_num, e_num), 'epoch_%d' % ep)
     chainer.serializers.load_npz(p, my_model)
@@ -55,12 +55,12 @@ print('Initializing')
 print('model initialized with %d parameters' % my_model.count_params())
 
 # --------------------------------------------------------------------------------------------
-DEBUG = False
+DEBUG = True
 # --------------------------------------------------------------------------------------------
 if DEBUG:
-    batches = 16
-    train_total_steps = 2
-    epochs = 2
+    batches = 32
+    train_total_steps = 50
+    epochs = 200
 else:
     batches = 32
     train_total_steps = 1600 // batches
@@ -237,7 +237,7 @@ def run(which, model, optimizer, epoch, training_mode='change_points', validatio
 
 
 print('Enter training loop with validation')
-for e in range(0, epochs):
+for e in range(ep+1, epochs):
     exp_number = 15
     mod_num = 0
     # ----------------------------------------------------------------------------

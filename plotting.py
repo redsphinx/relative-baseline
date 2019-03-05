@@ -45,7 +45,8 @@ def plot_loss(which, model, experiment, loss_name):
 
     # 1 = mse, 2 = ccc, 3 = pearson
     # if exp=14; train 1=softmaxXE, 2=accuracy; val 1=accuracy, 2=ccc, 3=pearson
-    loss = np.genfromtxt(path, delimiter=',')[15:, 2]
+    # loss = np.genfromtxt(path, delimiter=',')[15:, 2]
+    loss = np.genfromtxt(path, delimiter=',')[:, 1]
 
     fig = plt.figure()
     x = range(len(loss))
@@ -60,5 +61,6 @@ def plot_loss(which, model, experiment, loss_name):
     del fig
 
 
-plot_loss('val', 4, 14, 'ccc')
+plot_loss('val', 0, 15, 'MSE')
+plot_loss('train', 0, 15, 'MSE')
 # plot_loss('train', 4, 14, 'softmax XE')
