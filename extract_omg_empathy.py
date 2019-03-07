@@ -109,7 +109,7 @@ def video_to_frames(which, path, extract='participant', body_part='full_body_bac
             num_frames = None
 
 
-path_to_data = '/scratch/users/gabras/data/omg_empathy'
+# path_to_data = '/scratch/users/gabras/data/omg_empathy'
 
 # video_to_frames(which='Validation', path=path_to_data, dims=(640, 360))
 # video_to_frames(which='Training', path=path_to_data, dims=(640, 360))
@@ -156,4 +156,4 @@ def smooth_labels(data=None, window_size=C.OMG_EMPATHY_FRAME_RATE, order=3):
                     my_file.write(line)
 
 
-smooth_labels(window_size=3*C.OMG_EMPATHY_FRAME_RATE, order=3)
+# smooth_labels(window_size=3*C.OMG_EMPATHY_FRAME_RATE, order=3)
