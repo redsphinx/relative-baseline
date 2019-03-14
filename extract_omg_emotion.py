@@ -197,9 +197,44 @@ def convert_to_jpgs(which, body_part, extension='jpg', num_frames=0, dims=None):
             frame_img.save(name_img, mode='RGB')
 
 
-convert_to_jpgs(which='Validation', body_part='full_body_background')
+# convert_to_jpgs(which='Validation', body_part='full_body_background')
 
 
-# create new annotations file without empty folder lines
-def create_new_labels():
-    pass
+# list utterances that were not downloaded
+# also creates new labels
+def list_missing_utterances(which, save_present=False):
+    assert which in ['Validation', 'Training', 'Test']
+
+    base_path = '/scratch/users/gabras/data/omg_emotion'
+    _, full_path = get_list_all_videos(os.path.join(base_path, which, 'Videos'))
+    full_path = [full_path[i].split('Videos/')[-1] for i in range(len(full_path))]
+
+    annotation_path = os.path.join(base_path, which, 'Annotations', 'annotations.csv')
+    annotations = np.genfromtxt(annotation_path, delimiter=',', dtype=str)
+
+    edited_annotations = os.path.join(base_path, which, 'Annotations', 'edited_annotations.csv')
+
+    cnt = 0
+    missing_list = os.path.join(base_path, which, 'MissingAnnotations.csv')
+
+    for i in range(len(annotations)):
+        name = '%s/%s' % (annotations[i][0], annotations[i][1])
+
+        line = ''
+        for j in range(len(annotations[i])):
+            line = line + annotations[i][j] + ','
+        line = line[0:-1]
+        line += '\n'
+
+        if name not in full_path:
+            cnt += 1
+            f = missing_list
+        else:
+            f = edited_annotations
+
+        if save_present:
+            with open(f, 'a') as my_file:
+                my_file.write(line)
+
+    print('%d utterances missing out of %d' % (cnt, len(annotations)))
+
