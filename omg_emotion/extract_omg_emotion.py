@@ -2,7 +2,7 @@ import os
 import skvideo.io
 from PIL import Image
 from tqdm import tqdm
-import utils as U
+import relative_baseline.utils as U
 import numpy as np
 import shutil
 
@@ -238,3 +238,5 @@ def list_missing_utterances(which, save_present=False):
 
     print('%d utterances missing out of %d' % (cnt, len(annotations)))
 
+
+list_missing_utterances('Validation')
