@@ -17,6 +17,22 @@ def calculate_loss(loss_name, input, target):
     return loss
 
 
+def calculate_accuracy(input, target):
+    # TODO
+    assert len(input) == len(target)
+    total = len(input)
+    acc = 0
+
+    def threshold(x):
+        pass
+
+    for i in range(total):
+        if threshold(input[i]) == target[i]:
+           acc += 1
+
+    return acc
+
+
 def run(project_variable, all_data, my_model, my_optimizer, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
