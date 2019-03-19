@@ -6,3 +6,13 @@ import numpy as np
 import random
 
 
+# temporary for debugging
+from .settings import ProjectVariable
+project_variable = ProjectVariable()
+
+
+def load_data(project_variable=project_variable):
+    pass
+
+
+

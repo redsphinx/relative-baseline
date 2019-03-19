@@ -1,7 +1,18 @@
 import os
 import numpy as np
-from .settings import ProjectVariable as PV
+from . import project_paths as PP
 
 
-# samples random single frames
-def run_basic(PV):
+# temporary for debugging
+from .settings import ProjectVariable
+
+
+
+
+
+
+# def run(project_variable):
+def run(project_variable, data, my_model, my_optimizer, device):
+    project_variable = ProjectVariable()
+
+
