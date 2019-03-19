@@ -14,6 +14,9 @@ class ProjectVariable(object):
         # int, experiment data for log
         self._model_number = None
         self._experiment_number = None
+        
+        # int, the current epoch
+        self._current_epoch = None
 
         # list of str, which datasets to train, val and test on
         self._dataset_train = ['omg_emotion']
@@ -91,6 +94,14 @@ class ProjectVariable(object):
     @experiment_number.setter
     def experiment_number(self, value):
         self._experiment_number = value
+
+    @property
+    def current_epoch(self):
+        return self._current_epoch
+
+    @current_epoch.setter
+    def current_epoch(self, value):
+        self._current_epoch = value
 
     @property
     def dataset_train(self):
@@ -181,12 +192,20 @@ class ProjectVariable(object):
         self._batch_size = value
 
     @property
-    def epochs(self):
-        return self._epochs
+    def start_epoch(self):
+        return self._start_epoch
 
-    @epochs.setter
-    def epochs(self, value):
-        self._epochs = value
+    @start_epoch.setter
+    def start_epoch(self, value):
+        self._start_epoch = value
+        
+    @property
+    def end_epoch(self):
+        return self._end_epoch
+
+    @end_epoch.setter
+    def end_epoch(self, value):
+        self._end_epoch = value
 
     @property
     def train_steps(self):
@@ -229,9 +248,9 @@ class ProjectVariable(object):
         self._save_model = value
 
     @property
-    def save_grpahs(self):
-        return self._save_grpahs
+    def save_graphs(self):
+        return self._save_graphs
 
-    @save_grpahs.setter
-    def save_grpahs(self, value):
-        self._save_grpahs = value
+    @save_graphs.setter
+    def save_graphs(self, value):
+        self._save_graphs = value

@@ -14,5 +14,3 @@ project_variable = ProjectVariable()
 def load_data(project_variable=project_variable):
     pass
 
-
-

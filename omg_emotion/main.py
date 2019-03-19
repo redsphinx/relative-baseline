@@ -21,12 +21,16 @@ def run(project_variable=project_variable):
     my_optimizer = setup.get_optimizer(project_variable)
     device = setup.get_device(project_variable)
 
-    for e in range(project_variable.epochs + 1):
+    # put model on GPU
+    my_model.to(device)
+
+    for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
+        project_variable.current_epoch = e
+
 
         if project_variable.train:
             training.run(project_variable, data, my_model, my_optimizer, device)
 
-            pass
 
         if project_variable.val:
             pass
