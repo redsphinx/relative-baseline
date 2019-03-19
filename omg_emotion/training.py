@@ -74,3 +74,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # save graphs
     # TODO
+
+
+# TODO
+# added different learning rates for different layers

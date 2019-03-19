@@ -22,5 +22,11 @@ def get_optimizer(project_variable):
 
 
 def get_device(project_variable):
-    # should be a string
-    project_variable = ProjectVariable()
+    if project_variable.device == None:
+        device = 'cpu'
+    elif type(project_variable.device) is int:
+        device = 'cuda:%d' % project_variable.device
+    else:
+        device = None
+
+    return device

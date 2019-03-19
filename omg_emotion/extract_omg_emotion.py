@@ -239,4 +239,60 @@ def list_missing_utterances(which, save_present=False):
     print('%d utterances missing out of %d' % (cnt, len(annotations)))
 
 
-list_missing_utterances('Validation')
+# list_missing_utterances('Validation')
+
+
+def distribution_classes_over_splits(which):
+    assert which in ['Validation', 'Training', 'Test']
+
+    base_path = '/scratch/users/gabras/data/omg_emotion/%s/Annotations/annotations.csv' % which
+
+    all_annotations = np.genfromtxt(base_path, delimiter=',', dtype=str)
+
+    classes = all_annotations[:, -1]
+
+    classes = np.array([int(classes[i]) for i in range(len(classes))])
+
+    unique, counts = np.unique(classes, return_counts=True)
+
+    class_names = ['anger', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+
+    d = dict(zip(unique, counts))
+
+    print(which, len(classes))
+    cnt = 0
+    for i in range(7):
+        print(class_names[i], d[i])
+        cnt += d[i]
+    print(cnt)
+
+    # Training 1955
+    # anger 262
+    # disgust 96
+    # fear 54
+    # happy 503
+    # neutral 682
+    # sad 339
+    # surprise 19
+
+    # Validation 481
+    # anger 51
+    # disgust 34
+    # fear 17
+    # happy 156
+    # neutral 141
+    # sad 75
+    # surprise 7
+
+    # Test 1989
+    # anger 329
+    # disgust 135
+    # fear 50
+    # happy 550
+    # neutral 678
+    # sad 231
+    # surprise 16
+
+#
+# for i in ['Test']:
+#     distribution_classes_over_splits(i)

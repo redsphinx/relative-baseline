@@ -5,7 +5,7 @@ class ProjectVariable(object):
         """
         Default values for all the experimental variables.
         """
-        # int, which gpu to use {None, 0, 1}
+        # int, which gpu to use {None, 0, 1, etc}
         self._device = 0
 
         # str, which model to load
