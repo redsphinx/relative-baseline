@@ -53,6 +53,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             labels = labels[0]
 
         # put data part on GPU
+        # TODO: figure out to() vs. cuda()
+        # TODO: how to make device
         data = torch.from_numpy(data).cuda(device)
         labels = torch.from_numpy(labels).cuda(device)
 
