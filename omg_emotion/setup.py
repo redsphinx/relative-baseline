@@ -1,6 +1,7 @@
 # from relative_baseline.omg_emotion.settings import ProjectVariable
 from torchvision.models import resnet18
 from torch.optim.adam import Adam
+import torch
 
 
 def get_model(project_variable):
@@ -24,10 +25,12 @@ def get_optimizer(project_variable, model):
 
 def get_device(project_variable):
     if project_variable.device is None:
-        device = 'cpu'
+        _dev = 'cpu'
     elif type(project_variable.device) is int:
-        device = 'cuda:%d' % project_variable.device
+        _dev = 'cuda:%d' % project_variable.device
     else:
-        device = None
+        _dev = None
+
+    device = torch.device(_dev)
 
     return device
