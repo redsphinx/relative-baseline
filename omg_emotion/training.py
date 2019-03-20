@@ -38,21 +38,23 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # all_data = [data, labels] shape = (n, 2)
     # device is string
 
-    project_variable = ProjectVariable()
+    # project_variable = ProjectVariable()
 
     loss_epoch = []
 
-    # TODO: decide steps here
+    train_steps = len(all_data[0]) // project_variable.batch_size
 
-    for ts in range(project_variable.train_steps):
+    # for ts in range(project_variable.train_steps):
+    for ts in range(train_steps):
 
         # get part of data
-        # TODO: fix the fetching
-        data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size, :]
+        data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size][:]
+        if len(labels) == 1:
+            labels = labels[0]
 
         # put data part on GPU
-        data = torch.from_numpy(data).to(device)
-        labels = torch.from_numpy(labels).to(device)
+        data = torch.from_numpy(data).cuda(device)
+        labels = torch.from_numpy(labels).cuda(device)
 
         # train
         with torch.device(device):

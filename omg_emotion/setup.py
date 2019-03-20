@@ -23,7 +23,7 @@ def get_optimizer(project_variable, model):
 
 
 def get_device(project_variable):
-    if project_variable.device == None:
+    if project_variable.device is None:
         device = 'cpu'
     elif type(project_variable.device) is int:
         device = 'cuda:%d' % project_variable.device

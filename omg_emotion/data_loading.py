@@ -22,11 +22,17 @@ from .settings import ProjectVariable
 # 5 - Sad
 # 6 - Surprise
 
+
 def load_labels(which, project_variable):
     # project_variable = ProjectVariable
     assert which in ['Training', 'Validation', 'Test']
     path = os.path.join(PP.data_path, which, 'Annotations', 'annotations.csv')
     annotations = np.genfromtxt(path, delimiter=',', dtype=str)
+
+    if project_variable.debug_mode:
+        annotations = annotations[0:project_variable.batch_size]
+        if project_variable.train:
+            np.random.shuffle(annotations)
 
     names = np.array(annotations[:, 0:2])
     arousal = annotations[:, 2]
@@ -50,9 +56,7 @@ def load_labels(which, project_variable):
     return labels
 
 
-
 def load_data(project_variable):
-    # TODO: load validation and test only once
     # project_variable = ProjectVariable()
 
     all_labels = []
@@ -60,7 +64,6 @@ def load_data(project_variable):
 
     if project_variable.train:
         labels = load_labels('Training', project_variable)
-        # TODO: shuffle
 
         all_labels.append(labels)
         splits.append('train')

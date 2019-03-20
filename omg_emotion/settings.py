@@ -24,9 +24,9 @@ class ProjectVariable(object):
         self._dataset_test = ['omg_emotion']
 
         # bool, which procedures to perform
-        self._train = True
-        self._val = True
-        self._test = True
+        self._train = None
+        self._val = None
+        self._test = None
         
         # list of str, which labels to use. ['categories', 'arousal', 'valence']
         self._label_type = ['categories']
@@ -44,12 +44,12 @@ class ProjectVariable(object):
         self._seed = 6
 
         # bool, if in debug mode
-        self._debug_mode = False
+        self._debug_mode = True
 
         # depending on debug mode
         if self._debug_mode:
             self._batch_size = 16
-            self._start_epoch = 0
+            self._start_epoch = -1
             self._end_epoch = 2
             self._train_steps = 10
             self._val_steps = 1

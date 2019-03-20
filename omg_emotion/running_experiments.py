@@ -4,6 +4,7 @@ from relative_baseline.omg_emotion import main_file
 
 project_variable = ProjectVariable()
 
+
 def pilot():
     project_variable.device = 1
     project_variable.model_number = 0
