@@ -197,7 +197,8 @@ def convert_to_jpgs(which, body_part, extension='jpg', num_frames=0, dims=None):
             frame_img.save(name_img, mode='RGB')
 
 
-convert_to_jpgs(which='Validation', body_part='full_body_background')
+convert_to_jpgs(which='Test', body_part='full_body_background')
+convert_to_jpgs(which='Training', body_part='full_body_background')
 
 
 # create new annotations file without empty folder lines
