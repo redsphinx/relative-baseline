@@ -45,6 +45,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     for ts in range(project_variable.train_steps):
 
         # get part of data
+        # TODO
         data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size, :]
 
         # put data part on GPU

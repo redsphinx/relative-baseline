@@ -27,6 +27,9 @@ class ProjectVariable(object):
         self._train = True
         self._val = True
         self._test = True
+        
+        # list of str, which labels to use. ['categories', 'arousal', 'valence']
+        self._label_type = ['categories']
 
         # list of float, learning rate
         self._learning_rate = [0.0001]
@@ -36,6 +39,9 @@ class ProjectVariable(object):
 
         # list of str, optimizer
         self._optimizer = ['adam']
+        
+        # int, seed for shuffling
+        self._seed = 6
 
         # bool, if in debug mode
         self._debug_mode = False
@@ -152,6 +158,14 @@ class ProjectVariable(object):
         self._test = value
 
     @property
+    def label_type(self):
+        return self._label_type
+
+    @label_type.setter
+    def label_type(self, value):
+        self._label_type = value
+
+    @property
     def learning_rate(self):
         return self._learning_rate
 
@@ -174,6 +188,14 @@ class ProjectVariable(object):
     @optimizer.setter
     def optimizer(self, value):
         self._optimizer = value
+
+    @property
+    def seed(self):
+        return self._seed
+
+    @seed.setter
+    def seed(self, value):
+        self._seed = value
 
     @property
     def debug_mode(self):

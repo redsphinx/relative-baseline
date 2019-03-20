@@ -13,9 +13,6 @@ project_variable = ProjectVariable()
 # def run(project_variable):
 def run(project_variable=project_variable):
 
-    # get data
-    data = D.load_data(project_variable)
-
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
     my_optimizer = setup.get_optimizer(project_variable)
@@ -26,6 +23,10 @@ def run(project_variable=project_variable):
 
     for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
         project_variable.current_epoch = e
+
+        # get data
+        data = D.load_data(project_variable)
+
 
         if project_variable.train:
             training.run(project_variable, data, my_model, my_optimizer, device)
