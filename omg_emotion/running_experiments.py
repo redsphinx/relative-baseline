@@ -1,12 +1,15 @@
-from .settings import ProjectVariable
-from . import main
+from relative_baseline.omg_emotion.settings import ProjectVariable
+from relative_baseline.omg_emotion import main_file
 
 
 project_variable = ProjectVariable()
 
-def test():
+def pilot():
+    project_variable.device = 1
     project_variable.model_number = 0
     project_variable.experiment_number = 0
     project_variable.debug_mode = True
-    main.run(project_variable)
+    main_file.run(project_variable)
 
+
+pilot()

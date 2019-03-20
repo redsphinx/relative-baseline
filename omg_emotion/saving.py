@@ -1,5 +1,5 @@
 import os
-from . import project_paths as PP
+from relative_baseline.omg_emotion import project_paths as PP
 import torch
 
 

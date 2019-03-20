@@ -1,4 +1,4 @@
-from .settings import ProjectVariable
+# from relative_baseline.omg_emotion.settings import ProjectVariable
 from torchvision.models import resnet18
 from torch.optim.adam import Adam
 
@@ -12,9 +12,10 @@ def get_model(project_variable):
     return model
 
 
-def get_optimizer(project_variable):
-    if project_variable.optimizer == 'adam':
-        optimizer = Adam(lr=project_variable.learning_rate)
+def get_optimizer(project_variable, model):
+    # TODO: multiple optimizers
+    if project_variable.optimizer[0] == 'adam':
+        optimizer = Adam(params=model.parameters(), lr=project_variable.learning_rate[0])
     else:
         optimizer = None
 

@@ -1,5 +1,5 @@
 import numpy as np
-from . import saving
+from relative_baseline.omg_emotion import saving
 import torch
 from torch.nn import CrossEntropyLoss
 
@@ -42,10 +42,12 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     loss_epoch = []
 
+    # TODO: decide steps here
+
     for ts in range(project_variable.train_steps):
 
         # get part of data
-        # TODO
+        # TODO: fix the fetching
         data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size, :]
 
         # put data part on GPU
@@ -55,6 +57,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         # train
         with torch.device(device):
             my_optimizer.zero_grad()
+            # TODO: fix model input and output
             predictions = my_model(data)
             loss = calculate_loss(project_variable.loss_function, predictions, labels)
             loss.backward()

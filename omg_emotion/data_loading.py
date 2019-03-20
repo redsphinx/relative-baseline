@@ -1,14 +1,11 @@
 import os
-import deepimpression2.constants as C
-from relative_baseline import utils as U
-from relative_baseline import data_loading as D
 import numpy as np
-import random
 from . import project_paths as PP
 from relative_baseline.omg_emotion import utils as U1
-import torch
 import random
 from PIL import Image
+import cv2
+from time import time
 
 # temporary for debugging
 from .settings import ProjectVariable
@@ -55,6 +52,7 @@ def load_labels(which, project_variable):
 
 
 def load_data(project_variable):
+    # TODO: load validation and test only once
     # project_variable = ProjectVariable()
 
     all_labels = []
@@ -87,8 +85,10 @@ def load_data(project_variable):
     final_labels = []
 
     for i, s in enumerate(splits):
+        start = time()
+        cnt = 0
         datapoints = len(all_labels[i][0])
-        data = np.zeros(shape=(datapoints, 3, 1280, 720), dtype=np.float32)
+        data = np.zeros(shape=(datapoints, 3, 720, 1280), dtype=np.float32)
 
         if s == 'train': which = 'Training'
         elif s == 'val': which = 'Validation'
@@ -103,22 +103,36 @@ def load_data(project_variable):
             utterance_path = os.path.join(PP.data_path,
                                           which,
                                           PP.omg_emotion_jpg,
-                                          all_labels[i][0][0][j],
-                                          all_labels[i][0][1][j].split('.')[0])
+                                          all_labels[i][0][j][0],
+                                          all_labels[i][0][j][1].split('.')[0])
 
             # select random frame
             frames = os.listdir(utterance_path)
             index = random.randint(0, len(frames)-1)
-            jpg_path = os.path.join(utterance_path, frames[index])
+            jpg_path = os.path.join(utterance_path, '%d.jpg' % index)
 
+            # left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
             jpg_as_arr = Image.open(jpg_path)
+            # TODO: get rid of this, fix the jpgs
+            if jpg_as_arr.width != 1280 or jpg_as_arr.height != 720:
+                jpg_as_arr = jpg_as_arr.resize((1280, 720))
+                cnt += 1
+            # ValueError: could not broadcast input array from shape (1280,3,720) into shape (3,720,1280)
+
+            jpg_as_arr = np.array(jpg_as_arr, dtype=np.float32).transpose((2, 0, 1))
+
             data[j] = jpg_as_arr
+
+        end = time() - start
+
 
         final_data.append(data)
 
-        tmp = all_labels[i][:, 1:]
+        tmp = all_labels[i][:][1:]
 
         final_labels.append(tmp)
+
+        print('items to resize %s: %d' % (s, cnt))
 
     # splits = ['train', 'val', 'test']
     # final_data = [[img0, img1,...],
@@ -127,6 +141,7 @@ def load_data(project_variable):
     # final_labels = [[arousal, valence, categories],
     #                 [arousal, valence, categories],
     #                 [arousal, valence, categories]]
+
     return splits, final_data, final_labels
 
 
