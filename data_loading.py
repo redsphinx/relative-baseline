@@ -4,7 +4,7 @@ import subprocess
 import random
 from deepimpression2.chalearn20 import poisson_disc as pd
 from PIL import Image
-import utils as U
+from . import utils as U
 import deepimpression2.constants as C
 
 

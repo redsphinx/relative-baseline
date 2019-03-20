@@ -2,7 +2,7 @@ import os
 import skvideo.io
 from PIL import Image
 from tqdm import tqdm
-import utils as U
+from . import utils as U
 import numpy as np
 from scipy.signal import savgol_filter
 from deepimpression2 import constants as C

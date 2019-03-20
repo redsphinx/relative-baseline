@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import chainer
 import numpy as np
 # from deepimpression2.model_53 import Deepimpression
-from model_1 import Siamese
-import data_loading as L
+from .model_1 import Siamese
+from . import data_loading as L
 # import plotting
 
 import deepimpression2.constants as C
