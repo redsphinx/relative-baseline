@@ -30,9 +30,12 @@ class ProjectVariable(object):
         
         # list of str, which labels to use. ['categories', 'arousal', 'valence']
         self._label_type = ['categories']
+        
+        # int, label size for the output type
+        self._label_size = 7
 
-        # list of float, learning rate
-        self._learning_rate = [0.0001]
+        # float, learning rate
+        self._learning_rate = 0.0001
 
         # str, loss function
         self._loss_function = 'cross_entropy'
@@ -165,6 +168,14 @@ class ProjectVariable(object):
     def label_type(self, value):
         self._label_type = value
 
+    @property
+    def label_size(self):
+        return self._label_size
+
+    @label_size.setter
+    def label_size(self, value):
+        self._label_size = value
+    
     @property
     def learning_rate(self):
         return self._learning_rate

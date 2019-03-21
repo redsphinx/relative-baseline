@@ -53,15 +53,13 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             labels = labels[0]
 
         # put data part on GPU
-        # TODO: figure out to() vs. cuda()
-        # TODO: how to make device
         data = torch.from_numpy(data).cuda(device)
         labels = torch.from_numpy(labels).cuda(device)
 
         # train
         with torch.device(device):
             my_optimizer.zero_grad()
-            # TODO: fix model input and output
+            # TODO: fix model input 
             predictions = my_model(data)
             loss = calculate_loss(project_variable.loss_function, predictions, labels)
             loss.backward()
