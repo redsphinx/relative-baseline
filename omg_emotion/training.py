@@ -75,6 +75,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             # # crossentropyloss requires target to be of type long
             # labels = labels_onehot.long()
             labels = labels.long()
+            # https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542
+
             labels = labels.cuda(device)
 
 
