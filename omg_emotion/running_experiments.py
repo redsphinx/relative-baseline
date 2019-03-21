@@ -6,7 +6,7 @@ project_variable = ProjectVariable()
 
 
 def pilot():
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.model_number = 0
     project_variable.experiment_number = 0
     project_variable.debug_mode = True

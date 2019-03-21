@@ -92,7 +92,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss.backward()
         my_optimizer.step()
 
-        loss_epoch.append(loss)
+        loss_epoch.append(float(loss))
 
     # save data
     # TODO: DEBUG FROM HERE
