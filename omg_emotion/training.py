@@ -52,18 +52,28 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         if len(labels) == 1:
             labels = labels[0]
 
-        # put data part on GPU
-        data = torch.from_numpy(data).cuda(device)
+        if project_variable.model_number == 0:
+            # normalize image data
+            import torchvision.transforms as transforms
+            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                             std=[0.229, 0.224, 0.225])
+            data = torch.from_numpy(data)
+            for _b in range(project_variable.batch_size):
+                data[_b] = normalize(data[_b])
+
+            data = data.cuda(device)
+        else:
+            data = torch.from_numpy(data).cuda(device)
+
         labels = torch.from_numpy(labels).cuda(device)
 
         # train
-        with torch.device(device):
-            my_optimizer.zero_grad()
-            # TODO: fix model input 
-            predictions = my_model(data)
-            loss = calculate_loss(project_variable.loss_function, predictions, labels)
-            loss.backward()
-            my_optimizer.step()
+        # with torch.device(device):
+        my_optimizer.zero_grad()
+        predictions = my_model(data)
+        loss = calculate_loss(project_variable.loss_function, predictions, labels)
+        loss.backward()
+        my_optimizer.step()
 
         loss_epoch.append(loss)
 

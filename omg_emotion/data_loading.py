@@ -93,6 +93,8 @@ def load_data(project_variable):
         datapoints = len(all_labels[i][0])
         data = np.zeros(shape=(datapoints, 3, 720, 1280), dtype=np.float32)
 
+        # TODO: https://pytorch.org/docs/stable/torchvision/models.html
+
         if s == 'train': which = 'Training'
         elif s == 'val': which = 'Validation'
         else: which = 'Test'
@@ -123,6 +125,10 @@ def load_data(project_variable):
             # ValueError: could not broadcast input array from shape (1280,3,720) into shape (3,720,1280)
 
             jpg_as_arr = np.array(jpg_as_arr, dtype=np.float32).transpose((2, 0, 1))
+
+            # scale between 0 and 1 for resnet18
+            if project_variable.model_number == 0:
+                jpg_as_arr /= np.max(jpg_as_arr)
 
             data[j] = jpg_as_arr
 

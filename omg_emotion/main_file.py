@@ -29,6 +29,8 @@ def run(project_variable):
     my_model = setup.get_model(project_variable)
     device = setup.get_device(project_variable)
 
+
+
     if project_variable.device is not None:
         my_model.cuda(device)
 
