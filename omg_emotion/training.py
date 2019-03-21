@@ -9,7 +9,7 @@ from .settings import ProjectVariable
 
 def calculate_loss(loss_name, input, target):
     if loss_name == 'cross_entropy':
-        loss_function = CrossEntropyLoss
+        loss_function = CrossEntropyLoss()
     else:
         loss_function = None
 
@@ -62,10 +62,25 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                 data[_b] = normalize(data[_b])
 
             data = data.cuda(device)
+
+            # onehot encode labels -- not needed
+
+            # labels = np.expand_dims(labels, -1)
+            labels = torch.from_numpy(labels)
+
+            # labels_onehot = torch.Tensor(project_variable.batch_size, project_variable.label_size)
+            # labels_onehot.zero_()
+            # labels_onehot.scatter_(1, labels, 1)
+            #
+            # # crossentropyloss requires target to be of type long
+            # labels = labels_onehot.long()
+            labels = labels.long()
+            labels = labels.cuda(device)
+
+
         else:
             data = torch.from_numpy(data).cuda(device)
-
-        labels = torch.from_numpy(labels).cuda(device)
+            labels = torch.from_numpy(labels).cuda(device)
 
         # train
         # with torch.device(device):
@@ -78,6 +93,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss_epoch.append(loss)
 
     # save data
+    # TODO: DEBUG FROM HERE
     loss = float(np.mean(loss_epoch))
     if project_variable.save_data:
         saving.update_logs(project_variable, 'train', [loss])
