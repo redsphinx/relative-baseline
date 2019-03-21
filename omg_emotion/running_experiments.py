@@ -9,7 +9,9 @@ def pilot():
     project_variable.device = 0
     project_variable.model_number = 0
     project_variable.experiment_number = 0
-    project_variable.debug_mode = True
+
+    project_variable.batch_size = 16
+
     main_file.run(project_variable)
 
 

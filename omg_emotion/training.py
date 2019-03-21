@@ -2,6 +2,7 @@ import numpy as np
 from relative_baseline.omg_emotion import saving
 import torch
 from torch.nn import CrossEntropyLoss
+from tqdm import tqdm
 
 # temporary for debugging
 from .settings import ProjectVariable
@@ -43,14 +44,20 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     loss_epoch = []
 
     train_steps = len(all_data[0]) // project_variable.batch_size
+    print('train steps: %d' % train_steps)
+
+    full_data, full_labels = all_data
+
+    if len(full_labels) == 1:
+        full_labels = full_labels[0]
 
     # for ts in range(project_variable.train_steps):
-    for ts in range(train_steps):
+    for ts in tqdm(range(train_steps)):
 
         # get part of data
-        data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size][:]
-        if len(labels) == 1:
-            labels = labels[0]
+        # data, labels = all_data[ts*project_variable.batch_size:(1+ts)*project_variable.batch_size][:]
+        data = full_data[ts*project_variable.batch_size:(ts+1)*project_variable.batch_size]
+        labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
 
         if project_variable.model_number == 0:
             # normalize image data
@@ -95,7 +102,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss_epoch.append(float(loss))
 
     # save data
-    # TODO: DEBUG FROM HERE
     loss = float(np.mean(loss_epoch))
     if project_variable.save_data:
         saving.update_logs(project_variable, 'train', [loss])

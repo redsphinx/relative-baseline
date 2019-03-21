@@ -31,8 +31,8 @@ def load_labels(which, project_variable):
 
     if project_variable.debug_mode:
         annotations = annotations[0:project_variable.batch_size]
-        if project_variable.train:
-            np.random.shuffle(annotations)
+    if project_variable.train:
+        np.random.shuffle(annotations)
 
     names = np.array(annotations[:, 0:2])
     arousal = annotations[:, 2]
@@ -54,6 +54,23 @@ def load_labels(which, project_variable):
 
     # labels = [names, arousal, valence, categories]
     return labels
+
+
+def get_nonzero_frame(frames, utterance_path, cnt):
+    index = random.randint(0, len(frames) - 1)
+    jpg_path = os.path.join(utterance_path, '%d.jpg' % index)
+
+    # left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
+    jpg_as_arr = Image.open(jpg_path)
+    # TODO: get rid of this, fix the jpgs
+    if jpg_as_arr.width != 1280 or jpg_as_arr.height != 720:
+        jpg_as_arr = jpg_as_arr.resize((1280, 720))
+        cnt += 1
+    # ValueError: could not broadcast input array from shape (1280,3,720) into shape (3,720,1280)
+
+    jpg_as_arr = np.array(jpg_as_arr, dtype=np.float32).transpose((2, 0, 1))
+
+    return jpg_as_arr, cnt
 
 
 def load_data(project_variable):
@@ -113,22 +130,35 @@ def load_data(project_variable):
 
             # select random frame
             frames = os.listdir(utterance_path)
-            index = random.randint(0, len(frames)-1)
-            jpg_path = os.path.join(utterance_path, '%d.jpg' % index)
 
-            # left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
-            jpg_as_arr = Image.open(jpg_path)
-            # TODO: get rid of this, fix the jpgs
-            if jpg_as_arr.width != 1280 or jpg_as_arr.height != 720:
-                jpg_as_arr = jpg_as_arr.resize((1280, 720))
-                cnt += 1
-            # ValueError: could not broadcast input array from shape (1280,3,720) into shape (3,720,1280)
+            jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
 
-            jpg_as_arr = np.array(jpg_as_arr, dtype=np.float32).transpose((2, 0, 1))
+            # index = random.randint(0, len(frames)-1)
+            # jpg_path = os.path.join(utterance_path, '%d.jpg' % index)
+            #
+            # # left_data = np.zeros((batch_size, 3, 542, 662), dtype=np.float32)
+            # jpg_as_arr = Image.open(jpg_path)
+            # # TODO: get rid of this, fix the jpgs
+            # if jpg_as_arr.width != 1280 or jpg_as_arr.height != 720:
+            #     jpg_as_arr = jpg_as_arr.resize((1280, 720))
+            #     cnt += 1
+            # # ValueError: could not broadcast input array from shape (1280,3,720) into shape (3,720,1280)
+            #
+            # jpg_as_arr = np.array(jpg_as_arr, dtype=np.float32).transpose((2, 0, 1))
 
             # scale between 0 and 1 for resnet18
             if project_variable.model_number == 0:
-                jpg_as_arr /= np.max(jpg_as_arr)
+                while int(np.max(jpg_as_arr)) == 0:
+                    print('max is zero')
+                    jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+
+                jpg_as_arr /= int(np.max(jpg_as_arr))
+
+                # if int(np.max(jpg_as_arr)) > 0:
+                #     jpg_as_arr /= int(np.max(jpg_as_arr))
+                # else:
+                #     print('something wrong with: %s' % jpg_path)
+                #     jpg_as_arr = np.zeros(shape=jpg_as_arr.shape)
 
             data[j] = jpg_as_arr
 
@@ -141,7 +171,7 @@ def load_data(project_variable):
 
         final_labels.append(tmp)
 
-        print('items to resize %s: %d' % (s, cnt))
+        # print('items to resize %s: %d' % (s, cnt))
 
     # splits = ['train', 'val', 'test']
     # final_data = [[img0, img1,...],

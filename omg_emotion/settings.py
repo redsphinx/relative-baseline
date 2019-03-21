@@ -47,13 +47,13 @@ class ProjectVariable(object):
         self._seed = 6
 
         # bool, if in debug mode
-        self._debug_mode = True
+        self._debug_mode = False
 
         # depending on debug mode
         if self._debug_mode:
             self._batch_size = 16
             self._start_epoch = -1
-            self._end_epoch = 2
+            self._end_epoch = 10
             self._train_steps = 10
             self._val_steps = 1
             self._test_steps = 1

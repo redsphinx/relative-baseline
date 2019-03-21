@@ -17,13 +17,13 @@ def run(project_variable):
     # load val and test data once
     project_variable.val = True
     project_variable.test = True
-    data = D.load_data(project_variable)
+    # data = D.load_data(project_variable)
 
-    data_val = data[1][0]
-    data_test = data[1][1]
-
-    labels_val = data[2][0]
-    labels_test = data[2][1]
+    # data_val = data[1][0]
+    # data_test = data[1][1]
+    #
+    # labels_val = data[2][0]
+    # labels_test = data[2][1]
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
