@@ -15,8 +15,8 @@ def run(project_variable):
 # def run(project_variable=project_variable):
 
     # load val and test data once
-    project_variable.val = True
-    project_variable.test = True
+    # project_variable.val = True
+    # project_variable.test = True
     # data = D.load_data(project_variable)
 
     # data_val = data[1][0]
@@ -28,8 +28,6 @@ def run(project_variable):
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
     device = setup.get_device(project_variable)
-
-
 
     if project_variable.device is not None:
         my_model.cuda(device)
@@ -62,12 +60,13 @@ def run(project_variable):
         if project_variable.train:
             training.run(project_variable, data, my_model, my_optimizer, device)
 
-        project_variable.val = True
-        project_variable.test = True
-
-        if project_variable.val:
-            pass
-
-        if project_variable.test:
-            pass
+        # TODO: implement
+        # project_variable.val = True
+        # project_variable.test = True
+        #
+        # if project_variable.val:
+        #     pass
+        #
+        # if project_variable.test:
+        #     pass
 

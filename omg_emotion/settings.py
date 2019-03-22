@@ -1,7 +1,9 @@
 
 
 class ProjectVariable(object):
-    def __init__(self):
+    def __init__(self, debug_mode=True):
+        if debug_mode:
+            print('running in debug mode')
         """
         Default values for all the experimental variables.
         """
@@ -46,11 +48,8 @@ class ProjectVariable(object):
         # int, seed for shuffling
         self._seed = 6
 
-        # bool, if in debug mode
-        self._debug_mode = False
-
         # depending on debug mode
-        if self._debug_mode:
+        if debug_mode:
             self._batch_size = 16
             self._start_epoch = -1
             self._end_epoch = 10
@@ -207,14 +206,6 @@ class ProjectVariable(object):
     @seed.setter
     def seed(self, value):
         self._seed = value
-
-    @property
-    def debug_mode(self):
-        return self._debug_mode
-
-    @debug_mode.setter
-    def debug_mode(self, value):
-        self._debug_mode = value
 
     @property
     def batch_size(self):

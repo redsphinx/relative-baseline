@@ -296,3 +296,46 @@ def distribution_classes_over_splits(which):
 #
 # for i in ['Test']:
 #     distribution_classes_over_splits(i)
+
+
+def resize_images():
+    from relative_baseline.omg_emotion import data_loading as DL
+    from relative_baseline.omg_emotion.settings import ProjectVariable
+    from relative_baseline.omg_emotion import project_paths as PP
+
+    project_variable = ProjectVariable()
+
+    # splits = ['Training', 'Validation', 'Test']
+    splits = ['Test']
+
+    for i in splits:
+        cnt = 0
+        cnt_d = 0
+        labels = DL.load_labels(i, project_variable)
+        datapoints = len(labels[0])
+        for j in range(datapoints):
+            aff = True
+            utterance_path = os.path.join(PP.data_path,
+                                          i,
+                                          PP.omg_emotion_jpg,
+                                          labels[0][j][0],
+                                          labels[0][j][1].split('.')[0])
+
+            frames = os.listdir(utterance_path)
+
+            for k in range(len(frames)):
+                jpg_path = os.path.join(utterance_path, '%d.jpg' % k)
+                jpg_as_arr = Image.open(jpg_path)
+                if jpg_as_arr.width != 1280 or jpg_as_arr.height != 720:
+                    jpg_as_arr = jpg_as_arr.resize((1280, 720))
+                    jpg_as_arr.save(jpg_path)
+                    cnt += 1
+                    if aff:
+                        cnt_d += 1
+                        print('%d' % j)
+                        aff = False
+
+        print('resized in %s, frames: %d, datapoints: %d ' % (i, cnt, cnt_d))
+
+
+# resize_images()
