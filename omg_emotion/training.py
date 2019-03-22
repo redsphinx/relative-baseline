@@ -19,17 +19,18 @@ def calculate_loss(loss_name, input, target):
 
 
 def calculate_accuracy(input, target):
-    # TODO
-    assert len(input) == len(target)
-    total = len(input)
+    # accuracy of step
     acc = 0
 
-    def threshold(x):
-        pass
+    input = input.cpu()
+    input = np.array(input.data)
 
-    for i in range(total):
-        if threshold(input[i]) == target[i]:
-           acc += 1
+    target = target.cpu()
+    target = np.array(target.data)
+
+    for i in range(len(input)):
+        if input[i].argmax() == target[i]:
+            acc += 1
 
     return acc
 
@@ -42,9 +43,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # project_variable = ProjectVariable()
 
     loss_epoch = []
+    accuracy_epoch = []
 
     train_steps = len(all_data[0]) // project_variable.batch_size
-    print('train steps: %d' % train_steps)
+    # print('train steps: %d' % train_steps)
 
     full_data, full_labels = all_data
 
@@ -99,14 +101,21 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss.backward()
         my_optimizer.step()
 
+        accuracy = calculate_accuracy(predictions, labels)
+
         loss_epoch.append(float(loss))
+        accuracy_epoch.append(float(accuracy))
 
     # save data
     loss = float(np.mean(loss_epoch))
-    if project_variable.save_data:
-        saving.update_logs(project_variable, 'train', [loss])
+    accuracy = float(np.mean(accuracy_epoch))
 
-    print('epoch %d train %s: %f' % (project_variable.current_epoch, project_variable.loss_function, loss))
+    if project_variable.save_data:
+        saving.update_logs(project_variable, 'train', [loss, accuracy])
+
+    print('epoch %d train, %s: %f, accuracy: %f out of %d' % (project_variable.current_epoch,
+                                                              project_variable.loss_function,
+                                                              loss, accuracy, project_variable.batch_size))
 
     # save model
     if project_variable.save_model:
@@ -116,5 +125,3 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # TODO
 
 
-# TODO
-# added different learning rates for different layers

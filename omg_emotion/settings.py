@@ -7,6 +7,9 @@ class ProjectVariable(object):
         """
         Default values for all the experimental variables.
         """
+
+        self._debug_mode = debug_mode
+
         # int, which gpu to use {None, 0, 1, etc}
         self._device = None
 
@@ -50,9 +53,9 @@ class ProjectVariable(object):
 
         # depending on debug mode
         if debug_mode:
-            self._batch_size = 16
+            self._batch_size = 24
             self._start_epoch = -1
-            self._end_epoch = 10
+            self._end_epoch = 2
             self._train_steps = 10
             self._val_steps = 1
             self._test_steps = 1
@@ -69,7 +72,10 @@ class ProjectVariable(object):
             self._save_data = True
             self._save_model = True
             self._save_graphs = True
-    
+
+    @property
+    def debug_mode(self):
+        return self._debug_mode
     
     @property
     def device(self):

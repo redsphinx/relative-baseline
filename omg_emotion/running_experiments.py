@@ -10,10 +10,10 @@ def pilot():
     project_variable.model_number = 0
     project_variable.experiment_number = 0
 
-    project_variable.batch_size = 16
+    project_variable.batch_size = 20
 
-    project_variable.save_model = False
-    project_variable.save_data = False
+    # project_variable.save_model = False
+    # project_variable.save_data = False
 
     main_file.run(project_variable)
 
