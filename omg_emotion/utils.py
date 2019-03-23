@@ -1,4 +1,5 @@
 import numpy as np
+from torch.nn import CrossEntropyLoss
 
 
 def str_list_to_num_arr(input_list, to_type):
@@ -10,3 +11,31 @@ def str_list_to_num_arr(input_list, to_type):
         input_list = np.array([int(input_list[i]) for i in range(len(input_list))])
 
     return input_list
+
+
+def calculate_loss(loss_name, input, target):
+    if loss_name == 'cross_entropy':
+        loss_function = CrossEntropyLoss()
+    else:
+        loss_function = None
+
+    loss = loss_function(input, target)
+    return loss
+
+
+def calculate_accuracy(input, target):
+    # accuracy of step
+    acc = 0
+
+    input = input.cpu()
+    input = np.array(input.data)
+
+    target = target.cpu()
+    target = np.array(target.data)
+
+    for i in range(len(input)):
+        if input[i].argmax() == target[i]:
+            acc += 1
+
+    return acc
+

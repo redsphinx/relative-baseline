@@ -1,38 +1,11 @@
 import numpy as np
 from relative_baseline.omg_emotion import saving
 import torch
-from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
+from relative_baseline.omg_emotion import utils as U
 
 # temporary for debugging
 from .settings import ProjectVariable
-
-
-def calculate_loss(loss_name, input, target):
-    if loss_name == 'cross_entropy':
-        loss_function = CrossEntropyLoss()
-    else:
-        loss_function = None
-
-    loss = loss_function(input, target)
-    return loss
-
-
-def calculate_accuracy(input, target):
-    # accuracy of step
-    acc = 0
-
-    input = input.cpu()
-    input = np.array(input.data)
-
-    target = target.cpu()
-    target = np.array(target.data)
-
-    for i in range(len(input)):
-        if input[i].argmax() == target[i]:
-            acc += 1
-
-    return acc
 
 
 def run(project_variable, all_data, my_model, my_optimizer, device):
@@ -97,11 +70,11 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         # with torch.device(device):
         my_optimizer.zero_grad()
         predictions = my_model(data)
-        loss = calculate_loss(project_variable.loss_function, predictions, labels)
+        loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
         loss.backward()
         my_optimizer.step()
 
-        accuracy = calculate_accuracy(predictions, labels)
+        accuracy = U.calculate_accuracy(predictions, labels)
 
         loss_epoch.append(float(loss))
         accuracy_epoch.append(float(accuracy))
