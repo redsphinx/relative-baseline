@@ -3,6 +3,8 @@ from torchvision.models import resnet18
 from torch.optim.adam import Adam
 import torch
 from torch import nn
+from relative_baseline.omg_emotion import project_paths as PP
+import os
 
 
 def prepare_model(project_variable, model):
@@ -14,9 +16,16 @@ def prepare_model(project_variable, model):
 
 
 def get_model(project_variable):
+    # project_variable = ProjectVariable()
+
     if project_variable.model_number == 0:
         model = resnet18(pretrained=True)
         model = prepare_model(project_variable, model)
+        if project_variable.load_model is not None:
+            ex, mo, ep = project_variable.load_model
+            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
+            model.load_state_dict(torch.load(path))
+            model.eval()
     else:
         model = None
 

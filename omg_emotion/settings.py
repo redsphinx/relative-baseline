@@ -13,7 +13,7 @@ class ProjectVariable(object):
         # int, which gpu to use {None, 0, 1, etc}
         self._device = None
 
-        # str, which model to load
+        # list of int, which model to load, [experiment, model, epoch]
         self._load_model = None
 
         # int, experiment data for log

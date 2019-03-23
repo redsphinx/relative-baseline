@@ -69,6 +69,5 @@ def run(project_variable, all_data, my_model, device):
     if project_variable.save_data:
         saving.update_logs(project_variable, 'val', [loss, accuracy])
 
-    print('epoch %d val, %s: %f, accuracy: %f out of %d' % (project_variable.current_epoch,
-                                                            project_variable.loss_function,
-                                                            loss, accuracy, project_variable.batch_size))
+    print('val, %s: %f, accuracy: %f out of %d' % (project_variable.loss_function,
+                                                   loss, accuracy, project_variable.batch_size))
