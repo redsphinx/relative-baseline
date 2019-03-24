@@ -61,13 +61,13 @@ def run(project_variable):
         # if project_variable.train:
         #     training.run(project_variable, data, my_model, my_optimizer, device)
 
-        project_variable.val = True
-        if project_variable.val:
-            data = data_val, labels_val
-            validation.run(project_variable, my_optimizer, data, my_model, device)
-
-        # project_variable.test = True
-        # if project_variable.test:
-        #     data = data_test, labels_test
+        # project_variable.val = True
+        # if project_variable.val:
+        #     data = data_val, labels_val
         #     validation.run(project_variable, my_optimizer, data, my_model, device)
+
+        project_variable.test = True
+        if project_variable.test:
+            data = data_test, labels_test
+            testing.run(project_variable, my_optimizer, data, my_model, device)
 

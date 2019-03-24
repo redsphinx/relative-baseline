@@ -39,3 +39,27 @@ def calculate_accuracy(input, target):
 
     return acc
 
+
+def confusion_matrix(matrix, input, target):
+    # col = target, row = prediction
+    input = input.cpu()
+    input = np.array(input.data)
+
+    target = target.cpu()
+    target = np.array(target.data)
+
+    for i in range(len(input)):
+        matrix[target[i], input[i].argmax()] += 1
+
+    return matrix
+
+
+def flatten_confusion(matrix):
+    s = ''
+    matrix = matrix.flatten()
+    for i in range(len(matrix)):
+        s += '%d,' % matrix[i]
+
+    s = s[:-1]
+
+    return s
