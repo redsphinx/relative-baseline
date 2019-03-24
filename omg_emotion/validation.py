@@ -8,7 +8,7 @@ from relative_baseline.omg_emotion import utils as U
 from .settings import ProjectVariable
 
 
-def run(project_variable, all_data, my_model, device):
+def run(project_variable, my_optimizer, all_data, my_model, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
     # device is string
@@ -54,8 +54,10 @@ def run(project_variable, all_data, my_model, device):
 
         # train
         # with torch.device(device):
+        my_optimizer.zero_grad()
         predictions = my_model(data)
         loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
+        loss.backward()
 
         accuracy = U.calculate_accuracy(predictions, labels)
 

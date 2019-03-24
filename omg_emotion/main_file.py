@@ -12,15 +12,19 @@ from relative_baseline.omg_emotion import data_loading as D
 def run(project_variable):
 
     # load val and test data once
-    project_variable.val = True
-    # project_variable.test = True
+    project_variable.val = False
+    project_variable.train = False
+    project_variable.test = True
+
     data = D.load_data(project_variable)
 
-    data_val = data[1][0]
-    # data_test = data[1][1]
+    if project_variable.val:
+        data_val = data[1][0]
+        labels_val = data[2][0]
 
-    labels_val = data[2][0]
-    # labels_test = data[2][1]
+    if project_variable.test:
+        data_test = data[1][0]
+        labels_test = data[2][0]
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
@@ -29,7 +33,7 @@ def run(project_variable):
     if project_variable.device is not None:
         my_model.cuda(device)
 
-    # my_optimizer = setup.get_optimizer(project_variable, my_model)
+    my_optimizer = setup.get_optimizer(project_variable, my_model)
 
     for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
         project_variable.current_epoch = e
@@ -58,12 +62,12 @@ def run(project_variable):
         #     training.run(project_variable, data, my_model, my_optimizer, device)
 
         project_variable.val = True
-        # project_variable.test = True
-        #
         if project_variable.val:
             data = data_val, labels_val
-            validation.run(project_variable, data, my_model, device)
+            validation.run(project_variable, my_optimizer, data, my_model, device)
 
+        # project_variable.test = True
         # if project_variable.test:
-        #     pass
+        #     data = data_test, labels_test
+        #     validation.run(project_variable, my_optimizer, data, my_model, device)
 

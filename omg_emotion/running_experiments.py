@@ -23,9 +23,12 @@ def e1():
     project_variable.model_number = 0
     project_variable.experiment_number = 1
 
-    project_variable.batch_size = 20
+    project_variable.batch_size = 16
     project_variable.end_epoch = 1
 
     project_variable.load_model = [0, 0, 99]  # experiment, model, epoch
 
     main_file.run(project_variable)
+
+
+e1()
