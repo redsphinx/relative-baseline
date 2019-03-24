@@ -11,7 +11,11 @@ def initialize(project_variable, all_data):
         steps = len(all_data[0]) // project_variable.batch_size
     else:
         steps = len(all_data[0]) // project_variable.batch_size + 1
+
     full_data, full_labels = all_data
+
+    if len(full_labels) == 1:
+        full_labels = full_labels[0]
 
     return loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data
 

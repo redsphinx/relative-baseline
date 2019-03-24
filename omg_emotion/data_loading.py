@@ -188,8 +188,17 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
         data = torch.from_numpy(data)
-        for _b in range(project_variable.batch_size):
-            data[_b] = normalize(data[_b])
+
+        if ts == steps - 1:
+            if nice_div == 0:
+                for _b in range(project_variable.batch_size):
+                    data[_b] = normalize(data[_b])
+            else:
+                for _b in range(nice_div):
+                    data[_b] = normalize(data[_b])
+        else:
+            for _b in range(project_variable.batch_size):
+                data[_b] = normalize(data[_b])
 
         data = data.cuda(device)
 

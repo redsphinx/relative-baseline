@@ -38,11 +38,12 @@ def run(project_variable, my_optimizer, all_data, my_model, device):
 
     # save data
     loss = float(np.mean(loss_epoch))
-    accuracy = float(np.mean(accuracy_epoch))
+    accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
     confusion_flatten = U.flatten_confusion(confusion_epoch)
 
     if project_variable.save_data:
         saving.update_logs(project_variable, 'val', [loss, accuracy, confusion_flatten])
 
-    print('val, %s: %f, accuracy: %f out of %d' % (project_variable.loss_function,
-                                                   loss, accuracy, project_variable.batch_size))
+    print('epoch %d val, %s: %f, accuracy: %f ' % (project_variable.current_epoch,
+                                                   project_variable.loss_function,
+                                                   loss, accuracy))
