@@ -2,6 +2,20 @@ import numpy as np
 from torch.nn import CrossEntropyLoss
 
 
+def initialize(project_variable, all_data):
+    loss_epoch = []
+    accuracy_epoch = []
+    confusion_epoch = np.zeros(shape=(project_variable.label_size, project_variable.label_size), dtype=int)
+    nice_div = len(all_data[0]) % project_variable.batch_size
+    if nice_div == 0:
+        steps = len(all_data[0]) // project_variable.batch_size
+    else:
+        steps = len(all_data[0]) // project_variable.batch_size + 1
+    full_data, full_labels = all_data
+
+    return loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data
+
+
 def str_list_to_num_arr(input_list, to_type):
     assert to_type in [float, int]
 

@@ -6,6 +6,7 @@ import random
 from PIL import Image
 import cv2
 from time import time
+import torch
 
 # temporary for debugging
 from .settings import ProjectVariable
@@ -150,7 +151,6 @@ def load_data(project_variable):
 
         end = time() - start
 
-
         final_data.append(data)
 
         tmp = all_labels[i][:][1:]
@@ -170,7 +170,37 @@ def load_data(project_variable):
     return splits, final_data, final_labels
 
 
+def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
+    if ts == steps - 1:
+        if nice_div == 0:
+            data = full_data[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
+            labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
+        else:
+            data = full_data[ts * nice_div:(ts + 1) * nice_div]
+            labels = full_labels[ts * nice_div:(ts + 1) * nice_div]
+    else:
+        data = full_data[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
+        labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
 
+    if project_variable.model_number == 0:
+        # normalize image data
+        import torchvision.transforms as transforms
+        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                         std=[0.229, 0.224, 0.225])
+        data = torch.from_numpy(data)
+        for _b in range(project_variable.batch_size):
+            data[_b] = normalize(data[_b])
 
+        data = data.cuda(device)
 
+        labels = torch.from_numpy(labels)
+        labels = labels.long()
+        # https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542
 
+        labels = labels.cuda(device)
+
+    else:
+        data = torch.from_numpy(data).cuda(device)
+        labels = torch.from_numpy(labels).cuda(device)
+
+    return data, labels
