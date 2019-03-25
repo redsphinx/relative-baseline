@@ -28,7 +28,7 @@ def e1():
 
     project_variable.load_model = [0, 0, 99]  # experiment, model, epoch
 
-    main_file.run(project_variable)
-
+    # main_file.run(project_variable)
+    main_file.run_many_val(project_variable)
 
 e1()

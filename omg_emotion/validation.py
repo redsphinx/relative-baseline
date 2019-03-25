@@ -6,8 +6,12 @@ from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import data_loading as DL
 
 # temporary for debugging
-from .settings import ProjectVariable
+# from .settings import ProjectVariable
 
+# for debugging
+# project_variable = ProjectVariable()
+# from tensorboardX import SummaryWriter
+# project_variable.writer = SummaryWriter()
 
 def run(project_variable, my_optimizer, all_data, my_model, device):
     # all_data = np.array with the train datasplit depending
@@ -47,3 +51,6 @@ def run(project_variable, my_optimizer, all_data, my_model, device):
     print('epoch %d val, %s: %f, accuracy: %f ' % (project_variable.current_epoch,
                                                    project_variable.loss_function,
                                                    loss, accuracy))
+
+    # add things to writer
+    project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)

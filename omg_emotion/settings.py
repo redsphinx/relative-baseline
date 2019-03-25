@@ -1,4 +1,3 @@
-from tensorboardX import SummaryWriter
 
 
 class ProjectVariable(object):
@@ -8,7 +7,7 @@ class ProjectVariable(object):
         """
         Default values for all the experimental variables.
         """
-        self._writer = SummaryWriter()
+        self._writer = None
 
         self._debug_mode = debug_mode
 
@@ -78,6 +77,10 @@ class ProjectVariable(object):
     @property
     def writer(self):
         return self._writer
+
+    @writer.setter
+    def writer(self, value):
+        self._writer = value
 
     @property
     def debug_mode(self):

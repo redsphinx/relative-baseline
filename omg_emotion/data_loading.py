@@ -24,7 +24,6 @@ from .settings import ProjectVariable
 # 6 - Surprise
 
 def load_labels(which, project_variable):
-    # TODO: one-hot-encode labels
     # project_variable = ProjectVariable
     assert which in ['Training', 'Validation', 'Test']
     path = os.path.join(PP.data_path, which, 'Annotations', 'annotations.csv')
