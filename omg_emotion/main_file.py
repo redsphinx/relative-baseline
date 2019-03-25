@@ -32,6 +32,7 @@ def run(project_variable):
     if project_variable.val:
         data_val = data[1][0]
         labels_val = data[2][0]
+        print(labels_val)
 
     if project_variable.test:
         data_test = data[1][0]
@@ -39,15 +40,25 @@ def run(project_variable):
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
+
+    print(my_model.fc.weight)
+
     device = setup.get_device(project_variable)
 
     if project_variable.device is not None:
         my_model.cuda(device)
 
-    my_optimizer = setup.get_optimizer(project_variable, my_model)
+    if project_variable.train:
+        my_optimizer = setup.get_optimizer(project_variable, my_model)
+    else:
+        my_optimizer = None
 
-    for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
-        project_variable.current_epoch = e
+    data = data_val, labels_val
+    validation.run(project_variable, my_optimizer, data, my_model, device)
+
+    # for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
+    #     project_variable.current_epoch = e
+        # my_model.train()
 
         # get data
         # splits = ['train', 'val', 'test']
@@ -72,10 +83,10 @@ def run(project_variable):
         # if project_variable.train:
         #     training.run(project_variable, data, my_model, my_optimizer, device)
 
-        project_variable.val = True
-        if project_variable.val:
-            data = data_val, labels_val
-            validation.run(project_variable, my_optimizer, data, my_model, device)
+        # project_variable.val = True
+        # if project_variable.val:
+        #     data = data_val, labels_val
+        #     validation.run(project_variable, my_optimizer, data, my_model, device)
 
         # project_variable.test = True
         # if project_variable.test:
@@ -83,7 +94,28 @@ def run(project_variable):
         #     testing.run(project_variable, my_optimizer, data, my_model, device)
 
 
-def run_many_val(project_variable):
+def run_many_val(project_variable, data1, data2):
+    # create writer for tensorboardX
+    # setup model, optimizer & device
+    my_model = setup.get_model(project_variable)
+    print(my_model.fc.weight)
+    device = setup.get_device(project_variable)
+
+    if project_variable.device is not None:
+        my_model.cuda(device)
+
+    if project_variable.train:
+        my_optimizer = setup.get_optimizer(project_variable, my_model)
+    else:
+        my_optimizer = None
+
+    print(data2)
+    validation.run(project_variable, my_optimizer, (data1, data2), my_model, device)
+
+    del my_model
+
+
+def run_many_val_0(project_variable):
     # from .settings import ProjectVariable
     # project_variable = ProjectVariable()
 
@@ -104,15 +136,21 @@ def run_many_val(project_variable):
     if project_variable.val:
         data_val = data[1][0]
         labels_val = data[2][0]
+    else:
+        data_val = None
+        labels_val = None
 
     device = setup.get_device(project_variable)
 
     ex, mo, ep = project_variable.load_model
     all_models = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo))
-    models_to_load = os.listdir(all_models)
-    models_to_load.sort()
+    models_to_load = len(os.listdir(all_models))
 
-    for i in range(len(models_to_load)):
+    prev_data_val = data_val
+    prev_labels_val = labels_val
+
+    for i in range(0, models_to_load):
+        # data = data_val, labels_val
 
         project_variable.current_epoch = i
 
@@ -120,13 +158,18 @@ def run_many_val(project_variable):
 
         # setup model, optimizer & device
         my_model = setup.get_model(project_variable)
+        # my_model.eval()
+
 
         if project_variable.device is not None:
             my_model.cuda(device)
 
-        my_optimizer = setup.get_optimizer(project_variable, my_model)
+        # my_optimizer = setup.get_optimizer(project_variable, my_model)
+        my_optimizer = None
 
         project_variable.val = True
         if project_variable.val:
-            data = data_val, labels_val
-            validation.run(project_variable, my_optimizer, data, my_model, device)
+
+            validation.run(project_variable, my_optimizer, (data_val, labels_val), my_model, device)
+
+

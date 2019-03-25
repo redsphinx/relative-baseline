@@ -29,10 +29,17 @@ def run(project_variable, my_optimizer, all_data, my_model, device):
         # get part of data
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-        my_optimizer.zero_grad()
-        predictions = my_model(data)
-        loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
-        loss.backward()
+        my_model.eval()
+        with torch.no_grad():
+            # my_optimizer.zero_grad()
+            # predictions = my_model.forward(data)
+            predictions = my_model(data)
+            # print(predictions)
+            loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
+            # print('loss raw: %s' % str(loss))
+            loss = loss.detach()
+            # loss.backward()
+        my_model.train()
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
@@ -41,6 +48,7 @@ def run(project_variable, my_optimizer, all_data, my_model, device):
         accuracy_epoch.append(float(accuracy))
 
     # save data
+    # print('loss epoch: ', loss_epoch)
     loss = float(np.mean(loss_epoch))
     accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
     confusion_flatten = U.flatten_confusion(confusion_epoch)
