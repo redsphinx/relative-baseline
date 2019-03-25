@@ -25,7 +25,10 @@ def get_model(project_variable):
             ex, mo, ep = project_variable.load_model
             path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
             model.load_state_dict(torch.load(path))
-            model.eval()
+            # TODO: https://cs230-stanford.github.io/pytorch-getting-started.html#training-vs-evaluation
+            # model.eval()
+
+            print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
     else:
         model = None
 
