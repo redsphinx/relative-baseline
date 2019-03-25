@@ -1,6 +1,6 @@
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
-
+import numpy as np
 
 project_variable = ProjectVariable(debug_mode=True)
 
@@ -53,6 +53,9 @@ def e1():
             print('ss')
         project_variable.current_epoch = i
         project_variable.load_model = [0, 0, i]  # experiment, model, epoch
+        # TODO: make this nicer
+        data_val = np.copy(data[1][0])
+        labels_val = np.copy(data[2][0])
         main_file.run_many_val(project_variable, data_val, labels_val)
 
 

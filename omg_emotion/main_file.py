@@ -41,7 +41,7 @@ def run(project_variable):
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
 
-    print(my_model.fc.weight)
+    # print(my_model.fc.weight)
 
     device = setup.get_device(project_variable)
 
@@ -98,7 +98,7 @@ def run_many_val(project_variable, data1, data2):
     # create writer for tensorboardX
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
-    print(my_model.fc.weight)
+    # print(my_model.fc.weight)
     device = setup.get_device(project_variable)
 
     if project_variable.device is not None:
