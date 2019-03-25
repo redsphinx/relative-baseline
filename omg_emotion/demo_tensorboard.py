@@ -24,7 +24,7 @@ recall = [1.0, 0.8533334, 0.28, 0.0666667, 0.0]
 
 for n_iter in range(100):
     # writer.
-    
+
     s1 = torch.rand(1)  # value to keep
     s2 = torch.rand(1)
     # data grouping by `slash`
