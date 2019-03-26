@@ -24,15 +24,15 @@ def run(project_variable):
 
     # load val and test data once
     project_variable.val = False
-    project_variable.train = False
-    project_variable.test = True
+    project_variable.train = True
+    project_variable.test = False
 
     data = D.load_data(project_variable)
 
     if project_variable.val:
         data_val = data[1][0]
         labels_val = data[2][0]
-        print(labels_val)
+        # print(labels_val)
 
     if project_variable.test:
         data_test = data[1][0]
@@ -53,8 +53,8 @@ def run(project_variable):
     else:
         my_optimizer = None
 
-    # data = data_val, labels_val
-    data = data_test, labels_test
+    data = data_val, labels_val
+    # data = data_test, labels_test
     validation.run(project_variable, my_optimizer, data, my_model, device)
 
     # for e in range(project_variable.start_epoch+1, project_variable.end_epoch):

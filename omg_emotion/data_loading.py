@@ -7,6 +7,7 @@ from PIL import Image
 import cv2
 from time import time
 import torch
+from multiprocessing import Pool, Queue
 
 # temporary for debugging
 from .settings import ProjectVariable
@@ -22,6 +23,13 @@ from .settings import ProjectVariable
 # 4 - Neutral
 # 5 - Sad
 # 6 - Surprise
+
+global_queue = Queue()
+# pass q to everything
+# put things in q
+# q.put()
+# when q is filled
+# q.get()
 
 # TODO: parallel data laoding
 
@@ -74,7 +82,43 @@ def get_nonzero_frame(frames, utterance_path, cnt):
     return jpg_as_arr, cnt
 
 
+def get_image(things):
+    utterance_path = things[0]
+    index = things[1]
+
+    frames = os.listdir(utterance_path)
+    cnt = 0
+
+    jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+
+    # scale between 0 and 1 for resnet18
+    while int(np.max(jpg_as_arr)) == 0:
+        print('max is zero')
+        jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+
+    jpg_as_arr /= int(np.max(jpg_as_arr))
+
+    import torchvision.transforms as transforms
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+    jpg_as_arr = torch.from_numpy(jpg_as_arr)
+    jpg_as_arr = normalize(jpg_as_arr)
+    jpg_as_arr = jpg_as_arr.numpy()
+
+    global_queue.put([jpg_as_arr, index])
+
+
+# def parallel_load(path_list, index_list, number_processes=20):
+def parallel_load(items, number_processes=20):
+    func = get_image
+    pool = Pool(processes=number_processes)
+    pool.apply_async(func)
+    # pool.map(func, [path_list, index_list])
+    pool.map(func, items)
+
+
 def load_data(project_variable):
+    # TODO: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
     # project_variable = ProjectVariable()
 
@@ -83,7 +127,6 @@ def load_data(project_variable):
 
     if project_variable.train:
         labels = load_labels('Training', project_variable)
-
         all_labels.append(labels)
         splits.append('train')
 
@@ -111,8 +154,6 @@ def load_data(project_variable):
         datapoints = len(all_labels[i][0])
         data = np.zeros(shape=(datapoints, 3, 720, 1280), dtype=np.float32)
 
-        # TODO: https://pytorch.org/docs/stable/torchvision/models.html
-
         if s == 'train': which = 'Training'
         elif s == 'val': which = 'Validation'
         else: which = 'Test'
@@ -120,36 +161,67 @@ def load_data(project_variable):
         if s == 'val' or s == 'test':
             random.seed(project_variable.seed)
 
-        for j in range(datapoints):
+        if project_variable.train:
+            start = time()
+            items_packaged = []
 
-            # '../omg_emotion/Validation/jpg.../xxxxxxx/utterance_xx/'
-            utterance_path = os.path.join(PP.data_path,
-                                          which,
-                                          PP.omg_emotion_jpg,
-                                          all_labels[i][0][j][0],
-                                          all_labels[i][0][j][1].split('.')[0])
+            all_utterance_paths = []
+            for j in range(datapoints):
+                # '../omg_emotion/Validation/jpg.../xxxxxxx/utterance_xx/'
+                utterance_path = os.path.join(PP.data_path,
+                                              which,
+                                              PP.omg_emotion_jpg,
+                                              all_labels[i][0][j][0],
+                                              all_labels[i][0][j][1].split('.')[0])
+                all_utterance_paths.append(utterance_path)
+                items_packaged.append([utterance_path, j])
 
-            # select random frame
-            frames = os.listdir(utterance_path)
+            # parallel_load(all_utterance_paths, index_list)
+            parallel_load(items_packaged)
 
-            jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+            assert global_queue.qsize() == datapoints
+            indices = []
 
-            # scale between 0 and 1 for resnet18
-            if project_variable.model_number == 0:
-                while int(np.max(jpg_as_arr)) == 0:
-                    print('max is zero')
-                    jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+            for d in range(datapoints):
+                item = global_queue.get()
+                indices.append(item[1])
+                data[item[1]] = item[0]
 
-                jpg_as_arr /= int(np.max(jpg_as_arr))
+            print('parallel loading: %f' % (time() - start))
 
-                import torchvision.transforms as transforms
-                normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                                 std=[0.229, 0.224, 0.225])
-                jpg_as_arr = torch.from_numpy(jpg_as_arr)
-                jpg_as_arr = normalize(jpg_as_arr)
-                jpg_as_arr = jpg_as_arr.numpy()
+        else:
+            start = time()
+            for j in range(datapoints):
 
-            data[j] = jpg_as_arr
+                # '../omg_emotion/Validation/jpg.../xxxxxxx/utterance_xx/'
+                utterance_path = os.path.join(PP.data_path,
+                                              which,
+                                              PP.omg_emotion_jpg,
+                                              all_labels[i][0][j][0],
+                                              all_labels[i][0][j][1].split('.')[0])
+
+                # select random frame
+                frames = os.listdir(utterance_path)
+
+                jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+
+                # scale between 0 and 1 for resnet18
+                if project_variable.model_number == 0:
+                    while int(np.max(jpg_as_arr)) == 0:
+                        print('max is zero')
+                        jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
+
+                    jpg_as_arr /= int(np.max(jpg_as_arr))
+
+                    import torchvision.transforms as transforms
+                    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                     std=[0.229, 0.224, 0.225])
+                    jpg_as_arr = torch.from_numpy(jpg_as_arr)
+                    jpg_as_arr = normalize(jpg_as_arr)
+                    jpg_as_arr = jpg_as_arr.numpy()
+
+                data[j] = jpg_as_arr
+            print('normal loading: %f' % (time() - start))
 
         final_data.append(data)
 

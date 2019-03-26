@@ -2,7 +2,7 @@ from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 import numpy as np
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 
 def pilot():
@@ -25,7 +25,9 @@ def e1():
     project_variable.end_epoch = 1
     project_variable.load_model = [0, 0, 99]
     project_variable.save_data = False
-    main_file.run_many_val(project_variable)
+    main_file.run(project_variable)
+    # main_file.run_many_val(project_variable)
 
 
+e1()
 
