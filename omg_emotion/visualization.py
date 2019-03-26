@@ -18,7 +18,7 @@ def plot_confusion_matrix(confusion_matrix, labels=l):
     np.set_printoptions(precision=2)
     ###fig, ax = matplotlib.figure.Figure()
 
-    fig = plt.Figure(figsize=(5, 5), dpi=320, facecolor='w', edgecolor='k')
+    fig = plt.Figure(figsize=(6, 6), dpi=320, facecolor='w', edgecolor='k')
     ax = fig.add_subplot(1, 1, 1)
     im = ax.imshow(cm, cmap='Oranges')
 

@@ -53,7 +53,6 @@ def run(project_variable, all_data, my_model, device):
                                                    loss, accuracy))
 
     # add things to writer
-    # project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)
     project_variable.writer.add_scalars('metrics/test', {"loss": loss,
                                                         "accuracy": accuracy},
                                         project_variable.current_epoch)

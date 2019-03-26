@@ -53,10 +53,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     if project_variable.save_model:
         saving.save_model(project_variable, my_model)
 
-        # add things to writer
-        project_variable.writer.add_scalars('metrics/train', {"loss": loss,
-                                                            "accuracy": accuracy},
-                                            project_variable.current_epoch)
+    # add things to writer
+    project_variable.writer.add_scalars('metrics/train', {"loss": loss,
+                                                        "accuracy": accuracy},
+                                        project_variable.current_epoch)
 
-        fig = VZ.plot_confusion_matrix(confusion_epoch)
-        project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)
+    fig = VZ.plot_confusion_matrix(confusion_epoch)
+    project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)

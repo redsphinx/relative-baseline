@@ -57,7 +57,7 @@ class ProjectVariable(object):
 
         # depending on debug mode
         if debug_mode:
-            self._batch_size = 24
+            self._batch_size = 20
             self._start_epoch = -1
             self._end_epoch = 5
             self._train_steps = 10
@@ -67,9 +67,9 @@ class ProjectVariable(object):
             self._save_model = False
             self._save_graphs = False
         else:
-            self._batch_size = 32
+            self._batch_size = 20
             self._start_epoch = -1
-            self._end_epoch = 100
+            self._end_epoch = 300
             self._train_steps = 50
             self._val_steps = 10
             self._test_steps = 10

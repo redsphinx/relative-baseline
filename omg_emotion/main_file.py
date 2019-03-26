@@ -18,8 +18,13 @@ def run(project_variable):
     # project_variable = ProjectVariable()
 
     # create writer for tensorboardX
-    path = os.path.join(PP.writer_path, 'experiment_%d_model_%d' % (project_variable.experiment_number,
-                                                                    project_variable.model_number))
+    if not project_variable.debug_mode:
+        path = os.path.join(PP.writer_path, 'experiment_%d_model_%d' % (project_variable.experiment_number,
+                                                                        project_variable.model_number))
+
+    else:
+        path = os.path.join(PP.writer_path, 'debugging')
+
     if not os.path.exists(path):
         os.mkdir(path)
     project_variable.writer = SummaryWriter(path)
@@ -46,10 +51,7 @@ def run(project_variable):
     if project_variable.device is not None:
         my_model.cuda(device)
 
-    if project_variable.train:
-        my_optimizer = setup.get_optimizer(project_variable, my_model)
-    else:
-        my_optimizer = None
+    my_optimizer = setup.get_optimizer(project_variable, my_model)
 
     for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
         project_variable.current_epoch = e
@@ -109,7 +111,7 @@ def run(project_variable):
             project_variable.loss_weights = w
 
             data = data_test, labels_test
-            testing.run(project_variable, my_optimizer, data, my_model, device)
+            testing.run(project_variable, data, my_model, device)
         # ------------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------------
 
