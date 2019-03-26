@@ -154,14 +154,17 @@ def load_data(project_variable):
         datapoints = len(all_labels[i][0])
         data = np.zeros(shape=(datapoints, 3, 720, 1280), dtype=np.float32)
 
-        if s == 'train': which = 'Training'
-        elif s == 'val': which = 'Validation'
-        else: which = 'Test'
+        if s == 'train':
+            which = 'Training'
+        elif s == 'val':
+            which = 'Validation'
+        else:
+            which = 'Test'
 
         if s == 'val' or s == 'test':
             random.seed(project_variable.seed)
 
-        if project_variable.train:
+        if s == 'train':
             start = time()
             items_packaged = []
 

@@ -4,6 +4,7 @@ import torch
 from tqdm import tqdm
 from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import data_loading as DL
+from relative_baseline.omg_emotion import visualization as VZ
 
 # temporary for debugging
 from .settings import ProjectVariable
@@ -12,8 +13,6 @@ from .settings import ProjectVariable
 def run(project_variable, all_data, my_model, my_optimizer, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
-
-    # project_variable = ProjectVariable()
 
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
@@ -26,7 +25,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         my_optimizer.zero_grad()
         predictions = my_model(data)
-        loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
+        loss = U.calculate_loss(project_variable, predictions, labels)
         loss.backward()
         my_optimizer.step()
 
@@ -54,3 +53,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     if project_variable.save_model:
         saving.save_model(project_variable, my_model)
 
+        # add things to writer
+        project_variable.writer.add_scalars('metrics/train', {"loss": loss,
+                                                            "accuracy": accuracy},
+                                            project_variable.current_epoch)
+
+        fig = VZ.plot_confusion_matrix(confusion_epoch)
+        project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)

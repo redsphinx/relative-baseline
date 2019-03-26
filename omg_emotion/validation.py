@@ -4,6 +4,7 @@ import torch
 from tqdm import tqdm
 from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import data_loading as DL
+from relative_baseline.omg_emotion import visualization as VZ
 
 # temporary for debugging
 # from .settings import ProjectVariable
@@ -17,8 +18,6 @@ def run(project_variable, all_data, my_model, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
     # device is string
-
-    # project_variable = ProjectVariable()
 
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
@@ -35,7 +34,7 @@ def run(project_variable, all_data, my_model, device):
             # predictions = my_model.forward(data)
             predictions = my_model(data)
             # print(predictions)
-            loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
+            loss = U.calculate_loss(project_variable, predictions, labels)
             # print('loss raw: %s' % str(loss))
             loss = loss.detach()
             # loss.backward()
@@ -61,4 +60,11 @@ def run(project_variable, all_data, my_model, device):
                                                    loss, accuracy))
 
     # add things to writer
-    project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)
+    # project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalars('metrics/val', {"loss": loss,
+                                                        "accuracy": accuracy},
+                                        project_variable.current_epoch)
+
+    fig = VZ.plot_confusion_matrix(confusion_epoch)
+    project_variable.writer.add_figure(tag='confusion/val', figure=fig, global_step=project_variable.current_epoch)
+

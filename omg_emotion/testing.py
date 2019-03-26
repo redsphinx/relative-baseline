@@ -3,73 +3,61 @@ from relative_baseline.omg_emotion import saving
 import torch
 from tqdm import tqdm
 from relative_baseline.omg_emotion import utils as U
+from relative_baseline.omg_emotion import data_loading as DL
+from relative_baseline.omg_emotion import visualization as VZ
 
-# temporary for debugging
-from .settings import ProjectVariable
 
-
-def run(project_variable, my_optimizer, all_data, my_model, device):
+def run(project_variable, all_data, my_model, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
     # device is string
 
-    # project_variable = ProjectVariable()
-
-    loss_epoch = []
-    accuracy_epoch = []
-
-    test_steps = len(all_data[0]) // project_variable.batch_size
-
-    full_data, full_labels = all_data
-
-    if len(full_labels) == 1:
-        full_labels = full_labels[0]
+    loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
+        U.initialize(project_variable, all_data)
 
     # for ts in range(project_variable.train_steps):
-    for ts in tqdm(range(test_steps)):
+    for ts in tqdm(range(steps)):
 
         # get part of data
-        data = full_data[ts*project_variable.batch_size:(ts+1)*project_variable.batch_size]
-        labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
+        data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-        if project_variable.model_number == 0:
-            # normalize image data
-            import torchvision.transforms as transforms
-            normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                             std=[0.229, 0.224, 0.225])
-            data = torch.from_numpy(data)
-            for _b in range(project_variable.batch_size):
-                data[_b] = normalize(data[_b])
-
-            data = data.cuda(device)
-            labels = torch.from_numpy(labels)
-
-            labels = labels.long()
-            # https://discuss.pytorch.org/t/runtimeerror-expected-object-of-scalar-type-long-but-got-scalar-type-float-when-using-crossentropyloss/30542
-
-            labels = labels.cuda(device)
-        else:
-            data = torch.from_numpy(data).cuda(device)
-            labels = torch.from_numpy(labels).cuda(device)
-
-        # train
-        # with torch.device(device):
-        my_optimizer.zero_grad()
-        predictions = my_model(data)
-        loss = U.calculate_loss(project_variable.loss_function, predictions, labels)
-        loss.backward()
+        my_model.eval()
+        with torch.no_grad():
+            # my_optimizer.zero_grad()
+            # predictions = my_model.forward(data)
+            predictions = my_model(data)
+            # print(predictions)
+            loss = U.calculate_loss(project_variable, predictions, labels)
+            # print('loss raw: %s' % str(loss))
+            loss = loss.detach()
+            # loss.backward()
+        my_model.train()
 
         accuracy = U.calculate_accuracy(predictions, labels)
+        confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
         loss_epoch.append(float(loss))
         accuracy_epoch.append(float(accuracy))
 
     # save data
+    # print('loss epoch: ', loss_epoch)
     loss = float(np.mean(loss_epoch))
-    accuracy = float(np.mean(accuracy_epoch))
+    accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
+    confusion_flatten = U.flatten_confusion(confusion_epoch)
 
     if project_variable.save_data:
-        saving.update_logs(project_variable, 'test', [loss, accuracy])
+        saving.update_logs(project_variable, 'test', [loss, accuracy, confusion_flatten])
 
-    print('test, %s: %f, accuracy: %f out of %d' % (project_variable.loss_function,
-                                                   loss, accuracy, project_variable.batch_size))
+    print('epoch %d test, %s: %f, accuracy: %f ' % (project_variable.current_epoch,
+                                                   project_variable.loss_function,
+                                                   loss, accuracy))
+
+    # add things to writer
+    # project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalars('metrics/test', {"loss": loss,
+                                                        "accuracy": accuracy},
+                                        project_variable.current_epoch)
+
+    fig = VZ.plot_confusion_matrix(confusion_epoch)
+    project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
+

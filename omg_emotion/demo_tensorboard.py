@@ -37,7 +37,7 @@ for n_iter in range(100):
     x = torch.rand(32, 3, 64, 64)  # output from network
     if n_iter % 10 == 0:
         x = vutils.make_grid(x, normalize=True, scale_each=True)
-        writer.add_image('Image', x, n_iter)  # Tensor
+           # Tensor
         writer.add_image_with_boxes('imagebox', x, torch.Tensor([[10, 10, 40, 40], [40, 40, 60, 60]]), n_iter)
         x = torch.zeros(sample_rate * 2)
         for i in range(x.size(0)):

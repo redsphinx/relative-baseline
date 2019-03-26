@@ -6,6 +6,8 @@ from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
 
 import os
+import numpy as np
+import torch
 from tensorboardX import SummaryWriter
 
 # temporary for debugging
@@ -23,26 +25,22 @@ def run(project_variable):
     project_variable.writer = SummaryWriter(path)
 
     # load val and test data once
-    project_variable.val = False
-    project_variable.train = True
-    project_variable.test = False
+    project_variable.val = True
+    project_variable.test = True
+    project_variable.train = False
 
     data = D.load_data(project_variable)
 
     if project_variable.val:
         data_val = data[1][0]
         labels_val = data[2][0]
-        # print(labels_val)
 
     if project_variable.test:
-        data_test = data[1][0]
-        labels_test = data[2][0]
+        data_test = data[1][1]
+        labels_test = data[2][1]
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
-
-    # print(my_model.fc.weight)
-
     device = setup.get_device(project_variable)
 
     if project_variable.device is not None:
@@ -53,13 +51,8 @@ def run(project_variable):
     else:
         my_optimizer = None
 
-    data = data_val, labels_val
-    # data = data_test, labels_test
-    validation.run(project_variable, my_optimizer, data, my_model, device)
-
-    # for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
-    #     project_variable.current_epoch = e
-        # my_model.train()
+    for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
+        project_variable.current_epoch = e
 
         # get data
         # splits = ['train', 'val', 'test']
@@ -70,29 +63,58 @@ def run(project_variable):
         #                 [arousal, valence, categories],
         #                 [arousal, valence, categories]]
 
-        # project_variable.train = True
-        # project_variable.val = False
-        # project_variable.test = False
+        # ------------------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------------------
+        project_variable.train = True
+        project_variable.val = False
+        project_variable.test = False
 
-        # data = D.load_data(project_variable)
-        # data_train = data[1][0]
-        # labels_train = data[2][0]
-        # labels is list because can be more than one type of labels
+        if project_variable.train:
+            w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+            w = w.astype(dtype=np.float32)
+            w = torch.from_numpy(w).cuda(device)
+            project_variable.loss_weights = w
 
-        # data = data_train, labels_train
-        #
-        # if project_variable.train:
-        #     training.run(project_variable, data, my_model, my_optimizer, device)
+            data = D.load_data(project_variable)
+            data_train = data[1][0]
+            labels_train = data[2][0]
+            # labels is list because can be more than one type of labels
+            data = data_train, labels_train
+            my_model.train()
+            training.run(project_variable, data, my_model, my_optimizer, device)
+        # ------------------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------------------
+        project_variable.train = False
+        project_variable.val = True
+        project_variable.test = False
 
-        # project_variable.val = True
-        # if project_variable.val:
-        #     data = data_val, labels_val
-        #     validation.run(project_variable, my_optimizer, data, my_model, device)
+        if project_variable.val:
+            w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
+            w = w.astype(dtype=np.float32)
+            w = torch.from_numpy(w).cuda(device)
+            project_variable.loss_weights = w
 
-        # project_variable.test = True
-        # if project_variable.test:
-        #     data = data_test, labels_test
-        #     testing.run(project_variable, my_optimizer, data, my_model, device)
+            data = data_val, labels_val
+            validation.run(project_variable, data, my_model, device)
+        # ------------------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------------------
+        project_variable.train = False
+        project_variable.val = False
+        project_variable.test = True
+
+        if project_variable.test:
+            w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+            w = w.astype(dtype=np.float32)
+            w = torch.from_numpy(w).cuda(device)
+            project_variable.loss_weights = w
+
+            data = data_test, labels_test
+            testing.run(project_variable, my_optimizer, data, my_model, device)
+        # ------------------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------
 
 
 def run_many_val_0(project_variable, data1, data2):

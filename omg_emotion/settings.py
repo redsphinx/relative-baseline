@@ -45,6 +45,9 @@ class ProjectVariable(object):
 
         # str, loss function
         self._loss_function = 'cross_entropy'
+        
+        # list, weights for balanced loss
+        self._loss_weights = None
 
         # list of str, optimizer
         self._optimizer = ['adam']
@@ -56,7 +59,7 @@ class ProjectVariable(object):
         if debug_mode:
             self._batch_size = 24
             self._start_epoch = -1
-            self._end_epoch = 2
+            self._end_epoch = 5
             self._train_steps = 10
             self._val_steps = 1
             self._test_steps = 1
@@ -205,6 +208,14 @@ class ProjectVariable(object):
     @loss_function.setter
     def loss_function(self, value):
         self._loss_function = value
+
+    @property
+    def loss_weights(self):
+        return self._loss_weights
+
+    @loss_weights.setter
+    def loss_weights(self, value):
+        self._loss_weights = value
 
     @property
     def optimizer(self):

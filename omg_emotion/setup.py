@@ -41,11 +41,11 @@ def get_optimizer(project_variable, model):
     if project_variable.optimizer[0] == 'adam':
         optimizer = Adam(
             [
-                {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate/7},
-                {'params': model.bn1.parameters(), 'lr': project_variable.learning_rate/6},
-                {'params': model.layer1.parameters(), 'lr': project_variable.learning_rate/5},
-                {'params': model.layer2.parameters(), 'lr': project_variable.learning_rate/4},
-                {'params': model.layer3.parameters(), 'lr': project_variable.learning_rate/3},
+                {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate/64},
+                {'params': model.bn1.parameters(), 'lr': project_variable.learning_rate/32},
+                {'params': model.layer1.parameters(), 'lr': project_variable.learning_rate/16},
+                {'params': model.layer2.parameters(), 'lr': project_variable.learning_rate/8},
+                {'params': model.layer3.parameters(), 'lr': project_variable.learning_rate/4},
                 {'params': model.layer4.parameters(), 'lr': project_variable.learning_rate/2},
                 {'params': model.fc.parameters(), 'lr': project_variable.learning_rate}
             ],
