@@ -23,9 +23,9 @@ def run(project_variable):
     project_variable.writer = SummaryWriter(path)
 
     # load val and test data once
-    project_variable.val = True
+    project_variable.val = False
     project_variable.train = False
-    project_variable.test = False
+    project_variable.test = True
 
     data = D.load_data(project_variable)
 
@@ -53,7 +53,8 @@ def run(project_variable):
     else:
         my_optimizer = None
 
-    data = data_val, labels_val
+    # data = data_val, labels_val
+    data = data_test, labels_test
     validation.run(project_variable, my_optimizer, data, my_model, device)
 
     # for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
@@ -94,7 +95,7 @@ def run(project_variable):
         #     testing.run(project_variable, my_optimizer, data, my_model, device)
 
 
-def run_many_val(project_variable, data1, data2):
+def run_many_val_0(project_variable, data1, data2):
     # create writer for tensorboardX
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
@@ -115,7 +116,7 @@ def run_many_val(project_variable, data1, data2):
     del my_model
 
 
-def run_many_val_0(project_variable):
+def run_many_val(project_variable):
     # from .settings import ProjectVariable
     # project_variable = ProjectVariable()
 
@@ -132,13 +133,8 @@ def run_many_val_0(project_variable):
     project_variable.test = False
 
     data = D.load_data(project_variable)
-
-    if project_variable.val:
-        data_val = data[1][0]
-        labels_val = data[2][0]
-    else:
-        data_val = None
-        labels_val = None
+    data_val = data[1][0]
+    labels_val = data[2][0]
 
     device = setup.get_device(project_variable)
 
@@ -146,30 +142,15 @@ def run_many_val_0(project_variable):
     all_models = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo))
     models_to_load = len(os.listdir(all_models))
 
-    prev_data_val = data_val
-    prev_labels_val = labels_val
-
     for i in range(0, models_to_load):
-        # data = data_val, labels_val
-
         project_variable.current_epoch = i
-
         project_variable.load_model = [ex, mo, i] # [experiment, model, epoch]
 
         # setup model, optimizer & device
         my_model = setup.get_model(project_variable)
-        # my_model.eval()
-
 
         if project_variable.device is not None:
             my_model.cuda(device)
 
-        # my_optimizer = setup.get_optimizer(project_variable, my_model)
-        my_optimizer = None
-
-        project_variable.val = True
-        if project_variable.val:
-
-            validation.run(project_variable, my_optimizer, (data_val, labels_val), my_model, device)
-
+        validation.run(project_variable, (data_val, labels_val), my_model, device)
 

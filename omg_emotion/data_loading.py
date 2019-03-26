@@ -75,6 +75,7 @@ def get_nonzero_frame(frames, utterance_path, cnt):
 
 
 def load_data(project_variable):
+    # normalize the data
     # project_variable = ProjectVariable()
 
     all_labels = []
@@ -106,7 +107,6 @@ def load_data(project_variable):
     final_labels = []
 
     for i, s in enumerate(splits):
-        start = time()
         cnt = 0
         datapoints = len(all_labels[i][0])
         data = np.zeros(shape=(datapoints, 3, 720, 1280), dtype=np.float32)
@@ -142,15 +142,14 @@ def load_data(project_variable):
 
                 jpg_as_arr /= int(np.max(jpg_as_arr))
 
-                # if int(np.max(jpg_as_arr)) > 0:
-                #     jpg_as_arr /= int(np.max(jpg_as_arr))
-                # else:
-                #     print('something wrong with: %s' % jpg_path)
-                #     jpg_as_arr = np.zeros(shape=jpg_as_arr.shape)
+                import torchvision.transforms as transforms
+                normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                 std=[0.229, 0.224, 0.225])
+                jpg_as_arr = torch.from_numpy(jpg_as_arr)
+                jpg_as_arr = normalize(jpg_as_arr)
+                jpg_as_arr = jpg_as_arr.numpy()
 
             data[j] = jpg_as_arr
-
-        end = time() - start
 
         final_data.append(data)
 
@@ -184,22 +183,24 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
         labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
 
     if project_variable.model_number == 0:
+        if type(data) == np.ndarray:
+            data = torch.from_numpy(data)
         # normalize image data
-        import torchvision.transforms as transforms
-        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                         std=[0.229, 0.224, 0.225])
-        data = torch.from_numpy(data)
-
-        if ts == steps - 1:
-            if nice_div == 0:
-                for _b in range(project_variable.batch_size):
-                    data[_b] = normalize(data[_b])
-            else:
-                for _b in range(nice_div):
-                    data[_b] = normalize(data[_b])
-        else:
-            for _b in range(project_variable.batch_size):
-                data[_b] = normalize(data[_b])
+        # import torchvision.transforms as transforms
+        # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+        #                                  std=[0.229, 0.224, 0.225])
+        # data = torch.from_numpy(data)
+        #
+        # if ts == steps - 1:
+        #     if nice_div == 0:
+        #         for _b in range(project_variable.batch_size):
+        #             data[_b] = normalize(data[_b])
+        #     else:
+        #         for _b in range(nice_div):
+        #             data[_b] = normalize(data[_b])
+        # else:
+        #     for _b in range(project_variable.batch_size):
+        #         data[_b] = normalize(data[_b])
 
         data = data.cuda(device)
 

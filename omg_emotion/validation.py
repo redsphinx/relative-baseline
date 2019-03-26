@@ -13,7 +13,7 @@ from relative_baseline.omg_emotion import data_loading as DL
 # from tensorboardX import SummaryWriter
 # project_variable.writer = SummaryWriter()
 
-def run(project_variable, my_optimizer, all_data, my_model, device):
+def run(project_variable, all_data, my_model, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
     # device is string
