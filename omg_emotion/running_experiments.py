@@ -35,8 +35,8 @@ def e2():
     project_variable.device = 0
     project_variable.model_number = 0
     project_variable.experiment_number = 2
-    project_variable.load_model = [2, 0, 6]
-    project_variable.start_epoch = 7
+    project_variable.load_model = [2, 0, 15]
+    project_variable.start_epoch = 15
     main_file.run(project_variable)
 
 

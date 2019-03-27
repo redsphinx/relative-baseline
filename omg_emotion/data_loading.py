@@ -113,8 +113,12 @@ def parallel_load(items, number_processes=20):
     func = get_image
     pool = Pool(processes=number_processes)
     pool.apply_async(func)
-    # pool.map(func, [path_list, index_list])
-    pool.map(func, items)
+    try:
+        pool.map(func, items)
+    except OSError:
+        print('here')
+        pool.map(func, items)
+
 
 
 def load_data(project_variable):
