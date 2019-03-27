@@ -113,11 +113,8 @@ def parallel_load(items, number_processes=20):
     func = get_image
     pool = Pool(processes=number_processes)
     pool.apply_async(func)
-    try:
-        pool.map(func, items)
-    except OSError:
-        print('here')
-        pool.map(func, items)
+    pool.map(func, items)
+    pool.close()
 
 
 
@@ -193,6 +190,11 @@ def load_data(project_variable):
                 item = global_queue.get()
                 indices.append(item[1])
                 data[item[1]] = item[0]
+
+            # close queue
+            global_queue.close()
+
+            print('is queue empty?', global_queue.empty())
 
             print('parallel loading: %f' % (time() - start))
 
