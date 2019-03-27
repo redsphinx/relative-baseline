@@ -1,16 +1,18 @@
-
+from relative_baseline.omg_emotion import project_paths as PP
 
 class ProjectVariable(object):
     def __init__(self, debug_mode=True):
+        print("\nRUNNING ON '%s' SERVER\n" % PP.server)
         if debug_mode:
-            print('running in debug mode')
+            print("running in debug mode")
+
         """
         Default values for all the experimental variables.
         """
         self._writer = None
 
         self._debug_mode = debug_mode
-
+        
         # int, which gpu to use {None, 0, 1, etc}
         self._device = None
 
@@ -88,7 +90,7 @@ class ProjectVariable(object):
     @property
     def debug_mode(self):
         return self._debug_mode
-    
+
     @property
     def device(self):
         return self._device
