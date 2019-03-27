@@ -5,12 +5,13 @@ from relative_baseline.omg_emotion import utils as U1
 import random
 from PIL import Image
 import cv2
-from time import time
+# from time import time
 import torch
 from multiprocessing import Pool, Queue
-
+from tqdm import tqdm
 # temporary for debugging
 from .settings import ProjectVariable
+import time
 
 # arousal,valence
 # Training: {0: 262, 1: 96, 2: 54, 3: 503, 4: 682, 5: 339, 6: 19}
@@ -114,7 +115,8 @@ def parallel_load(items, number_processes=20):
     pool = Pool(processes=number_processes)
     pool.apply_async(func)
     pool.map(func, items)
-    pool.close()
+    # pool.close()
+    return pool
 
 
 
@@ -166,7 +168,7 @@ def load_data(project_variable):
             random.seed(project_variable.seed)
 
         if s == 'train':
-            start = time()
+            start = time.time()
             items_packaged = []
 
             all_utterance_paths = []
@@ -181,25 +183,24 @@ def load_data(project_variable):
                 items_packaged.append([utterance_path, j])
 
             # parallel_load(all_utterance_paths, index_list)
-            parallel_load(items_packaged)
+            pool = parallel_load(items_packaged)
+            # print('training data parallel loaded')
 
             assert global_queue.qsize() == datapoints
             indices = []
 
-            for d in range(datapoints):
+            for d in tqdm(range(datapoints)):
                 item = global_queue.get()
                 indices.append(item[1])
                 data[item[1]] = item[0]
 
             # close queue
-            global_queue.close()
+            pool.terminate()
 
-            print('is queue empty?', global_queue.empty())
-
-            print('parallel loading: %f' % (time() - start))
+            print('parallel loading: %f' % (time.time() - start))
 
         else:
-            start = time()
+            start = time.time()
             for j in range(datapoints):
 
                 # '../omg_emotion/Validation/jpg.../xxxxxxx/utterance_xx/'
@@ -230,7 +231,7 @@ def load_data(project_variable):
                     jpg_as_arr = jpg_as_arr.numpy()
 
                 data[j] = jpg_as_arr
-            print('normal loading: %f' % (time() - start))
+            print('normal loading: %f' % (time.time() - start))
 
         final_data.append(data)
 
