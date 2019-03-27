@@ -41,4 +41,13 @@ def e2():
     main_file.run(project_variable)
 
 
-e2()
+def e3():
+    project_variable.device = 0
+    project_variable.model_number = 0
+    project_variable.experiment_number = 3
+    project_variable.pretrain_resnet18_weights = False
+    main_file.run(project_variable)
+
+
+# e2()
+e3()

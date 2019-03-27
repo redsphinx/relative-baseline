@@ -19,7 +19,7 @@ def get_model(project_variable):
     # project_variable = ProjectVariable()
 
     if project_variable.model_number == 0:
-        model = resnet18(pretrained=True)
+        model = resnet18(pretrained=project_variable.pretrain_resnet18_weights)
         model = prepare_model(project_variable, model)
         if project_variable.load_model is not None:
             ex, mo, ep = project_variable.load_model

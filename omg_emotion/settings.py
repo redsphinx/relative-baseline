@@ -23,6 +23,9 @@ class ProjectVariable(object):
         self._model_number = None
         self._experiment_number = None
         
+        # bool
+        self._pretrain_resnet18_weights = True
+        
         # int, the current epoch
         self._current_epoch = None
 
@@ -123,6 +126,14 @@ class ProjectVariable(object):
     def experiment_number(self, value):
         self._experiment_number = value
 
+    @property
+    def pretrain_resnet18_weights(self):
+        return self._pretrain_resnet18_weights
+
+    @pretrain_resnet18_weights.setter
+    def pretrain_resnet18_weights(self, value):
+        self._pretrain_resnet18_weights = value
+    
     @property
     def current_epoch(self):
         return self._current_epoch
