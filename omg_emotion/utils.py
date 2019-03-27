@@ -82,3 +82,9 @@ def flatten_confusion(matrix):
     s = s[:-1]
 
     return s
+
+
+# https://pytorch.org/docs/master/onnx.html
+# https://github.com/onnx/onnx-tensorflow
+# https://github.com/ysh329/deep-learning-model-convertor
+# https://github.com/albermax/innvestigate/blob/master/examples/notebooks/introduction.ipynb
