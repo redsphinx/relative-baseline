@@ -32,8 +32,6 @@ global_queue = Queue()
 # when q is filled
 # q.get()
 
-# TODO: parallel data laoding
-
 def load_labels(which, project_variable):
     # project_variable = ProjectVariable
     assert which in ['Training', 'Validation', 'Test']
