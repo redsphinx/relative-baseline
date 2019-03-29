@@ -2,7 +2,7 @@ from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 import numpy as np
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 
 def pilot():

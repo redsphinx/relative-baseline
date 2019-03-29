@@ -44,3 +44,12 @@ def plot_confusion_matrix(confusion_matrix, labels=l):
     fig.set_tight_layout(True)
     # summary = tfplot.figure.to_summary(fig, tag=tensor_name)
     return fig
+
+
+def visualize_network(model):
+    import torch
+    from torchviz import make_dot
+    x = torch.zeros(1, 3, 224, 224, dtype=torch.float, requires_grad=False)
+    out = model(x)
+    dot = make_dot(out)
+    dot.save('resnet18_emotion.dot', '/huge/gabras/AffectNet/misc')

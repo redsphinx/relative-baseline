@@ -30,6 +30,7 @@ class ProjectVariable(object):
         self._current_epoch = None
 
         # list of str, which datasets to train, val and test on
+        # implemented sets: omg_emotion, affectnet
         self._dataset_train = ['omg_emotion']
         self._dataset_val = ['omg_emotion']
         self._dataset_test = ['omg_emotion']
@@ -39,10 +40,14 @@ class ProjectVariable(object):
         self._val = None
         self._test = None
         
-        # list of str, which labels to use. ['categories', 'arousal', 'valence']
+        # list of str, which labels to use.
+        # omg_emotion: ['categories', 'arousal', 'valence']
+        # affect_net: [categories, arousal, valence, face, landmarks]
         self._label_type = ['categories']
         
         # int, label size for the output type
+        # omg_emotion categories: 7
+        # affect_net categories: 11
         self._label_size = 7
 
         # float, learning rate

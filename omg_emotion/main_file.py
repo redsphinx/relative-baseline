@@ -4,6 +4,7 @@ from relative_baseline.omg_emotion import testing
 from relative_baseline.omg_emotion import setup
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
+from relative_baseline.omg_emotion import visualization as V
 
 import os
 import numpy as np
@@ -47,6 +48,9 @@ def run(project_variable):
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
     device = setup.get_device(project_variable)
+
+    # TEMPORARY
+    # V.visualize_network(my_model)
 
     if project_variable.device is not None:
         my_model.cuda(device)

@@ -4,17 +4,11 @@ from relative_baseline.omg_emotion import project_paths as PP
 from multiprocessing import Pool, Queue
 import time
 import shutil
-
-# what are the 6998 too many files?
-
-# are all the files in the labels present?
-'''
-get all labels
-for each label
-does image exist
-if yes: do nothing
-if no: remember
-'''
+from PIL import Image
+from tqdm import tqdm
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 
 global_queue = Queue()
 
@@ -93,3 +87,125 @@ def split_data():
 
 
 # split_data()
+
+def get_biggest_image():
+    # which = 'train_images'
+    which = 'val_images'
+    data_path = os.path.join(PP.affectnet_base, which)
+
+    list_data = os.listdir(data_path)
+
+    largest_x = 0
+    largest_y = 0
+
+    smallest_x = 100000000
+    smallest_y = 100000000
+
+    mean_pixel = [0, 0, 0]
+
+    for i in tqdm(range(len(list_data))):
+        p = os.path.join(data_path, list_data[i])
+        img = Image.open(p)
+        img_x = img.width
+        img_y = img.height
+
+        if img_x > largest_x:
+            largest_x = img_x
+        if img_y > largest_y:
+            largest_y = img_y
+
+        if img_x < smallest_x:
+            smallest_x = img_x
+        if img_y < smallest_y:
+            smallest_y = img_y
+
+        img = np.array(img)
+        mean_pixel += list(img.mean(axis=0).mean(axis=0))
+
+    print('%s\n biggest x: %d, biggest y: %d, smallest x: %d, smallest y: %d' %
+          (which, largest_x, largest_y, smallest_x, smallest_y))
+    print('mean pixel: ', np.array(mean_pixel, dtype=int)//len(list_data))
+
+
+# get_biggest_image()
+
+def get_histogram_image_sizes():
+    which = 'val_images'
+    pkl_path = '/huge/gabras/AffectNet/misc/%s_sizes.pkl' % which
+
+    if not os.path.exists(pkl_path):
+
+        data_path = os.path.join(PP.affectnet_base, which)
+
+        list_data = os.listdir(data_path)
+
+
+        all_sizes = np.zeros(shape=(len(list_data), 2))
+
+        for i in tqdm(range(len(list_data))):
+            p = os.path.join(data_path, list_data[i])
+            img = Image.open(p)
+            all_sizes[i] = [img.width, img.height]
+
+        np.save(pkl_path, all_sizes)
+    else:
+        all_sizes = np.load(pkl_path)
+
+    # hist
+    n, bins, patches = plt.hist(all_sizes[:, 0], 50, density=True, facecolor='g', alpha=0.75)
+
+    plt.xlabel('width')
+    plt.ylabel('Probability')
+    plt.title('Histogram of OMG Emotion Image size')
+    plt.grid(True)
+    plt.savefig('/huge/gabras/AffectNet/misc/histo_size.jpg')
+
+
+# get_histogram_image_sizes()
+
+which = 'train_images'
+
+def resize_this(name):
+    src_folder = os.path.join(PP.affectnet_base, which)
+    d = which + '_250'
+    dest_folder = os.path.join(PP.affectnet_base, d)
+    if not os.path.exists(dest_folder):
+        os.mkdir(dest_folder)
+
+    img_path = os.path.join(src_folder, name)
+    try:
+        img = Image.open(img_path)
+        img = img.resize((250, 250))
+        # name = name.split('.')[0] + '.png'
+        dest_path = os.path.join(dest_folder, name)
+        img.save(dest_path)
+    except OSError:
+        print('cannot deal with: ', img_path)
+
+
+def parallel_resize(paths, processes=50):
+    func = resize_this
+    pool = Pool(processes=processes)
+    pool.apply_async(func)
+    pool.map(func, paths)
+    pool.terminate()
+
+
+def resize_omg_emotion():
+    # given histogram, resize to 250x250
+    src_folder = os.path.join(PP.affectnet_base, which)
+    paths = os.listdir(src_folder)
+
+    done_paths = os.listdir('/huge/gabras/AffectNet/manually_annotated/train_images_250')
+
+    todo = list(set(paths) - set(done_paths))
+
+    paths = todo
+
+    for i in todo:
+        resize_this(i)
+
+    # parallel_resize(paths)
+
+
+# resize_omg_emotion()
