@@ -102,7 +102,7 @@ def get_image(things):
         jpg_as_arr[2] = jpg_as_arr[2] / np.max(jpg_as_arr[2])
     except RuntimeWarning:
         print('channel has a max of 0')
-        break
+        return
 
     import torchvision.transforms as transforms
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -122,7 +122,6 @@ def parallel_load(items, number_processes=20):
     pool.map(func, items)
     # pool.close()
     return pool
-
 
 
 def load_data(project_variable):
@@ -232,7 +231,7 @@ def load_data(project_variable):
                         jpg_as_arr[2] = jpg_as_arr[2] / np.max(jpg_as_arr[2])
                     except RuntimeWarning:
                         print('channel has a max of 0')
-                        break
+                        return
                     # jpg_as_arr /= int(np.max(jpg_as_arr))
 
                     import torchvision.transforms as transforms
