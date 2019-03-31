@@ -171,7 +171,8 @@ def load_data(project_variable):
         if s == 'val' or s == 'test':
             random.seed(project_variable.seed)
 
-        if s == 'train':
+        # if s == 'train':
+        if s == 'debug_this_shit':
             start = time.time()
             items_packaged = []
 

@@ -1,7 +1,7 @@
 import os
 
-server = 'lovelace'
-# server = 'schmidhuber'
+# server = 'lovelace'
+server = 'schmidhuber'
 
 if server == 'schmidhuber':
     server_path = '/scratch/users/gabras/data'
