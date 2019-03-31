@@ -31,9 +31,9 @@ class ProjectVariable(object):
 
         # list of str, which datasets to train, val and test on
         # implemented sets: omg_emotion, affectnet
-        self._dataset_train = ['omg_emotion']
-        self._dataset_val = ['omg_emotion']
-        self._dataset_test = ['omg_emotion']
+        self._dataset_train = ['affectnet']
+        self._dataset_val = ['affectnet']
+        self._dataset_test = ['affectnet']
 
         # bool, which procedures to perform
         self._train = None
@@ -47,8 +47,8 @@ class ProjectVariable(object):
         
         # int, label size for the output type
         # omg_emotion categories: 7
-        # affect_net categories: 11
-        self._label_size = 7
+        # affectnet categories: 11
+        self._label_size = 11
 
         # float, learning rate
         self._learning_rate = 0.0001

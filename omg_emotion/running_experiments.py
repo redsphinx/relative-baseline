@@ -49,5 +49,10 @@ def e3():
     main_file.run(project_variable)
 
 
-# e2()
-e3()
+def e4():
+    project_variable.device = 0
+    project_variable.model_number = 0
+    project_variable.experiment_number = 3
+    main_file.run(project_variable)
+
+
