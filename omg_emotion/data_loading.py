@@ -95,7 +95,14 @@ def get_image(things):
         print('max is zero')
         jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
 
-    jpg_as_arr /= int(np.max(jpg_as_arr))
+    # jpg_as_arr /= int(np.max(jpg_as_arr))
+    try:
+        jpg_as_arr[0] = jpg_as_arr[0] / np.max(jpg_as_arr[0])
+        jpg_as_arr[1] = jpg_as_arr[1] / np.max(jpg_as_arr[1])
+        jpg_as_arr[2] = jpg_as_arr[2] / np.max(jpg_as_arr[2])
+    except RuntimeWarning:
+        print('channel has a max of 0')
+        break
 
     import torchvision.transforms as transforms
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
