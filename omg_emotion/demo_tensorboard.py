@@ -9,7 +9,8 @@ from tensorboardX import SummaryWriter
 import datetime
 
 resnet18 = models.resnet18(False)
-path = 'absolute path'
+path = '/scratch/users/gabras/data/omg_emotion/saving_data/tensorboardX/testing'
+# path = 'absolute path'
 writer = SummaryWriter(path)
 sample_rate = 44100
 freqs = [262, 294, 330, 349, 392, 440, 440, 440, 440, 440, 440]
