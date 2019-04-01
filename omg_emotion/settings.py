@@ -47,7 +47,7 @@ class ProjectVariable(object):
         
         # int, label size for the output type
         # omg_emotion categories: 7
-        # affect_net categories: 11
+        # affectnet categories: 11
         self._label_size = 7
 
         # float, learning rate

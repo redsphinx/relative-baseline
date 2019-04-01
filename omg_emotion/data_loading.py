@@ -95,7 +95,14 @@ def get_image(things):
         print('max is zero')
         jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
 
-    jpg_as_arr /= int(np.max(jpg_as_arr))
+    # jpg_as_arr /= int(np.max(jpg_as_arr))
+    try:
+        jpg_as_arr[0] = jpg_as_arr[0] / np.max(jpg_as_arr[0])
+        jpg_as_arr[1] = jpg_as_arr[1] / np.max(jpg_as_arr[1])
+        jpg_as_arr[2] = jpg_as_arr[2] / np.max(jpg_as_arr[2])
+    except RuntimeWarning:
+        print('channel has a max of 0')
+        return
 
     import torchvision.transforms as transforms
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -115,7 +122,6 @@ def parallel_load(items, number_processes=20):
     pool.map(func, items)
     # pool.close()
     return pool
-
 
 
 def load_data(project_variable):
@@ -165,7 +171,8 @@ def load_data(project_variable):
         if s == 'val' or s == 'test':
             random.seed(project_variable.seed)
 
-        if s == 'train':
+        # if s == 'train':
+        if s == 'debug_this_shit':
             start = time.time()
             items_packaged = []
 
@@ -219,7 +226,14 @@ def load_data(project_variable):
                         print('max is zero')
                         jpg_as_arr, cnt = get_nonzero_frame(frames, utterance_path, cnt)
 
-                    jpg_as_arr /= int(np.max(jpg_as_arr))
+                    try:
+                        jpg_as_arr[0] = jpg_as_arr[0] / np.max(jpg_as_arr[0])
+                        jpg_as_arr[1] = jpg_as_arr[1] / np.max(jpg_as_arr[1])
+                        jpg_as_arr[2] = jpg_as_arr[2] / np.max(jpg_as_arr[2])
+                    except RuntimeWarning:
+                        print('channel has a max of 0')
+                        return
+                    # jpg_as_arr /= int(np.max(jpg_as_arr))
 
                     import torchvision.transforms as transforms
                     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
