@@ -43,7 +43,7 @@ def grab_em_by_the_links():
     path = '/huge/gabras/IBM_DiF_v1/DiF_v1b.csv'
 
     num_done, dest_path = which_done()
-    links = cat(path, 10000, num_done)
+    links = cat(path, 100000, num_done)
 
     could_not_download = '/huge/gabras/IBM_DiF_v1/not_downloaded.txt'
 
@@ -62,4 +62,11 @@ def grab_em_by_the_links():
             print('could not download %s' % links[i][0])
 
 
+grab_em_by_the_links()
+grab_em_by_the_links()
+grab_em_by_the_links()
+grab_em_by_the_links()
+grab_em_by_the_links()
+grab_em_by_the_links()
+grab_em_by_the_links()
 grab_em_by_the_links()
