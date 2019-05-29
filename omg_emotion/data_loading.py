@@ -12,6 +12,7 @@ from tqdm import tqdm
 # temporary for debugging
 from .settings import ProjectVariable
 import time
+import torchvision.datasets as datasets
 
 # arousal,valence
 # Training: {0: 262, 1: 96, 2: 54, 3: 503, 4: 682, 5: 339, 6: 19}
@@ -309,3 +310,34 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
         labels = torch.from_numpy(labels).cuda(device)
 
     return data, labels
+
+
+def load_mnist(project_variable, device):
+    # TODO: transform?
+    # TODO: keep as tensors?
+
+    # what to do about validation?
+    # they load as tensors
+
+    if project_variable.train:
+        data = datasets.MNIST(root=PP.mnist_location,
+                              train=True,
+                              download=False).train_data
+
+        labels = data.train_labels
+
+    elif project_variable.test:
+        data = datasets.MNIST(root=PP.mnist_location,
+                              train=False,
+                              download=False).test_data
+        labels = data.test_labels
+    else:
+        print('ERROR: either train or test must be True')
+        data = None
+        labels = None
+
+    data = data.cuda(device)
+    labels = labels.cuda(device)
+
+    return data, labels
+

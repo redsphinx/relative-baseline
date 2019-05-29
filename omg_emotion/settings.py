@@ -29,6 +29,9 @@ class ProjectVariable(object):
         # int, the current epoch
         self._current_epoch = None
 
+        # TODO: add mnist
+        # TODO: add moving mnist
+
         # list of str, which datasets to train, val and test on
         # implemented sets: omg_emotion, affectnet
         self._dataset_train = ['omg_emotion']

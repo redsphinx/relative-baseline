@@ -1,7 +1,7 @@
 import os
 
-# server = 'lovelace'
-server = 'schmidhuber'
+server = 'lovelace'
+# server = 'schmidhuber'
 
 if server == 'schmidhuber':
     server_path = '/scratch/users/gabras/data'
@@ -25,3 +25,5 @@ affectnet_base = os.path.join(server_path, 'AffectNet/manually_annotated')
 affectnet_jpgs = os.path.join(affectnet_base, 'all_images')
 affectnet_labels_train = os.path.join(affectnet_base, 'training.csv')
 affectnet_labels_val = os.path.join(affectnet_base, 'validation.csv')
+
+mnist_location = '/home/gabras/deployed/mnist'

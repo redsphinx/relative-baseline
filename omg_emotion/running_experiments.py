@@ -62,5 +62,3 @@ def e5():
     project_variable.experiment_number = 4
     main_file.run(project_variable)
 
-
-e5()
