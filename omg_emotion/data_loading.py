@@ -332,7 +332,8 @@ def load_mnist(project_variable, device):
                               download=False).test_data
         labels = data.test_labels
     else:
-        print('ERROR: either train or test must be True')
+        print('ERROR: either train or test must be True\n train = %s, test = %s' % (str(project_variable.train),
+                                                                                    str(project_variable.test)))
         data = None
         labels = None
 

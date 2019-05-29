@@ -1,0 +1,3 @@
+project_variable.model_number
+0   resnet18
+1   lenet

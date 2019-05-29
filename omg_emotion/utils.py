@@ -1,5 +1,7 @@
 import numpy as np
 from torch.nn import CrossEntropyLoss
+from torchviz import make_dot
+import torch
 
 
 def initialize(project_variable, all_data):
@@ -83,6 +85,18 @@ def flatten_confusion(matrix):
 
     return s
 
+
+# https://discuss.pytorch.org/t/how-do-i-check-the-number-of-parameters-of-a-model/4325/7
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+
+def save_architecture_as_dot(model, file_name, save_location):
+    # file_name ends with .dot
+    x = torch.zeros(1, 3, 224, 224, dtype=torch.float, requires_grad=False)
+    out = model(x)
+    dot = make_dot(out)
+    dot.save(file_name, save_location)
 
 # https://pytorch.org/docs/master/onnx.html
 # https://github.com/onnx/onnx-tensorflow
