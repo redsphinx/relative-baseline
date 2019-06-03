@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from relative_baseline.omg_emotion import project_paths as PP
 import os
+from relative_baseline.omg_emotion import models as M
 
 
 def prepare_model(project_variable, model):
@@ -29,6 +30,9 @@ def get_model(project_variable):
             # model.eval()
 
             print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+    elif project_variable.model_number == 1:
+        model = M.LeNet5_2d()
+        
     else:
         model = None
 
