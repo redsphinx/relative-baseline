@@ -13,6 +13,7 @@ from tqdm import tqdm
 from .settings import ProjectVariable
 import time
 import torchvision.datasets as datasets
+import torchvision
 
 # arousal,valence
 # Training: {0: 262, 1: 96, 2: 54, 3: 503, 4: 682, 5: 339, 6: 19}
@@ -325,35 +326,54 @@ def load_mnist(project_variable):
     # what to do about validation?
     # they load as tensors
 
+    image_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
+                                                      torchvision.transforms.Normalize((0.5, 0.5, 0.5),
+                                                                                       (0.5, 0.5, 0.5))])
+
+    splits = []
+    all_labels = []
+    all_data = []
+
     if project_variable.train:
-        data = datasets.MNIST(root=PP.mnist_location,
-                              train=True,
-                              download=False).train_data[:50000]
+        mnist = datasets.MNIST(root=PP.mnist_location,
+                               train=True,
+                               download=False,
+                               transform=image_transform)
 
-        labels = data.train_labels[:50000]
+        data = mnist.train_data[:50000]
+        labels = mnist.train_labels[:50000]
 
-    elif project_variable.val:
-        data = datasets.MNIST(root=PP.mnist_location,
-                              train=True,
-                              download=False).train_data[50000:]
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(labels)
 
-        labels = data.train_labels[50000:]
+    if project_variable.val:
+        mnist = datasets.MNIST(root=PP.mnist_location,
+                               train=True,
+                               download=False,
+                               transform=image_transform)
 
-    elif project_variable.test:
-        data = datasets.MNIST(root=PP.mnist_location,
-                              train=False,
-                              download=False).test_data
-        labels = data.test_labels
-    else:
-        print('ERROR: either train, test or val must be True\n t = %s, test = %s, val = %s' % (
-        str(project_variable.train),
-        str(project_variable.test),
-        str(project_variable.val)))
+        data = mnist.train_data[50000:]
+        labels = mnist.train_labels[50000:]
 
-        data = None
-        labels = None
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(labels)
 
-    return data, labels
+    if project_variable.test:
+        mnist = datasets.MNIST(root=PP.mnist_location,
+                               train=False,
+                               download=False,
+                               transform=image_transform)
+
+        data = mnist.test_data
+        labels = mnist.test_labels
+
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    return splits, all_data, all_labels
 
 
 def load_data(project_variable):

@@ -1,6 +1,7 @@
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from torchvision.models import resnet18
 from torch.optim.adam import Adam
+from torch.optim.sgd import SGD
 import torch
 from torch import nn
 from relative_baseline.omg_emotion import project_paths as PP
@@ -42,20 +43,27 @@ def get_model(project_variable):
 def get_optimizer(project_variable, model):
     # project_variable = ProjectVariable()
 
-    if project_variable.optimizer[0] == 'adam':
-        optimizer = Adam(
-            [
-                {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate/64},
-                {'params': model.bn1.parameters(), 'lr': project_variable.learning_rate/32},
-                {'params': model.layer1.parameters(), 'lr': project_variable.learning_rate/16},
-                {'params': model.layer2.parameters(), 'lr': project_variable.learning_rate/8},
-                {'params': model.layer3.parameters(), 'lr': project_variable.learning_rate/4},
-                {'params': model.layer4.parameters(), 'lr': project_variable.learning_rate/2},
-                {'params': model.fc.parameters(), 'lr': project_variable.learning_rate}
-            ],
-            lr=project_variable.learning_rate
-        )
+    if project_variable.optimizer == 'adam':
+        if project_variable.model_number == 0:
+
+            optimizer = Adam(
+                [
+                    {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate/64},
+                    {'params': model.bn1.parameters(), 'lr': project_variable.learning_rate/32},
+                    {'params': model.layer1.parameters(), 'lr': project_variable.learning_rate/16},
+                    {'params': model.layer2.parameters(), 'lr': project_variable.learning_rate/8},
+                    {'params': model.layer3.parameters(), 'lr': project_variable.learning_rate/4},
+                    {'params': model.layer4.parameters(), 'lr': project_variable.learning_rate/2},
+                    {'params': model.fc.parameters(), 'lr': project_variable.learning_rate}
+                ],
+                lr=project_variable.learning_rate
+            )
+
+    elif project_variable.optimizer == 'sgd':
+        optimizer = SGD(model.parameters(), lr=project_variable.learning_rate, momentum=project_variable.momentum)
+
     else:
+        print('Error: optimizer %s not supported' % project_variable.optimizer)
         optimizer = None
 
     return optimizer

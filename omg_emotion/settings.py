@@ -58,7 +58,7 @@ class ProjectVariable(object):
         self._label_size = 10
 
         # float, learning rate
-        self._learning_rate = 0.0001
+        self._learning_rate = 0.001
 
         # str, loss function
         self._loss_function = 'cross_entropy'
@@ -67,7 +67,11 @@ class ProjectVariable(object):
         self._loss_weights = None
 
         # list of str, optimizer
-        self._optimizer = ['adam']
+        # supported: adam, sgd
+        self._optimizer = 'sgd'
+        
+        # momentum
+        self._momentum = 0.9
         
         # int, seed for shuffling
         self._seed = 6
@@ -84,9 +88,9 @@ class ProjectVariable(object):
             self._save_model = False
             self._save_graphs = False
         else:
-            self._batch_size = 20
+            self._batch_size = 30
             self._start_epoch = -1
-            self._end_epoch = 300
+            self._end_epoch = 20
             self._train_steps = 50
             self._val_steps = 10
             self._test_steps = 10
@@ -257,6 +261,14 @@ class ProjectVariable(object):
     @optimizer.setter
     def optimizer(self, value):
         self._optimizer = value
+
+    @property
+    def momentum(self):
+        return self._momentum
+
+    @momentum.setter
+    def momentum(self, value):
+        self._momentum = value
 
     @property
     def seed(self):

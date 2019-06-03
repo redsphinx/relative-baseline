@@ -12,6 +12,7 @@ else:
     print('server unknown')
     server_path = None
 
+
 saving_data = os.path.join(server_path, 'omg_emotion/saving_data')
 data_path = os.path.join(server_path, 'omg_emotion')
 
@@ -26,4 +27,5 @@ affectnet_jpgs = os.path.join(affectnet_base, 'all_images')
 affectnet_labels_train = os.path.join(affectnet_base, 'training.csv')
 affectnet_labels_val = os.path.join(affectnet_base, 'validation.csv')
 
+# TODO: integrate paths better in pipeline
 mnist_location = '/home/gabras/deployed/mnist'

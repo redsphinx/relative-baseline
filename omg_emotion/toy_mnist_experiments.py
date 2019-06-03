@@ -16,3 +16,6 @@ def pilot():
     # project_variable.save_data = False
 
     main_file.run(project_variable)
+
+
+pilot()
