@@ -323,12 +323,14 @@ def load_mnist(project_variable):
     # TODO: transform?
     # TODO: keep as tensors?
 
+    # to float and then tensors?
+
     # what to do about validation?
     # they load as tensors
 
     image_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                       torchvision.transforms.Normalize((0.5, 0.5, 0.5),
-                                                                                       (0.5, 0.5, 0.5))])
+                                                                                       (0.5, 0.5, 0.5)),])
 
     splits = []
     all_labels = []
@@ -337,10 +339,11 @@ def load_mnist(project_variable):
     if project_variable.train:
         mnist = datasets.MNIST(root=PP.mnist_location,
                                train=True,
-                               download=False,
-                               transform=image_transform)
+                               download=False)
+                               # ,
+                               # transform=image_transform)
 
-        data = mnist.train_data[:50000]
+        data = mnist.train_data[:50000].unsqueeze(1).type(torch.float)
         labels = mnist.train_labels[:50000]
 
         splits.append('train')
@@ -350,10 +353,11 @@ def load_mnist(project_variable):
     if project_variable.val:
         mnist = datasets.MNIST(root=PP.mnist_location,
                                train=True,
-                               download=False,
-                               transform=image_transform)
+                               download=False)
+                               # ,
+                               # transform=image_transform)
 
-        data = mnist.train_data[50000:]
+        data = mnist.train_data[50000:].unsqueeze(1).type(torch.float)
         labels = mnist.train_labels[50000:]
 
         splits.append('val')
@@ -363,15 +367,20 @@ def load_mnist(project_variable):
     if project_variable.test:
         mnist = datasets.MNIST(root=PP.mnist_location,
                                train=False,
-                               download=False,
-                               transform=image_transform)
+                               download=False)
+                               # ,
+                               # transform=image_transform)
 
-        data = mnist.test_data
+        data = mnist.test_data.unsqueeze(1).type(torch.float)
         labels = mnist.test_labels
 
         splits.append('test')
         all_data.append(data)
         all_labels.append(labels)
+
+    # expand dim
+
+
 
     return splits, all_data, all_labels
 

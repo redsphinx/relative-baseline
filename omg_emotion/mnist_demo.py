@@ -3,18 +3,20 @@
 
 import torch
 
-torch.multiprocessing.set_start_method("spawn")  # https://github.com/pytorch/pytorch/issues/3491#event-1326332533
+# torch.multiprocessing.set_start_method("spawn")  # https://github.com/pytorch/pytorch/issues/3491#event-1326332533
 import torch.nn
 import torch.optim
 import torch.nn.functional
 import torchvision.datasets
 import torchvision.transforms
+from torch.utils.data import DataLoader
 
-from torch import np  # this is torch's wrapper for numpy
+# from torch import np  # this is torch's wrapper for numpy
+import numpy as np
 import matplotlib
 
 matplotlib.use('Agg')
-get_ipython().magic('matplotlib inline')
+# get_ipython().magic('matplotlib inline')
 from matplotlib import pyplot
 from matplotlib.pyplot import subplot
 from sklearn.metrics import accuracy_score
@@ -32,11 +34,13 @@ from sklearn.metrics import accuracy_score
 # [Refer line 73] http://pytorch.org/docs/0.2.0/_modules/torchvision/datasets/mnist.html
 # [Refer 'ToTensor' class] http://pytorch.org/docs/0.2.0/_modules/torchvision/transforms.html
 
+mnist_location = '/home/gabras/deployed/mnist'
+
 transformImg = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-train = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transformImg)
-valid = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transformImg)
-test = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transformImg)
+train = torchvision.datasets.MNIST(root=mnist_location, train=True, download=False, transform=transformImg)
+valid = torchvision.datasets.MNIST(root=mnist_location, train=True, download=False, transform=transformImg)
+test = torchvision.datasets.MNIST(root=mnist_location, train=False, download=False, transform=transformImg)
 
 # create training and validation set indexes (80-20 split)
 idx = list(range(len(train)))
@@ -48,14 +52,14 @@ valid_idx = idx[int(0.8 * len(idx)):]
 # In[3]:
 
 # sample images
-fig1 = train.train_data[0].numpy()
-fig2 = train.train_data[2500].numpy()
-fig3 = train.train_data[25000].numpy()
-fig4 = train.train_data[59999].numpy()
-subplot(2, 2, 1), pyplot.imshow(fig1)
-subplot(2, 2, 2), pyplot.imshow(fig2)
-subplot(2, 2, 3), pyplot.imshow(fig3)
-subplot(2, 2, 4), pyplot.imshow(fig4)
+# fig1 = train.train_data[0].numpy()
+# fig2 = train.train_data[2500].numpy()
+# fig3 = train.train_data[25000].numpy()
+# fig4 = train.train_data[59999].numpy()
+# subplot(2, 2, 1), pyplot.imshow(fig1)
+# subplot(2, 2, 2), pyplot.imshow(fig2)
+# subplot(2, 2, 3), pyplot.imshow(fig3)
+# subplot(2, 2, 4), pyplot.imshow(fig4)
 
 # In[4]:
 
@@ -66,9 +70,10 @@ valid_set = torch.utils.data.sampler.SubsetRandomSampler(valid_idx)
 # Load training and validation data based on above samples
 # Size of an individual batch during training and validation is 30
 # Both training and validation datasets are shuffled at every epoch by 'SubsetRandomSampler()'. Test set is not shuffled.
-train_loader = torch.utils.data.DataLoader(train, batch_size=30, sampler=train_set, num_workers=4)
-valid_loader = torch.utils.data.DataLoader(train, batch_size=30, sampler=valid_set, num_workers=4)
-test_loader = torch.utils.data.DataLoader(test, num_workers=4)
+workers = 4
+train_loader = DataLoader(train, batch_size=30, sampler=train_set, num_workers=workers)
+valid_loader = DataLoader(train, batch_size=30, sampler=valid_set, num_workers=workers)
+test_loader = DataLoader(test, num_workers=workers)
 
 
 # In[5]:
@@ -113,9 +118,9 @@ class LeNet5(torch.nn.Module):
 
         return x
 
-
+device = torch.device('cuda:1')
 net = LeNet5()
-net.cuda()
+net.cuda(device)
 
 # In[6]:
 
