@@ -125,6 +125,7 @@ def parallel_load(items, number_processes=20):
     return pool
 
 
+# TODO: make it specific to dataset == 'omg_emotion' and NOT model == 0
 def load_omg_emotion(project_variable):
     # TODO: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
@@ -265,6 +266,7 @@ def load_omg_emotion(project_variable):
     return splits, final_data, final_labels
 
 
+# TODO: make it specific to datasets and not model number
 def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
     if ts == steps - 1:
         if nice_div == 0:
@@ -326,9 +328,16 @@ def load_mnist(project_variable):
     if project_variable.train:
         data = datasets.MNIST(root=PP.mnist_location,
                               train=True,
-                              download=False).train_data
+                              download=False).train_data[:50000]
 
-        labels = data.train_labels
+        labels = data.train_labels[:50000]
+
+    elif project_variable.val:
+        data = datasets.MNIST(root=PP.mnist_location,
+                              train=True,
+                              download=False).train_data[50000:]
+
+        labels = data.train_labels[50000:]
 
     elif project_variable.test:
         data = datasets.MNIST(root=PP.mnist_location,
@@ -336,8 +345,11 @@ def load_mnist(project_variable):
                               download=False).test_data
         labels = data.test_labels
     else:
-        print('ERROR: either train or test must be True\n t = %s, test = %s' % (str(project_variable.train),
-                                                                                    str(project_variable.test)))
+        print('ERROR: either train, test or val must be True\n t = %s, test = %s, val = %s' % (
+        str(project_variable.train),
+        str(project_variable.test),
+        str(project_variable.val)))
+
         data = None
         labels = None
 

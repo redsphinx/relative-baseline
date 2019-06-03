@@ -4,7 +4,7 @@ from relative_baseline.omg_emotion import testing
 from relative_baseline.omg_emotion import setup
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
-from relative_baseline.omg_emotion import visualization as V
+# from relative_baseline.omg_emotion import visualization as V
 
 import os
 import numpy as np
@@ -14,7 +14,7 @@ from tensorboardX import SummaryWriter
 # temporary for debugging
 # from .settings import ProjectVariable
 
-
+# TODO: make data loading specific to datasets and not the model number
 def run(project_variable):
     # project_variable = ProjectVariable()
 
