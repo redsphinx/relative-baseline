@@ -125,7 +125,7 @@ def parallel_load(items, number_processes=20):
     return pool
 
 
-def load_data(project_variable):
+def load_omg_emotion(project_variable):
     # TODO: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
     # project_variable = ProjectVariable()
@@ -305,6 +305,10 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
 
         labels = labels.cuda(device)
 
+    elif project_variable.model_number == 1:
+        data = data.cuda(device)
+        labels = labels.cuda(device)
+
     else:
         data = torch.from_numpy(data).cuda(device)
         labels = torch.from_numpy(labels).cuda(device)
@@ -312,7 +316,7 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
     return data, labels
 
 
-def load_mnist(project_variable, device):
+def load_mnist(project_variable):
     # TODO: transform?
     # TODO: keep as tensors?
 
@@ -332,13 +336,19 @@ def load_mnist(project_variable, device):
                               download=False).test_data
         labels = data.test_labels
     else:
-        print('ERROR: either train or test must be True\n train = %s, test = %s' % (str(project_variable.train),
+        print('ERROR: either train or test must be True\n t = %s, test = %s' % (str(project_variable.train),
                                                                                     str(project_variable.test)))
         data = None
         labels = None
 
-    data = data.cuda(device)
-    labels = labels.cuda(device)
-
     return data, labels
 
+
+def load_data(project_variable):
+    if project_variable.dataset == 'omg_emotion':
+        return load_omg_emotion(project_variable)
+    elif project_variable.dataset == 'mnist':
+        return load_mnist(project_variable)
+    else:
+        print('Error: dataset %s not supported' % project_variable.dataset)
+        return None

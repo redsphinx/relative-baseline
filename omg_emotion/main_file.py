@@ -35,6 +35,8 @@ def run(project_variable):
     project_variable.test = True
     project_variable.train = False
 
+    # --------------------------------------------
+    # TODO: fix data loading for MNIST
     data = D.load_data(project_variable)
 
     if project_variable.val:
@@ -44,6 +46,7 @@ def run(project_variable):
     if project_variable.test:
         data_test = data[1][1]
         labels_test = data[2][1]
+    # --------------------------------------------
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
@@ -76,14 +79,19 @@ def run(project_variable):
         project_variable.test = False
 
         if project_variable.train:
-            w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-            w = w.astype(dtype=np.float32)
-            w = torch.from_numpy(w).cuda(device)
-            project_variable.loss_weights = w
+            if project_variable.model_number == 0:
+                w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+                w = w.astype(dtype=np.float32)
+                w = torch.from_numpy(w).cuda(device)
+                project_variable.loss_weights = w
 
+            # -------------------------------------------
+            # TODO: fix data loading for MNIST
             data = D.load_data(project_variable)
             data_train = data[1][0]
             labels_train = data[2][0]
+            # -------------------------------------------
+
             # labels is list because can be more than one type of labels
             data = data_train, labels_train
             my_model.train()
@@ -95,10 +103,11 @@ def run(project_variable):
         project_variable.test = False
 
         if project_variable.val:
-            w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
-            w = w.astype(dtype=np.float32)
-            w = torch.from_numpy(w).cuda(device)
-            project_variable.loss_weights = w
+            if project_variable.model_number == 0:
+                w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
+                w = w.astype(dtype=np.float32)
+                w = torch.from_numpy(w).cuda(device)
+                project_variable.loss_weights = w
 
             data = data_val, labels_val
             validation.run(project_variable, data, my_model, device)
@@ -109,10 +118,11 @@ def run(project_variable):
         project_variable.test = True
 
         if project_variable.test:
-            w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-            w = w.astype(dtype=np.float32)
-            w = torch.from_numpy(w).cuda(device)
-            project_variable.loss_weights = w
+            if project_variable.model_number == 0:
+                w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+                w = w.astype(dtype=np.float32)
+                w = torch.from_numpy(w).cuda(device)
+                project_variable.loss_weights = w
 
             data = data_test, labels_test
             testing.run(project_variable, data, my_model, device)

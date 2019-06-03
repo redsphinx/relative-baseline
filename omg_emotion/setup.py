@@ -32,7 +32,7 @@ def get_model(project_variable):
             print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
     elif project_variable.model_number == 1:
         model = M.LeNet5_2d()
-        
+
     else:
         model = None
 

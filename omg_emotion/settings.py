@@ -29,7 +29,6 @@ class ProjectVariable(object):
         # int, the current epoch
         self._current_epoch = None
 
-        # TODO: add mnist
         # TODO: add moving mnist
 
         # list of str, which datasets to train, val and test on
@@ -37,6 +36,10 @@ class ProjectVariable(object):
         self._dataset_train = ['omg_emotion']
         self._dataset_val = ['omg_emotion']
         self._dataset_test = ['omg_emotion']
+        
+        # instead of having 3 dataset splits, have just 1 dataset parameter
+        # implemented datasets: omg_emotion, affectnet, mnist
+        self._dataset = 'mnist'
 
         # bool, which procedures to perform
         self._train = None
@@ -47,11 +50,12 @@ class ProjectVariable(object):
         # omg_emotion: ['categories', 'arousal', 'valence']
         # affect_net: [categories, arousal, valence, face, landmarks]
         self._label_type = ['categories']
-        
+
         # int, label size for the output type
         # omg_emotion categories: 7
         # affectnet categories: 11
-        self._label_size = 7
+        # mnist: 10
+        self._label_size = 10
 
         # float, learning rate
         self._learning_rate = 0.0001
@@ -59,7 +63,7 @@ class ProjectVariable(object):
         # str, loss function
         self._loss_function = 'cross_entropy'
         
-        # list, weights for balanced loss
+        # list, weights for balanced loss, necessary for resnet18
         self._loss_weights = None
 
         # list of str, optimizer
@@ -174,6 +178,14 @@ class ProjectVariable(object):
     def dataset_test(self, value):
         self._dataset_test = value
 
+    @property
+    def dataset(self):
+        return self._dataset
+
+    @dataset.setter
+    def dataset(self, value):
+        self._dataset = value
+    
     @property
     def train(self):
         return self._train

@@ -7,6 +7,8 @@ import re
 import itertools
 import numpy as np
 from sklearn.metrics import confusion_matrix
+import torch
+from torchviz import make_dot
 
 l = ['anger', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
 
@@ -46,10 +48,9 @@ def plot_confusion_matrix(confusion_matrix, labels=l):
     return fig
 
 
-def visualize_network(model):
-    import torch
-    from torchviz import make_dot
+def visualize_network(model, file_name, save_location):
     x = torch.zeros(1, 3, 224, 224, dtype=torch.float, requires_grad=False)
     out = model(x)
     dot = make_dot(out)
-    dot.save('resnet18_emotion.dot', '/huge/gabras/AffectNet/misc')
+    # dot.save('resnet18_emotion.dot', '/huge/gabras/AffectNet/misc')
+    dot.save(file_name, save_location)
