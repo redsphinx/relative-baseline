@@ -1,5 +1,7 @@
 import torch
 
+from torch.nn.functional import conv3d
+
 
 class LeNet5_2d(torch.nn.Module):
 
