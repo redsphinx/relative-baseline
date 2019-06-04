@@ -78,7 +78,7 @@ class ProjectVariable(object):
 
         # depending on debug mode
         if debug_mode:
-            self._batch_size = 20
+            self._batch_size = 30
             self._start_epoch = -1
             self._end_epoch = 5
             self._train_steps = 10

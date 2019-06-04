@@ -35,8 +35,6 @@ def run(project_variable):
     project_variable.test = True
     project_variable.train = False
 
-    # --------------------------------------------
-    # TODO: fix data loading for MNIST
     data = D.load_data(project_variable)
 
     if project_variable.val:
@@ -46,7 +44,6 @@ def run(project_variable):
     if project_variable.test:
         data_test = data[1][1]
         labels_test = data[2][1]
-    # --------------------------------------------
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
@@ -85,12 +82,9 @@ def run(project_variable):
                 w = torch.from_numpy(w).cuda(device)
                 project_variable.loss_weights = w
 
-            # -------------------------------------------
-            # TODO: fix data loading for MNIST
             data = D.load_data(project_variable)
             data_train = data[1][0]
             labels_train = data[2][0]
-            # -------------------------------------------
 
             # labels is list because can be more than one type of labels
             data = data_train, labels_train
