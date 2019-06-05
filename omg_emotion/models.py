@@ -1,6 +1,12 @@
+import numpy as np
 import torch
 
+from torch.nn.modules import conv
+from torch.nn import functional as F
+from torch.nn.modules.utils import _triple
+
 from torch.nn.functional import conv3d
+from torch.nn.functional import affine_grid, grid_sample
 
 
 class LeNet5_2d(torch.nn.Module):
@@ -81,3 +87,95 @@ class LeNet5_3d(torch.nn.Module):
         x = self.fc3(x)
 
         return x
+
+
+def make_affine_matrix(scale, rotate, translate_x, translate_y, to_tensor=True):
+    """
+    :param scale: list of scale ints
+    :param rotate: list of rotation ints
+    :param translate_x: list of translation x ints
+    :param translate_y: list of translation y ints
+    :param to_tensor: boolean, defualt to True
+    :return: if to_tensor, tensor, else numpy matrix
+    """
+
+    # check if the parameters are all same length
+
+
+
+    matrix = np.zeros(shape=(2, 3), dtype=np.float)
+
+    # https://en.wikipedia.org/wiki/Transformation_matrix
+    matrix[0][0] = scale * np.cos(rotate)
+    matrix[1][0] = -scale * np.sin(rotate)
+    # TODO: add the last t'_x term
+    matrix[2][0] = translate_x*scale*np.cos(rotate)-translate_y*scale*np.sin(rotate) # t'_x
+    matrix[0][1] = scale * np.sin(rotate)
+    matrix[1][1] = -scale * np.cos(rotate)
+    # TODO: add the last t'_y term
+    matrix[2][1] = translate_x * scale * np.sin(rotate) - translate_y * scale * np.cos(rotate)  # t'_y
+
+
+    if to_tensor:
+        matrix = torch.from_numpy(matrix)
+
+    return matrix
+
+
+class ConvTTN3d(conv._ConvNd):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
+                 padding=0, dilation=1, groups=1,
+                 bias=True, padding_mode='zeros'):
+        kernel_size = _triple(kernel_size)
+        stride = _triple(stride)
+        padding = _triple(padding)
+        dilation = _triple(dilation)
+
+        # ----
+        # implement for scale, translate, rotate
+        # ----
+        scale = None
+        rotate = None
+        translate_x = None
+        translate_y = None
+
+        self.theta = make_affine_matrix(scale, rotate, translate_x, translate_y)
+        # TODO: figure out size
+        self.grid = affine_grid(theta=self.theta, size=None)
+        self.spatial_transform = grid_sample(self.grid)
+
+
+        # ----
+
+
+        super(ConvTTN3d, self).__init__(
+            in_channels, out_channels, kernel_size, stride, padding, dilation,
+            False, _triple(0), groups, bias, padding_mode)
+
+    def forward(self, input):
+
+        # ----
+        self.weight = self.spatial_transform()
+        # ----
+
+
+
+        if self.padding_mode == 'circular':
+            expanded_padding = ((self.padding[2] + 1) // 2, self.padding[2] // 2,
+                                (self.padding[1] + 1) // 2, self.padding[1] // 2,
+                                (self.padding[0] + 1) // 2, self.padding[0] // 2)
+            return F.conv3d(F.pad(input, expanded_padding, mode='circular'),
+                            self.weight, self.bias, self.stride, _triple(0),
+                            self.dilation, self.groups)
+
+
+
+        return F.conv3d(input, self.weight, self.bias, self.stride,
+                        self.padding, self.dilation, self.groups)
+
+
+
+
+
+
