@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torchvision
 
+
 from torch.nn.modules import conv
 from torch.nn import functional as F
 from torch.nn.modules.utils import _triple
@@ -118,8 +119,10 @@ class LeNet5_3d(torch.nn.Module):
 #
 #     return matrix
 
+
 def make_affine_matrix(scale, rotate, translate_x, translate_y):
     matrix = []
+    matrix = torch.tensor(matrix)
     return matrix
 
 
@@ -140,19 +143,19 @@ class ConvTTN3d(conv._ConvNd):
         # ------
         # affine parameters
         self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(1)))
+        # TODO: angle in radians?
         self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(1)))
         self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(1)))
         self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(1)))
         # affine transformation matrix
-        self.theta = torchvision.transforms.fun
-
-
-        # self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
+        # TODO: assume different transformations for each timepoint on the time axis
+        self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
+        self.grid = F.affine_grid(self.theta, )
 
 
         # ------
 
-
+# example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
 
     def forward(self, input, kernels2d):
 
