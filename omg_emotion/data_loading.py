@@ -378,18 +378,17 @@ def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uni
                             zeros:      zeros
                             ones:       ones
     """
-
+    tp = np.float32
+    data = np.zeros(shape=(num_datapoints, c, d, h, w), dtype=tp)
     if pop_with == 'uniform':
-        data = np.random.uniform(size=(num_datapoints, c, d, h, w))
-    elif pop_with == 'zeros':
-        data = np.zeros(size=(num_datapoints, c, d, h, w))
+        data[:] = np.random.uniform(size=data.shape)
     elif pop_with == 'ones':
-        data = np.ones(size=(num_datapoints, c, d, h, w))
+        data = np.ones(shape=(num_datapoints, c, d, h, w), dtype=tp)
     else:
         print('Error: %s not a valid value for pop_with' % pop_with)
         data = None
 
-    labels = np.zeros((num_datapoints, num_class))
+    labels = np.zeros((num_datapoints, num_class), dtype=int)
     _tmp = np.random.randint(low=num_class, size=num_datapoints)
 
     for i in range(num_datapoints):
