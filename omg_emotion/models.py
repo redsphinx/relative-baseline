@@ -18,6 +18,7 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y):
     for i in range(0, scale.shape[0]):
         # first transform is the identity
         matrix[i][0] = torch.eye(3)[:2]
+        # TODO: maybe torch.transpose is missing some parameters
         # https://en.wikipedia.org/wiki/Transformation_matrix
         for j in range(1, scale.shape[1]):
             matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
@@ -69,9 +70,12 @@ class ConvTTN3d(conv._ConvNd):
 # the 2d kernels are broadcasted and copied to the 3d kernels
     def forward(self, input):
 
-        print(self.weight.shape) 
+        print(self.weight.shape)
         self.weight = F.grid_sample(self.weight[:][:][0], self.grid)
+
+        # TODO: is this the correct place to set gradient to False?
         self.weight.requires_grad = False
+
         y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y
 

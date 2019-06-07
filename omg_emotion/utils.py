@@ -104,5 +104,3 @@ def save_architecture_as_dot(model, file_name, save_location):
 # https://github.com/albermax/innvestigate/blob/master/examples/notebooks/introduction.ipynb
 
 
-
-

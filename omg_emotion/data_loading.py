@@ -393,3 +393,74 @@ def load_data(project_variable):
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
+
+
+def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uniform'):
+    """
+    options for pop_with    uniform:     random uniform floats between 0 and 1
+                            zeros:      zeros
+                            ones:       ones
+    """
+
+    if pop_with == 'normal':
+        data = np.random.uniform(size=(num_datapoints, c, d, h, w))
+    elif pop_with == 'zeros':
+        data = np.zeros(size=(num_datapoints, c, d, h, w))
+    elif pop_with == 'ones':
+        data = np.ones(size=(num_datapoints, c, d, h, w))
+    else:
+        print('Error: %s not a valid value for pop_with' % pop_with)
+        data = None
+
+    labels = np.zeros((num_datapoints, num_class))
+    _tmp = np.random.randint(low=num_class, size=num_datapoints)
+
+    for i in range(num_datapoints):
+        labels[i][_tmp[i]] = 1
+
+    return data, labels
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
