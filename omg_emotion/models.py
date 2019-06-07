@@ -99,13 +99,15 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y):
 
     matrix = torch.zeros((scale.shape[0], scale.shape[1], 2, 3))
 
-    # first transform is the identity
-    matrix[0] = torch.eye(3)[:2]
+
 
     # i = number of filters
     # j = number of transformations
-    for i in range(1, scale.shape[0]):
-        for j in range(scale.shape[1]):
+    for i in range(0, scale.shape[0]):
+        # first transform is the identity
+        matrix[i][0] = torch.eye(3)[:2]
+        # https://en.wikipedia.org/wiki/Transformation_matrix
+        for j in range(1, scale.shape[1]):
             matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
             matrix[i][j][0][1] = -scale[i][j] * torch.sin(rotate[i][j])
             matrix[i][j][0][2] = translate_x[i][j] * scale[i][j] * torch.cos(rotate[i][j]) - translate_y[i][j] * \
