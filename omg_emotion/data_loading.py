@@ -126,7 +126,6 @@ def parallel_load(items, number_processes=20):
     return pool
 
 
-# TODO: make it specific to dataset == 'omg_emotion' and NOT model == 0
 def load_omg_emotion(project_variable):
     # TODO: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
@@ -267,7 +266,6 @@ def load_omg_emotion(project_variable):
     return splits, final_data, final_labels
 
 
-# TODO: make it specific to datasets and not model number
 def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
     if ts == steps - 1:
         if nice_div == 0:
@@ -280,7 +278,7 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
         data = full_data[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
         labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
 
-    if project_variable.model_number == 0:
+    if project_variable.dataset in ['omg_emotion', 'dummy']:
         if type(data) == np.ndarray:
             data = torch.from_numpy(data)
         # normalize image data
@@ -308,7 +306,7 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
 
         labels = labels.cuda(device)
 
-    elif project_variable.model_number == 1:
+    elif project_variable.dataset in ['mnist']:
         data = data.cuda(device)
         labels = labels.cuda(device)
 
@@ -320,14 +318,7 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
 
 
 def load_mnist(project_variable):
-    # TODO: transform?
-    # TODO: keep as tensors?
-
-    # to float and then tensors?
-
-    # what to do about validation?
-    # they load as tensors
-
+    # TODO: do transform?
     image_transform = torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
                                                       torchvision.transforms.Normalize((0.5, 0.5, 0.5),
                                                                                        (0.5, 0.5, 0.5)),])
@@ -378,31 +369,17 @@ def load_mnist(project_variable):
         all_data.append(data)
         all_labels.append(labels)
 
-    # expand dim
-
-
-
     return splits, all_data, all_labels
-
-
-def load_data(project_variable):
-    if project_variable.dataset == 'omg_emotion':
-        return load_omg_emotion(project_variable)
-    elif project_variable.dataset == 'mnist':
-        return load_mnist(project_variable)
-    else:
-        print('Error: dataset %s not supported' % project_variable.dataset)
-        return None
 
 
 def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uniform'):
     """
-    options for pop_with    uniform:     random uniform floats between 0 and 1
+    options for pop_with    uniform:    random uniform floats between 0 and 1
                             zeros:      zeros
                             ones:       ones
     """
 
-    if pop_with == 'normal':
+    if pop_with == 'uniform':
         data = np.random.uniform(size=(num_datapoints, c, d, h, w))
     elif pop_with == 'zeros':
         data = np.zeros(size=(num_datapoints, c, d, h, w))
@@ -419,6 +396,44 @@ def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uni
         labels[i][_tmp[i]] = 1
 
     return data, labels
+
+
+def dummy_uniform_lenet5_3d(project_variable):
+
+    splits, all_data, all_labels = [], [], []
+
+    if project_variable.train:
+        data, labels = create_dummy_3d_dataset(320, 1, 3, 28, 28, 10)
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(labels)
+    if project_variable.val:
+        data, labels = create_dummy_3d_dataset(160, 1, 3, 28, 28, 10)
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(labels)
+    if project_variable.test:
+        data, labels = create_dummy_3d_dataset(160, 1, 3, 28, 28, 10)
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    return splits, all_data, all_labels
+
+
+def load_data(project_variable):
+    if project_variable.dataset == 'omg_emotion':
+        return load_omg_emotion(project_variable)
+    elif project_variable.dataset == 'mnist':
+        return load_mnist(project_variable)
+    elif project_variable.dataset == 'dummy':
+        return dummy_uniform_lenet5_3d(project_variable)
+    else:
+        print('Error: dataset %s not supported' % project_variable.dataset)
+        return None
+
+
+
 
 
 

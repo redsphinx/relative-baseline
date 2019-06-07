@@ -1,3 +1,5 @@
 project_variable.model_number
 0   resnet18
-1   lenet
+1   lenet5 2dconv
+2   lenet5 3dconv
+3   lenet5 3dconvTTN

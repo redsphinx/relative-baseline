@@ -18,4 +18,13 @@ def pilot():
     main_file.run(project_variable)
 
 
-pilot()
+def dummy_data():
+    project_variable.device = 1
+    project_variable.model_number = 2
+    project_variable.experiment_number = 1
+    project_variable.batch_size = 20
+    project_variable.dataset = 'dummy'
+    main_file.run(project_variable)
+
+
+dummy_data()

@@ -38,7 +38,7 @@ class ProjectVariable(object):
         self._dataset_test = ['omg_emotion']
         
         # instead of having 3 dataset splits, have just 1 dataset parameter
-        # implemented datasets: omg_emotion, affectnet, mnist
+        # implemented datasets: omg_emotion, mnist, 'dummy'.  status affectnet??
         self._dataset = 'mnist'
 
         # bool, which procedures to perform

@@ -33,8 +33,12 @@ def get_model(project_variable):
             print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
     elif project_variable.model_number == 1:
         model = M.LeNet5_2d()
-
+    elif project_variable.model_number == 2:
+        model = M.LeNet5_3d()
+    elif project_variable.model_number == 3:
+        model = M.LeNet5_TTN3d()
     else:
+        print('Error: model with number %d not supported' % project_variable.model_number)
         model = None
 
     return model
