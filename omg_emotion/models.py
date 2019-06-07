@@ -147,6 +147,7 @@ class ConvTTN3d(conv._ConvNd):
         # affine transformation matrix
         self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
         self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
+
         print(self.grid.shape)
         # ------
 
@@ -154,11 +155,7 @@ class ConvTTN3d(conv._ConvNd):
 # assuming transfer learning scenario
     def forward(self, input, kernels2d):
 
-        # ------
-        self.weight = self.transform(kernels2d, self.grid)
-
+        self.weight = F.grid_sample(kernels2d, self.grid)
         self.weight.requires_grad = False
-        return F.conv3d(input, self.weight, self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
-        # ------
-
+        y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+        return y
