@@ -400,19 +400,24 @@ def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uni
 def dummy_uniform_lenet5_3d(project_variable):
 
     splits, all_data, all_labels = [], [], []
+    
+    channels = 1
+    time_dim = 10
+    side = 28
+    classes = 10
 
     if project_variable.train:
-        data, labels = create_dummy_3d_dataset(320, 1, 3, 28, 28, 10)
+        data, labels = create_dummy_3d_dataset(320, channels, time_dim, side, side, classes)
         splits.append('train')
         all_data.append(data)
         all_labels.append(labels)
     if project_variable.val:
-        data, labels = create_dummy_3d_dataset(160, 1, 3, 28, 28, 10)
+        data, labels = create_dummy_3d_dataset(160, channels, time_dim, side, side, classes)
         splits.append('val')
         all_data.append(data)
         all_labels.append(labels)
     if project_variable.test:
-        data, labels = create_dummy_3d_dataset(160, 1, 3, 28, 28, 10)
+        data, labels = create_dummy_3d_dataset(160, channels, time_dim, side, side, classes)
         splits.append('test')
         all_data.append(data)
         all_labels.append(labels)
