@@ -24,11 +24,11 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y):
             matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
             matrix[i][j][0][1] = -scale[i][j] * torch.sin(rotate[i][j])
             matrix[i][j][0][2] = translate_x[i][j] * scale[i][j] * torch.cos(rotate[i][j]) - translate_y[i][j] * \
-                                 scale[i][j] * torch.sin(rotate[i][j]) + torch.transpose(translate_x[i][j])
+                                 scale[i][j] * torch.sin(rotate[i][j])
             matrix[i][j][1][0] = scale[i][j] * torch.sin(rotate[i][j])
             matrix[i][j][1][1] = -scale[i][j] * torch.cos(rotate[i][j])
             matrix[i][j][1][2] = translate_x[i][j] * scale[i][j] * torch.sin(rotate[i][j]) + translate_y[i][j] * \
-                                 scale[i][j] * torch.cos(rotate[i][j]) + torch.transpose(translate_y[i][j])
+                                 scale[i][j] * torch.cos(rotate[i][j])
 
     return matrix
 
@@ -50,26 +50,31 @@ class ConvTTN3d(conv._ConvNd):
             in_channels, out_channels, kernel_size, stride, padding, dilation,
             False, _triple(0), groups, bias, padding_mode)
 
-        print(kernel_size.shape)
+        # kernel_size = (5, 5, 5), type = tuple
+
+        # most general formulation of the affine matrix. if False then imposes scale, rotate and translate restrictions
+        most_general = True
 
         # ------
         # affine parameters
-        self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-        self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-        self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-        self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-        # affine transformation matrix
-        self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
-        self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
+        if most_general:
+             self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
+        else:
+            self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+            self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+            self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+            self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+            # affine transformation matrix
+            self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
 
-        print(self.grid.shape)
+        self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
         # ------
 
 # example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
 # assuming transfer learning scenario, transfer happens in python file setup.py
 # the 2d kernels are broadcasted and copied to the 3d kernels
     def forward(self, input):
-
+        # TODO: update first weights
         print(self.weight.shape)
         self.weight = F.grid_sample(self.weight[:][:][0], self.grid)
 

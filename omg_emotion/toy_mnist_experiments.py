@@ -27,4 +27,13 @@ def dummy_data():
     main_file.run(project_variable)
 
 
-dummy_data()
+def conv3dttnpilot():
+    project_variable.device = 1
+    project_variable.model_number = 3
+    project_variable.experiment_number = 1
+    project_variable.batch_size = 20
+    project_variable.dataset = 'dummy'
+    main_file.run(project_variable)
+
+
+conv3dttnpilot()
