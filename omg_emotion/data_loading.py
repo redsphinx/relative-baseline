@@ -390,9 +390,10 @@ def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uni
 
     labels = np.zeros((num_datapoints, num_class), dtype=int)
     _tmp = np.random.randint(low=num_class, size=num_datapoints)
+    labels = _tmp
 
-    for i in range(num_datapoints):
-        labels[i][_tmp[i]] = 1
+    # for i in range(num_datapoints):
+    #     labels[i][_tmp[i]] = 1
 
     return data, labels
 
@@ -400,7 +401,7 @@ def create_dummy_3d_dataset(num_datapoints, c, d, h, w, num_class, pop_with='uni
 def dummy_uniform_lenet5_3d(project_variable):
 
     splits, all_data, all_labels = [], [], []
-    
+
     channels = 1
     time_dim = 10
     side = 28

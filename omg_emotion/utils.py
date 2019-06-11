@@ -35,10 +35,13 @@ def str_list_to_num_arr(input_list, to_type):
 
 def calculate_loss(project_variable, input, target):
     loss_name = project_variable.loss_function
-    if loss_name == 'cross_entropy':
-        loss_function = CrossEntropyLoss(weight=project_variable.loss_weights)
+    if project_variable.model_number == 0:
+        if loss_name == 'cross_entropy':
+            loss_function = CrossEntropyLoss(weight=project_variable.loss_weights)
+        else:
+            loss_function = None
     else:
-        loss_function = None
+        loss_function = CrossEntropyLoss()
 
     loss = loss_function(input, target)
     return loss
