@@ -29,6 +29,7 @@ def run(project_variable):
     if not os.path.exists(path):
         os.mkdir(path)
     project_variable.writer = SummaryWriter(path)
+    print('tensorboardX writer path: %s' % path)
 
     # load val and test data once
     project_variable.val = True

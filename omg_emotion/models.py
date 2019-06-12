@@ -53,13 +53,14 @@ class ConvTTN3d(conv._ConvNd):
         # kernel_size = (5, 5, 5), type = tuple
 
         # most general formulation of the affine matrix. if False then imposes scale, rotate and translate restrictions
-        most_general = True
+        most_general = False
 
         # ------
         # affine parameters
         if most_general:
              self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
         else:
+            # TODO: add self.weight for the first time slice
             self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
             self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
             self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
