@@ -115,16 +115,3 @@ def random_sampling():
 
 
 
-def make_transformations(out_channels=1):
-    scale = np.arange(-1, 1, 0.2)
-    rotation = np.arange(-1, 1, 0.2)
-    translate_x = np.arange(-1, 1, 0.2)
-    translate_y = np.arange(-1, 1, 0.2)
-
-    # scaling only
-    for i in range(10):
-        theta = make_theta_matrix(scale[i], rotation[i], translate_x[i], translate_y[i])
-        grid = F.affine_grid(theta, torch.Size([out_channels, 1, 28, 28]))
-
-
-
