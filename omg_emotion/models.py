@@ -54,13 +54,16 @@ class ConvTTN3d(conv._ConvNd):
 
         # most general formulation of the affine matrix. if False then imposes scale, rotate and translate restrictions
         most_general = False
+        # TODO: implement initialize with affine
+        # when transferring from 2D network, copy trained weights to this parameter after initialization
+        self.first_weight = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
+                                                                                kernel_size[1], kernel_size[2])))
 
         # ------
         # affine parameters
         if most_general:
              self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
         else:
-            # TODO: add self.weight for the first time slice
             self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
             self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
             self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
@@ -75,12 +78,14 @@ class ConvTTN3d(conv._ConvNd):
 # assuming transfer learning scenario, transfer happens in python file setup.py
 # the 2d kernels are broadcasted and copied to the 3d kernels
     def forward(self, input):
-        # TODO: update first weights
-        print(self.weight.shape)
-        self.weight = F.grid_sample(self.weight[:][:][0], self.grid)
+        # print(self.weight.shape)
+        # TODO: are shapes correct?
+        self.weight = F.grid_sample(self.first_weight, self.grid)
 
+        # TODO: check what happens when weight.requires_grad == False
         # TODO: is this the correct place to set gradient to False?
         self.weight.requires_grad = False
+
 
         y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y

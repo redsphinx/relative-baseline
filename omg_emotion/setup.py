@@ -37,6 +37,7 @@ def get_model(project_variable):
         model = M.LeNet5_3d()
     elif project_variable.model_number == 3:
         model = M.LeNet5_TTN3d()
+        # TODO: implement transfer from 2D here
     else:
         print('Error: model with number %d not supported' % project_variable.model_number)
         model = None

@@ -72,7 +72,7 @@ class ProjectVariable(object):
         
         # momentum
         self._momentum = 0.9
-        
+
         # int, seed for shuffling
         self._seed = 6
 
