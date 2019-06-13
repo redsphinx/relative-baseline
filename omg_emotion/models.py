@@ -89,7 +89,8 @@ class ConvTTN3d(conv._ConvNd):
                 self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
                 self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
         else:
-            self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
+            # initialize strictly positively
+            self.scale = torch.abs(torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0])))))
             self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
             self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
             self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
@@ -98,8 +99,11 @@ class ConvTTN3d(conv._ConvNd):
         # affine transformation matrix
         self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y,
                                         use_out_channels=use_out_channels)
-        self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
+        # TODO: fix RuntimeError: Expected tensor to have size 6 at dimension 0, but got size 5 for argument #2 'batch2' (while checking arguments for bmm)
+        self.grid = F.affine_grid(self.theta, torch.Size([kernel_size[0], in_channels, kernel_size[1], kernel_size[2]]))
+        # self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
         # ------
+        self.weight.requires_grad = False
 
 # example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
 # assuming transfer learning scenario, transfer happens in python file setup.py
@@ -111,7 +115,7 @@ class ConvTTN3d(conv._ConvNd):
 
         # TODO: check what happens when weight.requires_grad == False
         # TODO: is this the correct place to set gradient to False?
-        self.weight.requires_grad = False
+
 
 
         y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
