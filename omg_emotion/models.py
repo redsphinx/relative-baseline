@@ -7,28 +7,43 @@ from torch.nn.modules.utils import _triple
 from torch.nn.functional import conv3d
 
 
-def make_affine_matrix(scale, rotate, translate_x, translate_y):
+def make_affine_matrix(scale, rotate, translate_x, translate_y, use_out_channels=False):
+    # if out_channels is used, the shape of the matrix returned is different
 
     assert scale.shape == rotate.shape == translate_x.shape == translate_y.shape
 
-    matrix = torch.zeros((scale.shape[0], scale.shape[1], 2, 3))
+    if use_out_channels:
+        matrix = torch.zeros((scale.shape[0], scale.shape[1], 2, 3))
 
-    # i = number of filters
-    # j = number of transformations
-    for i in range(0, scale.shape[0]):
-        # first transform is the identity
-        matrix[i][0] = torch.eye(3)[:2]
-        # TODO: maybe torch.transpose is missing some parameters
-        # https://en.wikipedia.org/wiki/Transformation_matrix
-        for j in range(1, scale.shape[1]):
-            matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
-            matrix[i][j][0][1] = -scale[i][j] * torch.sin(rotate[i][j])
-            matrix[i][j][0][2] = translate_x[i][j] * scale[i][j] * torch.cos(rotate[i][j]) - translate_y[i][j] * \
-                                 scale[i][j] * torch.sin(rotate[i][j])
-            matrix[i][j][1][0] = scale[i][j] * torch.sin(rotate[i][j])
-            matrix[i][j][1][1] = -scale[i][j] * torch.cos(rotate[i][j])
-            matrix[i][j][1][2] = translate_x[i][j] * scale[i][j] * torch.sin(rotate[i][j]) + translate_y[i][j] * \
-                                 scale[i][j] * torch.cos(rotate[i][j])
+        # i = number of filters
+        # j = number of transformations
+        for i in range(0, scale.shape[0]):
+            # first transform is the identity
+            matrix[i][0] = torch.eye(3)[:2]
+            # TODO: maybe torch.transpose is missing some parameters
+            # https://en.wikipedia.org/wiki/Transformation_matrix
+            for j in range(1, scale.shape[1]):
+                matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
+                matrix[i][j][0][1] = -scale[i][j] * torch.sin(rotate[i][j])
+                matrix[i][j][0][2] = translate_x[i][j] * scale[i][j] * torch.cos(rotate[i][j]) - translate_y[i][j] * \
+                                     scale[i][j] * torch.sin(rotate[i][j])
+                matrix[i][j][1][0] = scale[i][j] * torch.sin(rotate[i][j])
+                matrix[i][j][1][1] = -scale[i][j] * torch.cos(rotate[i][j])
+                matrix[i][j][1][2] = translate_x[i][j] * scale[i][j] * torch.sin(rotate[i][j]) + translate_y[i][j] * \
+                                     scale[i][j] * torch.cos(rotate[i][j])
+    else:
+        matrix = torch.zeros((scale.shape[0], 2, 3))
+        matrix[0] = torch.eye(3)[:2]
+        for i in range(1, scale.shape[0]):
+            matrix[i][0][0] = scale[i] * torch.cos(rotate[i])
+            matrix[i][0][1] = -scale[i] * torch.sin(rotate[i])
+            matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
+                              scale[i] * torch.sin(rotate[i])
+            matrix[i][1][0] = scale[i] * torch.sin(rotate[i])
+            matrix[i][1][1] = -scale[i] * torch.cos(rotate[i])
+            matrix[i][1][2] = translate_x[i] * scale[i] * torch.sin(rotate[i]) + translate_y[i] * \
+                                 scale[i] * torch.cos(rotate[i])
+
 
     return matrix
 
@@ -54,6 +69,9 @@ class ConvTTN3d(conv._ConvNd):
 
         # most general formulation of the affine matrix. if False then imposes scale, rotate and translate restrictions
         most_general = False
+        # if use_out_channels = True, all filters in out_channels will have their own affine transformations. if False, 
+        # a single set of parameters is used for all filters in out_channels
+        use_out_channels = False
         # TODO: implement initialize with affine
         # when transferring from 2D network, copy trained weights to this parameter after initialization
         self.first_weight = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
@@ -61,16 +79,25 @@ class ConvTTN3d(conv._ConvNd):
 
         # ------
         # affine parameters
-        if most_general:
-             self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
+        if use_out_channels:
+            if most_general:
+                 self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
+            else:
+                # TODO: fix for when use_out_channels==True
+                self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+                self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+                self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
+                self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
         else:
-            self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-            self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-            self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-            self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
-            # affine transformation matrix
-            self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y)
+            self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
+            self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
+            self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
+            self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
 
+        # for now just use the same transformation for all filters in out_channels
+        # affine transformation matrix
+        self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y,
+                                        use_out_channels=use_out_channels)
         self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
         # ------
 
