@@ -7,12 +7,12 @@ from torch.nn.modules.utils import _triple
 from torch.nn.functional import conv3d
 
 
-def make_affine_matrix(scale, rotate, translate_x, translate_y, use_out_channels=False):
+def make_affine_matrix(scale, rotate, translate_x, translate_y, use_time_N=False):
     # if out_channels is used, the shape of the matrix returned is different
 
     assert scale.shape == rotate.shape == translate_x.shape == translate_y.shape
 
-    if use_out_channels:
+    if use_time_N:
         matrix = torch.zeros((scale.shape[0], scale.shape[1], 2, 3))
 
         # i = number of filters
@@ -20,7 +20,6 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y, use_out_channels
         for i in range(0, scale.shape[0]):
             # first transform is the identity
             matrix[i][0] = torch.eye(3)[:2]
-            # TODO: maybe torch.transpose is missing some parameters
             # https://en.wikipedia.org/wiki/Transformation_matrix
             for j in range(1, scale.shape[1]):
                 matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
@@ -69,38 +68,42 @@ class ConvTTN3d(conv._ConvNd):
 
         # most general formulation of the affine matrix. if False then imposes scale, rotate and translate restrictions
         most_general = False
-        # if use_out_channels = True, all filters in out_channels will have their own affine transformations. if False, 
-        # a single set of parameters is used for all filters in out_channels
-        use_out_channels = False
+        # if use_time_N = True, all time slices will have their own affine transformations. if False,
+        # a single set of parameters is used for all time slices
+        use_time_N = False
         # TODO: implement initialize with affine
         # when transferring from 2D network, copy trained weights to this parameter after initialization
-        self.first_weight = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
+        # TODO: remove the dimension with '1'
+        self.first_weight = torch.nn.init.normal(torch.nn.Parameter(torch.zeros(out_channels, in_channels, # 1,
                                                                                 kernel_size[1], kernel_size[2])))
 
         # ------
         # affine parameters
-        if use_out_channels:
+        if use_time_N:
             if most_general:
                  self.theta = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0], 2, 3))))
             else:
-                # TODO: fix for when use_out_channels==True
+                # TODO: fix for when use_time_N==True
                 self.scale = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
                 self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
                 self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
                 self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels, kernel_size[0]))))
         else:
             # initialize strictly positively
-            self.scale = torch.abs(torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0])))))
-            self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
-            self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
-            self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((kernel_size[0]))))
+            self.scale = torch.abs(torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels)))))
+            self.rotate = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels))))
+            self.translate_x = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels))))
+            self.translate_y = torch.nn.init.normal(torch.nn.Parameter(torch.zeros((out_channels))))
 
-        # for now just use the same transformation for all filters in out_channels
-        # affine transformation matrix
+        # for now use different transforms for separate filters, but same transform in the time domains
         self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y,
-                                        use_out_channels=use_out_channels)
-        # TODO: fix RuntimeError: Expected tensor to have size 6 at dimension 0, but got size 5 for argument #2 'batch2' (while checking arguments for bmm)
-        self.grid = F.affine_grid(self.theta, torch.Size([kernel_size[0], in_channels, kernel_size[1], kernel_size[2]]))
+                                        use_time_N=use_time_N)
+        # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
+        the_size = torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]])
+
+
+        self.grid = torch.nn.Parameter(F.affine_grid(self.theta, the_size))
+        self.grid.requires_grad = False
         # self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
         # ------
         self.weight.requires_grad = False
@@ -109,12 +112,9 @@ class ConvTTN3d(conv._ConvNd):
 # assuming transfer learning scenario, transfer happens in python file setup.py
 # the 2d kernels are broadcasted and copied to the 3d kernels
     def forward(self, input):
-        # print(self.weight.shape)
-        # TODO: are shapes correct?
+        # TODO: fix with for loop
+        thingy = F.grid_sample(self.first_weight, self.grid)
         self.weight = F.grid_sample(self.first_weight, self.grid)
-
-        # TODO: check what happens when weight.requires_grad == False
-        # TODO: is this the correct place to set gradient to False?
 
 
 
