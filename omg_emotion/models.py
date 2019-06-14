@@ -32,8 +32,7 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y, use_time_N=False
                                      scale[i][j] * torch.cos(rotate[i][j])
     else:
         matrix = torch.zeros((scale.shape[0], 2, 3))
-        matrix[0] = torch.eye(3)[:2]
-        for i in range(1, scale.shape[0]):
+        for i in range(0, scale.shape[0]):
             matrix[i][0][0] = scale[i] * torch.cos(rotate[i])
             matrix[i][0][1] = -scale[i] * torch.sin(rotate[i])
             matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
@@ -60,9 +59,17 @@ class ConvTTN3d(conv._ConvNd):
         padding = _triple(padding)
         dilation = _triple(dilation)
 
-        super(ConvTTN3d, self).__init__(
-            in_channels, out_channels, kernel_size, stride, padding, dilation,
-            False, _triple(0), groups, bias, padding_mode)
+        # (self, in_channels, out_channels, kernel_size, stride, padding, dilation, transposed, output_padding, groups, bias, padding_mode):
+
+        if torch.__version__ == '1.0.0':
+            super(ConvTTN3d, self).__init__(
+                in_channels, out_channels, kernel_size, stride, padding, dilation,
+                False, _triple(0), groups, bias)
+        else:
+            # padding_mode = 'zeros'
+            super(ConvTTN3d, self).__init__(
+                in_channels, out_channels, kernel_size, stride, padding, dilation,
+                False, _triple(0), groups, bias, padding_mode)
 
         # kernel_size = (5, 5, 5), type = tuple
 
@@ -107,16 +114,25 @@ class ConvTTN3d(conv._ConvNd):
         # self.grid = F.affine_grid(self.theta, torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]]))
         # ------
         self.weight.requires_grad = False
+        
 
 # example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
 # assuming transfer learning scenario, transfer happens in python file setup.py
 # the 2d kernels are broadcasted and copied to the 3d kernels
     def forward(self, input):
-        # TODO: fix with for loop
-        thingy = F.grid_sample(self.first_weight, self.grid)
-        self.weight = F.grid_sample(self.first_weight, self.grid)
+        # ---
+        # needed to deal with the cudnn error
+        try:
+            _ = F.grid_sample(self.first_weight, self.grid)
+        except RuntimeError:
+            torch.backends.cudnn.deterministic = True
+            _ = F.grid_sample(self.first_weight, self.grid)
+            print('ok cudnn')
+        # ---
 
-
+        self.weight[:, :, 0, :, :] = self.first_weight
+        for i in range(1, self.weight.shape[2]):
+            self.weight[:, :, i, :, :] = F.grid_sample(self.first_weight, self.grid)
 
         y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y
