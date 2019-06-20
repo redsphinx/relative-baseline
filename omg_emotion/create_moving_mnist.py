@@ -1,15 +1,23 @@
+import os
 import numpy as np
 from PIL import Image
 import PIL
 
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion.settings import ProjectVariable
+from relative_baseline.omg_emotion import project_paths as PP
 
 
 FRAMES = 30
 DTYPE = np.uint8
 RESAMPLE = Image.BILINEAR
 SIDE = 28
+
+PV = ProjectVariable()
+PV.dataset = 'mnist'
+PV.train = False
+PV.val = False
+PV.test = True
 
 
 def move_horizontal(image, frames=FRAMES):
@@ -243,6 +251,23 @@ def create_moving_mnist():
     TODO: 9	random movements
     '''
 
+    mov_mnist_data_folder = os.path.join(PP.moving_mnist_location, 'data')
+    if not os.path.exists(mov_mnist_data_folder):
+        os.mkdir(mov_mnist_data_folder)
+
     # get original mnist
+    mnist_all = D.load_mnist(PV)
+    data = mnist_all[1][0]
+    labels = mnist_all[2][0]
+    # change this later
+
+    # mnist_all[1][0].shape
+    # torch.Size([50000, 1, 28, 28])
+    # mnist_all[2][0].shape
+    # torch.Size([50000])
+
+    # save labels
+    print('asdf')
 
 
+create_moving_mnist()

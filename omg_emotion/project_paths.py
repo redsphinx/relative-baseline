@@ -30,5 +30,6 @@ affectnet_labels_val = os.path.join(affectnet_base, 'validation.csv')
 # TODO: integrate paths better in pipeline
 mnist_location = '/home/gabras/deployed/mnist'
 
-
 dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
+
+moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
