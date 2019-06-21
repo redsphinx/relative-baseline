@@ -242,8 +242,8 @@ def move_in_circle(image, frames=FRAMES):
         y_list = np.flip(y_list)
 
     def to_top_left(x, y):
-        x -= SIDE//2#-radius
-        y -= SIDE//2#-radius
+        x -= SIDE//2
+        y -= SIDE//2
         return int(x), int(y)
 
     image_pil = Image.fromarray(image)
@@ -259,8 +259,58 @@ def move_in_circle(image, frames=FRAMES):
 
 
 def random_transformations(image, frames=FRAMES):
-    pass
+    img_x, img_y = SIDE, SIDE
+    image_pil = Image.fromarray(image)
 
+    video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
+    video[0] = image
+
+    last_image = image_pil
+    angle_memory = []
+
+    # rotate
+    for i in range(1, frames):
+        direction = np.random.randint(-1, 2)
+        delta_angle = direction * (360 // frames)
+        angle_memory.append(delta_angle)
+        rot_image = image_pil.rotate(sum(angle_memory), resample=RESAMPLE)
+        video[i] = np.array(rot_image, dtype=DTYPE)
+        # last_image = last_image.rotate(delta_angle, resample=RESAMPLE)
+        # video[i] = np.array(last_image, dtype=DTYPE)
+
+    # move
+    # sample random movement in x y plane
+    x_start = SIDE // 4 # 7
+    y_start = SIDE // 4
+
+    x_list = [x_start]
+    y_list = [y_start]
+
+    for i in range(1, frames):
+        
+        next_x = x_list[i-1]+np.random.randint(-1, 2)
+        while (SIDE // 2 - 1)  < next_x < 0:
+            next_x = x_list[i - 1] + np.random.randint(-1, 2)
+
+        next_y = y_list[i - 1] + np.random.randint(-1, 2)
+        while (SIDE // 2 - 1) < next_y < 0:
+            next_y = y_list[i - 1] + np.random.randint(-1, 2)
+        
+        x_list.append(next_x)
+        y_list.append(next_y)
+
+    for i in range(frames):
+        canvas = Image.new(image_pil.mode, size=(int(1.5 * SIDE), int(1.5 * SIDE)))
+        image_pil = Image.fromarray(video[i])
+
+        top_left = (x_list[i], y_list[i])
+        canvas.paste(image_pil, top_left)
+
+        box = (SIDE // 4, SIDE // 4, SIDE + SIDE // 4, SIDE + SIDE // 4)
+        canvas = canvas.crop(box)
+        video[i] = np.array(canvas, dtype=DTYPE)
+
+    return video
 
 
 def create_moving_mnist(frames=FRAMES):
@@ -277,7 +327,7 @@ def create_moving_mnist(frames=FRAMES):
     6	scale up while rotating clockwise
     7	moves horizontally while rotating counter clockwise
     8	rotate clockwise and then counter clockwise GOOD
-    TODO: 9	random movements
+    9	random movements
     '''
 
     mov_mnist_data_folder = os.path.join(PP.moving_mnist_location, 'debugging_data')
@@ -290,7 +340,7 @@ def create_moving_mnist(frames=FRAMES):
     labels = np.array(mnist_all[2][0])[0:100]
 
     # make data
-    represent = [8, 1, 0, 2, 3, 4, 11, 18, 61]
+    represent = [7, 8, 1, 0, 2, 3, 4, 11, 18, 61]
 
     for i in represent:
         lab = labels[i]
@@ -317,21 +367,20 @@ def create_moving_mnist(frames=FRAMES):
         elif lab == 8:
             video = rotate_clock_and_counter(image, frames)
         elif lab == 9:
-            pass # TODO
+            video = random_transformations(image, frames)
         else:
             print('Error: lab with value not expected %d' % lab)
 
-        if lab not in [9]:
-            # save arrays as jpgs
-            folder = os.path.join(mov_mnist_data_folder, '%d' % lab)
-            if not os.path.exists(folder):
-                os.mkdir(folder)
+        # save arrays as pngs
+        folder = os.path.join(mov_mnist_data_folder, '%d' % lab)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
-            for j in range(FRAMES):
-                im = Image.fromarray(video[j].astype(DTYPE), mode=MODE)
-                path = os.path.join(folder, '%d.png' % j)
-                # path = os.path.join(folder, '%d.jpg' % j)
-                im.save(path)
+        for j in range(FRAMES):
+            im = Image.fromarray(video[j].astype(DTYPE), mode=MODE)
+            path = os.path.join(folder, '%d.png' % j)
+            # path = os.path.join(folder, '%d.jpg' % j)
+            im.save(path)
 
 
 create_moving_mnist()
