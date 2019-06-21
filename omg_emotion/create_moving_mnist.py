@@ -20,7 +20,7 @@ PV.val = False
 PV.test = True
 
 
-def get_next_x(x_current, direction, speed):
+def get_next_x(x_current, y_current, direction, speed):
     x_next = x_current + direction * speed
     if x_next > (SIDE - 1) or x_next < 1:
         direction *= -1
@@ -29,10 +29,16 @@ def get_next_x(x_current, direction, speed):
         if x_next > (SIDE - 1) or x_next < 1:
             print('Something is wrong: x_next=%d' % x_next)
             return 0, direction, speed
-    return x_next, direction, speed
+
+    loc = (x_current, 0, x_current + SIDE, SIDE)
+    return loc, x_next, y_current, direction, speed
 
 
-def move_horizontal(image, frames=FRAMES, direction=None):
+def move(image, move_fun, frames=FRAMES, direction=None):
+    '''
+    move_fun:   for horizontal/vertical movement: get_next_x
+                for circular movement: get_next_pos
+    '''
     img_x, img_y = SIDE, SIDE
     video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
 
@@ -46,21 +52,26 @@ def move_horizontal(image, frames=FRAMES, direction=None):
     image_pil = Image.fromarray(image)
 
     velocity = np.random.randint(2) + 1
+    # x, y positions at the start
     x_position = SIDE // 2
+    y_position = SIDE // 2
 
     for i in range(frames):
         canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
 
-        x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
-
-        location = (x_position, 0, x_position+SIDE, SIDE)
+        location, x_position, y_position, right_first, velocity = move_fun(x_position, y_position, right_first, velocity)
 
         canvas.paste(image_pil, location)
-        box = (SIDE//2, 0, SIDE+SIDE//2, SIDE)
+        box = (SIDE // 2, 0, SIDE + SIDE // 2, SIDE)
         canvas = canvas.crop(box)
 
         video[i] = np.array(canvas, dtype=DTYPE)
 
+    return video
+
+
+def move_horizontal(image, frames=FRAMES, direction=None):
+    video = move(image, get_next_x, frames, direction)
     return video
 
 
@@ -178,15 +189,18 @@ def move_horizontal_rotate_counter(image, frames=FRAMES):
 
     velocity = np.random.randint(2) + 1
     x_position = SIDE // 2
+    y_position = SIDE // 2
 
     for i in range(frames):
         image = video[i]
         image_pil = Image.fromarray(image)
         canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
 
-        x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
+        location, x_position, y_position, right_first, velocity = get_next_x(x_position, y_position, right_first,
+                                                                           velocity)
+        # x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
 
-        location = (x_position, 0, x_position + SIDE, SIDE)
+        # location = (x_position, 0, x_position + SIDE, SIDE)
 
         canvas.paste(image_pil, location)
         box = (SIDE // 2, 0, SIDE + SIDE // 2, SIDE)
@@ -210,8 +224,38 @@ def rotate_clock_and_counter(image, frames=FRAMES):
     return video
 
 
-def move_in_circle():
-    pass
+def move_in_circle(image, frames=FRAMES):
+    img_x, img_y = SIDE, SIDE
+    video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
+
+    direction = np.random.randint(2)
+    print('direction: ', direction)
+
+    radius = np.random.randint(4, SIDE//2 -1)
+    delta_angle = 360 // frames
+    list_angles = np.arange(0, 360, delta_angle)
+    x_list = np.round(radius * np.cos(list_angles)) + SIDE
+    y_list = np.round(radius * np.sin(list_angles)) + SIDE
+
+    if not direction:
+        x_list = np.flip(x_list)
+        y_list = np.flip(y_list)
+
+    def to_top_left(x, y):
+        x -= SIDE//2#-radius
+        y -= SIDE//2#-radius
+        return int(x), int(y)
+
+    image_pil = Image.fromarray(image)
+    for i in range(frames):
+        canvas = Image.new(image_pil.mode, size=(2 * SIDE, 2 * SIDE))
+        top_left = to_top_left(x_list[i], y_list[i])
+        canvas.paste(image_pil, top_left)
+        box = (SIDE // 2, SIDE // 2, SIDE + SIDE // 2, SIDE + SIDE // 2)
+        canvas = canvas.crop(box)
+        video[i] = np.array(canvas, dtype=DTYPE)
+
+    return video
 
 
 def random_transformations(image, frames=FRAMES):
@@ -229,7 +273,7 @@ def create_moving_mnist(frames=FRAMES):
     2	scales down and then up GOOD
     3	rotates clockwise GOOD
     4	rotates counter clockwise GOOD
-    TODO 5	moves in circle
+    5	moves in circle
     6	scale up while rotating clockwise
     7	moves horizontally while rotating counter clockwise
     8	rotate clockwise and then counter clockwise GOOD
@@ -246,7 +290,7 @@ def create_moving_mnist(frames=FRAMES):
     labels = np.array(mnist_all[2][0])[0:100]
 
     # make data
-    represent = [1, 0, 2, 3, 4, 11, 18, 61]
+    represent = [8, 1, 0, 2, 3, 4, 11, 18, 61]
 
     for i in represent:
         lab = labels[i]
@@ -265,7 +309,7 @@ def create_moving_mnist(frames=FRAMES):
         elif lab == 4:
             video = rotate(1, image, frames)
         elif lab == 5:
-            pass # TODO
+            video = move_in_circle(image, frames)
         elif lab == 6:
             video = scale_up_rotate_clockwise(image, frames)
         elif lab == 7:
@@ -277,7 +321,7 @@ def create_moving_mnist(frames=FRAMES):
         else:
             print('Error: lab with value not expected %d' % lab)
 
-        if lab not in [5, 9]:
+        if lab not in [9]:
             # save arrays as jpgs
             folder = os.path.join(mov_mnist_data_folder, '%d' % lab)
             if not os.path.exists(folder):
@@ -285,7 +329,8 @@ def create_moving_mnist(frames=FRAMES):
 
             for j in range(FRAMES):
                 im = Image.fromarray(video[j].astype(DTYPE), mode=MODE)
-                path = os.path.join(folder, '%d.jpg' % j)
+                path = os.path.join(folder, '%d.png' % j)
+                # path = os.path.join(folder, '%d.jpg' % j)
                 im.save(path)
 
 
