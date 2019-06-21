@@ -20,6 +20,18 @@ PV.val = False
 PV.test = True
 
 
+def get_next_x(x_current, direction, speed):
+    x_next = x_current + direction * speed
+    if x_next > (SIDE - 1) or x_next < 1:
+        direction *= -1
+        speed += 1
+        x_next = x_current + direction * speed
+        if x_next > (SIDE - 1) or x_next < 1:
+            print('Something is wrong: x_next=%d' % x_next)
+            return 0, direction, speed
+    return x_next, direction, speed
+
+
 def move_horizontal(image, frames=FRAMES, direction=None):
     img_x, img_y = SIDE, SIDE
     video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
@@ -35,17 +47,6 @@ def move_horizontal(image, frames=FRAMES, direction=None):
 
     velocity = np.random.randint(2) + 1
     x_position = SIDE // 2
-
-    def get_next_x(x_current, direction, speed):
-        x_next = x_current + direction * speed
-        if x_next > (SIDE - 1) or x_next < 1:
-            direction *= -1
-            speed += 1
-            x_next = x_current + direction * speed
-            if x_next > (SIDE - 1) or x_next < 1:
-                print('Something is wrong: x_next=%d' % x_next)
-                return 0, direction, speed
-        return x_next, direction, speed
 
     for i in range(frames):
         canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
@@ -168,32 +169,19 @@ def move_horizontal_rotate_counter(image, frames=FRAMES):
     for i in range(frames):
         image_rot = image_pil.rotate(i * delta_angle, resample=RESAMPLE)
         video[i] = np.array(image_rot, dtype=DTYPE)
-    # ------------    
-
-
-
-
+    # ------------
+    # ------------
+    # ------------
     right_first = np.random.randint(2)
     if not right_first:
         right_first = -1
 
-    image_pil = Image.fromarray(image)
-
     velocity = np.random.randint(2) + 1
     x_position = SIDE // 2
 
-    def get_next_x(x_current, direction, speed):
-        x_next = x_current + direction * speed
-        if x_next > (SIDE - 1) or x_next < 1:
-            direction *= -1
-            speed += 1
-            x_next = x_current + direction * speed
-            if x_next > (SIDE - 1) or x_next < 1:
-                print('Something is wrong: x_next=%d' % x_next)
-                return 0, direction, speed
-        return x_next, direction, speed
-
     for i in range(frames):
+        image = video[i]
+        image_pil = Image.fromarray(image)
         canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
 
         x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
@@ -205,8 +193,6 @@ def move_horizontal_rotate_counter(image, frames=FRAMES):
         canvas = canvas.crop(box)
 
         video[i] = np.array(canvas, dtype=DTYPE)
-
-    return video
 
     return video
 
@@ -238,14 +224,14 @@ def create_moving_mnist(frames=FRAMES):
     Method to create the moving MNIST dataset
     Moving MNIST is MNIST but each digit class moves in a specific way, for at least 10 frames
     Affine transformations: rotate, scale, translate x y
-    0	moves only horizontally TODO does not move left (high)
-    1	moves only vertically TODO does not move up (high)
+    0	moves only horizontally
+    1	moves only vertically
     2	scales down and then up GOOD
     3	rotates clockwise GOOD
     4	rotates counter clockwise GOOD
     TODO 5	moves in circle
     6	scale up while rotating clockwise
-    7	moves horizontally while rotating counter clockwise TODO: doesn't move horizontal (high)
+    7	moves horizontally while rotating counter clockwise
     8	rotate clockwise and then counter clockwise GOOD
     TODO: 9	random movements
     '''
