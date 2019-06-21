@@ -20,51 +20,45 @@ PV.val = False
 PV.test = True
 
 
-def move_horizontal(image, frames=FRAMES):
+def move_horizontal(image, frames=FRAMES, direction=None):
     img_x, img_y = SIDE, SIDE
     video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
-    right_first = np.random.randint(2)
 
-    velocity_1 = (img_x // 2) // (frames // 2)
-    velocity_2 = round(img_x / (frames // 2))
-
-    if right_first: # 1 == move right
-        last_loc = 0
-        for i in range(frames // 2):
-            video[i, :, i*velocity_1:] = image[:, 0:img_x-i*velocity_1]
-            last_loc = i*velocity_1
-        place = 0
-        for i in range(frames // 2, frames):
-            loc_v = last_loc - place * velocity_2
-            loc_i = img_x - last_loc + place * velocity_2
-            if loc_v < 0:
-                loc_i = img_x + loc_v
-                video[i, :, 0:img_x + loc_v] = image[:, 0:loc_i]
-            else:
-                video[i, :, loc_v:] = image[:, 0:loc_i]
-            place += 1
+    if direction is None:
+        right_first = np.random.randint(2)
+        if not right_first:
+            right_first = -1
     else:
-        last_loc = 0
-        for i in range(frames // 2):
-            video[i, :, 0:img_x - i * velocity_1] = image[:, i * velocity_1:]
-            last_loc = img_x - i * velocity_1
-        place = 0
-        place_2 = 0
-        for i in range(frames // 2, frames):
-            if i == 28:
-                # TODO: properly fix this; make the image move left again
-                video[i] = video[i-2]
-            elif i == 29:
-                video[i] = video[i - 3]
-            else:
-                loc_v = last_loc + (place + 1) * velocity_2
-                loc_i = img_x - loc_v
-                if loc_i < 0:
-                    video[i, :, (place_2 + 1) * velocity_2:] = image[:, 0:img_x - (place_2 + 1) * velocity_2]
-                    place_2 += 1
-                else:
-                    video[i, :, 0:loc_v] = image[:, loc_i:]
-                    place += 1
+        right_first = direction
+
+    image_pil = Image.fromarray(image)
+
+    velocity = np.random.randint(2) + 1
+    x_position = SIDE // 2
+
+    def get_next_x(x_current, direction, speed):
+        x_next = x_current + direction * speed
+        if x_next > (SIDE - 1) or x_next < 1:
+            direction *= -1
+            speed += 1
+            x_next = x_current + direction * speed
+            if x_next > (SIDE - 1) or x_next < 1:
+                print('Something is wrong: x_next=%d' % x_next)
+                return 0, direction, speed
+        return x_next, direction, speed
+
+    for i in range(frames):
+        canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
+
+        x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
+
+        location = (x_position, 0, x_position+SIDE, SIDE)
+
+        canvas.paste(image_pil, location)
+        box = (SIDE//2, 0, SIDE+SIDE//2, SIDE)
+        canvas = canvas.crop(box)
+
+        video[i] = np.array(canvas, dtype=DTYPE)
 
     return video
 
@@ -145,20 +139,19 @@ def scale_up_rotate_clockwise(image, frames=FRAMES):
         if side == 0:
             side = 1
 
-        image_resized = image_pil.resize((side, side), RESAMPLE)
         canvas = Image.new(image_pil.mode, size=image_pil.size)
+
+        image_rotate = image_pil.rotate(i * delta_angle, resample=RESAMPLE)
+        image_resized = image_rotate.resize((side, side), RESAMPLE)
 
         if side > SIDE:
             offset = (side - img_x) // 2
-            box = (offset, offset, img_x - offset, img_x - offset)
-            image_resized = image_resized.crop(box)
-            top_left = (0, 0)
+            top_left = (-offset, -offset)
             canvas.paste(image_resized, top_left)
         else:
             top_left = (img_x // 2 - i, img_x // 2 - i)
             canvas.paste(image_resized, top_left)
 
-        canvas = canvas.rotate(i * delta_angle, resample=RESAMPLE)
         video[i] = np.array(canvas, dtype=DTYPE)
 
     return video
@@ -176,55 +169,45 @@ def move_horizontal_rotate_counter(image, frames=FRAMES):
         image_rot = image_pil.rotate(i * delta_angle, resample=RESAMPLE)
         video[i] = np.array(image_rot, dtype=DTYPE)
     # ------------    
-    
-    # move horizontal
-    right_first = np.random.randint(2)
-    velocity_1 = (img_x // 2) // (frames // 2)
-    velocity_2 = round(img_x / (frames // 2))
 
-    print('right first: %d' % right_first)
-    if right_first:  # 1 == move right
-        last_loc = 0
-        for i in range(frames // 2):
-            image_arr = video[i]
-            video[i, :, i * velocity_1:] = image_arr[:, 0:img_x - i * velocity_1]
-            last_loc = i * velocity_1
-        place = 0
-        for i in range(frames // 2, frames):
-            image_arr = video[i]
-            loc_v = last_loc - place * velocity_2
-            loc_i = img_x - last_loc + place * velocity_2
-            if loc_v < 0:
-                loc_i = img_x + loc_v
-                video[i, :, 0:img_x + loc_v] = image_arr[:, 0:loc_i]
-            else:
-                video[i, :, loc_v:] = image_arr[:, 0:loc_i]
-            place += 1
-    else:
-        last_loc = 0
-        for i in range(frames // 2):
-            image_arr = video[i]
-            video[i, :, 0:img_x - i * velocity_1] = image_arr[:, i * velocity_1:]
-            last_loc = img_x - i * velocity_1
-        place = 0
-        place_2 = 0
-        for i in range(frames // 2, frames):
-            if i == 28:
-                # TODO: properly fix this; make the image move left again
-                video[i] = video[i-2]
-            elif i == 29:
-                video[i] = video[i - 3]
-            else:
-                image_arr = video[i]
-                loc_v = last_loc + (place + 1) * velocity_2
-                loc_i = img_x - loc_v
-                if loc_i < 0:
-                    video[i, :, (place_2 + 1) * velocity_2:] = image_arr[:, 0:img_x - (place_2 + 1) * velocity_2]
-                    place_2 += 1
-                else:
-                    video[i, :, 0:loc_v] = image_arr[:, loc_i:]
-                    place += 1
-    
+
+
+
+    right_first = np.random.randint(2)
+    if not right_first:
+        right_first = -1
+
+    image_pil = Image.fromarray(image)
+
+    velocity = np.random.randint(2) + 1
+    x_position = SIDE // 2
+
+    def get_next_x(x_current, direction, speed):
+        x_next = x_current + direction * speed
+        if x_next > (SIDE - 1) or x_next < 1:
+            direction *= -1
+            speed += 1
+            x_next = x_current + direction * speed
+            if x_next > (SIDE - 1) or x_next < 1:
+                print('Something is wrong: x_next=%d' % x_next)
+                return 0, direction, speed
+        return x_next, direction, speed
+
+    for i in range(frames):
+        canvas = Image.new(image_pil.mode, size=(2 * SIDE, SIDE))
+
+        x_position, right_first, velocity = get_next_x(x_position, right_first, velocity)
+
+        location = (x_position, 0, x_position + SIDE, SIDE)
+
+        canvas.paste(image_pil, location)
+        box = (SIDE // 2, 0, SIDE + SIDE // 2, SIDE)
+        canvas = canvas.crop(box)
+
+        video[i] = np.array(canvas, dtype=DTYPE)
+
+    return video
+
     return video
 
 
@@ -261,7 +244,7 @@ def create_moving_mnist(frames=FRAMES):
     3	rotates clockwise GOOD
     4	rotates counter clockwise GOOD
     TODO 5	moves in circle
-    6	scale up while rotating clockwise TODO: try rotate and then resize (low priority)
+    6	scale up while rotating clockwise
     7	moves horizontally while rotating counter clockwise TODO: doesn't move horizontal (high)
     8	rotate clockwise and then counter clockwise GOOD
     TODO: 9	random movements
@@ -318,8 +301,6 @@ def create_moving_mnist(frames=FRAMES):
                 im = Image.fromarray(video[j].astype(DTYPE), mode=MODE)
                 path = os.path.join(folder, '%d.jpg' % j)
                 im.save(path)
-
-
 
 
 create_moving_mnist()
