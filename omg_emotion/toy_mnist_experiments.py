@@ -45,4 +45,5 @@ def conv3dttn_mmnist_pilot():
     main_file.run(project_variable)
 
 
-conv3dttn_mmnist_pilot()
+conv3dttnpilot()
+# conv3dttn_mmnist_pilot()

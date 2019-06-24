@@ -403,7 +403,9 @@ def dummy_uniform_lenet5_3d(project_variable):
     splits, all_data, all_labels = [], [], []
 
     channels = 1
-    time_dim = 10
+    time_dim = 30 #10 # TODO: change to 30 see what happens
+    # ValueError: Expected input batch_size (100) to match target batch_size (20).
+
     side = 28
     classes = 10
 
@@ -433,21 +435,24 @@ def load_movmnist(project_variable):
     tp = np.float32
     frames = 30
 
+    # TODO: for debugging
+    TMP = 100
 
     def load(which):
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
-        labels = np.genfromtxt(label_path, dtype=int)
+        labels = np.genfromtxt(label_path, dtype=int)[:TMP]
 
-        num_points = os.listdir(path)
+        num_points = len(labels)
 
         data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
 
         for i in tqdm(range(num_points)):
             for j in range(frames):
                 file_path = os.path.join(path, str(i), '%d.png' % j)
-                tmp = Image.open(file_path)
+                tmp = np.array(Image.open(file_path))
                 data[i, 0, j] = tmp
+
         return data, labels
 
 
@@ -469,7 +474,7 @@ def load_movmnist(project_variable):
         all_data.append(data)
         all_labels.append(labels)
 
-    return all_data, all_labels
+    return splits, all_data, all_labels
 
 
 def load_data(project_variable):

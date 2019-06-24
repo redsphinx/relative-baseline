@@ -247,6 +247,7 @@ class LeNet5_TTN3d(torch.nn.Module):
         x = self.max_pool_2(x)
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
         # read through https://stackoverflow.com/a/42482819/7551231
+        # TODO: reshaping to [50, 400]
         x = x.view(-1, 16 * 5 * 5)
         # FC-1, then perform ReLU non-linearity
         x = torch.nn.functional.relu(self.fc1(x))
