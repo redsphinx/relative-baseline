@@ -27,9 +27,9 @@ affectnet_jpgs = os.path.join(affectnet_base, 'all_images')
 affectnet_labels_train = os.path.join(affectnet_base, 'training.csv')
 affectnet_labels_val = os.path.join(affectnet_base, 'validation.csv')
 
-# TODO: integrate paths better in pipeline
+# MNIST stuff
 mnist_location = '/home/gabras/deployed/mnist'
-
 dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
-
 moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
+moving_mnist_png = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/png'
+

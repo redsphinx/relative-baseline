@@ -1,6 +1,8 @@
 import os
 import numpy as np
 from PIL import Image
+import h5py as h5
+import tqdm
 
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion.settings import ProjectVariable
@@ -313,7 +315,7 @@ def random_transformations(image, frames=FRAMES):
     return video
 
 
-def create_moving_mnist(frames=FRAMES):
+def create_moving_mnist_demo(frames=FRAMES):
     '''
     Method to create the moving MNIST dataset
     Moving MNIST is MNIST but each digit class moves in a specific way, for at least 10 frames
@@ -383,4 +385,84 @@ def create_moving_mnist(frames=FRAMES):
             im.save(path)
 
 
-create_moving_mnist()
+def create_moving_mnist_png(which, frames=FRAMES):
+    assert which in ['test', 'train', 'val']
+
+    # setting up
+    settings = ProjectVariable()
+    settings.dataset = 'mnist'
+    settings.train = False
+    settings.val = False
+    settings.test = False
+
+    if which == 'train':
+        settings.train = True
+        SEED = 6
+    elif which == 'val':
+        settings.val = True
+        SEED = 7
+    elif which == 'test':
+        settings.test = True
+        SEED = 8
+    else:
+        SEED = None
+
+    np.random.seed(SEED)
+
+    mov_mnist_data_folder = os.path.join(PP.moving_mnist_png, which, 'data')
+
+    if not os.path.exists(mov_mnist_data_folder):
+        os.mkdir(mov_mnist_data_folder)
+
+    label_file = os.path.join(PP.moving_mnist_location, which, 'labels.csv')
+
+    # get original mnist
+    mnist_all = D.load_mnist(settings)
+    data = np.array(mnist_all[1][0])
+    labels = np.array(mnist_all[2][0])
+
+    # make data
+    for i in tqdm.tqdm(range(data.shape[0])):
+        lab = labels[i]
+        image = data[i][0]
+        video = None
+
+        if lab == 0:
+            video = move_horizontal(image, frames)
+        elif lab == 1:
+            video = move_vertical(image, frames)
+        elif lab == 2:
+            video = scale(image, frames)
+        elif lab == 3:
+            video = rotate(-1, image, frames)
+        elif lab == 4:
+            video = rotate(1, image, frames)
+        elif lab == 5:
+            video = move_in_circle(image, frames)
+        elif lab == 6:
+            video = scale_up_rotate_clockwise(image, frames)
+        elif lab == 7:
+            video = move_horizontal_rotate_counter(image, frames)
+        elif lab == 8:
+            video = rotate_clock_and_counter(image, frames)
+        elif lab == 9:
+            video = random_transformations(image, frames)
+        else:
+            print('Error: lab with value not expected %d' % lab)
+
+        # save arrays as pngs
+        folder = os.path.join(mov_mnist_data_folder, '%d' % i)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        for j in range(FRAMES):
+            im = Image.fromarray(video[j].astype(DTYPE), mode=MODE)
+            path = os.path.join(folder, '%d.png' % j)
+            im.save(path)
+
+        # save label
+        with open(label_file, 'a') as my_file:
+            my_file.write('%d\n' % lab)
+
+
+create_moving_mnist_png(which='test')
