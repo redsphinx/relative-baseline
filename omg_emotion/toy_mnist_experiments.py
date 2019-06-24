@@ -45,5 +45,15 @@ def conv3dttn_mmnist_pilot():
     main_file.run(project_variable)
 
 
-conv3dttnpilot()
-# conv3dttn_mmnist_pilot()
+# dummy_data()  # x = torch.Size([20, 1, 30, 28, 28])
+# torch.Size([20, 16, 5, 5, 5]) before view
+# torch.Size([100, 400]) after view
+# torch.Size([100, 10])
+
+
+# conv3dttnpilot()  # x = torch.Size([20, 1, 30, 28, 28])
+# torch.Size([20, 16, 5, 5, 5])
+# torch.Size([100, 400])
+# torch.Size([100, 10])
+
+conv3dttn_mmnist_pilot()
