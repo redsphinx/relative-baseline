@@ -28,10 +28,20 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss = U.calculate_loss(project_variable, predictions, labels)
         # TODO: fix THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         # retrain_graph=True because RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time.
-        if project_variable.model_number == 3:
-            loss.backward(retain_graph=True)
-        else:
-            loss.backward()
+        # loss.backward()
+        # try:
+        #     loss.backward()
+        # except RuntimeError:
+        #     loss.backward(retain_graph=True)
+
+        # This seems to solve the RuntimeError
+        loss.backward(retain_graph=True)
+        
+        # if project_variable.model_number == 3 and project_variable.current_epoch == 0 and ts == 0:
+        #     print('retain_graph is True')
+        #     loss.backward(retain_graph=True, create_graph=True)
+        # else:
+        #     loss.backward()
 
         my_optimizer.step()
 
