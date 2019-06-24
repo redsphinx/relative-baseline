@@ -463,7 +463,7 @@ def load_movmnist(project_variable):
         all_data.append(data)
         all_labels.append(labels)
 
-    if project_variable.val:
+    if project_variable.test:
         data, labels = load('test')
         splits.append('test')
         all_data.append(data)
