@@ -231,7 +231,7 @@ def move_in_circle(image, frames=FRAMES):
     video = np.zeros((frames, img_x, img_y), dtype=DTYPE)
 
     direction = np.random.randint(2)
-    print('direction: ', direction)
+    # print('direction: ', direction)
 
     radius = np.random.randint(4, SIDE//2 -1)
     delta_angle = 360 // frames
@@ -409,12 +409,14 @@ def create_moving_mnist_png(which, frames=FRAMES):
 
     np.random.seed(SEED)
 
-    mov_mnist_data_folder = os.path.join(PP.moving_mnist_png, which, 'data')
+    mov_mnist_data_folder = os.path.join(PP.moving_mnist_png, which)
 
     if not os.path.exists(mov_mnist_data_folder):
         os.mkdir(mov_mnist_data_folder)
 
-    label_file = os.path.join(PP.moving_mnist_location, which, 'labels.csv')
+    label_file = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+    with open(label_file, 'w') as my_file:
+        pass
 
     # get original mnist
     mnist_all = D.load_mnist(settings)
@@ -465,4 +467,6 @@ def create_moving_mnist_png(which, frames=FRAMES):
             my_file.write('%d\n' % lab)
 
 
-create_moving_mnist_png(which='test')
+# create_moving_mnist_png(which='test') # 01:11<00:00, 138.99it/s
+# create_moving_mnist_png(which='val') # [01:11<00:00, 143.24it/s]
+# create_moving_mnist_png(which='train') # [05:09<00:00, 161.75it/s]

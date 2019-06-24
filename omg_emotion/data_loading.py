@@ -427,7 +427,49 @@ def dummy_uniform_lenet5_3d(project_variable):
 
 
 def load_movmnist(project_variable):
-    pass
+    splits = []
+    all_labels = []
+    all_data = []
+    tp = np.float32
+    frames = 30
+
+
+    def load(which):
+        path = os.path.join(PP.moving_mnist_png, which)
+        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+        labels = np.genfromtxt(label_path, dtype=int)
+
+        num_points = os.listdir(path)
+
+        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            for j in range(frames):
+                file_path = os.path.join(path, str(i), '%d.png' % j)
+                tmp = Image.open(file_path)
+                data[i, 0, j] = tmp
+        return data, labels
+
+
+    if project_variable.train:
+        data, labels = load('train')
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.val:
+        data, labels = load('val')
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.val:
+        data, labels = load('test')
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    return all_data, all_labels
 
 
 def load_data(project_variable):
@@ -437,7 +479,7 @@ def load_data(project_variable):
         return load_mnist(project_variable)
     elif project_variable.dataset == 'dummy':
         return dummy_uniform_lenet5_3d(project_variable)
-    elif project_variable.dataset == 'movmnist':
+    elif project_variable.dataset == 'mov_mnist':
         return load_movmnist(project_variable)
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)

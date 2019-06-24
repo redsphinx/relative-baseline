@@ -36,5 +36,10 @@ def conv3dttnpilot():
     main_file.run(project_variable)
 
 
-# dummy_data()
-conv3dttnpilot()
+def conv3dttn_mmnist():
+    project_variable.device = 1
+    project_variable.model_number = 3
+    project_variable.experiment_number = 1
+    project_variable.batch_size = 10
+    project_variable.dataset = 'mov_mnist'
+    main_file.run(project_variable)
