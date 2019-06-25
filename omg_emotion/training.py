@@ -45,7 +45,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         #     loss.backward()
 
         my_optimizer.step()
-        my_model.update()
+        my_model.conv1.update_this(device)
+        my_model.conv2.update_this(device)
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
