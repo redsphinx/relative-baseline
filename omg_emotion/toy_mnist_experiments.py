@@ -57,3 +57,5 @@ conv3dttnpilot()  # x = torch.Size([20, 1, 30, 28, 28])
 # torch.Size([100, 10])
 
 # conv3dttn_mmnist_pilot()
+
+# pilot()

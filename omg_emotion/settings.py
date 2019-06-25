@@ -39,7 +39,7 @@ class ProjectVariable(object):
         
         # instead of having 3 dataset splits, have just 1 dataset parameter
         # implemented datasets: omg_emotion, mnist, 'dummy', 'mov_mnist.  status affectnet??
-        self._dataset = 'mov_mnist'
+        self._dataset = 'mnist'
 
         # bool, which procedures to perform
         self._train = None
