@@ -37,6 +37,13 @@ def get_model(project_variable):
         model = M.LeNet5_3d()
     elif project_variable.model_number == 3:
         model = M.LeNet5_TTN3d()
+        # set grid and weight to requires_grad=False
+        model.conv1.weight.requires_grad = False
+        model.conv2.weight.requires_grad = False
+        model.conv1.grid.requires_grad = False
+        model.conv2.grid.requires_grad = False
+
+
         # TODO: implement transfer from 2D here
     else:
         print('Error: model with number %d not supported' % project_variable.model_number)
