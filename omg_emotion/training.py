@@ -35,8 +35,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         #     loss.backward(retain_graph=True)
 
         # This seems to solve the RuntimeError
-        # loss.backward(retain_graph=True)
-        loss.backward()
+        loss.backward(retain_graph=True)
+        # loss.backward()
 
         # if project_variable.model_number == 3 and project_variable.current_epoch == 0 and ts == 0:
         #     print('retain_graph is True')

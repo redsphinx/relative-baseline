@@ -51,11 +51,11 @@ def conv3dttn_mmnist_pilot():
 # torch.Size([100, 10])
 
 
-conv3dttnpilot()  # x = torch.Size([20, 1, 30, 28, 28])
+# conv3dttnpilot()  # x = torch.Size([20, 1, 30, 28, 28])
 # torch.Size([20, 16, 5, 5, 5])
 # torch.Size([100, 400])
 # torch.Size([100, 10])
 
-# conv3dttn_mmnist_pilot()
-
+conv3dttn_mmnist_pilot()
+# TODO: Warning: NaN or Inf found in input tensor.
 # pilot()
