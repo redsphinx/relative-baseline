@@ -24,7 +24,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
         my_optimizer.zero_grad()
-        predictions = my_model(data)
+        predictions = my_model(data, device)
         loss = U.calculate_loss(project_variable, predictions, labels)
         # TODO: fix THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         # retrain_graph=True because RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time.
