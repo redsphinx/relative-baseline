@@ -62,6 +62,6 @@ def run(project_variable, all_data, my_model, device):
     project_variable.writer.add_scalar('test/loss', loss, project_variable.current_epoch)
     project_variable.writer.add_scalar('test/accuracy', accuracy, project_variable.current_epoch)
 
-    fig = VZ.plot_confusion_matrix(confusion_epoch)
+    fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
 

@@ -58,7 +58,7 @@ class ProjectVariable(object):
         self._label_size = 10
 
         # float, learning rate
-        self._learning_rate = 0.001
+        self._learning_rate = 0.00001
 
         # str, loss function
         self._loss_function = 'cross_entropy'
@@ -68,7 +68,7 @@ class ProjectVariable(object):
 
         # list of str, optimizer
         # supported: adam, sgd
-        self._optimizer = 'sgd'
+        self._optimizer = 'sgd' # TODO: fix this adam
         
         # momentum
         self._momentum = 0.9

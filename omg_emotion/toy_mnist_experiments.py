@@ -66,8 +66,8 @@ def conv3d_mnist():
 # torch.Size([100, 400])
 # torch.Size([100, 10])
 
-# conv3dttn_mmnist_pilot()
-# TODO: Warning: NaN or Inf found in input tensor.
+conv3dttn_mmnist_pilot()
+# TODO: Warning: NaN or Inf found in input tensor. could be initialization and/or optimizer
 # pilot()
 
-conv3d_mnist()
+# conv3d_mnist()

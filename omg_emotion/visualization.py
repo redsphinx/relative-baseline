@@ -10,10 +10,16 @@ from sklearn.metrics import confusion_matrix
 import torch
 from torchviz import make_dot
 
-l = ['anger', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
 
 # def plot_confusion_matrix(correct_labels, predict_labels, labels, title='Confusion matrix', tensor_name = 'MyFigure/image', normalize=False):
-def plot_confusion_matrix(confusion_matrix, labels=l):
+def plot_confusion_matrix(confusion_matrix, dataset):
+
+    if dataset == 'omg_emotion':
+        labels = ['anger', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+    elif dataset in ['mnist', 'mov_mnist']:
+        labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    else:
+        labels = None
 
     cm = confusion_matrix
 
