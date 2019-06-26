@@ -33,3 +33,6 @@ dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
 moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
 moving_mnist_png = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/png'
 
+
+# todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
+# todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py

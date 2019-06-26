@@ -49,6 +49,9 @@ def calculate_loss(project_variable, input, target):
 
 def calculate_accuracy(input, target):
     # accuracy of step
+    predictions = []
+    labels = []
+
     acc = 0
 
     input = input.cpu()
@@ -58,8 +61,14 @@ def calculate_accuracy(input, target):
     target = np.array(target.data)
 
     for i in range(len(input)):
+        predictions.append(input[i].argmax())
+        labels.append(target[i])
+
         if input[i].argmax() == target[i]:
             acc += 1
+
+    print('predictions: %s\n'
+          'labels:      %s' % (str(predictions), str(labels)))
 
     return acc
 

@@ -24,7 +24,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
         my_optimizer.zero_grad()
-        predictions = my_model(data, device)
+        if project_variable.model_number == 3:
+            predictions = my_model(data, device)
+        else:
+            predictions = my_model(data)
         loss = U.calculate_loss(project_variable, predictions, labels)
         # TODO: fix THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         # retrain_graph=True because RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time.
@@ -34,9 +37,12 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         # except RuntimeError:
         #     loss.backward(retain_graph=True)
 
+        # https://discuss.pytorch.org/t/runtimeerror-trying-to-backward-through-the-graph-a-second-time-but-the-buffers-have-already-been-freed-specify-retain-graph-true-when-calling-backward-the-first-time/6795/28
         # This seems to solve the RuntimeError
-        loss.backward(retain_graph=True)
-        # loss.backward()
+        if project_variable.model_number == 3:
+            loss.backward(retain_graph=True)
+        else:
+            loss.backward()
 
         # if project_variable.model_number == 3 and project_variable.current_epoch == 0 and ts == 0:
         #     print('retain_graph is True')
@@ -45,8 +51,9 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         #     loss.backward()
 
         my_optimizer.step()
-        my_model.conv1.update_this(device)
-        my_model.conv2.update_this(device)
+        if project_variable.model_number == 3:
+            my_model.conv1.update_this()
+            my_model.conv2.update_this()
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
@@ -73,9 +80,13 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         saving.save_model(project_variable, my_model)
 
     # add things to writer
-    project_variable.writer.add_scalars('metrics/train', {"loss": loss,
-                                                        "accuracy": accuracy},
-                                        project_variable.current_epoch)
+    project_variable.writer.add_scalar('train/loss', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalar('train/accuracy', accuracy, project_variable.current_epoch)
+
+    # project_variable.writer.add_scalars('some_new_shit', {'thing1': np.random.randint(5), 'thing2': np.random.randint(5)},
+    #                                     project_variable.current_epoch)
+
+    # project_variable.writer.add_scalar('some_shit', np.random.randint(5), project_variable.current_epoch)
 
     fig = VZ.plot_confusion_matrix(confusion_epoch)
     project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)

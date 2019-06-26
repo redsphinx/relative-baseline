@@ -6,7 +6,7 @@ project_variable = ProjectVariable(debug_mode=True)
 
 
 def pilot():
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.model_number = 1
     project_variable.experiment_number = 0
 
@@ -28,19 +28,29 @@ def dummy_data():
 
 
 def conv3dttnpilot():
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.model_number = 3
     project_variable.experiment_number = 1
-    project_variable.batch_size = 20
+    project_variable.batch_size = 10
     project_variable.dataset = 'dummy'
     main_file.run(project_variable)
 
 
 def conv3dttn_mmnist_pilot():
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.model_number = 3
     project_variable.experiment_number = 1
     project_variable.batch_size = 10
+    project_variable.dataset = 'mov_mnist'
+    main_file.run(project_variable)
+
+
+def conv3d_mnist():
+    project_variable.device = 2
+    project_variable.model_number = 2
+    project_variable.experiment_number = 1
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
     main_file.run(project_variable)
 
@@ -56,6 +66,8 @@ def conv3dttn_mmnist_pilot():
 # torch.Size([100, 400])
 # torch.Size([100, 10])
 
-conv3dttn_mmnist_pilot()
+# conv3dttn_mmnist_pilot()
 # TODO: Warning: NaN or Inf found in input tensor.
 # pilot()
+
+conv3d_mnist()

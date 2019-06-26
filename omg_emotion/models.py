@@ -152,22 +152,7 @@ class ConvTTN3d_classic(conv._ConvNd):
         return y
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# original
-class ConvTTN3d(torch.nn.Module):
+class ConvTTN3d_umut(torch.nn.Module):
     # for now: assume different transformations for each slice on the time axis
 
     # number of filters = out_channels
@@ -176,7 +161,7 @@ class ConvTTN3d(torch.nn.Module):
     # def __init__(self, in_channels, out_channels, kernel_size,
     #              stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1):
-        super(ConvTTN3d, self).__init__()
+        super(ConvTTN3d_umut, self).__init__()
 
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -270,6 +255,86 @@ class ConvTTN3d(torch.nn.Module):
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         # y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y
+
+
+class ConvTTN3d(conv._ConvNd):
+    
+    def __init__(self, in_channels, out_channels, kernel_size,
+                 stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
+        kernel_size = _triple(kernel_size)
+        stride = _triple(stride)
+        padding = _triple(padding)
+        dilation = _triple(dilation)
+
+        super(ConvTTN3d, self).__init__(
+            in_channels, out_channels, kernel_size, stride, padding, dilation,
+            False, _triple(0), groups, bias, padding_mode)
+
+        self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
+                                                                                 kernel_size[1], kernel_size[2])))
+        self.scale = torch.abs(torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))))
+        self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+        self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+        self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+
+        self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+        self.grid = torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2))
+
+
+    def update_this(self):
+
+        for i in range(self.kernel_size[0] - 1):
+            self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i],
+                                               use_time_N=True)
+            # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
+            the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+
+            # theta.shape = (N x 2 x 3), N = time
+            self.grid[i] = torch.nn.Parameter(F.affine_grid(self.theta[i], the_size))
+
+            # self.grid.cuda(device)
+            # self.theta.cuda(device)
+
+    def forward(self, input, device):
+
+        my_weight = torch.zeros(
+            (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
+
+        self.grid = self.grid.cuda(device)  # torch.Size([4, 6, 5, 5, 2])
+        self.theta = self.theta.cuda(device)  # torch.Size([4, 6, 2, 3])
+
+        # self.weight[:, :, 0, :, :] = self.first_weight
+
+        # ---
+        # needed to deal with the cudnn error
+        try:
+            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
+        except RuntimeError:
+            torch.backends.cudnn.deterministic = True
+            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
+            print('ok cudnn')
+            del _
+        # ---
+
+        for i in range(my_weight.shape[2] - 1):
+            my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
+            # self.weight[:, :, i, :, :] = F.grid_sample(self.first_weight, self.grid)
+
+        my_weight = my_weight.cuda(device)
+
+        '''
+        kernel_size = (time, h, w)
+        first_weight.shape = (out_channels, in_channels, 1, h, w), 1 = first timeslice
+        my_weight.shape = (out_channels, in_channels, time-1, h, w)
+
+        '''
+        new_weight = torch.cat((self.first_weight, my_weight), 2)
+        # new_weight = np.concatenate(self.first_weight, my_weight, dimension=timedim)
+
+        y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+        # y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+        return y
+
 
 
 class LeNet5_2d(torch.nn.Module):
@@ -400,14 +465,65 @@ class LeNet5_TTN3d(torch.nn.Module):
         self.fc3 = torch.nn.Linear(84, 10)
 
     def forward(self, x, device):
-        x = torch.nn.functional.relu(self.conv1(x, device))
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 1')
+
+        x = self.conv1(x, device)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 2')
+
+        x = torch.nn.functional.relu(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 3')
+
         x = self.max_pool_1(x)
-        x = torch.nn.functional.relu(self.conv2(x, device))
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 4')
+
+        x = self.conv2(x, device)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 5')
+
+        x = torch.nn.functional.relu(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 6')
+
         x = self.max_pool_2(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 7 ')
+
         x = x.view(-1, 16 * 5 * 5 * 5)
-        x = torch.nn.functional.relu(self.fc1(x))
-        x = torch.nn.functional.relu(self.fc2(x))
+        x = self.fc1(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 8')
+
+        x = torch.nn.functional.relu(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 9')
+
+        x = self.fc2(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 10')
+
+        x = torch.nn.functional.relu(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 11')
+
         x = self.fc3(x)
+
+        if torch.isnan(x).sum() > 0:
+            print('NAN found 12')
+
         return x
 
 

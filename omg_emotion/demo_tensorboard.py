@@ -91,6 +91,6 @@ writer.add_embedding(all_features, metadata=all_labels, label_img=all_images.uns
 
 writer.close()
 
-#  ssh -L 6006:localhost:5006 -N gabras@131.174.106.210
-# tensorboard --logdir path --port 5006
+#  ssh -L 6006:localhost:5006 -N gabras@131.174.106.210 (on local)
+# tensorboard --logdir path --port 5006 (at the location where you save the files on the server)
 

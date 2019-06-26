@@ -32,7 +32,10 @@ def run(project_variable, all_data, my_model, device):
         with torch.no_grad():
             # my_optimizer.zero_grad()
             # predictions = my_model.forward(data)
-            predictions = my_model(data)
+            if project_variable.model_number == 3:
+                predictions = my_model(data, device)
+            else:
+                predictions = my_model(data)
             # print(predictions)
             loss = U.calculate_loss(project_variable, predictions, labels)
             # print('loss raw: %s' % str(loss))
@@ -61,9 +64,11 @@ def run(project_variable, all_data, my_model, device):
 
     # add things to writer
     # project_variable.writer.add_scalar('metrics/loss', loss, project_variable.current_epoch)
-    project_variable.writer.add_scalars('metrics/val', {"loss": loss,
-                                                        "accuracy": accuracy},
-                                        project_variable.current_epoch)
+    # project_variable.writer.add_scalars('metrics/val', {"loss": loss,
+    #                                                     "accuracy": accuracy},
+    #                                     project_variable.current_epoch)
+    project_variable.writer.add_scalar('val/loss', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalar('val/accuracy', accuracy, project_variable.current_epoch)
 
     fig = VZ.plot_confusion_matrix(confusion_epoch)
     project_variable.writer.add_figure(tag='confusion/val', figure=fig, global_step=project_variable.current_epoch)
