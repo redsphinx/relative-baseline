@@ -100,34 +100,34 @@ def run(project_variable):
             training.run(project_variable, data, my_model, my_optimizer, device)
         # ------------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------------
-        project_variable.train = False
-        project_variable.val = True
-        project_variable.test = False
-
-        if project_variable.val:
-            if project_variable.model_number == 0:
-                w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
-                w = w.astype(dtype=np.float32)
-                w = torch.from_numpy(w).cuda(device)
-                project_variable.loss_weights = w
-
-            data = data_val, labels_val
-            validation.run(project_variable, data, my_model, device)
-        # ------------------------------------------------------------------------------------------------
-        # ------------------------------------------------------------------------------------------------
-        project_variable.train = False
-        project_variable.val = False
-        project_variable.test = True
-
-        if project_variable.test:
-            if project_variable.model_number == 0:
-                w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-                w = w.astype(dtype=np.float32)
-                w = torch.from_numpy(w).cuda(device)
-                project_variable.loss_weights = w
-
-            data = data_test, labels_test
-            testing.run(project_variable, data, my_model, device)
+        # project_variable.train = False
+        # project_variable.val = True
+        # project_variable.test = False
+        #
+        # if project_variable.val:
+        #     if project_variable.model_number == 0:
+        #         w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
+        #         w = w.astype(dtype=np.float32)
+        #         w = torch.from_numpy(w).cuda(device)
+        #         project_variable.loss_weights = w
+        #
+        #     data = data_val, labels_val
+        #     validation.run(project_variable, data, my_model, device)
+        # # ------------------------------------------------------------------------------------------------
+        # # ------------------------------------------------------------------------------------------------
+        # project_variable.train = False
+        # project_variable.val = False
+        # project_variable.test = True
+        #
+        # if project_variable.test:
+        #     if project_variable.model_number == 0:
+        #         w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+        #         w = w.astype(dtype=np.float32)
+        #         w = torch.from_numpy(w).cuda(device)
+        #         project_variable.loss_weights = w
+        #
+        #     data = data_test, labels_test
+        #     testing.run(project_variable, data, my_model, device)
         # ------------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------------
 

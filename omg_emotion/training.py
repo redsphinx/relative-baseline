@@ -23,7 +23,14 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
+
+        # if project_variable.model_number == 3:
+        #     my_model.conv1.update_this()
+        #     my_model.conv2.update_this()
+
         my_optimizer.zero_grad()
+
+
 
         # NO: project_variable.writer.add_graph(my_model, [data, device])
 
@@ -43,11 +50,11 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         # https://discuss.pytorch.org/t/runtimeerror-trying-to-backward-through-the-graph-a-second-time-but-the-buffers-have-already-been-freed-specify-retain-graph-true-when-calling-backward-the-first-time/6795/28
         # This seems to solve the RuntimeError
-        # loss.backward()
-        if project_variable.model_number == 3:
-            loss.backward(retain_graph=True)
-        else:
-            loss.backward()
+        loss.backward()
+        # if project_variable.model_number == 3:
+        #     loss.backward(retain_graph=True)
+        # else:
+        #     loss.backward()
 
         # if project_variable.model_number == 3 and project_variable.current_epoch == 0 and ts == 0:
         #     print('retain_graph is True')
@@ -56,9 +63,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         #     loss.backward()
 
         my_optimizer.step()
-        if project_variable.model_number == 3:
-            my_model.conv1.update_this()
-            my_model.conv2.update_this()
+
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)

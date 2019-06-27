@@ -13,38 +13,6 @@ def make_affine_matrix(scale, rotate, translate_x, translate_y, use_time_N=False
 
     assert scale.shape == rotate.shape == translate_x.shape == translate_y.shape
 
-    # if use_time_N:
-    #     matrix = torch.zeros((scale.shape[0], scale.shape[1], 2, 3))
-    #
-    #     # i = number of filters
-    #     # j = number of transformations
-    #     for i in range(0, scale.shape[0]):
-    #         # first transform is the identity
-    #         matrix[i][0] = torch.eye(3)[:2]
-    #         # https://en.wikipedia.org/wiki/Transformation_matrix
-    #         for j in range(1, scale.shape[1]):
-    #             matrix[i][j][0][0] = scale[i][j] * torch.cos(rotate[i][j])
-    #             matrix[i][j][0][1] = -scale[i][j] * torch.sin(rotate[i][j])
-    #             matrix[i][j][0][2] = translate_x[i][j] * scale[i][j] * torch.cos(rotate[i][j]) - translate_y[i][j] * \
-    #                                  scale[i][j] * torch.sin(rotate[i][j])
-    #             matrix[i][j][1][0] = scale[i][j] * torch.sin(rotate[i][j])
-    #             matrix[i][j][1][1] = -scale[i][j] * torch.cos(rotate[i][j])
-    #             matrix[i][j][1][2] = translate_x[i][j] * scale[i][j] * torch.sin(rotate[i][j]) + translate_y[i][j] * \
-    #                                  scale[i][j] * torch.cos(rotate[i][j])
-    # else:
-    #     matrix = torch.zeros((scale.shape[0], 2, 3))
-    #     for i in range(0, scale.shape[0]):
-    #         matrix[i][0][0] = scale[i] * torch.cos(rotate[i])
-    #         matrix[i][0][1] = -scale[i] * torch.sin(rotate[i])
-    #         matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
-    #                           scale[i] * torch.sin(rotate[i])
-    #         matrix[i][1][0] = scale[i] * torch.sin(rotate[i])
-    #         matrix[i][1][1] = -scale[i] * torch.cos(rotate[i])
-    #         matrix[i][1][2] = translate_x[i] * scale[i] * torch.sin(rotate[i]) + translate_y[i] * \
-    #                              scale[i] * torch.cos(rotate[i])
-
-
-    #herererejrhekrhkejrh
     '''
     matrix.shape = (out_channels, 2, 3)
     '''
@@ -273,11 +241,15 @@ class ConvTTN3d(conv._ConvNd):
 
         self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
                                                                                  kernel_size[1], kernel_size[2])))
-        self.scale = 1 + torch.abs(torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))))
+
+
+        self.scale = 1+torch.abs(torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))))
         self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
         self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
         self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
 
+
+        # Don't init with zeros
         self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
         self.grid = torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2))
 
@@ -287,22 +259,23 @@ class ConvTTN3d(conv._ConvNd):
         for i in range(self.kernel_size[0] - 1):
             self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i],
                                                use_time_N=True)
-            # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
             the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
-            # theta.shape = (N x 2 x 3), N = time
             self.grid[i] = torch.nn.Parameter(F.affine_grid(self.theta[i], the_size))
 
             # self.grid.cuda(device)
             # self.theta.cuda(device)
 
     def forward(self, input, device):
+        
+        # self.update_this()
+        
 
         my_weight = torch.zeros(
             (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
 
         self.grid = self.grid.cuda(device)  # torch.Size([4, 6, 5, 5, 2])
-        self.theta = self.theta.cuda(device)  # torch.Size([4, 6, 2, 3])
+        # self.theta = self.theta.cuda(device)  # torch.Size([4, 6, 2, 3])
 
         # self.weight[:, :, 0, :, :] = self.first_weight
 
