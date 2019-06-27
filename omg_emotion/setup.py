@@ -40,8 +40,8 @@ def get_model(project_variable):
         # set grid and weight to requires_grad=False
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
-        # model.conv1.grid.requires_grad = False
-        # model.conv2.grid.requires_grad = False
+        model.conv1.grid.requires_grad = False
+        model.conv2.grid.requires_grad = False
 
 
         # TODO: implement transfer from 2D here
