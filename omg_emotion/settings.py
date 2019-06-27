@@ -58,7 +58,7 @@ class ProjectVariable(object):
         self._label_size = 10
 
         # float, learning rate
-        self._learning_rate = 0.00001
+        self._learning_rate = 0.001
 
         # str, loss function
         self._loss_function = 'cross_entropy'

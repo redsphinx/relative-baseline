@@ -24,6 +24,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
         my_optimizer.zero_grad()
+
+        # NO: project_variable.writer.add_graph(my_model, [data, device])
+
+
         if project_variable.model_number == 3:
             predictions = my_model(data, device)
         else:
@@ -91,3 +95,4 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)
+

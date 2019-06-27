@@ -152,113 +152,114 @@ class ConvTTN3d_classic(conv._ConvNd):
         return y
 
 
-class ConvTTN3d_umut(torch.nn.Module):
-    # for now: assume different transformations for each slice on the time axis
-
-    # number of filters = out_channels
-    # number of transformations needed = kernel_size[0], where the first transformation is the identity
-    #
-    # def __init__(self, in_channels, out_channels, kernel_size,
-    #              stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1):
-        super(ConvTTN3d_umut, self).__init__()
-
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.kernel_size = _triple(kernel_size)
-        self.stride = _triple(stride)
-        self.padding = _triple(padding)
-        self.dilation = _triple(dilation)
-        self.groups = groups
-
-        self.bias = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.out_channels))))
-
-        self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(self.out_channels, self.in_channels, 1,
-                                                                                self.kernel_size[1], self.kernel_size[2])))
-        # self.first_weight_to_concat = self.first_weight.unsqueeze(2)
-        self.scale = torch.abs(torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels)))))#, self.kernel_size[0]-1)))))
-        self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
-        self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
-        self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
-
-        self.theta = torch.zeros((self.kernel_size[0]-1, self.out_channels, 2, 3))
-        self.grid = torch.zeros((self.kernel_size[0]-1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
-
-        # self.theta = [[] for i in range(self.kernel_size[0] - 1)]
-        # self.grid = [[] for i in range(self.kernel_size[0] - 1)]
-
-
-        # self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y,
-        #                                 use_time_N=False)
-        # # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
-        # the_size = torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]])
-        #
-        # self.grid = torch.nn.Parameter(F.affine_grid(self.theta, the_size))
-
-
-    def update_this(self, device):
-
-        for i in range(self.kernel_size[0]-1):
-            self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i],
-                                            use_time_N=True)
-            # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
-            the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
-
-            # theta.shape = (N x 2 x 3), N = time
-            self.grid[i] = torch.nn.Parameter(F.affine_grid(self.theta[i], the_size))
-
-            # self.grid.cuda(device)
-            # self.theta.cuda(device)
-
-
-# example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
-# assuming transfer learning scenario, transfer happens in python file setup.py
-# the 2d kernels are broadcasted and copied to the 3d kernels
-    def forward(self, input, device):
-
-
-        # my_weight = torch.Tensor(np.array((self.out_channels - 1, self.in_channels, self.kernel_size,
-        #                                    self.kernel_size, self.kernel_size)))
-        my_weight = torch.zeros(
-            (self.out_channels, self.in_channels, self.kernel_size[0]-1, self.kernel_size[1], self.kernel_size[2]))
-
-        self.grid = self.grid.cuda(device) # torch.Size([4, 6, 5, 5, 2])
-        self.theta = self.theta.cuda(device) # torch.Size([4, 6, 2, 3])
-
-        # self.weight[:, :, 0, :, :] = self.first_weight
-
-        # ---
-        # needed to deal with the cudnn error
-        try:
-            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
-        except RuntimeError:
-            torch.backends.cudnn.deterministic = True
-            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
-            print('ok cudnn')
-        # ---
-
-        for i in range(my_weight.shape[2]-1):
-            my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
-            # self.weight[:, :, i, :, :] = F.grid_sample(self.first_weight, self.grid)
-
-        my_weight = my_weight.cuda(device)
-
-        '''
-        kernel_size = (time, h, w)
-        first_weight.shape = (out_channels, in_channels, 1, h, w), 1 = first timeslice
-        my_weight.shape = (out_channels, in_channels, time-1, h, w)
-        
-        '''
-        new_weight = torch.cat((self.first_weight, my_weight), 2)
-        # new_weight = np.concatenate(self.first_weight, my_weight, dimension=timedim)
-
-        y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
-        # y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
-        return y
+# umut
+# class ConvTTN3d(torch.nn.Module):
+#     # for now: assume different transformations for each slice on the time axis
+#
+#     # number of filters = out_channels
+#     # number of transformations needed = kernel_size[0], where the first transformation is the identity
+#     #
+#     # def __init__(self, in_channels, out_channels, kernel_size,
+#     #              stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
+#     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1):
+#         super(ConvTTN3d, self).__init__()
+#
+#         self.in_channels = in_channels
+#         self.out_channels = out_channels
+#         self.kernel_size = _triple(kernel_size)
+#         self.stride = _triple(stride)
+#         self.padding = _triple(padding)
+#         self.dilation = _triple(dilation)
+#         self.groups = groups
+#
+#         self.bias = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.out_channels))))
+#
+#         self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(self.out_channels, self.in_channels, 1,
+#                                                                                 self.kernel_size[1], self.kernel_size[2])))
+#         # self.first_weight_to_concat = self.first_weight.unsqueeze(2)
+#         self.scale = torch.abs(torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels)))))#, self.kernel_size[0]-1)))))
+#         self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
+#         self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
+#         self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((self.kernel_size[0]-1, self.out_channels))))#, self.kernel_size[0]-1))))
+#
+#         self.theta = torch.zeros((self.kernel_size[0]-1, self.out_channels, 2, 3))
+#         self.grid = torch.zeros((self.kernel_size[0]-1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
+#
+#         # self.theta = [[] for i in range(self.kernel_size[0] - 1)]
+#         # self.grid = [[] for i in range(self.kernel_size[0] - 1)]
+#
+#
+#         # self.theta = make_affine_matrix(self.scale, self.rotate, self.translate_x, self.translate_y,
+#         #                                 use_time_N=False)
+#         # # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
+#         # the_size = torch.Size([out_channels, kernel_size[0], kernel_size[1], kernel_size[2]])
+#         #
+#         # self.grid = torch.nn.Parameter(F.affine_grid(self.theta, the_size))
+#
+#
+#     def update_this(self):
+#
+#         for i in range(self.kernel_size[0]-1):
+#             self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i],
+#                                             use_time_N=True)
+#             # the_size = torch.Size([kernel_size[0], out_channels, kernel_size[1], kernel_size[2]])
+#             the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+#
+#             # theta.shape = (N x 2 x 3), N = time
+#             self.grid[i] = torch.nn.Parameter(F.affine_grid(self.theta[i], the_size))
+#
+#             # self.grid.cuda(device)
+#             # self.theta.cuda(device)
+#
+#
+# # example of how grid is used: https://discuss.pytorch.org/t/affine-transformation-matrix-paramters-conversion/19522
+# # assuming transfer learning scenario, transfer happens in python file setup.py
+# # the 2d kernels are broadcasted and copied to the 3d kernels
+#     def forward(self, input, device):
+#
+#
+#         # my_weight = torch.Tensor(np.array((self.out_channels - 1, self.in_channels, self.kernel_size,
+#         #                                    self.kernel_size, self.kernel_size)))
+#         my_weight = torch.zeros(
+#             (self.out_channels, self.in_channels, self.kernel_size[0]-1, self.kernel_size[1], self.kernel_size[2]))
+#
+#         self.grid = self.grid.cuda(device) # torch.Size([4, 6, 5, 5, 2])
+#         self.theta = self.theta.cuda(device) # torch.Size([4, 6, 2, 3])
+#
+#         # self.weight[:, :, 0, :, :] = self.first_weight
+#
+#         # ---
+#         # needed to deal with the cudnn error
+#         try:
+#             _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
+#         except RuntimeError:
+#             torch.backends.cudnn.deterministic = True
+#             _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
+#             print('ok cudnn')
+#         # ---
+#
+#         for i in range(my_weight.shape[2]-1):
+#             my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
+#             # self.weight[:, :, i, :, :] = F.grid_sample(self.first_weight, self.grid)
+#
+#         my_weight = my_weight.cuda(device)
+#
+#         '''
+#         kernel_size = (time, h, w)
+#         first_weight.shape = (out_channels, in_channels, 1, h, w), 1 = first timeslice
+#         my_weight.shape = (out_channels, in_channels, time-1, h, w)
+#
+#         '''
+#         new_weight = torch.cat((self.first_weight, my_weight), 2)
+#         # new_weight = np.concatenate(self.first_weight, my_weight, dimension=timedim)
+#
+#         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+#         # y = F.conv3d(input, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+#         return y
 
 
 class ConvTTN3d(conv._ConvNd):
-    
+
     def __init__(self, in_channels, out_channels, kernel_size,
                  stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
         kernel_size = _triple(kernel_size)
