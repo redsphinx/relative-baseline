@@ -330,7 +330,14 @@ class ConvTTN3d(conv._ConvNd):
         self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
                                                                                  kernel_size[1], kernel_size[2])))
 
-        self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
+        # as identity matrix
+        # self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
+        self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+        for i in range(kernel_size[0] - 1):
+            for j in range(out_channels):
+                self.theta[i][j] = torch.eye(3)[:2, ]
+
+        self.theta = torch.nn.Parameter(self.theta)
 
         # for cudnn issue
         # self.grid = torch.nn.Parameter(torch.zeros((1, out_channels, kernel_size[1], kernel_size[2], 2)))
@@ -414,6 +421,7 @@ class ConvTTN3d(conv._ConvNd):
         # new_weight = torch.cat((self.first_weight, my_weight), 2)
 
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+        self.weight = torch.nn.Parameter(new_weight)
         return y
 
 
