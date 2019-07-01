@@ -362,6 +362,6 @@ class ProjectVariable(object):
     def theta_init(self):
         return self._theta_init
 
-    @save_graphs.setter
+    @theta_init.setter
     def theta_init(self, value):
         self._theta_init = value

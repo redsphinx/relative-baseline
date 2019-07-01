@@ -42,7 +42,7 @@ def get_model(project_variable):
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
 
-        # only update s r x y, do not train theta
+        # if not initializing from theta, only update s r x y; do not update theta with backprop
         if project_variable.theta_init is None:
             model.conv1.theta.requires_grad = False
             model.conv2.theta.requires_grad = False

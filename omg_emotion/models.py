@@ -7,7 +7,7 @@ from torch.nn.modules.utils import _triple
 from torch.nn.functional import conv3d
 
 
-# TODO: implement this if project_variable.use_affine == True
+# TODO: make this work with the gpu
 def make_affine_matrix(scale, rotate, translate_x, translate_y, use_time_N=False):
     # if out_channels is used, the shape of the matrix returned is different
 
@@ -344,22 +344,21 @@ class ConvTTN3d(conv._ConvNd):
                 print("ERROR: theta_init mode '%s' not supported" % self.project_variable.theta_init)
                 self.theta = None
 
-            # self.theta = torch.nn.Parameter(self.theta)
+            self.theta = torch.nn.Parameter(self.theta)
 
         else:
             # use 4 parameters
-            self.scale = 1 + torch.abs(
-                torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))))
+            self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)))))
             self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
             self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
             self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
 
             # self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
-            self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
-            for i in range(kernel_size[0]-1):
-                self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+            self.theta = torch.zeros((1, out_channels, 2, 3))
+            # for i in range(kernel_size[0]-1):
+            #     self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
 
-        self.theta = torch.nn.Parameter(self.theta)
+        # self.theta = torch.nn.Parameter(self.theta)
 
 
         # for cudnn issue
@@ -371,12 +370,17 @@ class ConvTTN3d(conv._ConvNd):
         # self.the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
 
-    def update_2(self, grid):
+    def update_2(self, grid, device):
         # deal with updating s r x y
-        if self.project_variable.theta_init is not None:
+        if self.project_variable.theta_init is None:
+            # TODO: still problematic
             # update theta
             for i in range(self.kernel_size[0]-1):
-                self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+                tmp = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+                # tmp = tmp.cuda(device)
+                self.theta = torch.cat((self.theta, tmp.unsqueeze(0)), 0)
+                # self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+            self.theta = self.theta[1:]
 
         # cudnn error
         try:
@@ -414,8 +418,15 @@ class ConvTTN3d(conv._ConvNd):
 
         # self.update_this()
         grid = torch.zeros((1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
-        grid = grid.cuda(device)
-        grid = self.update_2(grid)[1:]
+
+        # TODO: fix this such that the cudnn error goes away
+        if self.project_variable.theta_init is not None:
+            grid = grid.cuda(device)
+
+        grid = self.update_2(grid, device)[1:]
+
+        if self.project_variable.theta_init is None:
+            grid = grid.cuda(device)
 
         # my_weight = torch.zeros(
         #     (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
@@ -427,11 +438,11 @@ class ConvTTN3d(conv._ConvNd):
 
         # ---
         # needed to deal with the cudnn error
-        # try:
-        #     _ = F.grid_sample(self.first_weight[:, :, 0], grid[0])
-        # except RuntimeError:
-        #     torch.backends.cudnn.deterministic = True
-        #     print('ok cudnn')
+        try:
+            _ = F.grid_sample(self.first_weight[:, :, 0], grid[0])
+        except RuntimeError:
+            torch.backends.cudnn.deterministic = True
+            print('ok cudnn')
         # ---
 
         new_weight = self.first_weight
