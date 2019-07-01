@@ -359,6 +359,8 @@ class ConvTTN3d(conv._ConvNd):
 
         # self.update_this()
 
+
+
         my_weight = torch.zeros(
             (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
 
@@ -378,12 +380,16 @@ class ConvTTN3d(conv._ConvNd):
             del _
         # ---
 
-        for i in range(my_weight.shape[2] - 1):
-            my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
+        new_weight = self.first_weight
 
-        my_weight = my_weight.cuda(device)
+        for i in range(my_weight.shape[2]):
+            tmp = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
+            new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
+            # my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
 
-        new_weight = torch.cat((self.first_weight, my_weight), 2)
+        # my_weight = my_weight.cuda(device)
+
+        # new_weight = torch.cat((self.first_weight, my_weight), 2)
 
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y

@@ -78,6 +78,21 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # accuracy = float(np.mean(accuracy_epoch))
 
+    # if conv3d model, add kernels from first layer to tensorboard
+    if project_variable.model_number in [2, 3]:
+        kernel = my_model.conv1.weight.data
+        kernel = kernel.transpose(1, 2)
+
+        for k in range(kernel.shape[0]):
+
+            new_k = kernel[k].unsqueeze(0)
+
+            project_variable.writer.add_video(tag='kernel %d' % k, vid_tensor=new_k,
+                                          global_step=project_variable.current_epoch, fps=2)
+
+
+
+
     if project_variable.save_data:
         saving.update_logs(project_variable, 'train', [loss, accuracy, confusion_flatten])
 

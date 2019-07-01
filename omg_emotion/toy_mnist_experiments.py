@@ -31,11 +31,13 @@ def conv3dttnpilot():
     project_variable.device = 2
     project_variable.model_number = 3
     project_variable.experiment_number = 1
-    project_variable.batch_size = 10
+    project_variable.batch_size = 30
     project_variable.dataset = 'dummy'
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.0001
+
+    project_variable.end_epoch = 50
 
     main_file.run(project_variable)
 
@@ -44,8 +46,9 @@ def conv3dttn_mmnist_pilot():
     project_variable.device = 2
     project_variable.model_number = 3
     project_variable.experiment_number = 1
-    project_variable.batch_size = 10
+    project_variable.batch_size = 30
     project_variable.dataset = 'mov_mnist'
+    project_variable.end_epoch = 50
 
     # project_variable.optimizer = 'adam'
     # project_variable.learning_rate = 0.001
@@ -59,7 +62,7 @@ def conv3d_mnist():
     project_variable.model_number = 2
     project_variable.experiment_number = 1
     project_variable.batch_size = 30
-    project_variable.end_epoch = 20
+    project_variable.end_epoch = 100
     project_variable.dataset = 'mov_mnist'
     main_file.run(project_variable)
 
