@@ -333,36 +333,60 @@ class ConvTTN3d(conv._ConvNd):
         self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
 
         # for cudnn issue
-        self.grid = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2)))
+        # self.grid = torch.nn.Parameter(torch.zeros((1, out_channels, kernel_size[1], kernel_size[2], 2)))
+        # self.grid = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2)))
 
+        # self.grid = torch.zeros((1, out_channels, kernel_size[1], kernel_size[2], 2))
         # self.grid = torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2))
         # self.the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
 
-    def update_this(self):
+    def update_2(self, grid):
+
         # cudnn error
         try:
             _ = F.affine_grid(self.theta[0],
                               [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
         except RuntimeError:
             torch.backends.cudnn.deterministic = True
-            _ = F.affine_grid(self.theta[0],
-                              [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
             print('ok cudnn')
-            del _
 
         for i in range(self.kernel_size[0] - 1):
-            self.grid[i] = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+            tmp = F.affine_grid(self.theta[i],
+                                [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+            grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
+
+
+        return grid
+
+
+
+    def update_this(self):
+
+        # cudnn error
+        try:
+            _ = F.affine_grid(self.theta[0], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+        except RuntimeError:
+            torch.backends.cudnn.deterministic = True
+            print('ok cudnn')
+
+        # TODO: cat instead of assign
+
+        for i in range(self.kernel_size[0] - 1):
+            tmp = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+            self.grid = torch.cat((self.grid, tmp.unsqueeze(0)), 0)
+            # self.grid[i] = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
 
     def forward(self, input, device):
 
         # self.update_this()
+        grid = torch.zeros((1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
+        grid = grid.cuda(device)
+        grid = self.update_2(grid)[1:]
 
-
-
-        my_weight = torch.zeros(
-            (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
+        # my_weight = torch.zeros(
+        #     (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))
 
         # self.grid = self.grid.cuda(device)  # torch.Size([4, 6, 5, 5, 2])
         # self.theta = self.theta.cuda(device)  # torch.Size([4, 6, 2, 3])
@@ -371,19 +395,17 @@ class ConvTTN3d(conv._ConvNd):
 
         # ---
         # needed to deal with the cudnn error
-        try:
-            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
-        except RuntimeError:
-            torch.backends.cudnn.deterministic = True
-            _ = F.grid_sample(self.first_weight[:, :, 0], self.grid[0])
-            print('ok cudnn')
-            del _
+        # try:
+        #     _ = F.grid_sample(self.first_weight[:, :, 0], grid[0])
+        # except RuntimeError:
+        #     torch.backends.cudnn.deterministic = True
+        #     print('ok cudnn')
         # ---
 
         new_weight = self.first_weight
 
-        for i in range(my_weight.shape[2]):
-            tmp = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
+        for i in range(self.kernel_size[0] - 1):
+            tmp = F.grid_sample(self.first_weight[:, :, 0], grid[i])
             new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
             # my_weight[:, :, i, :, :] = F.grid_sample(self.first_weight[:, :, 0], self.grid[i])
 

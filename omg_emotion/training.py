@@ -23,17 +23,9 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-
-        # if project_variable.model_number == 3:
-        #     my_model.conv1.update_this()
-        #     my_model.conv2.update_this()
-
         my_optimizer.zero_grad()
 
-
-
         # NO: project_variable.writer.add_graph(my_model, [data, device])
-
 
         if project_variable.model_number == 3:
             predictions = my_model(data, device)
@@ -63,6 +55,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         #     loss.backward()
 
         my_optimizer.step()
+
+        # if project_variable.model_number == 3:
+        #     my_model.conv1.update_this()
+        #     my_model.conv2.update_this()
 
 
         accuracy = U.calculate_accuracy(predictions, labels)
