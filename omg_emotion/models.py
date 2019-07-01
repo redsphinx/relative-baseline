@@ -7,7 +7,7 @@ from torch.nn.modules.utils import _triple
 from torch.nn.functional import conv3d
 
 
-
+# TODO: implement this if project_variable.use_affine == True
 def make_affine_matrix(scale, rotate, translate_x, translate_y, use_time_N=False):
     # if out_channels is used, the shape of the matrix returned is different
 
@@ -316,7 +316,7 @@ class ConvTTN3d(conv._ConvNd):
     basic version where theta is sampled, so we avoid needing the matrix def
     '''
 
-    def __init__(self, in_channels, out_channels, kernel_size,
+    def __init__(self, in_channels, out_channels, kernel_size, project_variable,
                  stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
         kernel_size = _triple(kernel_size)
         stride = _triple(stride)
@@ -327,17 +327,40 @@ class ConvTTN3d(conv._ConvNd):
             in_channels, out_channels, kernel_size, stride, padding, dilation,
             False, _triple(0), groups, bias, padding_mode)
 
+        self.project_variable = project_variable
+
         self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
                                                                                  kernel_size[1], kernel_size[2])))
 
-        # as identity matrix
-        # self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
-        self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
-        for i in range(kernel_size[0] - 1):
-            for j in range(out_channels):
-                self.theta[i][j] = torch.eye(3)[:2, ]
+        if self.project_variable.theta_init is not None:
+            self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+            if self.project_variable.theta_init == 'eye':
+                for i in range(kernel_size[0] - 1):
+                    for j in range(out_channels):
+                        self.theta[i][j] = torch.eye(3)[:2, ]
+            elif self.project_variable.theta_init == 'normal':
+                self.theta = torch.nn.init.normal_(self.theta)
+            else:
+                print("ERROR: theta_init mode '%s' not supported" % self.project_variable.theta_init)
+                self.theta = None
+
+            # self.theta = torch.nn.Parameter(self.theta)
+
+        else:
+            # use 4 parameters
+            self.scale = 1 + torch.abs(
+                torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))))
+            self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+            self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+            self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+
+            # self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
+            self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+            for i in range(kernel_size[0]-1):
+                self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
 
         self.theta = torch.nn.Parameter(self.theta)
+
 
         # for cudnn issue
         # self.grid = torch.nn.Parameter(torch.zeros((1, out_channels, kernel_size[1], kernel_size[2], 2)))
@@ -349,6 +372,11 @@ class ConvTTN3d(conv._ConvNd):
 
 
     def update_2(self, grid):
+        # deal with updating s r x y
+        if self.project_variable.theta_init is not None:
+            # update theta
+            for i in range(self.kernel_size[0]-1):
+                self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
 
         # cudnn error
         try:
@@ -363,26 +391,23 @@ class ConvTTN3d(conv._ConvNd):
                                 [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
             grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
 
-
         return grid
 
 
-
-    def update_this(self):
-
-        # cudnn error
-        try:
-            _ = F.affine_grid(self.theta[0], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
-        except RuntimeError:
-            torch.backends.cudnn.deterministic = True
-            print('ok cudnn')
-
-        # TODO: cat instead of assign
-
-        for i in range(self.kernel_size[0] - 1):
-            tmp = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
-            self.grid = torch.cat((self.grid, tmp.unsqueeze(0)), 0)
-            # self.grid[i] = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+    #
+    # def update_this(self):
+    #
+    #     # cudnn error
+    #     try:
+    #         _ = F.affine_grid(self.theta[0], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+    #     except RuntimeError:
+    #         torch.backends.cudnn.deterministic = True
+    #         print('ok cudnn')
+    #
+    #     for i in range(self.kernel_size[0] - 1):
+    #         tmp = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+    #         self.grid = torch.cat((self.grid, tmp.unsqueeze(0)), 0)
+    #         # self.grid[i] = F.affine_grid(self.theta[i], [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
 
     def forward(self, input, device):
@@ -541,11 +566,11 @@ class LeNet5_3d(torch.nn.Module):
 
 class LeNet5_TTN3d(torch.nn.Module):
 
-    def __init__(self):
+    def __init__(self, project_variable):
         super(LeNet5_TTN3d, self).__init__()
-        self.conv1 = ConvTTN3d(in_channels=1, out_channels=6, kernel_size=5, padding=2)
+        self.conv1 = ConvTTN3d(in_channels=1, out_channels=6, kernel_size=5, padding=2, project_variable=project_variable)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
-        self.conv2 = ConvTTN3d(in_channels=6, out_channels=16, kernel_size=5, padding=0)
+        self.conv2 = ConvTTN3d(in_channels=6, out_channels=16, kernel_size=5, padding=0, project_variable=project_variable)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         self.fc1 = torch.nn.Linear(16 * 5 * 5 * 5,
                                    120)

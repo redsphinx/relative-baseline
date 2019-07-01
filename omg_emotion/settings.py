@@ -98,6 +98,14 @@ class ProjectVariable(object):
             self._save_model = True
             self._save_graphs = True
 
+        # settings only for 3dconvttn stuff
+
+        # TODO: also change this in setup. if None, then theta is not a param, but s r x y are parameters
+        # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
+        self._theta_init = 'eye'
+
+
+
     @property
     def writer(self):
         return self._writer
@@ -349,3 +357,11 @@ class ProjectVariable(object):
     @save_graphs.setter
     def save_graphs(self, value):
         self._save_graphs = value
+
+    @property
+    def theta_init(self):
+        return self._theta_init
+
+    @save_graphs.setter
+    def theta_init(self, value):
+        self._theta_init = value
