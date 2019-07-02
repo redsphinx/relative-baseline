@@ -398,7 +398,7 @@ class ConvTTN3d(conv._ConvNd):
         return grid
 
 
-    #
+
     # def update_this(self):
     #
     #     # cudnn error

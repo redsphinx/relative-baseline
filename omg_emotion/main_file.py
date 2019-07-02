@@ -15,7 +15,6 @@ import shutil
 # temporary for debugging
 # from .settings import ProjectVariable
 
-# TODO: make data loading specific to datasets and not the model number
 def run(project_variable):
     # project_variable = ProjectVariable()
 
@@ -41,7 +40,7 @@ def run(project_variable):
     # load val and test data once
     project_variable.val = True
     project_variable.test = True
-    project_variable.train = False
+    project_variable.train = True
 
     data = D.load_data(project_variable)
 
@@ -52,6 +51,10 @@ def run(project_variable):
     if project_variable.test:
         data_test = data[1][1]
         labels_test = data[2][1]
+
+    if project_variable.train:
+        data_train = data[1][2]
+        labels_train = data[2][2]
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
@@ -90,9 +93,9 @@ def run(project_variable):
                 w = torch.from_numpy(w).cuda(device)
                 project_variable.loss_weights = w
 
-            data = D.load_data(project_variable)
-            data_train = data[1][0]
-            labels_train = data[2][0]
+            # data = D.load_data(project_variable)
+            # data_train = data[1][0]
+            # labels_train = data[2][0]
 
             # labels is list because can be more than one type of labels
             data = data_train, labels_train
