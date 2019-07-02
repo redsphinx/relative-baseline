@@ -456,6 +456,12 @@ def load_movmnist(project_variable):
         return data, labels
 
 
+    def load_faster(which):
+        # first load all data into cpu memory
+        # move data from cpu to gpu as you need it
+        pass
+
+
     if project_variable.train:
         data, labels = load('train')
         splits.append('train')

@@ -36,8 +36,7 @@ def run(project_variable):
     project_variable.writer = SummaryWriter(path)
     print('tensorboardX writer path: %s' % path)
 
-
-    # load val and test data once
+    # load all data once
     project_variable.val = True
     project_variable.test = True
     project_variable.train = True
