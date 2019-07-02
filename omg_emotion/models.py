@@ -354,7 +354,12 @@ class ConvTTN3d(conv._ConvNd):
             self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
 
             # self.theta = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))))
-            self.theta = torch.zeros((1, out_channels, 2, 3))
+
+            #here
+            # self.theta = torch.zeros((1, out_channels, 2, 3))
+
+
+
             # for i in range(kernel_size[0]-1):
             #     self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
 
@@ -369,33 +374,70 @@ class ConvTTN3d(conv._ConvNd):
         # self.grid = torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2))
         # self.the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
+    # TODO: make this work with the gpu
+    def make_affine_matrix(self, scale, rotate, translate_x, translate_y):
+        # if out_channels is used, the shape of the matrix returned is different
 
-    def update_2(self, grid, device):
+        assert scale.shape == rotate.shape == translate_x.shape == translate_y.shape
+
+        '''
+        matrix.shape = (out_channels, 2, 3)
+        '''
+        matrix = torch.zeros((scale.shape[0], 2, 3))
+        for i in range(scale.shape[0]):
+            matrix[i][0][0] = scale[i] * torch.cos(rotate[i])
+            matrix[i][0][1] = -scale[i] * torch.sin(rotate[i])
+            matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
+                              scale[i] * torch.sin(rotate[i])
+            matrix[i][1][0] = scale[i] * torch.sin(rotate[i])
+            matrix[i][1][1] = -scale[i] * torch.cos(rotate[i])
+            matrix[i][1][2] = translate_x[i] * scale[i] * torch.sin(rotate[i]) + translate_y[i] * \
+                              scale[i] * torch.cos(rotate[i])
+
+        return matrix
+
+
+    def update_2(self, grid, theta, device):
         # deal with updating s r x y
-        if self.project_variable.theta_init is None:
-            # TODO: still problematic
-            # update theta
+        
+        if theta is not None:
+
             for i in range(self.kernel_size[0]-1):
-                tmp = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
-                # tmp = tmp.cuda(device)
-                self.theta = torch.cat((self.theta, tmp.unsqueeze(0)), 0)
+                tmp = self.make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+                tmp = tmp.cuda(device)
+                theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
                 # self.theta[i] = make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
-            self.theta = self.theta[1:]
+            theta = theta[1:]
 
-        # cudnn error
-        try:
-            _ = F.affine_grid(self.theta[0],
-                              [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
-        except RuntimeError:
-            torch.backends.cudnn.deterministic = True
-            print('ok cudnn')
+            try:
+                _ = F.affine_grid(theta[0],
+                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+            except RuntimeError:
+                torch.backends.cudnn.deterministic = True
+                print('ok cudnn')
 
-        for i in range(self.kernel_size[0] - 1):
-            tmp = F.affine_grid(self.theta[i],
-                                [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
-            grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
+            for i in range(self.kernel_size[0] - 1):
+                tmp = F.affine_grid(theta[i],
+                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
 
-        return grid
+            return grid
+
+        else:
+            # cudnn error
+            try:
+                _ = F.affine_grid(self.theta[0],
+                                  [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+            except RuntimeError:
+                torch.backends.cudnn.deterministic = True
+                print('ok cudnn')
+
+            for i in range(self.kernel_size[0] - 1):
+                tmp = F.affine_grid(self.theta[i],
+                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
+
+            return grid
 
 
 
@@ -419,14 +461,29 @@ class ConvTTN3d(conv._ConvNd):
         # self.update_this()
         grid = torch.zeros((1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
 
-        # TODO: fix this such that the cudnn error goes away
-        if self.project_variable.theta_init is not None:
-            grid = grid.cuda(device)
-
-        grid = self.update_2(grid, device)[1:]
-
         if self.project_variable.theta_init is None:
-            grid = grid.cuda(device)
+            theta = torch.zeros((1, self.out_channels, 2, 3))
+            theta = theta.cuda(device)
+        else:
+            theta = None
+
+        grid = grid.cuda(device)
+        grid = self.update_2(grid, theta, device)[1:]
+
+
+
+
+        # TODO: fix this such that the cudnn error goes away
+        # if self.project_variable.theta_init is not None:
+        #     grid = grid.cuda(device)
+        #
+        # grid = self.update_2(grid, device)[1:]
+        #
+        # if self.project_variable.theta_init is None:
+        #     grid = grid.cuda(device)
+
+
+
 
         # my_weight = torch.zeros(
         #     (self.out_channels, self.in_channels, self.kernel_size[0] - 1, self.kernel_size[1], self.kernel_size[2]))

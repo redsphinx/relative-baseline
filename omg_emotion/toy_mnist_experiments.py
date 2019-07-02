@@ -1,8 +1,5 @@
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
-import numpy as np
-
-# project_variable = ProjectVariable(debug_mode=True)
 
 
 def pilot():
@@ -35,10 +32,10 @@ def conv3dttnpilot():
     project_variable.dataset = 'dummy'
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.0001
+    project_variable.learning_rate = 0.001
 
-    project_variable.end_epoch = 50
-    project_variable.theta_init = 'normal'
+    project_variable.end_epoch = 20
+    project_variable.theta_init = None
 
     main_file.run(project_variable)
 
@@ -53,8 +50,8 @@ def conv3dttn_mmnist_pilot():
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.001
 
-    project_variable.end_epoch = 50
-    project_variable.theta_init = 'normal'
+    project_variable.end_epoch = 25
+    project_variable.theta_init = None
 
     main_file.run(project_variable)
 
@@ -68,9 +65,11 @@ def conv3d_mnist():
     project_variable.dataset = 'mov_mnist'
     main_file.run(project_variable)
 
+# -----------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------
 
 def e1_conv3d_mnist():
-    # normal 3d conv on mnist
+    # regular 3d conv on mnist
     project_variable.experiment_number = 1
     project_variable.model_number = 2
 
@@ -85,6 +84,41 @@ def e1_conv3d_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
-e1_conv3d_mnist()
+def e2_conv3dttn_mnist():
+    # 3dttn with 'normal' theta init
+    project_variable.experiment_number = 2
+    project_variable.model_number = 3
 
+    project_variable.device = 2
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = 'normal'
+
+    main_file.run(project_variable)
+
+
+def e3_conv3dttn_mnist():
+    # 3dttn with 'eye' theta init
+    project_variable.experiment_number = 3
+    project_variable.model_number = 3
+
+    project_variable.device = 2
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = 'eye'
+
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
+# e1_conv3d_mnist()
+# e3_conv3dttn_mnist()
+conv3dttn_mmnist_pilot()

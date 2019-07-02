@@ -436,7 +436,7 @@ def load_movmnist(project_variable):
     frames = 30
 
     # TODO: for debugging
-    TMP = 10000
+    TMP = 1000
 
     def load(which):
         path = os.path.join(PP.moving_mnist_png, which)

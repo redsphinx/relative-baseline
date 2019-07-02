@@ -43,9 +43,9 @@ def get_model(project_variable):
         model.conv2.weight.requires_grad = False
 
         # if not initializing from theta, only update s r x y; do not update theta with backprop
-        if project_variable.theta_init is None:
-            model.conv1.theta.requires_grad = False
-            model.conv2.theta.requires_grad = False
+        # if project_variable.theta_init is None:
+        #     model.conv1.theta.requires_grad = False
+        #     model.conv2.theta.requires_grad = False
 
     else:
         print('Error: model with number %d not supported' % project_variable.model_number)
