@@ -374,7 +374,6 @@ class ConvTTN3d(conv._ConvNd):
         # self.grid = torch.zeros((kernel_size[0] - 1, out_channels, kernel_size[1], kernel_size[2], 2))
         # self.the_size = torch.Size([self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
 
-    # TODO: make this work with the gpu
     def make_affine_matrix(self, scale, rotate, translate_x, translate_y):
         # if out_channels is used, the shape of the matrix returned is different
 
