@@ -61,5 +61,3 @@ def visualize_network(model, file_name, save_location):
     # dot.save('resnet18_emotion.dot', '/huge/gabras/AffectNet/misc')
     dot.save(file_name, save_location)
 
-
-
