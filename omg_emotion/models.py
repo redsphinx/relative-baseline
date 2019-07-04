@@ -129,6 +129,13 @@ class ConvTTN3d(conv._ConvNd):
         grid = torch.zeros((1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
 
         if self.project_variable.theta_init is None:
+            # TODO: add smoothness constraint for SRXY
+            if self.project_variable.srxy_smoothness == 'naive':
+                self.scale = None
+                self.rotate = None
+                self.translate_x = None
+                self.translate_y = None
+
             theta = torch.zeros((1, self.out_channels, 2, 3))
             theta = theta.cuda(device)
         else:
