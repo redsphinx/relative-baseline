@@ -38,14 +38,29 @@ class ConvTTN3d(conv._ConvNd):
             self.theta = torch.nn.Parameter(self.theta)
 
         else:
+            if self.project_variable.srxy_init == 'normal':
             # use 4 parameters
-            self.scale = torch.nn.Parameter(
-                torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)))))
-            self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
-            self.translate_x = torch.nn.init.normal_(
-                torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
-            self.translate_y = torch.nn.init.normal_(
-                torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                self.scale = torch.nn.Parameter(
+                    torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)))))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                self.translate_x = torch.nn.init.normal_(
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                self.translate_y = torch.nn.init.normal_(
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+            elif self.project_variable.srxy_init == 'eye':
+                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, out_channels))))
+                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+            elif self.project_variable.srxy_init == 'eye-like':
+                self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)), mean=1, std=1e-5)))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
+                self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
+                self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
+            else:
+                print("ERROR: srxy_init mode '%s' not supported" % self.project_variable.srxy_init)
+                self.scale, self.rotate, self.translate_x, self.translate_y = None, None, None, None
+
 
     def make_affine_matrix(self, scale, rotate, translate_x, translate_y):
         # if out_channels is used, the shape of the matrix returned is different

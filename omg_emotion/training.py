@@ -120,6 +120,9 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
 
 
+    project_variable.writer.add_histogram('first_weight/conv1', my_model.conv1.first_weight, project_variable.current_epoch)
+    project_variable.writer.add_histogram('first_weight/conv2', my_model.conv2.first_weight, project_variable.current_epoch)
+
     project_variable.writer.add_histogram('fc1/weight', my_model.fc1.weight, project_variable.current_epoch)
     project_variable.writer.add_histogram('fc2/weight', my_model.fc2.weight, project_variable.current_epoch)
     project_variable.writer.add_histogram('fc3/weight', my_model.fc3.weight, project_variable.current_epoch)

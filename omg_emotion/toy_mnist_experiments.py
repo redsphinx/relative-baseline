@@ -48,10 +48,12 @@ def conv3dttn_mmnist_pilot():
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.01
+    project_variable.learning_rate = 0.001
 
     project_variable.end_epoch = 20
     project_variable.theta_init = None
+    # project_variable.srxy_init = 'eye'
+    project_variable.srxy_init = 'eye-like'
 
     main_file.run(project_variable)
 

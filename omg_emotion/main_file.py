@@ -37,6 +37,8 @@ def run(project_variable):
     project_variable.writer = SummaryWriter(path)
     print('tensorboardX writer path: %s' % path)
 
+    # TODO: add project settings to writer
+
     # load all data once
     project_variable.val = True
     project_variable.test = True

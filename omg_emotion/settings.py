@@ -103,7 +103,8 @@ class ProjectVariable(object):
         # TODO: also change this in setup. if None, then theta is not a param, but s r x y are parameters
         # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
-
+        # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
+        self._srxy_init = 'normal'
 
 
     @property
@@ -365,3 +366,11 @@ class ProjectVariable(object):
     @theta_init.setter
     def theta_init(self, value):
         self._theta_init = value
+
+    @property
+    def srxy_init(self):
+        return self._srxy_init
+
+    @srxy_init.setter
+    def srxy_init(self, value):
+        self._srxy_init = value
