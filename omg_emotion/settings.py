@@ -105,6 +105,8 @@ class ProjectVariable(object):
         self._theta_init = 'eye'
         # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
         self._srxy_init = 'normal'
+        # how to transform weights in kernel: 'naive'=weights are a transform of first_weight, 'seq'=sequential
+        self._weight_transform = 'naive'
 
 
     @property
@@ -374,3 +376,11 @@ class ProjectVariable(object):
     @srxy_init.setter
     def srxy_init(self, value):
         self._srxy_init = value
+
+    @property
+    def weight_transform(self):
+        return self._weight_transform
+
+    @weight_transform.setter
+    def weight_transform(self, value):
+        self._weight_transform = value

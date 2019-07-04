@@ -148,9 +148,17 @@ class ConvTTN3d(conv._ConvNd):
 
         new_weight = self.first_weight
 
-        for i in range(self.kernel_size[0] - 1):
-            tmp = F.grid_sample(self.first_weight[:, :, 0], grid[i])
-            new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
+        if self.project_variable.weight_transform == 'naive':
+            for i in range(self.kernel_size[0] - 1):
+                tmp = F.grid_sample(self.first_weight[:, :, 0], grid[i])
+                new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
+        elif self.project_variable.weight_transform == 'seq':
+            for i in range(self.kernel_size[0] - 1):
+                tmp = F.grid_sample(new_weight[:,:,-1], grid[i])
+                new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
+        else:
+            print('ERROR: weight_transform with value %s not supported' % self.project_variable.weight_transform)
+
 
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         self.weight = torch.nn.Parameter(new_weight)

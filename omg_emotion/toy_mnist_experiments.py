@@ -53,7 +53,8 @@ def conv3dttn_mmnist_pilot():
     project_variable.end_epoch = 20
     project_variable.theta_init = None
     # project_variable.srxy_init = 'eye'
-    project_variable.srxy_init = 'eye-like'
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
 
     main_file.run(project_variable)
 
