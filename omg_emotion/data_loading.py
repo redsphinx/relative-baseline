@@ -409,18 +409,20 @@ def dummy_uniform_lenet5_3d(project_variable):
     side = 28
     classes = 10
 
+    TMP = 1000
+
     if project_variable.train:
-        data, labels = create_dummy_3d_dataset(320, channels, time_dim, side, side, classes)
+        data, labels = create_dummy_3d_dataset(TMP, channels, time_dim, side, side, classes)
         splits.append('train')
         all_data.append(data)
         all_labels.append(labels)
     if project_variable.val:
-        data, labels = create_dummy_3d_dataset(160, channels, time_dim, side, side, classes)
+        data, labels = create_dummy_3d_dataset(TMP, channels, time_dim, side, side, classes)
         splits.append('val')
         all_data.append(data)
         all_labels.append(labels)
     if project_variable.test:
-        data, labels = create_dummy_3d_dataset(160, channels, time_dim, side, side, classes)
+        data, labels = create_dummy_3d_dataset(TMP, channels, time_dim, side, side, classes)
         splits.append('test')
         all_data.append(data)
         all_labels.append(labels)
@@ -436,7 +438,7 @@ def load_movmnist(project_variable):
     frames = 30
 
     # TODO: for debugging
-    TMP = 10000
+    TMP = 1000
 
     def load(which):
         path = os.path.join(PP.moving_mnist_png, which)

@@ -66,6 +66,22 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         loss_epoch.append(float(loss))
         accuracy_epoch.append(float(accuracy))
+        
+        if project_variable.theta_init is None and project_variable.current_epoch == 0:
+            s = my_model.conv1.scale.data
+            r = my_model.conv1.rotate.data
+            x = my_model.conv1.translate_x.data
+            y = my_model.conv1.translate_y.data
+        
+            for i in range(s.shape[1]):
+                project_variable.writer.add_scalars('SRXY/scale-k%d' % i,
+                                                    {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]}, ts)
+                project_variable.writer.add_scalars('SRXY/rotate-k%d' % i,
+                                                    {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]}, ts)
+                project_variable.writer.add_scalars('SRXY/translate_x-k%d' % i,
+                                                    {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]}, ts)
+                project_variable.writer.add_scalars('SRXY/translate_y-k%d' % i,
+                                                    {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]}, ts)
 
     # save data
     loss = float(np.mean(loss_epoch))
@@ -83,42 +99,35 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
             new_k = kernel[k].unsqueeze(0)
 
-            project_variable.writer.add_video(tag='kernel %d' % k, vid_tensor=new_k,
+            project_variable.writer.add_video(tag='kernels/%d' % k, vid_tensor=new_k,
                                           global_step=project_variable.current_epoch, fps=2)
 
     # plot learned s, r, x, y parameters
     if project_variable.theta_init is None:
         # data as histogram
-        project_variable.writer.add_histogram('conv1.scale', my_model.conv1.scale, project_variable.current_epoch)
-        project_variable.writer.add_histogram('conv1.rotate', my_model.conv1.rotate, project_variable.current_epoch)
-        project_variable.writer.add_histogram('conv1.translate_x', my_model.conv1.translate_x, project_variable.current_epoch)
-        project_variable.writer.add_histogram('conv1.translate_y', my_model.conv1.translate_y, project_variable.current_epoch)
-        # data as scalars
-        s = my_model.conv1.scale.data
-        r = my_model.conv1.rotate.data
-        x = my_model.conv1.translate_x.data
-        y = my_model.conv1.translate_y.data
+        project_variable.writer.add_histogram('conv1.weight/scale', my_model.conv1.scale, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.weight/rotate', my_model.conv1.rotate, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.weight/translate_x', my_model.conv1.translate_x, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.weight/translate_y', my_model.conv1.translate_y, project_variable.current_epoch)
 
-        for i in range(s.shape[1]):
-            project_variable.writer.add_scalars('SRXY/scale-k%d' % i,
-                                                {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]},
-                                                project_variable.current_epoch)
-            project_variable.writer.add_scalars('SRXY/rotate-k%d' % i,
-                                                {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]},
-                                                project_variable.current_epoch)
-            project_variable.writer.add_scalars('SRXY/translate_x-k%d' % i,
-                                                {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]},
-                                                project_variable.current_epoch)
-            project_variable.writer.add_scalars('SRXY/translate_y-k%d' % i,
-                                                {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]},
-                                                project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
 
-        #
-        # writer.add_scalars('data/scalar_group', {"xsinx": n_iter * np.sin(n_iter),
-        #                                          "xcosx": n_iter * np.cos(n_iter),
-        #                                          "arctanx": np.arctan(n_iter)}, n_iter)
+        project_variable.writer.add_histogram('conv2.weight/scale', my_model.conv2.scale, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.weight/rotate', my_model.conv2.rotate, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.weight/translate_x', my_model.conv2.translate_x, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.weight/translate_y', my_model.conv2.translate_y, project_variable.current_epoch)
+
+        project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
 
 
+    project_variable.writer.add_histogram('fc1/weight', my_model.fc1.weight, project_variable.current_epoch)
+    project_variable.writer.add_histogram('fc2/weight', my_model.fc2.weight, project_variable.current_epoch)
+    project_variable.writer.add_histogram('fc3/weight', my_model.fc3.weight, project_variable.current_epoch)
+
+    project_variable.writer.add_histogram('fc1/bias', my_model.fc1.bias, project_variable.current_epoch)
+    project_variable.writer.add_histogram('fc2/bias', my_model.fc2.bias, project_variable.current_epoch)
+    project_variable.writer.add_histogram('fc3/bias', my_model.fc3.bias, project_variable.current_epoch)
+    
 
     if project_variable.save_data:
         saving.update_logs(project_variable, 'train', [loss, accuracy, confusion_flatten])
@@ -132,8 +141,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         saving.save_model(project_variable, my_model)
 
     # add things to writer
-    project_variable.writer.add_scalar('train/loss', loss, project_variable.current_epoch)
-    project_variable.writer.add_scalar('train/accuracy', accuracy, project_variable.current_epoch)
+    project_variable.writer.add_scalar('loss/train', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalar('accuracy/train', accuracy, project_variable.current_epoch)
 
     # project_variable.writer.add_scalars('some_new_shit', {'thing1': np.random.randint(5), 'thing2': np.random.randint(5)},
     #                                     project_variable.current_epoch)

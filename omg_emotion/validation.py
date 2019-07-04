@@ -67,8 +67,8 @@ def run(project_variable, all_data, my_model, device):
     # project_variable.writer.add_scalars('metrics/val', {"loss": loss,
     #                                                     "accuracy": accuracy},
     #                                     project_variable.current_epoch)
-    project_variable.writer.add_scalar('val/loss', loss, project_variable.current_epoch)
-    project_variable.writer.add_scalar('val/accuracy', accuracy, project_variable.current_epoch)
+    project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
+    project_variable.writer.add_scalar('accuracy/val', accuracy, project_variable.current_epoch)
 
     fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
 

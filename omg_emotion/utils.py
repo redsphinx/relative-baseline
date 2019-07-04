@@ -67,8 +67,8 @@ def calculate_accuracy(input, target):
         if input[i].argmax() == target[i]:
             acc += 1
 
-    print('predictions: %s\n'
-          'labels:      %s' % (str(predictions), str(labels)))
+    # print('predictions: %s\n'
+    #       'labels:      %s' % (str(predictions), str(labels)))
 
     return acc
 

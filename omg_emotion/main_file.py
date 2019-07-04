@@ -4,6 +4,7 @@ from relative_baseline.omg_emotion import testing
 from relative_baseline.omg_emotion import setup
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
+from relative_baseline.omg_emotion import utils as U
 # from relative_baseline.omg_emotion import visualization as V
 
 import os
@@ -67,6 +68,8 @@ def run(project_variable):
 
     my_optimizer = setup.get_optimizer(project_variable, my_model)
 
+    print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
+
     for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
         project_variable.current_epoch = e
 
@@ -117,19 +120,19 @@ def run(project_variable):
             validation.run(project_variable, data, my_model, device)
         # # ------------------------------------------------------------------------------------------------
         # # ------------------------------------------------------------------------------------------------
-        project_variable.train = False
-        project_variable.val = False
-        project_variable.test = True
+    project_variable.train = False
+    project_variable.val = False
+    project_variable.test = True
 
-        if project_variable.test:
-            if project_variable.model_number == 0:
-                w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-                w = w.astype(dtype=np.float32)
-                w = torch.from_numpy(w).cuda(device)
-                project_variable.loss_weights = w
+    if project_variable.test:
+        if project_variable.model_number == 0:
+            w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+            w = w.astype(dtype=np.float32)
+            w = torch.from_numpy(w).cuda(device)
+            project_variable.loss_weights = w
 
-            data = data_test, labels_test
-            testing.run(project_variable, data, my_model, device)
+        data = data_test, labels_test
+        testing.run(project_variable, data, my_model, device)
         # ------------------------------------------------------------------------------------------------
         # ------------------------------------------------------------------------------------------------
 

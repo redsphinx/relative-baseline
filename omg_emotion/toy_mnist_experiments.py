@@ -32,7 +32,7 @@ def conv3dttnpilot():
     project_variable.dataset = 'dummy'
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.001
+    project_variable.learning_rate = 0.01
 
     project_variable.end_epoch = 20
     project_variable.theta_init = None
@@ -48,9 +48,9 @@ def conv3dttn_mmnist_pilot():
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.001
+    project_variable.learning_rate = 0.01
 
-    project_variable.end_epoch = 25
+    project_variable.end_epoch = 20
     project_variable.theta_init = None
 
     main_file.run(project_variable)
@@ -135,7 +135,8 @@ def e4_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 # e1_conv3d_mnist()
-e4_conv3dttn_mnist()
-# conv3dttn_mmnist_pilot()
+# e4_conv3dttn_mnist()
+conv3dttn_mmnist_pilot()
+# conv3dttnpilot()
