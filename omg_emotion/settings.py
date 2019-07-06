@@ -386,3 +386,11 @@ class ProjectVariable(object):
     @weight_transform.setter
     def weight_transform(self, value):
         self._weight_transform = value
+
+    @property
+    def srxy_smoothness(self):
+        return self._srxy_smoothness
+
+    @srxy_smoothness.setter
+    def srxy_smoothness(self, value):
+        self._srxy_smoothness = value

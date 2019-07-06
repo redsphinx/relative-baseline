@@ -52,9 +52,9 @@ def conv3dttn_mmnist_pilot():
 
     project_variable.end_epoch = 20
     project_variable.theta_init = None
-    # project_variable.srxy_init = 'eye'
     project_variable.srxy_init = 'eye'
     project_variable.weight_transform = 'seq'
+    project_variable.srxy_smoothness = 'naive'
 
     main_file.run(project_variable)
 
@@ -232,12 +232,33 @@ def e9_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+def e10_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 10
+    project_variable.model_number = 3
+
+    project_variable.device = 1
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+    project_variable.srxy_smoothness = 'naive'
+
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
 # e1_conv3d_mnist()
 # e5_conv3dttn_mnist()
 # e6_conv3dttn_mnist()
 # e7_conv3dttn_mnist()
 # e8_conv3dttn_mnist()
 # e9_conv3dttn_mnist()
-conv3dttn_mmnist_pilot()
+e10_conv3dttn_mnist()
+# conv3dttn_mmnist_pilot()
 # conv3dttnpilot()
