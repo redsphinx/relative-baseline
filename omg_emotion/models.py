@@ -131,11 +131,12 @@ class ConvTTN3d(conv._ConvNd):
         if self.project_variable.theta_init is None:
             # add smoothness constraint for SRXY
             if self.project_variable.srxy_smoothness == 'naive':
-                # self.scale.data = torch.nn.functional.relu(self.scale)
-                self.scale.data = 0.75*torch.sin(self.scale)+0.75  # scales between 0 and 1.5
-                print('scale', self.scale)
+
+                self.scale.data = torch.nn.functional.relu(self.scale)
+
+                # self.scale.data = 0.75*torch.sin(self.scale)+0.75  # scales between 0 and 1.5
+
                 self.rotate.data = torch.sin(self.rotate)  # scales between -5 and 5
-                # print('rotate', self.rotate)
                 self.translate_x.data = torch.sin(self.translate_x)  # scales between -1 and 1
                 self.translate_y.data = torch.sin(self.translate_y)  # scales between -1 and 1
 
