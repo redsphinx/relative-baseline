@@ -57,6 +57,11 @@ class ConvTTN3d(conv._ConvNd):
                 self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
                 self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
                 self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
+            elif  self.project_variable.srxy_smoothness == 'sigmoid':
+                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, out_channels)))*0.5)
+                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
             else:
                 print("ERROR: srxy_init mode '%s' not supported" % self.project_variable.srxy_init)
                 self.scale, self.rotate, self.translate_x, self.translate_y = None, None, None, None
@@ -77,7 +82,7 @@ class ConvTTN3d(conv._ConvNd):
             matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
                               scale[i] * torch.sin(rotate[i])
             matrix[i][1][0] = scale[i] * torch.sin(rotate[i])
-            matrix[i][1][1] = -scale[i] * torch.cos(rotate[i])
+            matrix[i][1][1] = scale[i] * torch.cos(rotate[i])
             matrix[i][1][2] = translate_x[i] * scale[i] * torch.sin(rotate[i]) + translate_y[i] * \
                               scale[i] * torch.cos(rotate[i])
 
@@ -139,6 +144,12 @@ class ConvTTN3d(conv._ConvNd):
                 self.rotate.data = torch.sin(self.rotate)  # scales between -5 and 5
                 self.translate_x.data = torch.sin(self.translate_x)  # scales between -1 and 1
                 self.translate_y.data = torch.sin(self.translate_y)  # scales between -1 and 1
+            elif self.project_variable.srxy_smoothness == 'sigmoid':
+                self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-4*self.scale) + 0  # between 0 and 1
+                self.rotate.data = (5 - -5) * torch.nn.functional.sigmoid(-3 * self.rotate) - 5  # between -5 and 5
+                self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-4 * self.translate_x) - 1  # between -1 and 1
+                self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-4 * self.translate_y) - 1  # between -1 and 1
+
 
             theta = torch.zeros((1, self.out_channels, 2, 3))
             theta = theta.cuda(device)

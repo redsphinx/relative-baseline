@@ -114,4 +114,45 @@ def random_sampling():
                 my_file.write(line)
 
 
+def matrix_transforms_test():
+    # goes through all the matrix transforms, applies them on an image and saves it
 
+    def make_affine_matrix(scale, rotate, translate_x, translate_y):
+        matrix = torch.zeros((2, 3))
+        matrix[0][0] = scale * torch.cos(rotate)
+        matrix[0][1] = -scale * torch.sin(rotate)
+        matrix[0][2] = translate_x * scale * torch.cos(rotate) - translate_y * scale * torch.sin(rotate)
+        matrix[1][0] = scale * torch.sin(rotate)
+        matrix[1][1] = scale * torch.cos(rotate)
+        matrix[1][2] = translate_x * scale * torch.sin(rotate) + translate_y * scale * torch.cos(rotate)
+
+        return matrix
+
+    source_image = 'number1.jpg'
+    # TODO: change to single channel
+    img = Image.open(source_image)
+    img = torch.Tensor(np.array(img.convert('L')))
+
+    s = torch.Tensor(np.array([1]))
+    r = torch.Tensor(np.array([0]))
+    x = torch.Tensor(np.array([0]))
+    y = torch.Tensor(np.array([0]))
+
+    theta = make_affine_matrix(s, r, x, y)
+
+    # tODO: fix this
+    '''
+        make_affine_matrix(s, r, x, y)
+        tensor([[ 1., -0.,  0.],
+                [ 0., -1.,  0.]])
+    '''
+
+
+    grid = F.affine_grid(theta, img.size())
+    result = F.grid_sample(img, grid)
+
+    result_name = '%d_%d_%d_%d.jpg' % (s, r, x, y)
+    result.save(result_name)
+
+
+matrix_transforms_test()

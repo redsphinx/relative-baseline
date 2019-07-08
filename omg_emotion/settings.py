@@ -68,7 +68,7 @@ class ProjectVariable(object):
 
         # list of str, optimizer
         # supported: adam, sgd
-        self._optimizer = 'sgd' # TODO: fix this adam
+        self._optimizer = 'sgd'
         
         # momentum
         self._momentum = 0.9
@@ -103,11 +103,11 @@ class ProjectVariable(object):
         # TODO: also change this in setup. if None, then theta is not a param, but s r x y are parameters
         # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
-        # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
+        # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e], 'sigmoid'=in the middle for sigmoid values
         self._srxy_init = 'normal'
         # how to transform weights in kernel: 'naive'=weights are a transform of first_weight, 'seq'=sequential
         self._weight_transform = 'naive'
-        # which kind of smoothness constraint for the srxy values: 'naive', None
+        # which kind of smoothness constraint for the srxy values: 'naive', None, 'sigmoid'
         self._srxy_smoothness = None
 
 
