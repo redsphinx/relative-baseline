@@ -116,6 +116,11 @@ def random_sampling():
 
 def matrix_transforms_test():
     # goes through all the matrix transforms, applies them on an image and saves it
+    # radians: https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/45_degree_rotations_expressed_in_radian_measure.svg/400px-45_degree_rotations_expressed_in_radian_measure.svg.png
+    # radians = counterclockwise
+    # scale: the bigger the number, the smaller the resulting image. so size is divided by s. fractions make it scale up
+    # translate_x: if 1, move half img horizontal left. if -1, move half img horizontal right
+    # translate_y: if 1, move half img vertical up. if -1, move half img vertical down
 
     def make_affine_matrix(scale, rotate, translate_x, translate_y):
         matrix = torch.zeros((2, 3))
@@ -129,30 +134,52 @@ def matrix_transforms_test():
         return matrix
 
     source_image = 'number1.jpg'
-    # TODO: change to single channel
     img = Image.open(source_image)
-    img = torch.Tensor(np.array(img.convert('L')))
+    img = np.array(img)
+    # TODO: it matters when transpose is used!!! check if transpose is used incorrectly in rest of code
+    img = img.transpose(2, 0, 1)
+    img = torch.Tensor(img)
+    # img = img.transpose(-1, 0)
 
-    s = torch.Tensor(np.array([1]))
-    r = torch.Tensor(np.array([0]))
-    x = torch.Tensor(np.array([0]))
-    y = torch.Tensor(np.array([0]))
+    # s = 0.9791
+    # r = -0.02759
+    # x = -0.01325
+    # y = 0.02823
 
-    theta = make_affine_matrix(s, r, x, y)
+    s = 1
+    r = 0
+    x = 0
+    y = 0
 
-    # tODO: fix this
-    '''
-        make_affine_matrix(s, r, x, y)
-        tensor([[ 1., -0.,  0.],
-                [ 0., -1.,  0.]])
-    '''
+    ss = torch.Tensor(np.array([s]))
+    rr = torch.Tensor(np.array([np.deg2rad(r)]))
+    xx = torch.Tensor(np.array([x]))
+    yy = torch.Tensor(np.array([y]))
 
+    theta = make_affine_matrix(ss, rr, xx, yy)
+    print(theta)
 
-    grid = F.affine_grid(theta, img.size())
-    result = F.grid_sample(img, grid)
+    grid = F.affine_grid(theta.unsqueeze(0), torch.Size((1,3,600,600)))
+    result = F.grid_sample(img.unsqueeze(0), grid)
 
-    result_name = '%d_%d_%d_%d.jpg' % (s, r, x, y)
+    result = np.array(result, dtype=np.uint8)[0]
+    result = result.transpose(1, 2, 0)
+    result = Image.fromarray(result, mode='RGB')
+
+    result_name = '%f_%f_%f_%f.jpg' % (s, r, x, y)
     result.save(result_name)
 
 
 matrix_transforms_test()
+
+
+def sanity_check_image():
+    source_image = 'number1.jpg'
+    img = Image.open(source_image)
+    img = np.array(img)
+    img = img.transpose(2, 0, 1)
+    img = img.transpose(1, 2, 0)
+    img = Image.fromarray(img, mode='RGB')
+    img.save('001.jpg')
+
+# sanity_check_image()

@@ -247,7 +247,7 @@ def e10_conv3dttn_mnist():
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
     project_variable.weight_transform = 'seq'
-    project_variable.srxy_smoothness = None
+    project_variable.srxy_smoothness = 'sigmoid'
 
     main_file.run(project_variable)
 
