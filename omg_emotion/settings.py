@@ -103,7 +103,7 @@ class ProjectVariable(object):
         # TODO: also change this in setup. if None, then theta is not a param, but s r x y are parameters
         # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
-        # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e], 'sigmoid'=in the middle for sigmoid values
+        # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
         self._srxy_init = 'normal'
         # how to transform weights in kernel: 'naive'=weights are a transform of first_weight, 'seq'=sequential
         self._weight_transform = 'naive'
