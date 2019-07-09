@@ -135,21 +135,16 @@ class ConvTTN3d(conv._ConvNd):
 
         if self.project_variable.theta_init is None:
             # add smoothness constraint for SRXY
-            if self.project_variable.srxy_smoothness == 'naive':
-
-                self.scale.data = torch.nn.functional.relu(self.scale)
-
-                # self.scale.data = 0.75*torch.sin(self.scale)+0.75  # scales between 0 and 1.5
-
-                self.rotate.data = torch.sin(self.rotate)  # scales between -5 and 5
-                self.translate_x.data = torch.sin(self.translate_x)  # scales between -1 and 1
-                self.translate_y.data = torch.sin(self.translate_y)  # scales between -1 and 1
-            elif self.project_variable.srxy_smoothness == 'sigmoid':
-                self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-4*self.scale) + 0  # between 0 and 1
-                self.rotate.data = (5 - -5) * torch.nn.functional.sigmoid(-3 * self.rotate) - 5  # between -5 and 5
-                self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-4 * self.translate_x) - 1  # between -1 and 1
-                self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-4 * self.translate_y) - 1  # between -1 and 1
-
+            if self.project_variable.srxy_smoothness == 'sigmoid':
+                self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-self.scale) + 0  # between 0 and 1
+                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_x) - 1  # between -1 and 1
+                self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_x) - 1  # between -1 and 1
+                self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_y) - 1  # between -1 and 1
+            elif self.project_variable.srxy_smoothness == 'sigmoid_bounded':
+                self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-3 * self.scale) + 0  # between 0 and 1
+                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-3*self.translate_x) - 1  # between -1 and 1
+                self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-3 * self.translate_x) - 1  # between -1 and 1
+                self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-3 * self.translate_y) - 1  # between -1 and 1
 
             theta = torch.zeros((1, self.out_channels, 2, 3))
             theta = theta.cuda(device)

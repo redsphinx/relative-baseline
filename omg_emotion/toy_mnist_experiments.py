@@ -120,13 +120,15 @@ def e3_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+# TODO: everything with theta_init is None has to be fixed because of the scale bug
 
+# FIX
 def e4_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 4
     project_variable.model_number = 3
 
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -137,13 +139,13 @@ def e4_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# FIX
 def e5_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 5
     project_variable.model_number = 3
 
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -156,12 +158,13 @@ def e5_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+# FIX
 def e6_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 6
     project_variable.model_number = 3
 
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -174,13 +177,13 @@ def e6_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# FIX
 def e7_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 7
     project_variable.model_number = 3
 
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -193,13 +196,13 @@ def e7_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# FIX
 def e8_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 8
     project_variable.model_number = 3
 
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -212,13 +215,13 @@ def e8_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# FIX
 def e9_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 9
     project_variable.model_number = 3
 
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -231,13 +234,13 @@ def e9_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# FIX
 def e10_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 10
     project_variable.model_number = 3
 
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.batch_size = 30
     project_variable.end_epoch = 50
     project_variable.dataset = 'mov_mnist'
@@ -245,20 +248,43 @@ def e10_conv3dttn_mnist():
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.001
     project_variable.theta_init = None
-    project_variable.srxy_init = 'eye'
+    project_variable.srxy_init = 'sigmoid'
     project_variable.weight_transform = 'seq'
     project_variable.srxy_smoothness = 'sigmoid'
 
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=True)
+def e11_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 11
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'sigmoid'
+    project_variable.weight_transform = 'seq'
+    project_variable.srxy_smoothness = 'sigmoid_bounded'
+
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=False)
 # e1_conv3d_mnist()
+# e4_conv3dttn_mnist()
 # e5_conv3dttn_mnist()
 # e6_conv3dttn_mnist()
 # e7_conv3dttn_mnist()
 # e8_conv3dttn_mnist()
 # e9_conv3dttn_mnist()
-e10_conv3dttn_mnist()
+# e10_conv3dttn_mnist()
+e11_conv3dttn_mnist()
+
 # conv3dttn_mmnist_pilot()
 # conv3dttnpilot()

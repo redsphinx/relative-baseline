@@ -82,6 +82,7 @@ def run(project_variable):
            'theta init:             %s;' \
            'srxy init:              %s;' \
            'weight transform:       %s;' \
+           'srxy smoothness:        %s;' \
            % (project_variable.experiment_number,
               project_variable.model_number,
               project_variable.debug_mode,
@@ -92,7 +93,8 @@ def run(project_variable):
               project_variable.end_epoch,
               project_variable.theta_init,
               project_variable.srxy_init,
-              project_variable.weight_transform)
+              project_variable.weight_transform,
+              project_variable.srxy_smoothness)
     project_variable.writer.add_text('project settings', text)
 
 

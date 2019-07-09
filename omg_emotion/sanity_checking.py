@@ -121,6 +121,7 @@ def matrix_transforms_test():
     # scale: the bigger the number, the smaller the resulting image. so size is divided by s. fractions make it scale up
     # translate_x: if 1, move half img horizontal left. if -1, move half img horizontal right
     # translate_y: if 1, move half img vertical up. if -1, move half img vertical down
+    # translate: 1=half, 0.5=fourth; in general 1/2 * x or y
 
     def make_affine_matrix(scale, rotate, translate_x, translate_y):
         matrix = torch.zeros((2, 3))
@@ -146,10 +147,10 @@ def matrix_transforms_test():
     # x = -0.01325
     # y = 0.02823
 
-    s = 1
-    r = 0
-    x = 0
-    y = 0
+    s = 2
+    r = 90
+    x = 0.5
+    y = 0.5
 
     ss = torch.Tensor(np.array([s]))
     rr = torch.Tensor(np.array([np.deg2rad(r)]))
