@@ -122,7 +122,6 @@ def e3_conv3dttn_mnist():
 
 # TODO: everything with theta_init is None has to be fixed because of the scale bug
 
-# FIX
 def e4_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 4
@@ -139,7 +138,6 @@ def e4_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e5_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 5
@@ -158,7 +156,6 @@ def e5_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e6_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 6
@@ -177,7 +174,6 @@ def e6_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e7_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 7
@@ -196,7 +192,6 @@ def e7_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e8_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 8
@@ -215,7 +210,6 @@ def e8_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e9_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 9
@@ -234,7 +228,6 @@ def e9_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-# FIX
 def e10_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 10
@@ -270,7 +263,7 @@ def e11_conv3dttn_mnist():
     project_variable.theta_init = None
     project_variable.srxy_init = 'sigmoid'
     project_variable.weight_transform = 'seq'
-    project_variable.srxy_smoothness = 'sigmoid_bounded'
+    project_variable.srxy_smoothness = 'sigmoid_small'
 
     main_file.run(project_variable)
 

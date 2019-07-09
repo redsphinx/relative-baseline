@@ -57,7 +57,7 @@ class ConvTTN3d(conv._ConvNd):
                 self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
                 self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
                 self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
-            elif  self.project_variable.srxy_smoothness == 'sigmoid':
+            elif  self.project_variable.srxy_init == 'sigmoid':
                 self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, out_channels)))*0.5)
                 self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
                 self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
@@ -137,14 +137,19 @@ class ConvTTN3d(conv._ConvNd):
             # add smoothness constraint for SRXY
             if self.project_variable.srxy_smoothness == 'sigmoid':
                 self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-self.scale) + 0  # between 0 and 1
-                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_x) - 1  # between -1 and 1
+                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-self.rotate) - 1  # between -1 and 1
                 self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_x) - 1  # between -1 and 1
                 self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-self.translate_y) - 1  # between -1 and 1
-            elif self.project_variable.srxy_smoothness == 'sigmoid_bounded':
+            elif self.project_variable.srxy_smoothness == 'sigmoid_bounded': # UNUSED
                 self.scale.data = (1 - 0) * torch.nn.functional.sigmoid(-3 * self.scale) + 0  # between 0 and 1
-                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-3*self.translate_x) - 1  # between -1 and 1
+                self.rotate.data = (1 - -1) * torch.nn.functional.sigmoid(-3*self.rotate) - 1  # between -1 and 1
                 self.translate_x.data = (1 - -1) * torch.nn.functional.sigmoid(-3 * self.translate_x) - 1  # between -1 and 1
                 self.translate_y.data = (1 - -1) * torch.nn.functional.sigmoid(-3 * self.translate_y) - 1  # between -1 and 1
+            elif self.project_variable.srxy_smoothness == 'sigmoid_small':
+                self.scale.data = (1.1 - 0.9) * torch.nn.functional.sigmoid(-self.scale) + 0.9  # between 0.9 and 1.1
+                self.rotate.data = (0.5 - -0.5) * torch.nn.functional.sigmoid(-self.rotate) - 0.5  # between -0.5 and 0.5
+                self.translate_x.data = (0.25 - -0.25) * torch.nn.functional.sigmoid(-self.translate_x) - 0.25  # between -0.25 and 0.25
+                self.translate_y.data = (0.25 - -0.25) * torch.nn.functional.sigmoid(-self.translate_y) - 0.25  # between -0.25 and 0.25
 
             theta = torch.zeros((1, self.out_channels, 2, 3))
             theta = theta.cuda(device)
