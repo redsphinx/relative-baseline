@@ -281,3 +281,5 @@ e11_conv3dttn_mnist()
 
 # conv3dttn_mmnist_pilot()
 # conv3dttnpilot()
+
+# TODO: initialize with gabor filters
