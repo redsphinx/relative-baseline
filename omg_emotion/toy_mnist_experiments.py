@@ -287,6 +287,26 @@ def e12_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
+def e13_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 13
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'normal'
+    project_variable.weight_transform = 'seq'
+    project_variable.srxy_smoothness = 'sigmoid_small'
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 # e1_conv3d_mnist()
 # e4_conv3dttn_mnist()
@@ -297,7 +317,8 @@ project_variable = ProjectVariable(debug_mode=False)
 # e9_conv3dttn_mnist()
 # e10_conv3dttn_mnist()
 # e11_conv3dttn_mnist()
-e12_conv3dttn_mnist()
+# e12_conv3dttn_mnist()
+e13_conv3dttn_mnist()
 
 # conv3dttn_mmnist_pilot()
 # conv3dttnpilot()
