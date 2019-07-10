@@ -19,8 +19,9 @@ class ProjectVariable(object):
         # list of int, which model to load, [experiment, model, epoch]
         self._load_model = None
 
-        # int, experiment data for log
+        # which model to load. mapping in legend.txt
         self._model_number = None
+        # int, experiment data for log
         self._experiment_number = None
         
         # bool

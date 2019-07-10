@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 from torch.nn.modules import conv
 from torch.nn import functional as F
 from torch.nn.modules.utils import _triple
@@ -273,63 +274,108 @@ class LeNet5_TTN3d(torch.nn.Module):
         self.fc3 = torch.nn.Linear(84, 10)
 
     def forward(self, x, device):
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 1')
-
         x = self.conv1(x, device)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 2')
-
         x = torch.nn.functional.relu(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 3')
-
         x = self.max_pool_1(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 4')
-
         x = self.conv2(x, device)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 5')
-
         x = torch.nn.functional.relu(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 6')
-
         x = self.max_pool_2(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 7 ')
-
         x = x.view(-1, 16 * 5 * 5 * 5)
         x = self.fc1(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 8')
-
         x = torch.nn.functional.relu(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 9')
-
         x = self.fc2(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 10')
-
         x = torch.nn.functional.relu(x)
-
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 11')
-
         x = self.fc3(x)
+        return x
 
-        if torch.isnan(x).sum() > 0:
-            print('NAN found 12')
 
+class AlexNet_classic(nn.Module):
+
+    def __init__(self, num_classes=1000):
+        super(AlexNet_classic, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+        )
+        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = x.view(x.size(0), 256 * 6 * 6)
+        x = self.classifier(x)
+        return x
+    
+
+class AlexNet_2d(nn.Module):
+
+    def __init__(self, num_classes=1000):
+        super(AlexNet_2d, self).__init__()
+
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2)
+        # self. = nn.ReLU(inplace=True)
+        self.max_pool_1 = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.conv2 = nn.Conv2d(64, 192, kernel_size=5, padding=2)
+        # self. = nn.ReLU(inplace=True)
+        self.max_pool_2 = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.conv3 = nn.Conv2d(192, 384, kernel_size=3, padding=1)
+        # self. = nn.ReLU(inplace=True)
+        self.conv4 = nn.Conv2d(384, 256, kernel_size=3, padding=1)
+        # self. = nn.ReLU(inplace=True)
+        self.conv5 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
+        # self. = nn.ReLU(inplace=True)
+        self.max_pool_3 = nn.MaxPool2d(kernel_size=3, stride=2)
+        
+        # TODO: finish alexnet implementation, do the RELUs
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+        )
+        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.avgpool(x)
+        x = x.view(x.size(0), 256 * 6 * 6)
+        x = self.classifier(x)
         return x

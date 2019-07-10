@@ -25,41 +25,15 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         my_optimizer.zero_grad()
 
-        # NO: project_variable.writer.add_graph(my_model, [data, device])
-
         if project_variable.model_number == 3:
             predictions = my_model(data, device)
         else:
             predictions = my_model(data)
         loss = U.calculate_loss(project_variable, predictions, labels)
-        # TODO: fix THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
-        # retrain_graph=True because RuntimeError: Trying to backward through the graph a second time, but the buffers have already been freed. Specify retain_graph=True when calling backward the first time.
-        # loss.backward()
-        # try:
-        #     loss.backward()
-        # except RuntimeError:
-        #     loss.backward(retain_graph=True)
-
-        # https://discuss.pytorch.org/t/runtimeerror-trying-to-backward-through-the-graph-a-second-time-but-the-buffers-have-already-been-freed-specify-retain-graph-true-when-calling-backward-the-first-time/6795/28
-        # This seems to solve the RuntimeError
+        # FIX: THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         loss.backward()
-        # if project_variable.model_number == 3:
-        #     loss.backward(retain_graph=True)
-        # else:
-        #     loss.backward()
-
-        # if project_variable.model_number == 3 and project_variable.current_epoch == 0 and ts == 0:
-        #     print('retain_graph is True')
-        #     loss.backward(retain_graph=True, create_graph=True)
-        # else:
-        #     loss.backward()
 
         my_optimizer.step()
-
-        # if project_variable.model_number == 3:
-        #     my_model.conv1.update_this()
-        #     my_model.conv2.update_this()
-
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
@@ -67,22 +41,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss_epoch.append(float(loss))
         accuracy_epoch.append(float(accuracy))
         
-        # if project_variable.theta_init is None and project_variable.current_epoch == 0:
-        #     s = my_model.conv1.scale.data
-        #     r = my_model.conv1.rotate.data
-        #     x = my_model.conv1.translate_x.data
-        #     y = my_model.conv1.translate_y.data
-        #
-        #     for i in range(s.shape[1]):
-        #         project_variable.writer.add_scalars('SRXY/scale-k%d' % i,
-        #                                             {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]}, ts)
-        #         project_variable.writer.add_scalars('SRXY/rotate-k%d' % i,
-        #                                             {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]}, ts)
-        #         project_variable.writer.add_scalars('SRXY/translate_x-k%d' % i,
-        #                                             {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]}, ts)
-        #         project_variable.writer.add_scalars('SRXY/translate_y-k%d' % i,
-        #                                             {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]}, ts)
-
     # save data
     loss = float(np.mean(loss_epoch))
     accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
@@ -101,6 +59,16 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
             project_variable.writer.add_video(tag='kernels/%d' % k, vid_tensor=new_k,
                                           global_step=project_variable.current_epoch, fps=2)
+    elif project_variable.model_number == 1:
+        kernel = my_model.conv1.weight.data
+
+        for k in range(kernel.shape[0]):
+
+            new_k = kernel[k]
+            project_variable.writer.add_image(tag='kernels/%d' % k, img_tensor=new_k,
+                                          global_step=project_variable.current_epoch)
+
+        print('asdf')
 
     # plot learned s, r, x, y parameters
     if project_variable.theta_init is None:
@@ -137,16 +105,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             project_variable.writer.add_scalars('k%d/translate_y' % i,
                                                 {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]},
                                                 project_variable.current_epoch)
-
-
-            # project_variable.writer.add_scalars('SRXY/scale-k%d' % i,
-            #                                     {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]}, ts)
-            # project_variable.writer.add_scalars('SRXY/rotate-k%d' % i,
-            #                                     {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]}, ts)
-            # project_variable.writer.add_scalars('SRXY/translate_x-k%d' % i,
-            #                                     {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]}, ts)
-            # project_variable.writer.add_scalars('SRXY/translate_y-k%d' % i,
-            #                                     {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]}, ts)
 
     if project_variable.model_number == 3:
         project_variable.writer.add_histogram('first_weight/conv1', my_model.conv1.first_weight, project_variable.current_epoch)

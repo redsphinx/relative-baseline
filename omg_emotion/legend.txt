@@ -3,3 +3,7 @@ project_variable.model_number
 1   lenet5 2dconv
 2   lenet5 3dconv
 3   lenet5 3dconvTTN
+4   alexnet 2d pytorch implementation (serves as control for 5)
+5   alexnet 2d my implementation
+6   alexnet 3d
+7   alexnet 3dTTN

@@ -317,7 +317,7 @@ def e14_conv3d_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -333,7 +333,7 @@ def e15_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -341,6 +341,7 @@ def e15_conv3dttn_mnist():
     project_variable.theta_init = None
 
     main_file.run(project_variable)
+
 
 def e16_conv3dttn_mnist():
     # 3dttn with  s r x y params
@@ -349,7 +350,7 @@ def e16_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -359,6 +360,7 @@ def e16_conv3dttn_mnist():
     project_variable.weight_transform = 'naive'
 
     main_file.run(project_variable)
+
 
 def e17_conv3dttn_mnist():
     # 3dttn with  s r x y params
@@ -367,7 +369,7 @@ def e17_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -378,6 +380,7 @@ def e17_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
 def e18_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 18
@@ -385,7 +388,7 @@ def e18_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -396,6 +399,7 @@ def e18_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
 def e19_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 19
@@ -403,7 +407,7 @@ def e19_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -414,6 +418,7 @@ def e19_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
 def e20_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 20
@@ -421,7 +426,7 @@ def e20_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -432,6 +437,7 @@ def e20_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
 def e21_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 21
@@ -439,7 +445,7 @@ def e21_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -459,7 +465,7 @@ def e22_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -479,7 +485,7 @@ def e23_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -499,7 +505,7 @@ def e24_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -512,9 +518,31 @@ def e24_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
+def e25_lenet2d_mnist():
+    project_variable.device = 2
+    project_variable.model_number = 1
+    project_variable.experiment_number = 25
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.optimizer = 'adam'
+
+    main_file.run(project_variable)
+
+def e26_lenet2d_mnist():
+    project_variable.device = 2
+    project_variable.model_number = 1
+    project_variable.experiment_number = 26
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.optimizer = 'sgd'
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
-e14_conv3d_mnist() # FIX
+e26_lenet2d_mnist()
+# e14_conv3d_mnist()
 # e15_conv3dttn_mnist()
 # e16_conv3dttn_mnist()
 # e17_conv3dttn_mnist()
@@ -526,6 +554,6 @@ e14_conv3d_mnist() # FIX
 # e23_conv3dttn_mnist()
 # e24_conv3dttn_mnist()
 
-
-
 # TODO: initialize with gabor filters
+# TODO: understand the theta -> grid -> output transformations
+# TODO: add alexnet
