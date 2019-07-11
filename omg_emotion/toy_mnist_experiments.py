@@ -557,3 +557,4 @@ e26_lenet2d_mnist()
 # TODO: initialize with gabor filters
 # TODO: understand the theta -> grid -> output transformations
 # TODO: add alexnet
+# TODO: train first_weight and srxy parameters in alternating cycles
