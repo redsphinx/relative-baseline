@@ -630,4 +630,4 @@ e27_conv3dttn_mnist()
 # TODO: add alexnet
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
-# TODO: repeat experiment 10 times, show these results
+# TODO: add method that prints experiment run statistics like mean and std

@@ -1,7 +1,10 @@
+import os
 import numpy as np
 from torch.nn import CrossEntropyLoss
 from torchviz import make_dot
 import torch
+
+from relative_baseline.omg_emotion import project_paths as PP
 
 
 def initialize(project_variable, all_data):
@@ -109,6 +112,27 @@ def save_architecture_as_dot(model, file_name, save_location):
     out = model(x)
     dot = make_dot(out)
     dot.save(file_name, save_location)
+
+
+def experiment_runs_statistics(experiment, model):
+
+    for i in ['train', 'val', 'test']:
+        acc = []
+        folder_path = os.path.join(PP.saving_data, i)
+        name = 'experiment_%d_model_%d_run' % (experiment, model)
+        runs = sum([name in j for j in os.listdir(folder_path)])
+
+        for j in range(runs):
+            file_path = os.path.join(folder_path, '%s_%d.txt' % (name, j) )
+            data = np.genfromtxt(file_path, str, delimiter=',')
+            acc.append(float(data[-1][1]))
+
+        print('%s   mean: %f    std: %f     runs: %d' % (i, np.mean(acc), np.std(acc), runs))
+
+
+
+
+# experiment_runs_statistics(27, 3)
 
 # https://pytorch.org/docs/master/onnx.html
 # https://github.com/onnx/onnx-tensorflow
