@@ -21,8 +21,25 @@ class ConvTTN3d(conv._ConvNd):
 
         self.project_variable = project_variable
 
-        self.first_weight = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1,
-                                                                                 kernel_size[1], kernel_size[2])))
+        first_w = torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1, kernel_size[1], kernel_size[2]))
+
+        if project_variable.k0_init == 'normal':
+            self.first_weight = torch.nn.init.normal_(first_w)
+        elif project_variable.k0_init == 'ones':
+            self.first_weight = torch.nn.init.constant(first_w, 1)
+        elif project_variable.k0_init == 'ones_var':
+            self.first_weight = torch.nn.init.normal_(first_w, mean=1., std=0.5)
+        elif project_variable.k0_init == 'sparse':
+            self.first_weight = torch.nn.init.sparse(first_w, sparsity=0.1)
+        elif project_variable.k0_init == 'uniform':
+            self.first_weight = torch.nn.init.uniform(first_w)
+
+        
+        print('FIRST WEIGHT -----------------------------------------------')
+        print('------------------------------------------------------------')
+        print(self.first_weight)
+        print('FIRST WEIGHT -----------------------------------------------')
+        print('------------------------------------------------------------')
 
         if self.project_variable.theta_init is not None:
             self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))

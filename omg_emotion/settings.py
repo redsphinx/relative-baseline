@@ -110,6 +110,8 @@ class ProjectVariable(object):
         self._weight_transform = 'naive'
         # which kind of smoothness constraint for the srxy values: None, 'sigmoid', 'sigmoid_bounded'
         self._srxy_smoothness = None
+        # k_0 initialization: 'normal', 'ones', 'ones_var'=mean=1,std=0.5, 'sparse'=0.1 to 0, 'uniform'
+        self._k0_init = 'normal'
 
 
     @property
@@ -395,3 +397,11 @@ class ProjectVariable(object):
     @srxy_smoothness.setter
     def srxy_smoothness(self, value):
         self._srxy_smoothness = value
+
+    @property
+    def k0_init(self):
+        return self._k0_init
+
+    @k0_init.setter
+    def k0_init(self, value):
+        self._k0_init = value

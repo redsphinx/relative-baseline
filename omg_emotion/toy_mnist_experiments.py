@@ -539,22 +539,111 @@ def e26_lenet2d_mnist():
     main_file.run(project_variable)
 
 
+def e24_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 24
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'normal'
+    project_variable.weight_transform = 'seq'
+    project_variable.srxy_smoothness = 'sigmoid_small'
+
+    main_file.run(project_variable)
+
+
+def e27_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 27
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    project_variable.k0_init = 'ones'
+
+    main_file.run(project_variable)
+
+
+def e28_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 28
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    project_variable.k0_init = 'ones_var'
+
+    main_file.run(project_variable)
+
+
+def e29_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 29
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    project_variable.k0_init = 'sparse'
+
+    main_file.run(project_variable)
+
+
+def e30_conv3dttn_mnist():
+    # 3dttn with  s r x y params
+    project_variable.experiment_number = 30
+    project_variable.model_number = 3
+
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    project_variable.k0_init = 'uniform'
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
-e26_lenet2d_mnist()
-# e14_conv3d_mnist()
-# e15_conv3dttn_mnist()
-# e16_conv3dttn_mnist()
-# e17_conv3dttn_mnist()
-# e18_conv3dttn_mnist()
-# e19_conv3dttn_mnist()
-# e20_conv3dttn_mnist()
-# e21_conv3dttn_mnist()
-# e22_conv3dttn_mnist()
-# e23_conv3dttn_mnist()
-# e24_conv3dttn_mnist()
+# e27_conv3dttn_mnist()
+# e28_conv3dttn_mnist()
+# e29_conv3dttn_mnist()
+# e30_conv3dttn_mnist()
+
 
 # TODO: initialize with gabor filters
-# TODO: understand the theta -> grid -> output transformations
+# TODO: understand the theta -> grid -> output transformations for paper
 # TODO: add alexnet
 # TODO: train first_weight and srxy parameters in alternating cycles
+# TODO: experiment with different k_0
