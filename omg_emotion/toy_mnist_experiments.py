@@ -575,6 +575,8 @@ def e27_conv3dttn_mnist():
 
     project_variable.k0_init = 'ones'
 
+    project_variable.repeat_experiments = 3
+
     main_file.run(project_variable)
 
 
@@ -618,9 +620,9 @@ def e29_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e27_conv3dttn_mnist()
+e27_conv3dttn_mnist()
 # e28_conv3dttn_mnist()
-e29_conv3dttn_mnist()
+# e29_conv3dttn_mnist()
 
 
 # TODO: initialize with gabor filters
@@ -628,3 +630,4 @@ e29_conv3dttn_mnist()
 # TODO: add alexnet
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
+# TODO: repeat experiment 10 times, show these results

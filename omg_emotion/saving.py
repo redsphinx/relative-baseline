@@ -4,8 +4,9 @@ import torch
 
 
 def update_logs(project_variable, which, save_list):
-    log_file = 'experiment_%d_model_%d.txt' % (project_variable.experiment_number,
-                                               project_variable.model_number)
+    log_file = 'experiment_%d_model_%d_run_%d.txt' % (project_variable.experiment_number,
+                                                      project_variable.model_number,
+                                                      project_variable.at_which_run)
 
     log_path = os.path.join(PP.saving_data, which, log_file)
 
@@ -20,8 +21,9 @@ def update_logs(project_variable, which, save_list):
 
 
 def save_model(project_variable, my_model):
-    folder_model = 'experiment_%d_model_%d' % (project_variable.experiment_number,
-                                               project_variable.model_number)
+    folder_model = 'experiment_%d_model_%d_run_%d' % (project_variable.experiment_number,
+                                                      project_variable.model_number,
+                                                      project_variable.at_which_run)
     folder_path = os.path.join(PP.saving_data, 'models', folder_model)
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
@@ -29,10 +31,4 @@ def save_model(project_variable, my_model):
     name_model = 'epoch_%d' % project_variable.current_epoch
     save_path = os.path.join(folder_path, name_model)
     torch.save(my_model.state_dict(), save_path)
-
-
-def live_viz():
-    # TODO:
-    # https://github.com/lanpa/tensorboardX/wiki
-    pass
 

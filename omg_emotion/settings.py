@@ -99,9 +99,11 @@ class ProjectVariable(object):
             self._save_model = True
             self._save_graphs = True
 
+        self._repeat_experiments = 1
+        self._at_which_run = 0
+
         # settings only for 3dconvttn stuff
 
-        # TODO: also change this in setup. if None, then theta is not a param, but s r x y are parameters
         # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
         # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
@@ -365,6 +367,22 @@ class ProjectVariable(object):
     @save_graphs.setter
     def save_graphs(self, value):
         self._save_graphs = value
+
+    @property
+    def repeat_experiments(self):
+        return self._repeat_experiments
+
+    @repeat_experiments.setter
+    def repeat_experiments(self, value):
+        self._repeat_experiments = value
+
+    @property
+    def at_which_run(self):
+        return self._at_which_run
+
+    @at_which_run.setter
+    def at_which_run(self, value):
+        self._at_which_run = value
 
     @property
     def theta_init(self):
