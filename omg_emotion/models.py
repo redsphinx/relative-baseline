@@ -34,7 +34,7 @@ class ConvTTN3d(conv._ConvNd):
         elif project_variable.k0_init == 'uniform':
             self.first_weight = torch.nn.init.uniform(first_w)
 
-        
+
         print('FIRST WEIGHT -----------------------------------------------')
         print('------------------------------------------------------------')
         print(self.first_weight)

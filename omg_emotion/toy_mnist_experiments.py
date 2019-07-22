@@ -611,35 +611,16 @@ def e29_conv3dttn_mnist():
     project_variable.learning_rate = 0.001
     project_variable.theta_init = None
 
-    project_variable.k0_init = 'sparse'
-
-    main_file.run(project_variable)
-
-
-def e30_conv3dttn_mnist():
-    # 3dttn with  s r x y params
-    project_variable.experiment_number = 30
-    project_variable.model_number = 3
-
-    project_variable.device = 0
-    project_variable.batch_size = 30
-    project_variable.end_epoch = 20
-    project_variable.dataset = 'mov_mnist'
-
-    project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.001
-    project_variable.theta_init = None
-
     project_variable.k0_init = 'uniform'
 
     main_file.run(project_variable)
+
 
 project_variable = ProjectVariable(debug_mode=False)
 
 # e27_conv3dttn_mnist()
 # e28_conv3dttn_mnist()
-# e29_conv3dttn_mnist()
-# e30_conv3dttn_mnist()
+e29_conv3dttn_mnist()
 
 
 # TODO: initialize with gabor filters
