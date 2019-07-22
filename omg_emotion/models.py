@@ -35,11 +35,11 @@ class ConvTTN3d(conv._ConvNd):
             self.first_weight = torch.nn.init.uniform(first_w)
 
 
-        print('FIRST WEIGHT -----------------------------------------------')
-        print('------------------------------------------------------------')
-        print(self.first_weight)
-        print('FIRST WEIGHT -----------------------------------------------')
-        print('------------------------------------------------------------')
+        # print('FIRST WEIGHT -----------------------------------------------')
+        # print('------------------------------------------------------------')
+        # print(self.first_weight)
+        # print('FIRST WEIGHT -----------------------------------------------')
+        # print('------------------------------------------------------------')
 
         if self.project_variable.theta_init is not None:
             self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))

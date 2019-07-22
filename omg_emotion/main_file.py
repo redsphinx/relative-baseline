@@ -46,7 +46,10 @@ def run(project_variable):
     for w in _which:
         log_path = os.path.join(PP.saving_data, w, log_file)
         if os.path.exists(log_path):
-            shutil.rmtree(log_path)
+            if os.path.isdir(log_path):
+                shutil.rmtree(log_path)
+            else:
+                os.remove(log_path)
 
     for num_runs in range(project_variable.repeat_experiments):
         print('-------------------------------------------------------\n\n'
@@ -185,6 +188,8 @@ def run(project_variable):
             # ------------------------------------------------------------------------------------------------
             # ------------------------------------------------------------------------------------------------
         project_variable.at_which_run += 1
+
+    U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
 
 
 # ------------------------------------------------------------------------------------------------

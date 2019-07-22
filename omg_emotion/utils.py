@@ -127,7 +127,10 @@ def experiment_runs_statistics(experiment, model):
             data = np.genfromtxt(file_path, str, delimiter=',')
             acc.append(float(data[-1][1]))
 
-        print('%s   mean: %f    std: %f     runs: %d' % (i, np.mean(acc), np.std(acc), runs))
+        print('%s   mean: %f    std: %f     runs: %d    best run: %d' % (i, np.mean(acc), np.std(acc), runs,
+                                                                         acc.index(max(acc))))
+
+
 
 
 
