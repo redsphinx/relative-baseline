@@ -630,3 +630,8 @@ project_variable = ProjectVariable(debug_mode=False)
 # TODO: add alexnet
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
+# TODO: make graph of number of datapoints as they vary and compare to the normal 3dconv
+# TODO: increase number of channels? simple way of increasing parameters
+# vary ratio parameter-data
+# find regime where model performs better
+# TODO: add randomization of the training data
