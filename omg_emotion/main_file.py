@@ -6,6 +6,7 @@ from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
 from relative_baseline.omg_emotion import utils as U
 # from relative_baseline.omg_emotion import visualization as V
+from relative_baseline.omg_emotion import sheets as S
 
 import os
 import time
@@ -18,6 +19,10 @@ import shutil
 # from .settings import ProjectVariable
 
 def run(project_variable):
+    # write initial settings to spreadsheet
+    if not project_variable.debug_mode:
+        ROW = S.write_settings(project_variable)
+
     # project_variable = ProjectVariable()
 
     # load all data once
@@ -202,6 +207,7 @@ def run(project_variable):
         project_variable.at_which_run += 1
 
     if not project_variable.debug_mode:
-        U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
+        acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
+        S.write_results(acc, std, best_run, ROW)
 
 

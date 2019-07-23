@@ -567,7 +567,7 @@ def e27_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 20
+    project_variable.end_epoch = 10
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -576,7 +576,10 @@ def e27_conv3dttn_mnist():
 
     project_variable.k0_init = 'ones'
 
-    project_variable.repeat_experiments = 10
+    project_variable.repeat_experiments = 3
+    project_variable.randomize_training_data = True
+
+
 
     main_file.run(project_variable)
 
@@ -640,9 +643,10 @@ def this_debug():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
-this_debug()
+# this_debug()
+e27_conv3dttn_mnist()
 
 
 

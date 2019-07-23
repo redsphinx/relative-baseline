@@ -116,6 +116,8 @@ def save_architecture_as_dot(model, file_name, save_location):
 
 def experiment_runs_statistics(experiment, model):
 
+    test_acc, test_std, test_best = 0, 0, 0
+
     for i in ['train', 'val', 'test']:
         acc = []
         folder_path = os.path.join(PP.saving_data, i)
@@ -130,6 +132,12 @@ def experiment_runs_statistics(experiment, model):
         print('%s   mean: %f    std: %f     runs: %d    best run: %d' % (i, np.mean(acc), np.std(acc), runs,
                                                                          acc.index(max(acc))))
 
+        if i == 'test':
+            test_acc = np.mean(acc)
+            test_std = np.std(acc)
+            test_best = acc.index(max(acc))
+
+    return test_acc, test_std, test_best
 
 
 # experiment_runs_statistics(27, 3)
