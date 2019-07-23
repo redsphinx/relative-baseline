@@ -104,7 +104,6 @@ def run(project_variable):
         my_optimizer = setup.get_optimizer(project_variable, my_model)
 
         print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
-        # TODO: move printing to utils
         # add project settings to writer
         text = 'experiment number:      %d;' \
                'model number:           %d;' \

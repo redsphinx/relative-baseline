@@ -306,12 +306,12 @@ class ProjectVariable(object):
         self._momentum = value
 
     @property
-    def num_channels(self):
-        return self._num_channels
+    def num_out_channels(self):
+        return self._num_out_channels
 
-    @num_channels.setter
-    def num_channels(self, value):
-        self._num_channels = value
+    @num_out_channels.setter
+    def num_out_channels(self, value):
+        self._num_out_channels = value
 
     @property
     def seed(self):

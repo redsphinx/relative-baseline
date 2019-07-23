@@ -132,9 +132,6 @@ def experiment_runs_statistics(experiment, model):
 
 
 
-
-
-
 # experiment_runs_statistics(27, 3)
 
 # https://pytorch.org/docs/master/onnx.html

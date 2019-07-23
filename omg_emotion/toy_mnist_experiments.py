@@ -559,6 +559,7 @@ def e24_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
+# TODO: rerun
 def e27_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 27
@@ -579,7 +580,7 @@ def e27_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# TODO: rerun
 def e28_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 28
@@ -598,7 +599,7 @@ def e28_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
+# TODO: rerun
 def e29_conv3dttn_mnist():
     # 3dttn with  s r x y params
     project_variable.experiment_number = 29
@@ -618,11 +619,31 @@ def e29_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+def this_debug():
+    project_variable.experiment_number = 666
+    project_variable.model_number = 3
 
-# e27_conv3dttn_mnist()
-# e28_conv3dttn_mnist()
-# e29_conv3dttn_mnist()
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 10
+    project_variable.dataset = 'mov_mnist'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    project_variable.randomize_training_data = True
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [50, 100, 100]
+
+
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
+
+this_debug()
+
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
@@ -632,4 +653,3 @@ project_variable = ProjectVariable(debug_mode=False)
 # TODO: increase number of channels? simple way of increasing parameters
 # vary ratio parameter-data
 # find regime where model performs better
-# TODO: add randomization of the training data
