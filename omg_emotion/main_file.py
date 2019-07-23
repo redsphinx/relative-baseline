@@ -8,6 +8,7 @@ from relative_baseline.omg_emotion import utils as U
 # from relative_baseline.omg_emotion import visualization as V
 
 import os
+import time
 import numpy as np
 import torch
 from tensorboardX import SummaryWriter
@@ -58,11 +59,13 @@ def run(project_variable):
     for num_runs in range(project_variable.repeat_experiments):
         # load the training data (which is now randomized)
         if project_variable.randomize_training_data:
+            project_variable.test = False
+            project_variable.val = False
             project_variable.train = True
             data = D.load_data(project_variable)
             if project_variable.train:
-                data_train = data[1][2]
-                labels_train = data[2][2]
+                data_train = data[1][0]
+                labels_train = data[2][0]
 
         print('-------------------------------------------------------\n\n'
               'RUN: %d / %d\n\n'
@@ -86,6 +89,7 @@ def run(project_variable):
         else:
             # clear directory before writing new events
             shutil.rmtree(path)
+            time.sleep(2)
             os.mkdir(path)
 
         project_variable.writer = SummaryWriter(path)
@@ -95,15 +99,13 @@ def run(project_variable):
         my_model = setup.get_model(project_variable)
         device = setup.get_device(project_variable)
 
-        # TEMPORARY
-        # V.visualize_network(my_model)
-
         if project_variable.device is not None:
             my_model.cuda(device)
 
         my_optimizer = setup.get_optimizer(project_variable, my_model)
 
         print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
+
         # add project settings to writer
         text = 'experiment number:      %d;' \
                'model number:           %d;' \
@@ -199,69 +201,7 @@ def run(project_variable):
             # ------------------------------------------------------------------------------------------------
         project_variable.at_which_run += 1
 
-    U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
+    if not project_variable.debug_mode:
+        U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
 
-
-# ------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------
-
-
-def run_many_val_0(project_variable, data1, data2):
-    # create writer for tensorboardX
-    # setup model, optimizer & device
-    my_model = setup.get_model(project_variable)
-    # print(my_model.fc.weight)
-    device = setup.get_device(project_variable)
-
-    if project_variable.device is not None:
-        my_model.cuda(device)
-
-    if project_variable.train:
-        my_optimizer = setup.get_optimizer(project_variable, my_model)
-    else:
-        my_optimizer = None
-
-    print(data2)
-    validation.run(project_variable, my_optimizer, (data1, data2), my_model, device)
-
-    del my_model
-
-
-def run_many_val(project_variable):
-    # from .settings import ProjectVariable
-    # project_variable = ProjectVariable()
-
-    # create writer for tensorboardX
-    path = os.path.join(PP.writer_path, 'experiment_%d_model_%d' % (project_variable.experiment_number,
-                                                                    project_variable.model_number))
-    if not os.path.exists(path):
-        os.mkdir(path)
-    project_variable.writer = SummaryWriter(path)
-
-    # load val and test data once
-    project_variable.val = True
-    project_variable.train = False
-    project_variable.test = False
-
-    data = D.load_data(project_variable)
-    data_val = data[1][0]
-    labels_val = data[2][0]
-
-    device = setup.get_device(project_variable)
-
-    ex, mo, ep = project_variable.load_model
-    all_models = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo))
-    models_to_load = len(os.listdir(all_models))
-
-    for i in range(0, models_to_load):
-        project_variable.current_epoch = i
-        project_variable.load_model = [ex, mo, i] # [experiment, model, epoch]
-
-        # setup model, optimizer & device
-        my_model = setup.get_model(project_variable)
-
-        if project_variable.device is not None:
-            my_model.cuda(device)
-
-        validation.run(project_variable, (data_val, labels_val), my_model, device)
 

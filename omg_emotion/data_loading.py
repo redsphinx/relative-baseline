@@ -461,6 +461,7 @@ def load_movmnist(project_variable):
         chosen = np.arange(total_dp[which])
         random.shuffle(chosen)
         chosen = chosen[:dp]
+        chosen.sort()
 
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)

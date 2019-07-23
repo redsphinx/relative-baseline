@@ -635,7 +635,7 @@ def this_debug():
     project_variable.randomize_training_data = True
     project_variable.num_out_channels = [7, 17]
     project_variable.data_points = [50, 100, 100]
-
+    project_variable.repeat_experiments = 1
 
     main_file.run(project_variable)
 
