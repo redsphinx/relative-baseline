@@ -71,7 +71,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         print('asdf')
 
     # plot learned s, r, x, y parameters
-    if project_variable.theta_init is None:
+    if project_variable.theta_init is None and project_variable.model_number == 3:
         # data as histogram
         project_variable.writer.add_histogram('conv1.weight/scale', my_model.conv1.scale, project_variable.current_epoch)
         project_variable.writer.add_histogram('conv1.weight/rotate', my_model.conv1.rotate, project_variable.current_epoch)

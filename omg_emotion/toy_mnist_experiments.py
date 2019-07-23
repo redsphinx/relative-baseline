@@ -621,7 +621,7 @@ def e29_conv3dttn_mnist():
 
 def this_debug():
     project_variable.experiment_number = 666
-    project_variable.model_number = 3
+    project_variable.model_number = 2
 
     project_variable.device = 0
     project_variable.batch_size = 30
