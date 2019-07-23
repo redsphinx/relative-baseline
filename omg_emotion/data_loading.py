@@ -437,13 +437,11 @@ def load_movmnist(project_variable):
     tp = np.float32
     frames = 30
 
-    # TODO: for debugging
-    TMP = 100
 
-    def load(which):
+    def load(which, dp):
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
-        labels = np.genfromtxt(label_path, dtype=int)[:TMP]
+        labels = np.genfromtxt(label_path, dtype=int)[:dp]
 
         num_points = len(labels)
 
@@ -457,7 +455,32 @@ def load_movmnist(project_variable):
 
         return data, labels
 
+    def load_random(which, dp):
+        total_dp = {'train':50000, 'val':10000, 'test':10000}
 
+        chosen = np.arange(total_dp[which])
+        random.shuffle(chosen)
+        chosen = chosen[:dp]
+
+        path = os.path.join(PP.moving_mnist_png, which)
+        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+        labels = np.genfromtxt(label_path, dtype=int)[chosen]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            choose = chosen[i]
+            for j in range(frames):
+                file_path = os.path.join(path, str(choose), '%d.png' % j)
+                tmp = np.array(Image.open(file_path))
+                data[i, 0, j] = tmp
+
+        return data, labels
+
+
+    # TODO: implement
     def load_faster(which):
         # first load all data into cpu memory
         # move data from cpu to gpu as you need it
@@ -465,19 +488,22 @@ def load_movmnist(project_variable):
 
 
     if project_variable.train:
-        data, labels = load('train')
+        if project_variable.randomize_training_data:
+            data, labels = load_random('train', project_variable.data_points[0])
+        else:
+            data, labels = load('train', project_variable.data_points[0])
         splits.append('train')
         all_data.append(data)
         all_labels.append(labels)
 
     if project_variable.val:
-        data, labels = load('val')
+        data, labels = load('val', project_variable.data_points[1])
         splits.append('val')
         all_data.append(data)
         all_labels.append(labels)
 
     if project_variable.test:
-        data, labels = load('test')
+        data, labels = load('test', project_variable.data_points[2])
         splits.append('test')
         all_data.append(data)
         all_labels.append(labels)

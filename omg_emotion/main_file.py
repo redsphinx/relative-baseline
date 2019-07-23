@@ -22,7 +22,11 @@ def run(project_variable):
     # load all data once
     project_variable.val = True
     project_variable.test = True
-    project_variable.train = True
+
+    if not project_variable.randomize_training_data:
+        project_variable.train = True
+    else:
+        project_variable.train = False
 
     data = D.load_data(project_variable)
 
@@ -52,6 +56,14 @@ def run(project_variable):
                 os.remove(log_path)
 
     for num_runs in range(project_variable.repeat_experiments):
+        # load the training data (which is now randomized)
+        if project_variable.randomize_training_data:
+            project_variable.train = True
+            data = D.load_data(project_variable)
+            if project_variable.train:
+                data_train = data[1][2]
+                labels_train = data[2][2]
+
         print('-------------------------------------------------------\n\n'
               'RUN: %d / %d\n\n'
               '-------------------------------------------------------'
@@ -92,7 +104,7 @@ def run(project_variable):
         my_optimizer = setup.get_optimizer(project_variable, my_model)
 
         print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
-
+        # TODO: move printing to utils
         # add project settings to writer
         text = 'experiment number:      %d;' \
                'model number:           %d;' \
@@ -120,8 +132,7 @@ def run(project_variable):
                   project_variable.srxy_smoothness)
         project_variable.writer.add_text('project settings', text)
 
-
-
+        # start with epochs
         for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
             project_variable.current_epoch = e
 

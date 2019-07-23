@@ -29,19 +29,21 @@ class ProjectVariable(object):
         
         # int, the current epoch
         self._current_epoch = None
-
-        # TODO: add moving mnist
-
+    
+        # UNUSED? ================================================================================
         # list of str, which datasets to train, val and test on
         # implemented sets: omg_emotion, affectnet
         self._dataset_train = ['omg_emotion']
         self._dataset_val = ['omg_emotion']
         self._dataset_test = ['omg_emotion']
+        # UNUSED? ================================================================================
         
         # instead of having 3 dataset splits, have just 1 dataset parameter
         # implemented datasets: omg_emotion, mnist, 'dummy', 'mov_mnist.  status affectnet??
         self._dataset = 'mnist'
-
+        self._randomize_training_data = False
+        self._data_points = [100, 100, 100]  # [train, val, test]
+        
         # bool, which procedures to perform
         self._train = None
         self._val = None
@@ -206,6 +208,22 @@ class ProjectVariable(object):
     @dataset.setter
     def dataset(self, value):
         self._dataset = value
+
+    @property
+    def randomize_training_data(self):
+        return self._randomize_training_data
+
+    @randomize_training_data.setter
+    def randomize_training_data(self, value):
+        self._randomize_training_data = value
+
+    @property
+    def data_points(self):
+        return self._data_points
+
+    @data_points.setter
+    def data_points(self, value):
+        self._data_points = value
     
     @property
     def train(self):
