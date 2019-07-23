@@ -53,30 +53,21 @@ def write_settings(project_variable):
 
     initialize()
 
+
     values = [[
-        date.today().strftime('%d-%m-%Y'), # date                       #A
-        datetime.now().strftime('%H:%M:%S'), # start time experiment    #B
-        '', # end time experiment                                       #C
-        project_variable.experiment_number,                             #D
-        project_variable.model_number,                                  #E
-        project_variable.dataset,                                       #F
-        '', # mean accuracy                                             #G
-        '', # std                                                       #H
-        '', # best run                                                  #I
-        str(project_variable.data_points),                              #J
-        str(project_variable.num_out_channels),                         #K
-        project_variable.batch_size,                                    #L
-        project_variable.end_epoch,                                     #M
-        project_variable.repeat_experiments,                            #N
-        str(project_variable.theta_init),                               #O
-        project_variable.srxy_init,                                     #P
-        project_variable.weight_transform,                              #Q
-        str(project_variable.srxy_smoothness),                          #R
-        project_variable.k0_init                                        #S
+        date.today().strftime('%d-%m-%Y'),  # date                      #A
+        datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
+        '',  # end time experiment                                      #C
+        project_variable.experiment_number,                             # D
+        '',  # mean accuracy                                            #E
+        '',  # std                                                      #F
+        '',  # best run                                                 #G
+        str(project_variable.data_points),                              # H
+        str(project_variable.num_out_channels)                          # I
     ]]
 
     row = get_next_row()
-    range_name = 'A%d:S%d' % (row, row)
+    range_name = 'A%d:I%d' % (row, row)
 
     data = [
         {
@@ -110,11 +101,11 @@ def write_results(accuracy, std, best_run, row):
         valueInputOption=VALUE_INPUT_OPTION, body=body).execute()
 
     values = [[
-        accuracy,  # mean accuracy                                      #G
-        std,  # std                                                     #H
-        best_run,  # best run                                           #I
+        accuracy,  # mean accuracy                                      #E
+        std,  # std                                                     #F
+        best_run,  # best run                                           #G
     ]]
-    range_name = 'G%d:I%d' % (row, row)
+    range_name = 'E%d:G%d' % (row, row)
     data = [
         {
             'range': range_name,

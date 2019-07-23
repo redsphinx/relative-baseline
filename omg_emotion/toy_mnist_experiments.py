@@ -539,26 +539,6 @@ def e26_lenet2d_mnist():
     main_file.run(project_variable)
 
 
-def e24_conv3dttn_mnist():
-    # 3dttn with  s r x y params
-    project_variable.experiment_number = 24
-    project_variable.model_number = 3
-
-    project_variable.device = 0
-    project_variable.batch_size = 30
-    project_variable.end_epoch = 20
-    project_variable.dataset = 'mov_mnist'
-
-    project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.001
-    project_variable.theta_init = None
-    project_variable.srxy_init = 'normal'
-    project_variable.weight_transform = 'seq'
-    project_variable.srxy_smoothness = 'sigmoid_small'
-
-    main_file.run(project_variable)
-
-
 # TODO: rerun
 def e27_conv3dttn_mnist():
     # 3dttn with  s r x y params
@@ -567,7 +547,7 @@ def e27_conv3dttn_mnist():
 
     project_variable.device = 0
     project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 5
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
@@ -643,17 +623,238 @@ def this_debug():
     main_file.run(project_variable)
 
 
+#####################################################################################################################
+#                                   LONG EXPERIMENT START: 30 - 54
+#####################################################################################################################
+
+def set_init():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = 'sigmoid_small'
+    project_variable.weight_transform = 'seq'
+    project_variable.k0_init = 'normal'
+    project_variable.randomize_training_data = True
+    project_variable.repeat_experiments = 10
+
+# --------------------------------------------------------
+#                   out_channels = [6, 16]
+# --------------------------------------------------------
+
+def e30_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 30
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e31_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 31
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e32_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 32
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e34_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 34
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e35_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 35
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e36_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 36
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e37_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 37
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e38_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 38
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [7, 17]
+# --------------------------------------------------------
+
+def e39_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 39
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e40_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 40
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e41_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 41
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e42_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 42
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e43_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 43
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e44_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 44
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e45_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 45
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e46_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 46
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [8, 18]
+# --------------------------------------------------------
+
+def e47_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 47
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e48_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 48
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e49_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 49
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e50_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 50
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e51_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 51
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e52_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 52
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e53_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 53
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e54_conv3dttn_mnist():
+    set_init()
+    project_variable.experiment_number = 54
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
+
+
+
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
-# this_debug()
-e27_conv3dttn_mnist()
 
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
-
-# TODO: make graph of number of datapoints as they vary and compare to the normal 3dconv
-# TODO: increase number of channels? simple way of increasing parameters
-# vary ratio parameter-data
-# find regime where model performs better

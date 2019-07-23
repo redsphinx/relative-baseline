@@ -111,7 +111,7 @@ class ProjectVariable(object):
         self._srxy_init = 'normal'
         # how to transform weights in kernel: 'naive'=weights are a transform of first_weight, 'seq'=sequential
         self._weight_transform = 'naive'
-        # which kind of smoothness constraint for the srxy values: None, 'sigmoid', 'sigmoid_bounded'
+        # which kind of smoothness constraint for the srxy values: None, 'sigmoid', 'sigmoid_small'
         self._srxy_smoothness = None
         # k_0 initialization: 'normal', 'ones', 'ones_var'=mean=1,std=0.5, 'sparse'=0.1 to 0, 'uniform'
         self._k0_init = 'normal'
