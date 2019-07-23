@@ -237,14 +237,14 @@ class LeNet5_2d(torch.nn.Module):
 
 class LeNet5_3d(torch.nn.Module):
 
-    def __init__(self):
+    def __init__(self, project_variable):
         super(LeNet5_3d, self).__init__()
         # Convolution (In LeNet-5, 32x32 images are given as input. Hence padding of 2 is done below)
-        self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=6, kernel_size=5, stride=1, padding=2, bias=True)
+        self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=project_variable.num_channels[0], kernel_size=5, stride=1, padding=2, bias=True)
         # Max-pooling
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         # Convolution
-        self.conv2 = torch.nn.Conv3d(in_channels=6, out_channels=16, kernel_size=5, stride=1, padding=0, bias=True)
+        self.conv2 = torch.nn.Conv3d(in_channels=6, out_channels=project_variable.num_channels[1], kernel_size=5, stride=1, padding=0, bias=True)
         # Max-pooling
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         # Fully connected layer
@@ -279,10 +279,10 @@ class LeNet5_TTN3d(torch.nn.Module):
 
     def __init__(self, project_variable):
         super(LeNet5_TTN3d, self).__init__()
-        self.conv1 = ConvTTN3d(in_channels=1, out_channels=6, kernel_size=5, padding=2,
+        self.conv1 = ConvTTN3d(in_channels=1, out_channels=project_variable.num_channels[0], kernel_size=5, padding=2,
                                project_variable=project_variable)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
-        self.conv2 = ConvTTN3d(in_channels=6, out_channels=16, kernel_size=5, padding=0,
+        self.conv2 = ConvTTN3d(in_channels=6, out_channels=project_variable.num_channels[1], kernel_size=5, padding=0,
                                project_variable=project_variable)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         self.fc1 = torch.nn.Linear(16 * 5 * 5 * 5,

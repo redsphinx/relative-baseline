@@ -34,7 +34,7 @@ def get_model(project_variable):
     elif project_variable.model_number == 1:
         model = M.LeNet5_2d()
     elif project_variable.model_number == 2:
-        model = M.LeNet5_3d()
+        model = M.LeNet5_3d(project_variable)
     elif project_variable.model_number == 3:
         # TODO: implement transfer from 2D here
 

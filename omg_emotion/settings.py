@@ -60,19 +60,18 @@ class ProjectVariable(object):
 
         # float, learning rate
         self._learning_rate = 0.001
-
         # str, loss function
         self._loss_function = 'cross_entropy'
-        
         # list, weights for balanced loss, necessary for resnet18
         self._loss_weights = None
-
         # list of str, optimizer
         # supported: adam, sgd
         self._optimizer = 'sgd'
-        
         # momentum
         self._momentum = 0.9
+        
+        # number of out_channels for lenet5
+        self._num_out_channels = [6, 16]
 
         # int, seed for shuffling
         self._seed = 6
@@ -287,6 +286,14 @@ class ProjectVariable(object):
     @momentum.setter
     def momentum(self, value):
         self._momentum = value
+
+    @property
+    def num_channels(self):
+        return self._num_channels
+
+    @num_channels.setter
+    def num_channels(self, value):
+        self._num_channels = value
 
     @property
     def seed(self):
