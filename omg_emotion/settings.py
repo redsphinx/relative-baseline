@@ -24,6 +24,9 @@ class ProjectVariable(object):
         # int, experiment data for log
         self._experiment_number = None
         
+        # which google sheet to write to
+        self._sheet_number = None
+        
         # bool
         self._pretrain_resnet18_weights = True
         
@@ -160,6 +163,14 @@ class ProjectVariable(object):
     @experiment_number.setter
     def experiment_number(self, value):
         self._experiment_number = value
+
+    @property
+    def sheet_number(self):
+        return self._sheet_number
+
+    @sheet_number.setter
+    def sheet_number(self, value):
+        self._sheet_number = value
 
     @property
     def pretrain_resnet18_weights(self):

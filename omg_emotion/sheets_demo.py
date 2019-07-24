@@ -55,7 +55,7 @@ def main():
     #         print('%s, %s' % (row[0], row[4]))
 
     spreadsheet_id = '1p8S73Li52kqmi9NO-eJMOjnLbkVud9jMQ7PXxoTI2jA'
-    range_name = 'A2:F2'
+    range_name = 'Sheet2!K10:P10'
     value_input_option = 'RAW'
 
     values = [

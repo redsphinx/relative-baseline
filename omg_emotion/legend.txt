@@ -7,3 +7,8 @@ project_variable.model_number
 5   alexnet 2d my implementation
 6   alexnet 3d
 7   alexnet 3dTTN
+
+
+sheets containing experiments
+1   30-53   start at D16
+2   54-77   start at D11

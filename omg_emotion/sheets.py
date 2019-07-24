@@ -35,21 +35,29 @@ def initialize():
     SERVICE = build('sheets', 'v4', credentials=CREDS)
 
 
-def get_specific_row(experiment_number):
+def get_specific_row(experiment_number, sheet_number):
     initialize()
 
-    range_name = 'D16:D1000'
+    if sheet_number == 1:
+        start = 16
+    elif sheet_number == 2:
+        start = 11
+    else:
+        print('ERROR: Sheet number %d not supported' % sheet_number)
+        return None
+
+    range_name = 'Sheet%d!D%d:D1000' % (sheet_number, start)
 
     result = SERVICE.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID, range=range_name).execute()
     rows = result.get('values', [])
-    specific_row = 16 + rows.index([str(experiment_number)])
+    specific_row = start + rows.index([str(experiment_number)])
 
     return specific_row
 
 
-def get_next_row():
-    range_name = 'A1:A1000'
+def get_next_row(sheet_number):
+    range_name = 'Sheet%d!A1:A1000' % sheet_number
 
     result = SERVICE.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID, range=range_name).execute()

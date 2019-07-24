@@ -26,7 +26,7 @@ def run(project_variable):
                                                             project_variable.model_number)
 
         if project_variable.at_which_run != 0:  # experiment exists
-            ROW = S.get_specific_row(project_variable.experiment_number)
+            ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
         else:
             ROW = S.write_settings(project_variable)
 
