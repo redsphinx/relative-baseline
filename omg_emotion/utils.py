@@ -140,7 +140,15 @@ def experiment_runs_statistics(experiment, model):
     return test_acc, test_std, test_best
 
 
-# experiment_runs_statistics(27, 3)
+def experiment_exists(experiment_number, model_number):
+    num_runs = 0
+
+    path = os.path.join(PP.saving_data, 'tensorboardX', 'experiment_%d_model_%d' % (experiment_number, model_number))
+    if os.path.exists(path):
+        num_runs = len(os.listdir(path)) - 1  # -1 to adjust for logging dirs number difference.
+
+    return num_runs
+
 
 # https://pytorch.org/docs/master/onnx.html
 # https://github.com/onnx/onnx-tensorflow

@@ -849,32 +849,25 @@ def e53_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e30_conv3dttn_mnist()
-# e31_conv3dttn_mnist()
-# e32_conv3dttn_mnist()
-# e33_conv3dttn_mnist()
-# e34_conv3dttn_mnist()
-# e35_conv3dttn_mnist()
-# e36_conv3dttn_mnist()
-# e37_conv3dttn_mnist()
-# e38_conv3dttn_mnist()
-# e39_conv3dttn_mnist()
-#
-# e40_conv3dttn_mnist()
-# e41_conv3dttn_mnist()
-# e42_conv3dttn_mnist()
-# e43_conv3dttn_mnist()
-# e44_conv3dttn_mnist()
-# e45_conv3dttn_mnist()
-# e46_conv3dttn_mnist()
-# e47_conv3dttn_mnist()
-# e48_conv3dttn_mnist()
-# e49_conv3dttn_mnist()
-#
-# e50_conv3dttn_mnist()
-# e51_conv3dttn_mnist()
-# e52_conv3dttn_mnist()
-# e53_conv3dttn_mnist()
+
+
+# e38_conv3dttn_mnist()     # run 2 times
+# e39_conv3dttn_mnist()     # run 2 times
+# e40_conv3dttn_mnist()     # run 2 times
+# e41_conv3dttn_mnist()     # run 2 times
+# e42_conv3dttn_mnist()     # run 2 times
+# e43_conv3dttn_mnist()     # run 2 times
+# e44_conv3dttn_mnist()     # run 2 times
+# e45_conv3dttn_mnist()     # run 2 times
+
+# e46_conv3dttn_mnist()     # run 3 times
+# e47_conv3dttn_mnist()     # run 3 times
+# e48_conv3dttn_mnist()     # run 3 times
+# e49_conv3dttn_mnist()     # run 3 times
+# e50_conv3dttn_mnist()     # run 3 times
+# e51_conv3dttn_mnist()     # run 3 times
+# e52_conv3dttn_mnist()     # run 3 times
+# e53_conv3dttn_mnist()     # run 3 times
 
 
 

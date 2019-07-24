@@ -18,10 +18,17 @@ import shutil
 # temporary for debugging
 # from .settings import ProjectVariable
 
+
 def run(project_variable):
     # write initial settings to spreadsheet
     if not project_variable.debug_mode:
-        ROW = S.write_settings(project_variable)
+        project_variable.at_which_run = U.experiment_exists(project_variable.experiment_number,
+                                                            project_variable.model_number)
+
+        if project_variable.at_which_run != 0:  # experiment exists
+            ROW = S.get_specific_row(project_variable.experiment_number)
+        else:
+            ROW = S.write_settings(project_variable)
 
     # project_variable = ProjectVariable()
 
@@ -61,7 +68,9 @@ def run(project_variable):
             else:
                 os.remove(log_path)
 
-    for num_runs in range(project_variable.repeat_experiments):
+    start = project_variable.at_which_run
+
+    for num_runs in range(start, project_variable.repeat_experiments):
         # load the training data (which is now randomized)
         if project_variable.randomize_training_data:
             project_variable.test = False
@@ -76,7 +85,6 @@ def run(project_variable):
               'RUN: %d / %d\n\n'
               '-------------------------------------------------------'
               % (num_runs, project_variable.repeat_experiments))
-
 
         # create writer for tensorboardX
         if not project_variable.debug_mode:
@@ -205,6 +213,7 @@ def run(project_variable):
             # ------------------------------------------------------------------------------------------------
             # ------------------------------------------------------------------------------------------------
         project_variable.at_which_run += 1
+        project_variable.writer.close()
 
     if not project_variable.debug_mode:
         acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)

@@ -35,6 +35,19 @@ def initialize():
     SERVICE = build('sheets', 'v4', credentials=CREDS)
 
 
+def get_specific_row(experiment_number):
+    initialize()
+
+    range_name = 'D16:D1000'
+
+    result = SERVICE.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_ID, range=range_name).execute()
+    rows = result.get('values', [])
+    specific_row = 16 + rows.index(experiment_number)
+
+    return specific_row
+
+
 def get_next_row():
     range_name = 'A1:A1000'
 
