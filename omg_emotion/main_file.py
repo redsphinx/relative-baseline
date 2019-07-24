@@ -122,28 +122,11 @@ def run(project_variable):
         # add project settings to writer
         text = 'experiment number:      %d;' \
                'model number:           %d;' \
-               'debug mode:             %s;' \
                'trainable parameters:   %d;' \
-               'optimizer:              %s;' \
-               'learning rate:          %f;' \
-               'batch size:             %d;' \
-               'epochs:                 %d;' \
-               'theta init:             %s;' \
-               'srxy init:              %s;' \
-               'weight transform:       %s;' \
-               'srxy smoothness:        %s;' \
                % (project_variable.experiment_number,
                   project_variable.model_number,
-                  project_variable.debug_mode,
-                  U.count_parameters(my_model),
-                  project_variable.optimizer,
-                  project_variable.learning_rate,
-                  project_variable.batch_size,
-                  project_variable.end_epoch,
-                  project_variable.theta_init,
-                  project_variable.srxy_init,
-                  project_variable.weight_transform,
-                  project_variable.srxy_smoothness)
+                  U.count_parameters(my_model)
+                  )
         project_variable.writer.add_text('project settings', text)
 
         # start with epochs
@@ -217,6 +200,6 @@ def run(project_variable):
 
     if not project_variable.debug_mode:
         acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
-        S.write_results(acc, std, best_run, ROW)
+        S.write_results(acc, std, best_run, ROW, project_variable.sheet_number)
 
 
