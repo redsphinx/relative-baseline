@@ -850,8 +850,7 @@ def e53_conv3dttn_mnist():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-
-# e38_conv3dttn_mnist()     # run 2 times
+e38_conv3dttn_mnist()     # run 2 times
 # e39_conv3dttn_mnist()     # run 2 times
 # e40_conv3dttn_mnist()     # run 2 times
 # e41_conv3dttn_mnist()     # run 2 times
