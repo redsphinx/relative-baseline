@@ -76,7 +76,7 @@ def write_settings(project_variable):
 
     initialize()
 
-    if project_variable.sheet_number in [1, 2]:
+    if project_variable.sheet_number in [1, 2, 3]:
 
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A

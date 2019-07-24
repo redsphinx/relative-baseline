@@ -1375,38 +1375,259 @@ def e100_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+#####################################################################################################################
+#                                   LONG EXPERIMENT START: 101 - 124
+#####################################################################################################################
+
+def set_init_3():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = 'sigmoid'
+    project_variable.weight_transform = 'naive'
+    project_variable.k0_init = 'normal'
+    project_variable.randomize_training_data = True
+    project_variable.repeat_experiments = 10
+    project_variable.sheet_number = 3
+
+# --------------------------------------------------------
+#                   out_channels = [6, 16]
+# --------------------------------------------------------
+
+def e101_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 101
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e102_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 102
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e103_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 103
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e104_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 104
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e105_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 105
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e106_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 106
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e107_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 107
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e108_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 108
+    project_variable.device = 0
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [7, 17]
+# --------------------------------------------------------
+
+def e109_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 109
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e110_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 110
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e111_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 111
+    project_variable.device = 0
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e112_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 112
+    project_variable.device = 1
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e113_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 113
+    project_variable.device = 1
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e114_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 114
+    project_variable.device = 1
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e115_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 115
+    project_variable.device = 1
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e116_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 116
+    project_variable.device = 1
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [8, 18]
+# --------------------------------------------------------
+
+def e117_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 117
+    project_variable.device = 1
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e118_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 118
+    project_variable.device = 1
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e119_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 119
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e120_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 120
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e121_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 121
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e122_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 122
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e123_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 123
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+def e124_conv3dttn_mnist():
+    set_init_3()
+    project_variable.experiment_number = 124
+    project_variable.device = 0
+    project_variable.num_out_channels = [8, 18]
+    project_variable.data_points = [5000, 200, 200]
+    main_file.run(project_variable)
+
 
 project_variable = ProjectVariable(debug_mode=False)
 
-
-# e78_conv3d_mnist()
-
-# e79_conv3dttn_mnist()
-# e80_conv3dttn_mnist()
-# e81_conv3dttn_mnist()
-# e82_conv3dttn_mnist()
-
-# e83_conv3dttn_mnist()
-# e84_conv3dttn_mnist()
-# e85_conv3dttn_mnist()
-# e86_conv3dttn_mnist()
-# e87_conv3dttn_mnist()
-# e88_conv3dttn_mnist()
-
-# e89_conv3dttn_mnist()
-# e90_conv3dttn_mnist()
-# e91_conv3dttn_mnist()
-# e92_conv3dttn_mnist()
-# e93_conv3dttn_mnist()
-# e94_conv3dttn_mnist()
-
-# e95_conv3dttn_mnist()
-# e96_conv3dttn_mnist()
-# e97_conv3dttn_mnist()
-# e98_conv3dttn_mnist()
-# e99_conv3dttn_mnist()
-e100_conv3dttn_mnist()
-
+e101_conv3dttn_mnist()
+# e102_conv3dttn_mnist()
+# e103_conv3dttn_mnist()
+# e104_conv3dttn_mnist()
+# e105_conv3dttn_mnist()
+# e106_conv3dttn_mnist()
+# e107_conv3dttn_mnist()
+# e108_conv3dttn_mnist()
+#
+# e109_conv3dttn_mnist()
+# e110_conv3dttn_mnist()
+# e111_conv3dttn_mnist()
+# e112_conv3dttn_mnist()
+# e113_conv3dttn_mnist()
+# e114_conv3dttn_mnist()
+# e115_conv3dttn_mnist()
+# e116_conv3dttn_mnist()
+#
+# e117_conv3dttn_mnist()
+# e118_conv3dttn_mnist()
+# e119_conv3dttn_mnist()
+# e120_conv3dttn_mnist()
+# e121_conv3dttn_mnist()
+# e122_conv3dttn_mnist()
+# e123_conv3dttn_mnist()
+# e124_conv3dttn_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
