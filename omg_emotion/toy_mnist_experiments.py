@@ -801,7 +801,7 @@ def e47_conv3dttn_mnist():
 def e48_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 48
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [40, 200, 200]
     main_file.run(project_variable)
@@ -809,7 +809,7 @@ def e48_conv3dttn_mnist():
 def e49_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 49
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [50, 200, 200]
     main_file.run(project_variable)
@@ -817,7 +817,7 @@ def e49_conv3dttn_mnist():
 def e50_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 50
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [100, 200, 200]
     main_file.run(project_variable)
@@ -825,7 +825,7 @@ def e50_conv3dttn_mnist():
 def e51_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 51
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [500, 200, 200]
     main_file.run(project_variable)
@@ -833,7 +833,7 @@ def e51_conv3dttn_mnist():
 def e52_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 52
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [1000, 200, 200]
     main_file.run(project_variable)
@@ -841,7 +841,7 @@ def e52_conv3dttn_mnist():
 def e53_conv3dttn_mnist():
     set_init()
     project_variable.experiment_number = 53
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [5000, 200, 200]
     main_file.run(project_variable)
@@ -850,7 +850,7 @@ def e53_conv3dttn_mnist():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-e38_conv3dttn_mnist()     # run 2 times
+# e38_conv3dttn_mnist()     # run 2 times
 # e39_conv3dttn_mnist()     # run 2 times
 # e40_conv3dttn_mnist()     # run 2 times
 # e41_conv3dttn_mnist()     # run 2 times
@@ -866,7 +866,7 @@ e38_conv3dttn_mnist()     # run 2 times
 # e50_conv3dttn_mnist()     # run 3 times
 # e51_conv3dttn_mnist()     # run 3 times
 # e52_conv3dttn_mnist()     # run 3 times
-# e53_conv3dttn_mnist()     # run 3 times
+e53_conv3dttn_mnist()     # run 3 times
 
 
 
