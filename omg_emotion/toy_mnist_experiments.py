@@ -1205,7 +1205,7 @@ def e87_conv3dttn_mnist():
 def e88_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 88
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'normal'
 
@@ -1221,7 +1221,7 @@ def e88_conv3dttn_mnist():
 def e89_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 89
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1234,7 +1234,7 @@ def e89_conv3dttn_mnist():
 def e90_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 90
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1247,7 +1247,7 @@ def e90_conv3dttn_mnist():
 def e91_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 91
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1260,7 +1260,7 @@ def e91_conv3dttn_mnist():
 def e92_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 92
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1273,7 +1273,7 @@ def e92_conv3dttn_mnist():
 def e93_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 93
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1286,7 +1286,7 @@ def e93_conv3dttn_mnist():
 def e94_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 94
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
 
@@ -1301,7 +1301,7 @@ def e94_conv3dttn_mnist():
 def e95_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 95
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1314,7 +1314,7 @@ def e95_conv3dttn_mnist():
 def e96_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 96
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1327,7 +1327,7 @@ def e96_conv3dttn_mnist():
 def e97_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 97
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1340,7 +1340,7 @@ def e97_conv3dttn_mnist():
 def e98_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 98
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1353,7 +1353,7 @@ def e98_conv3dttn_mnist():
 def e99_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 99
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1366,7 +1366,7 @@ def e99_conv3dttn_mnist():
 def e100_conv3dttn_mnist():
     set_init_0()
     project_variable.experiment_number = 100
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye-like'
 
@@ -1405,7 +1405,7 @@ project_variable = ProjectVariable(debug_mode=False)
 # e97_conv3dttn_mnist()
 # e98_conv3dttn_mnist()
 # e99_conv3dttn_mnist()
-# e100_conv3dttn_mnist()
+e100_conv3dttn_mnist()
 
 
 
