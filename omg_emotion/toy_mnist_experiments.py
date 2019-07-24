@@ -1470,7 +1470,7 @@ def e108_conv3dttn_mnist():
 def e109_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 109
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.num_out_channels = [7, 17]
     project_variable.data_points = [20, 200, 200]
     main_file.run(project_variable)
@@ -1478,7 +1478,7 @@ def e109_conv3dttn_mnist():
 def e110_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 110
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.num_out_channels = [7, 17]
     project_variable.data_points = [30, 200, 200]
     main_file.run(project_variable)
@@ -1486,7 +1486,7 @@ def e110_conv3dttn_mnist():
 def e111_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 111
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.num_out_channels = [7, 17]
     project_variable.data_points = [40, 200, 200]
     main_file.run(project_variable)
@@ -1538,7 +1538,7 @@ def e116_conv3dttn_mnist():
 def e117_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 117
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [20, 200, 200]
     main_file.run(project_variable)
@@ -1546,7 +1546,7 @@ def e117_conv3dttn_mnist():
 def e118_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 118
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [30, 200, 200]
     main_file.run(project_variable)
@@ -1554,7 +1554,7 @@ def e118_conv3dttn_mnist():
 def e119_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 119
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [40, 200, 200]
     main_file.run(project_variable)
@@ -1562,7 +1562,7 @@ def e119_conv3dttn_mnist():
 def e120_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 120
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [50, 200, 200]
     main_file.run(project_variable)
@@ -1570,7 +1570,7 @@ def e120_conv3dttn_mnist():
 def e121_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 121
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [100, 200, 200]
     main_file.run(project_variable)
@@ -1578,7 +1578,7 @@ def e121_conv3dttn_mnist():
 def e122_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 122
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [500, 200, 200]
     main_file.run(project_variable)
@@ -1586,7 +1586,7 @@ def e122_conv3dttn_mnist():
 def e123_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 123
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [1000, 200, 200]
     main_file.run(project_variable)
@@ -1594,7 +1594,7 @@ def e123_conv3dttn_mnist():
 def e124_conv3dttn_mnist():
     set_init_3()
     project_variable.experiment_number = 124
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.num_out_channels = [8, 18]
     project_variable.data_points = [5000, 200, 200]
     main_file.run(project_variable)
@@ -1602,7 +1602,7 @@ def e124_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-e101_conv3dttn_mnist()
+# e101_conv3dttn_mnist()
 # e102_conv3dttn_mnist()
 # e103_conv3dttn_mnist()
 # e104_conv3dttn_mnist()
@@ -1627,7 +1627,7 @@ e101_conv3dttn_mnist()
 # e121_conv3dttn_mnist()
 # e122_conv3dttn_mnist()
 # e123_conv3dttn_mnist()
-# e124_conv3dttn_mnist()
+e124_conv3dttn_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
