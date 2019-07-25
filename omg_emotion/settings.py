@@ -118,7 +118,12 @@ class ProjectVariable(object):
         self._srxy_smoothness = None
         # k_0 initialization: 'normal', 'ones', 'ones_var'=mean=1,std=0.5, 'uniform'
         self._k0_init = 'normal'
-
+        # share transformation parameters across all filters in a layer.
+        # here we set how many sets of transformations are learned.
+        # note that 1 <= transformation_groups <= num_out_channels
+        self._transformation_groups = self.num_out_channels
+        # filters share k0
+        self._k0_groups = self.num_out_channels
 
     @property
     def writer(self):
@@ -459,3 +464,19 @@ class ProjectVariable(object):
     @k0_init.setter
     def k0_init(self, value):
         self._k0_init = value
+
+    @property
+    def transformation_groups(self):
+        return self._transformation_groups
+
+    @transformation_groups.setter
+    def transformation_groups(self, value):
+        self._transformation_groups = value
+    
+    @property
+    def k0_groups(self):
+        return self._k0_groups
+
+    @k0_groups.setter
+    def k0_groups(self, value):
+        self._k0_groups = value

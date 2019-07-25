@@ -8,7 +8,7 @@ from torch.nn.functional import conv3d
 
 class ConvTTN3d(conv._ConvNd):
 
-    def __init__(self, in_channels, out_channels, kernel_size, project_variable,
+    def __init__(self, in_channels, out_channels, kernel_size, project_variable, transformation_groups,
                  stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
         kernel_size = _triple(kernel_size)
         stride = _triple(stride)
@@ -29,8 +29,6 @@ class ConvTTN3d(conv._ConvNd):
             self.first_weight = torch.nn.init.constant(first_w, 1)
         elif project_variable.k0_init == 'ones_var':
             self.first_weight = torch.nn.init.normal_(first_w, mean=1., std=0.5)
-        elif project_variable.k0_init == 'sparse':
-            self.first_weight = torch.nn.init.sparse(first_w, sparsity=0.1)
         elif project_variable.k0_init == 'uniform':
             self.first_weight = torch.nn.init.uniform(first_w)
 
@@ -42,7 +40,8 @@ class ConvTTN3d(conv._ConvNd):
         # print('------------------------------------------------------------')
 
         if self.project_variable.theta_init is not None:
-            self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+            # self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
+            self.theta = torch.zeros((kernel_size[0] - 1, transformation_groups, 2, 3))
             if self.project_variable.theta_init == 'eye':
                 for i in range(kernel_size[0] - 1):
                     for j in range(out_channels):
@@ -54,27 +53,28 @@ class ConvTTN3d(conv._ConvNd):
                 self.theta = None
 
             self.theta = torch.nn.Parameter(self.theta)
-
+        
+        # replaced 'out_channels' with 'transformation_groups'
         else:
             if self.project_variable.srxy_init == 'normal':
             # use 4 parameters
                 self.scale = torch.nn.Parameter(
-                    torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)))))
-                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                    torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, transformation_groups)))))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
                 self.translate_x = torch.nn.init.normal_(
-                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
                 self.translate_y = torch.nn.init.normal_(
-                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))))
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
             elif self.project_variable.srxy_init == 'eye':
-                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, out_channels))))
-                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
-                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
-                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels)))
+                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, transformation_groups))))
+                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
+                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
+                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
             elif self.project_variable.srxy_init == 'eye-like':
-                self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, out_channels)), mean=1, std=1e-5)))
-                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
-                self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
-                self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, out_channels))), mean=0, std=1e-5)
+                self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, transformation_groups)), mean=1, std=1e-5)))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
+                self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
+                self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
             else:
                 print("ERROR: srxy_init mode '%s' not supported" % self.project_variable.srxy_init)
                 self.scale, self.rotate, self.translate_x, self.translate_y = None, None, None, None
@@ -100,6 +100,8 @@ class ConvTTN3d(conv._ConvNd):
                               scale[i] * torch.cos(rotate[i])
 
         return matrix
+
+    # TODO: fix out_channels into transformation_groups
 
     def update_2(self, grid, theta, device):
         # deal with updating s r x y
@@ -274,10 +276,12 @@ class LeNet5_TTN3d(torch.nn.Module):
     def __init__(self, project_variable):
         super(LeNet5_TTN3d, self).__init__()
         self.conv1 = ConvTTN3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=5, padding=2,
-                               project_variable=project_variable)
+                               project_variable=project_variable, 
+                               transformation_groups=project_variable.transformation_groups[0])
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
-                               project_variable=project_variable)
+                               project_variable=project_variable, 
+                               transformation_groups=project_variable.transformation_groups[0])
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * 5 * 5 * 5,
                                    120)
