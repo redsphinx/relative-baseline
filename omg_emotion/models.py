@@ -8,7 +8,7 @@ from torch.nn.functional import conv3d
 
 class ConvTTN3d(conv._ConvNd):
 
-    def __init__(self, in_channels, out_channels, kernel_size, project_variable, transformation_groups,
+    def __init__(self, in_channels, out_channels, kernel_size, project_variable, transformation_groups, k0_groups,
                  stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
         kernel_size = _triple(kernel_size)
         stride = _triple(stride)
@@ -21,8 +21,16 @@ class ConvTTN3d(conv._ConvNd):
 
         self.project_variable = project_variable
 
-        first_w = torch.nn.Parameter(torch.zeros(out_channels, in_channels, 1, kernel_size[1], kernel_size[2]))
+        assert (0 < transformation_groups <= out_channels)
+        self.transformation_groups = transformation_groups
 
+        assert (0 < k0_groups <= out_channels)
+        self.k0_groups = k0_groups
+
+        # replaced out_channels with k0_groups
+        first_w = torch.nn.Parameter(torch.zeros(self.k0_groups, in_channels, 1, kernel_size[1], kernel_size[2]))
+
+        # TODO when transfer learning this will be an issue?
         if project_variable.k0_init == 'normal':
             self.first_weight = torch.nn.init.normal_(first_w)
         elif project_variable.k0_init == 'ones':
@@ -31,9 +39,6 @@ class ConvTTN3d(conv._ConvNd):
             self.first_weight = torch.nn.init.normal_(first_w, mean=1., std=0.5)
         elif project_variable.k0_init == 'uniform':
             self.first_weight = torch.nn.init.uniform(first_w)
-
-        assert(0 < transformation_groups <= out_channels)
-        self.transformation_groups = transformation_groups
 
         if self.project_variable.theta_init is not None:
             # self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
@@ -167,8 +172,8 @@ class ConvTTN3d(conv._ConvNd):
         grid = grid.cuda(device)
         grid = self.update_2(grid, theta, device)[1:]
 
-        # check if shape of grid is compatible with first_weight. if not, fix it
-        if self.first_weight.shape[0] != grid.shape[1]:
+        # check if shape of grid is compatible with out_channels. if not, fix it
+        if self.out_channels != grid.shape[1]:
             if self.out_channels % self.transformation_groups == 0:
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups, 1)
             else:
@@ -176,20 +181,27 @@ class ConvTTN3d(conv._ConvNd):
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups+1, 1)
                 grid = grid[:, :self.out_channels, :, :, :]
 
+        # check if first_weight is compatible with out_channels. if not, fix it
+        if self.out_channels % self.k0_groups == 0:
+            times = self.out_channels // self.k0_groups
+        else:
+            times = self.out_channels // self.k0_groups + 1
+
         # ---
         # needed to deal with the cudnn error
         try:
-            _ = F.grid_sample(self.first_weight[:, :, 0], grid[0])
+            _ = F.grid_sample(self.first_weight[:, :, 0].repeat_interleave(times, 0)[:self.out_channels], grid[0])
+            # _ = F.grid_sample(self.first_weight[:, :, 0], grid[0])
         except RuntimeError:
             torch.backends.cudnn.deterministic = True
             print('ok cudnn')
         # ---
 
-        new_weight = self.first_weight
+        new_weight = self.first_weight.repeat_interleave(times, 0)[:self.out_channels] # TODO broadcast
 
         if self.project_variable.weight_transform == 'naive':
             for i in range(self.kernel_size[0] - 1):
-                tmp = F.grid_sample(self.first_weight[:, :, 0], grid[i])
+                tmp = F.grid_sample(self.first_weight[:, :, 0].repeat_interleave(times, 0)[:self.out_channels], grid[i]) # TODO broadcast
                 new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
         elif self.project_variable.weight_transform == 'seq':
             for i in range(self.kernel_size[0] - 1):
@@ -284,11 +296,13 @@ class LeNet5_TTN3d(torch.nn.Module):
         super(LeNet5_TTN3d, self).__init__()
         self.conv1 = ConvTTN3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=5, padding=2,
                                project_variable=project_variable, 
-                               transformation_groups=project_variable.transformation_groups[0])
+                               transformation_groups=project_variable.transformation_groups[0],
+                               k0_groups=project_variable.k0_groups[0])
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
                                project_variable=project_variable, 
-                               transformation_groups=project_variable.transformation_groups[0])
+                               transformation_groups=project_variable.transformation_groups[1],
+                               k0_groups=project_variable.k0_groups[1])
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * 5 * 5 * 5,
                                    120)

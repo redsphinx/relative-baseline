@@ -1602,23 +1602,24 @@ def e124_conv3dttn_mnist():
 
 def debug():
     project_variable.experiment_number = 666
-    project_variable.model_number = 3
+    project_variable.model_number = 2
 
     project_variable.device = 0
-    project_variable.batch_size = 30
-    project_variable.end_epoch = 10
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.001
-    project_variable.theta_init = None
+    project_variable.theta_init = 'eye'
 
-    # project_variable.randomize_training_data = True
-    project_variable.num_out_channels = [7, 17]
-    project_variable.data_points = [50, 50, 50]
-    project_variable.repeat_experiments = 1
+    project_variable.randomize_training_data = True
+    project_variable.data_points = [100, 200, 200]
+    project_variable.repeat_experiments = 10
 
-    project_variable.transformation_groups = [4, 4]
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.num_out_channels = [1, 1]
 
     main_file.run(project_variable)
 
