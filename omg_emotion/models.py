@@ -32,19 +32,16 @@ class ConvTTN3d(conv._ConvNd):
         elif project_variable.k0_init == 'uniform':
             self.first_weight = torch.nn.init.uniform(first_w)
 
-
-        # print('FIRST WEIGHT -----------------------------------------------')
-        # print('------------------------------------------------------------')
-        # print(self.first_weight)
-        # print('FIRST WEIGHT -----------------------------------------------')
-        # print('------------------------------------------------------------')
+        assert(0 < transformation_groups <= out_channels)
+        self.transformation_groups = transformation_groups
 
         if self.project_variable.theta_init is not None:
             # self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
-            self.theta = torch.zeros((kernel_size[0] - 1, transformation_groups, 2, 3))
+            self.theta = torch.zeros((kernel_size[0] - 1, self.transformation_groups, 2, 3))
             if self.project_variable.theta_init == 'eye':
                 for i in range(kernel_size[0] - 1):
-                    for j in range(out_channels):
+                    # for j in range(out_channels):
+                    for j in range(self.transformation_groups):
                         self.theta[i][j] = torch.eye(3)[:2, ]
             elif self.project_variable.theta_init == 'normal':
                 self.theta = torch.nn.init.normal_(self.theta)
@@ -59,22 +56,22 @@ class ConvTTN3d(conv._ConvNd):
             if self.project_variable.srxy_init == 'normal':
             # use 4 parameters
                 self.scale = torch.nn.Parameter(
-                    torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, transformation_groups)))))
-                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
+                    torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, self.transformation_groups)))))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))))
                 self.translate_x = torch.nn.init.normal_(
-                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))))
                 self.translate_y = torch.nn.init.normal_(
-                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))))
+                    torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))))
             elif self.project_variable.srxy_init == 'eye':
-                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, transformation_groups))))
-                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
-                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
-                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups)))
+                self.scale = torch.nn.Parameter(torch.nn.init.ones_(torch.zeros((kernel_size[0] - 1, self.transformation_groups))))
+                self.rotate = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups)))
+                self.translate_x = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups)))
+                self.translate_y = torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups)))
             elif self.project_variable.srxy_init == 'eye-like':
-                self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, transformation_groups)), mean=1, std=1e-5)))
-                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
-                self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
-                self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, transformation_groups))), mean=0, std=1e-5)
+                self.scale = torch.nn.Parameter(torch.abs(torch.nn.init.normal_(torch.zeros((kernel_size[0] - 1, self.transformation_groups)), mean=1, std=1e-5)))
+                self.rotate = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))), mean=0, std=1e-5)
+                self.translate_x = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))), mean=0, std=1e-5)
+                self.translate_y = torch.nn.init.normal_(torch.nn.Parameter(torch.zeros((kernel_size[0] - 1, self.transformation_groups))), mean=0, std=1e-5)
             else:
                 print("ERROR: srxy_init mode '%s' not supported" % self.project_variable.srxy_init)
                 self.scale, self.rotate, self.translate_x, self.translate_y = None, None, None, None
@@ -101,8 +98,8 @@ class ConvTTN3d(conv._ConvNd):
 
         return matrix
 
-    # TODO: fix out_channels into transformation_groups
 
+    # replace out_channels with self.transformation_groups
     def update_2(self, grid, theta, device):
         # deal with updating s r x y
 
@@ -113,17 +110,17 @@ class ConvTTN3d(conv._ConvNd):
                 tmp = tmp.cuda(device)
                 theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
             theta = theta[1:]
-
+        
             try:
                 _ = F.affine_grid(theta[0],
-                                  [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                                  [self.transformation_groups, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
             except RuntimeError:
                 torch.backends.cudnn.deterministic = True
                 print('ok cudnn')
 
             for i in range(self.kernel_size[0] - 1):
                 tmp = F.affine_grid(theta[i],
-                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                                    [self.transformation_groups, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
                 grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
 
             return grid
@@ -132,21 +129,22 @@ class ConvTTN3d(conv._ConvNd):
             # cudnn error
             try:
                 _ = F.affine_grid(self.theta[0],
-                                  [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                                  [self.transformation_groups, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
             except RuntimeError:
                 torch.backends.cudnn.deterministic = True
                 print('ok cudnn')
 
             for i in range(self.kernel_size[0] - 1):
                 tmp = F.affine_grid(self.theta[i],
-                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
+                                    [self.transformation_groups, self.kernel_size[0], self.kernel_size[1], self.kernel_size[2]])
                 grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
 
             return grid
 
+    # replace out_channels with transformation_groups
     def forward(self, input, device):
 
-        grid = torch.zeros((1, self.out_channels, self.kernel_size[1], self.kernel_size[2], 2))
+        grid = torch.zeros((1, self.transformation_groups, self.kernel_size[1], self.kernel_size[2], 2))
 
         if self.project_variable.theta_init is None:
             # add smoothness constraint for SRXY
@@ -161,13 +159,22 @@ class ConvTTN3d(conv._ConvNd):
                 self.translate_x.data = (0.25 - -0.25) * torch.nn.functional.sigmoid(-self.translate_x) - 0.25  # between -0.25 and 0.25
                 self.translate_y.data = (0.25 - -0.25) * torch.nn.functional.sigmoid(-self.translate_y) - 0.25  # between -0.25 and 0.25
 
-            theta = torch.zeros((1, self.out_channels, 2, 3))
+            theta = torch.zeros((1, self.transformation_groups, 2, 3))
             theta = theta.cuda(device)
         else:
             theta = None
 
         grid = grid.cuda(device)
         grid = self.update_2(grid, theta, device)[1:]
+
+        # check if shape of grid is compatible with first_weight. if not, fix it
+        if self.first_weight.shape[0] != grid.shape[1]:
+            if self.out_channels % self.transformation_groups == 0:
+                grid = grid.repeat_interleave(self.out_channels//self.transformation_groups, 1)
+            else:
+                print('working on it')
+                grid = grid.repeat_interleave(self.out_channels//self.transformation_groups+1, 1)
+                grid = grid[:, :self.out_channels, :, :, :]
 
         # ---
         # needed to deal with the cudnn error

@@ -1600,35 +1600,31 @@ def e124_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+def debug():
+    project_variable.experiment_number = 666
+    project_variable.model_number = 3
 
-# e101_conv3dttn_mnist()
-# e102_conv3dttn_mnist()
-# e103_conv3dttn_mnist()
-# e104_conv3dttn_mnist()
-# e105_conv3dttn_mnist()
-# e106_conv3dttn_mnist()
-# e107_conv3dttn_mnist()
-# e108_conv3dttn_mnist()
-#
-# e109_conv3dttn_mnist()
-# e110_conv3dttn_mnist()
-# e111_conv3dttn_mnist()
-# e112_conv3dttn_mnist()
-# e113_conv3dttn_mnist()
-# e114_conv3dttn_mnist()
-# e115_conv3dttn_mnist()
-# e116_conv3dttn_mnist()
-#
-# e117_conv3dttn_mnist()
-# e118_conv3dttn_mnist()
-# e119_conv3dttn_mnist()
-# e120_conv3dttn_mnist()
-# e121_conv3dttn_mnist()
-# e122_conv3dttn_mnist()
-# e123_conv3dttn_mnist()
-e124_conv3dttn_mnist()
+    project_variable.device = 0
+    project_variable.batch_size = 30
+    project_variable.end_epoch = 10
+    project_variable.dataset = 'mov_mnist'
 
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.theta_init = None
+
+    # project_variable.randomize_training_data = True
+    project_variable.num_out_channels = [7, 17]
+    project_variable.data_points = [50, 50, 50]
+    project_variable.repeat_experiments = 1
+
+    project_variable.transformation_groups = [4, 4]
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
+
+debug()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
