@@ -1652,6 +1652,8 @@ def e125_conv3d_mnist():
     project_variable.model_number = 2
     project_variable.device = 0
     project_variable.num_out_channels = [1, 1]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
 
 def e126_conv3dttn_mnist():
@@ -1659,6 +1661,8 @@ def e126_conv3dttn_mnist():
     project_variable.experiment_number = 126
     project_variable.device = 0
     project_variable.num_out_channels = [1, 1]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
 
 # --------------------------------------------------------
@@ -1735,13 +1739,13 @@ def e135_conv3dttn_mnist():
 def e136_conv3dttn_mnist():
     set_init_4()
     project_variable.experiment_number = 136
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.k0_groups = [4, 12]
     main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
-
-e125_conv3d_mnist()
+# debug()
+# e125_conv3d_mnist()
 # e126_conv3dttn_mnist()
 # e127_conv3d_mnist()
 # e128_conv3dttn_mnist()
@@ -1752,7 +1756,7 @@ e125_conv3d_mnist()
 # e133_conv3dttn_mnist()
 # e134_conv3dttn_mnist()
 # e135_conv3dttn_mnist()
-
+e136_conv3dttn_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
