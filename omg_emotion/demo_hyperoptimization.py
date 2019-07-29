@@ -3,6 +3,8 @@ from bayes_opt.observer import JSONLogger
 from bayes_opt.event import Events
 
 
+from bayes_opt import UtilityFunction
+
 def black_box_function(x, y):
     """Function with unknown internals we wish to maximize.
 

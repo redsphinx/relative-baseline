@@ -1623,9 +1623,137 @@ def debug():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
+#####################################################################################################################
+#                                   LONG EXPERIMENT START: 125 - 136
+#####################################################################################################################
+def set_init_4():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.randomize_training_data = True
+    project_variable.data_points = [100, 5000, 5000]
+    project_variable.repeat_experiments = 10
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = 'sigmoid'
+    project_variable.weight_transform = 'naive'
+    project_variable.k0_init = 'normal'
+    project_variable.sheet_number = 4
 
-debug()
+# --------------------------------------------------------
+#                   out_channels = [1, 1]
+# --------------------------------------------------------
+def e125_conv3d_mnist():
+    set_init_4()
+    project_variable.experiment_number = 125
+    project_variable.model_number = 2
+    project_variable.device = 0
+    project_variable.num_out_channels = [1, 1]
+    main_file.run(project_variable)
+
+def e126_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 126
+    project_variable.device = 0
+    project_variable.num_out_channels = [1, 1]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#        out_channels = [6, 16] baselines 5000 test
+# --------------------------------------------------------
+def e127_conv3d_mnist():
+    set_init_4()
+    project_variable.experiment_number = 127
+    project_variable.model_number = 2
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e128_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 128
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+# transformation_groups = [1, 1], [2, 4], [3, 8], [4, 12]
+# --------------------------------------------------------
+def e129_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 129
+    project_variable.device = 0
+    project_variable.transformation_groups = [1, 1]
+    main_file.run(project_variable)
+
+def e130_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 130
+    project_variable.device = 0
+    project_variable.transformation_groups = [2, 4]
+    main_file.run(project_variable)
+    
+def e131_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 131
+    project_variable.device = 0
+    project_variable.transformation_groups = [3, 8]
+    main_file.run(project_variable)
+
+def e132_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 132
+    project_variable.device = 0
+    project_variable.transformation_groups = [4, 12]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#       k0_groups = [1, 1], [2, 4], [3, 8], [4, 12]
+# --------------------------------------------------------
+def e133_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 133
+    project_variable.device = 0
+    project_variable.k0_groups = [1, 1]
+    main_file.run(project_variable)
+
+def e134_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 134
+    project_variable.device = 0
+    project_variable.k0_groups = [2, 4]
+    main_file.run(project_variable)
+
+def e135_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 135
+    project_variable.device = 0
+    project_variable.k0_groups = [3, 8]
+    main_file.run(project_variable)
+
+def e136_conv3dttn_mnist():
+    set_init_4()
+    project_variable.experiment_number = 136
+    project_variable.device = 0
+    project_variable.k0_groups = [4, 12]
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
+
+e125_conv3d_mnist()
+# e126_conv3dttn_mnist()
+# e127_conv3d_mnist()
+# e128_conv3dttn_mnist()
+# e129_conv3dttn_mnist()
+# e130_conv3dttn_mnist()
+# e131_conv3dttn_mnist()
+# e132_conv3dttn_mnist()
+# e133_conv3dttn_mnist()
+# e134_conv3dttn_mnist()
+# e135_conv3dttn_mnist()
+
+
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0
