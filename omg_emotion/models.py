@@ -30,7 +30,7 @@ class ConvTTN3d(conv._ConvNd):
         # replaced out_channels with k0_groups
         first_w = torch.nn.Parameter(torch.zeros(self.k0_groups, in_channels, 1, kernel_size[1], kernel_size[2]))
 
-        # TODO when transfer learning this will be an issue?
+        # when transfer learning this will be an issue? set k0_init to None when transfer learning
         if project_variable.k0_init == 'normal':
             self.first_weight = torch.nn.init.normal_(first_w)
         elif project_variable.k0_init == 'ones':
@@ -262,10 +262,23 @@ class LeNet5_3d(torch.nn.Module):
         super(LeNet5_3d, self).__init__()
         # Convolution (In LeNet-5, 32x32 images are given as input. Hence padding of 2 is done below)
         self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=project_variable.k_shape, stride=1, padding=2, bias=True)
+        # conv is initialized with uniformly sampled weights
+        if project_variable.k0_init == 'normal':
+            self.conv1.weight = torch.nn.init.normal_(self.conv1.weight)
+            self.conv1.bias = torch.nn.init.normal_(self.conv1.bias)
+        elif project_variable.k0_init == 'ones':
+            self.conv1.weight = torch.nn.init.constant_(self.conv1.weight, 1)
+            self.conv1.bias = torch.nn.init.constant_(self.conv1.bias, 1)
         # Max-pooling
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         # Convolution
         self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=project_variable.k_shape, stride=1, padding=0, bias=True)
+        if project_variable.k0_init == 'normal':
+            self.conv2.weight = torch.nn.init.normal_(self.conv2.weight)
+            self.conv2.bias = torch.nn.init.normal_(self.conv2.bias)
+        elif project_variable.k0_init == 'ones':
+            self.conv2.weight = torch.nn.init.constant_(self.conv2.weight, 1)
+            self.conv2.bias = torch.nn.init.constant_(self.conv2.bias, 1)
         # Max-pooling
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         # Fully connected layer

@@ -2117,7 +2117,7 @@ def e173_conv3d_mnist():
     main_file.run(project_variable)
 
 #####################################################################################################################
-#                                   k0_init
+#                                   k0_init experiments: 174 - 185
 #####################################################################################################################
 def set_init_8():
     project_variable.batch_size = 20
@@ -2126,7 +2126,6 @@ def set_init_8():
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.001
     project_variable.randomize_training_data = True
-    project_variable.data_points = [100, 100, 100]
     project_variable.repeat_experiments = 10
     project_variable.sheet_number = 7
 
@@ -2135,60 +2134,145 @@ def set_init_8():
     project_variable.srxy_init = 'eye'
     project_variable.weight_transform = 'seq'
 # --------------------------------------------------------
-#                   model_number=2
+#      model_number=2, data_points = [50, 1000, 1000]
 # --------------------------------------------------------
 def e174_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 174
     project_variable.model_number = 2
     project_variable.k0_init = 'ones'
+    project_variable.data_points = [50, 1000, 1000]
     project_variable.device = 0
     main_file.run(project_variable)
 
-def e175_conv35_mnist():
+def e175_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 175
     project_variable.model_number = 2
-    project_variable.k0_init = 'uniform'
+    project_variable.k0_init = 'normal'
+    project_variable.data_points = [50, 1000, 1000]
     project_variable.device = 0
     main_file.run(project_variable)
 
-def e176_conv35_mnist():
+def e176_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 176
     project_variable.model_number = 2
     project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.data_points = [50, 1000, 1000]
     project_variable.device = 0
+    project_variable.k0_init = None
     main_file.run(project_variable)
+
 # --------------------------------------------------------
-#                   model_number=3
+#      model_number=2, data_points = [100, 1000, 1000]
 # --------------------------------------------------------
 def e177_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 177
-    project_variable.model_number = 3
+    project_variable.model_number = 2
     project_variable.k0_init = 'ones'
+    project_variable.data_points = [100, 1000, 1000]
     project_variable.device = 0
     main_file.run(project_variable)
 
-def e178_conv35_mnist():
+def e178_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 178
-    project_variable.model_number = 3
-    project_variable.k0_init = 'uniform'
+    project_variable.model_number = 2
+    project_variable.k0_init = 'normal'
+    project_variable.data_points = [100, 1000, 1000]
     project_variable.device = 0
     main_file.run(project_variable)
 
-def e179_conv35_mnist():
+def e179_conv3d_mnist():
     set_init_8()
     project_variable.experiment_number = 179
-    project_variable.model_number = 3
+    project_variable.model_number = 2
     project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.data_points = [100, 1000, 1000]
     project_variable.device = 0
+    project_variable.k0_init = None
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#      model_number=3, data_points = [50, 1000, 1000]
+# --------------------------------------------------------
+def e180_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 180
+    project_variable.model_number = 3
+    project_variable.k0_init = 'ones'
+    project_variable.data_points = [50, 1000, 1000]
+    project_variable.device = 1
     main_file.run(project_variable)
 
+def e181_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 181
+    project_variable.model_number = 3
+    project_variable.k0_init = 'uniform'
+    project_variable.data_points = [50, 1000, 1000]
+    project_variable.device = 1
+    main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
-e179_conv35_mnist()
+def e182_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 182
+    project_variable.model_number = 3
+    project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.data_points = [50, 1000, 1000]
+    project_variable.device = 1
+    project_variable.k0_init = None
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#      model_number=2, data_points = [100, 1000, 1000]
+# --------------------------------------------------------
+def e183_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 183
+    project_variable.model_number = 3
+    project_variable.k0_init = 'ones'
+    project_variable.data_points = [100, 1000, 1000]
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e184_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 184
+    project_variable.model_number = 3
+    project_variable.k0_init = 'uniform'
+    project_variable.data_points = [100, 1000, 1000]
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e185_conv3dttn_mnist():
+    set_init_8()
+    project_variable.experiment_number = 185
+    project_variable.model_number = 3
+    project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.data_points = [100, 1000, 1000]
+    project_variable.device = 1
+    project_variable.k0_init = None
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
+
+# e174_conv3d_mnist()
+# e175_conv3d_mnist()
+# e176_conv3d_mnist()
+# e177_conv3d_mnist()
+# e178_conv3d_mnist()
+# e179_conv3d_mnist()
+#
+# e180_conv3dttn_mnist()
+# e181_conv3dttn_mnist()
+# e182_conv3dttn_mnist()
+# e183_conv3dttn_mnist()
+# e184_conv3dttn_mnist()
+# e185_conv3dttn_mnist()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
+# TODO: make networks overfit by increasing channels
+# TODO: or add noise to mov_mnist
+#

@@ -46,6 +46,8 @@ def get_specific_row(experiment_number, sheet_number):
         start = 13
     elif sheet_number in [4, 6]:
         start = 17
+    elif sheet_number in [7]:
+        start = 14
     else:
         print('ERROR: Sheet number %d not supported' % sheet_number)
         return None
@@ -124,6 +126,22 @@ def write_settings(project_variable):
             str(project_variable.k0_groups)                                 # K
         ]]
         end_letter = 'K'
+    elif project_variable.sheet_number in [7]:
+        values = [[
+            date.today().strftime('%d-%m-%Y'),  # date                      #A
+            datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
+            '',  # end time experiment                                      #C
+            project_variable.experiment_number,                             # D
+            '', # parameters                                                # E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.model_number),                         # I
+            str(project_variable.load_model),                    # J
+            str(project_variable.data_points),                                 # K
+            str(project_variable.k0_init)  # L
+        ]]
+        end_letter = 'L'
     else:
         print('Error: sheet_number not supported')
         return None
