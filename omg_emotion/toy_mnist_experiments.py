@@ -1968,34 +1968,132 @@ def e160_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
+#####################################################################################################################
+#                                   LONG EXPERIMENT START: 161 - 170
+#####################################################################################################################
+def set_init_6():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.randomize_training_data = True
+    project_variable.data_points = [100, 1000, 1000]
+    project_variable.repeat_experiments = 10
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+    project_variable.k0_init = 'normal'
+    project_variable.sheet_number = 6
+
+
+# --------------------------------------------------------
+#                   out_channels = [1, 1]
+# --------------------------------------------------------
+def e161_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 161
+    project_variable.device = 0
+    project_variable.num_out_channels = [1, 1]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#        out_channels = [6, 16] baselines 1000 test
+# --------------------------------------------------------
+def e162_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 162
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+# transformation_groups = [1, 1], [2, 4], [3, 8], [4, 12]
+# --------------------------------------------------------
+def e163_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 163
+    project_variable.device = 1
+    project_variable.transformation_groups = [1, 1]
+    main_file.run(project_variable)
+
+
+def e164_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 164
+    project_variable.device = 2
+    project_variable.transformation_groups = [2, 4]
+    main_file.run(project_variable)
+
+
+def e165_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 165
+    project_variable.device = 2
+    project_variable.transformation_groups = [3, 8]
+    main_file.run(project_variable)
+
+# TODO HERE
+
+def e166_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 166
+    project_variable.device = 0
+    project_variable.transformation_groups = [4, 12]
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#       k0_groups = [1, 1], [2, 4], [3, 8], [4, 12]
+# --------------------------------------------------------
+def e167_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 167
+    project_variable.device = 0
+    project_variable.k0_groups = [1, 1]
+    main_file.run(project_variable)
+
+
+def e168_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 168
+    project_variable.device = 0
+    project_variable.k0_groups = [2, 4]
+    main_file.run(project_variable)
+
+
+def e169_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 169
+    project_variable.device = 0
+    project_variable.k0_groups = [3, 8]
+    main_file.run(project_variable)
+
+
+def e170_conv3dttn_mnist():
+    set_init_6()
+    project_variable.experiment_number = 170
+    project_variable.device = 1
+    project_variable.k0_groups = [4, 12]
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
-e137_conv3dttn_mnist()
-# e138_conv3dttn_mnist()
-# e139_conv3dttn_mnist()
-# e140_conv3dttn_mnist()
-# e141_conv3dttn_mnist()
-# e142_conv3dttn_mnist()
-# e143_conv3dttn_mnist()
-# e144_conv3dttn_mnist()
+# e161_conv3dttn_mnist()
+# e162_conv3dttn_mnist()
+# e163_conv3dttn_mnist()
+# e164_conv3dttn_mnist()
+e165_conv3dttn_mnist()
+# e166_conv3dttn_mnist()
+# e167_conv3dttn_mnist()
+# e168_conv3dttn_mnist()
+# e170_conv3dttn_mnist()
 
-# e145_conv3dttn_mnist()
-# e146_conv3dttn_mnist()
-# e147_conv3dttn_mnist()
-# e148_conv3dttn_mnist()
-# e149_conv3dttn_mnist()
-# e150_conv3dttn_mnist()
-# e151_conv3dttn_mnist()
-# e152_conv3dttn_mnist()
-
-# e153_conv3dttn_mnist()
-# e154_conv3dttn_mnist()
-# e155_conv3dttn_mnist()
-# e156_conv3dttn_mnist()
-# e157_conv3dttn_mnist()
-# e158_conv3dttn_mnist()
-# e159_conv3dttn_mnist()
-# e160_conv3dttn_mnist()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0

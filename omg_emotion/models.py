@@ -177,7 +177,7 @@ class ConvTTN3d(conv._ConvNd):
             if self.out_channels % self.transformation_groups == 0:
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups, 1)
             else:
-                print('working on it')
+                # print('working on it')
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups+1, 1)
                 grid = grid[:, :self.out_channels, :, :, :]
 
