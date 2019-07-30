@@ -172,7 +172,7 @@ class ConvTTN3d(conv._ConvNd):
         grid = grid.cuda(device)
         grid = self.update_2(grid, theta, device)[1:]
 
-        # check if shape of grid is compatible with out_channels. if not, fix it
+        # check if shape of grid is compatible with out_channels. if not, correct it
         if self.out_channels != grid.shape[1]:
             if self.out_channels % self.transformation_groups == 0:
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups, 1)
@@ -181,7 +181,7 @@ class ConvTTN3d(conv._ConvNd):
                 grid = grid.repeat_interleave(self.out_channels//self.transformation_groups+1, 1)
                 grid = grid[:, :self.out_channels, :, :, :]
 
-        # check if first_weight is compatible with out_channels. if not, fix it
+        # check if first_weight is compatible with out_channels. if not, correct it
         if self.out_channels % self.k0_groups == 0:
             times = self.out_channels // self.k0_groups
         else:

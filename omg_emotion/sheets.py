@@ -38,13 +38,13 @@ def initialize():
 def get_specific_row(experiment_number, sheet_number):
     initialize()
 
-    if sheet_number == 1:
+    if sheet_number in [1, 3, 5]:
         start = 16
     elif sheet_number == 2:
         start = 11
     elif sheet_number == 0:
         start = 13
-    elif sheet_number == 4:
+    elif sheet_number in [4, 6]:
         start = 17
     else:
         print('ERROR: Sheet number %d not supported' % sheet_number)
@@ -78,49 +78,52 @@ def write_settings(project_variable):
 
     initialize()
 
-    if project_variable.sheet_number in [1, 2, 3]:
+    if project_variable.sheet_number in [1, 2, 3, 5]:
 
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A
             datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
             '',  # end time experiment                                      #C
             project_variable.experiment_number,                             # D
-            '',  # mean accuracy                                            #E
-            '',  # std                                                      #F
-            '',  # best run                                                 #G
-            str(project_variable.data_points),                              # H
-            str(project_variable.num_out_channels)                          # I
+            '',  # parameters                                               #E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.data_points),                              # I
+            str(project_variable.num_out_channels)                          # J
         ]]
-        end_letter = 'I'
+        end_letter = 'J'
     elif project_variable.sheet_number in [0]:
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A
             datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
             '',  # end time experiment                                      #C
-            project_variable.experiment_number,  # D
-            '',  # mean accuracy                                            #E
-            '',  # std                                                      #F
-            '',  # best run                                                 #G
-            str(project_variable.theta_init),  # H
-            str(project_variable.srxy_init),  # I
-            str(project_variable.srxy_smoothness),  # J
-            project_variable.weight_transform  # K
+            project_variable.experiment_number,                             # D
+            '', # parameters                                                # E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.theta_init),                               # I
+            str(project_variable.srxy_init),                                # J
+            str(project_variable.srxy_smoothness),                          # K
+            project_variable.weight_transform                               # L
         ]]
-        end_letter = 'K'
-    elif project_variable.sheet_number in [4]:
+        end_letter = 'L'
+    elif project_variable.sheet_number in [4, 6]:
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A
             datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
             '',  # end time experiment                                      #C
-            project_variable.experiment_number,  # D
-            '',  # mean accuracy                                            #E
-            '',  # std                                                      #F
-            '',  # best run                                                 #G
-            str(project_variable.num_out_channels),  # H
-            str(project_variable.transformation_groups),  # I
-            str(project_variable.k0_groups)  # J
+            project_variable.experiment_number,                             # D
+            '', # parameters                                                # E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.num_out_channels),                         # I
+            str(project_variable.transformation_groups),                    # J
+            str(project_variable.k0_groups)                                 # K
         ]]
-        end_letter = 'J'
+        end_letter = 'K'
     else:
         print('Error: sheet_number not supported')
         return None
@@ -143,6 +146,21 @@ def write_settings(project_variable):
     print('{0} cells updated.'.format(result.get('totalUpdatedCells')))
     
     return row
+
+
+def write_parameters(parameters, row, sheet_number):
+    initialize()
+
+    values = [[
+        parameters,  # end time experiment     #E
+    ]]
+    range_name = 'Sheet%d!E%d' % (sheet_number, row)
+    body = {
+        'values': values
+    }
+    result = SERVICE.spreadsheets().values().update(
+        spreadsheetId=SPREADSHEET_ID, range=range_name,
+        valueInputOption=VALUE_INPUT_OPTION, body=body).execute()
 
 
 def write_results(accuracy, std, best_run, row, sheet_number):

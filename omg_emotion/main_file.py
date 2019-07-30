@@ -119,6 +119,10 @@ def run(project_variable):
 
         print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
 
+        if not project_variable.debug_mode:
+            if num_runs == 0:
+                S.write_parameters(U.count_parameters(my_model), ROW, project_variable.sheet_number)
+
         # add project settings to writer
         text = 'experiment number:      %d;' \
                'model number:           %d;' \
