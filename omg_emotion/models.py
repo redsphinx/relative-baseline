@@ -197,11 +197,11 @@ class ConvTTN3d(conv._ConvNd):
             print('ok cudnn')
         # ---
 
-        new_weight = self.first_weight.repeat_interleave(times, 0)[:self.out_channels] # TODO broadcast
+        new_weight = self.first_weight.repeat_interleave(times, 0)[:self.out_channels]
 
         if self.project_variable.weight_transform == 'naive':
             for i in range(self.kernel_size[0] - 1):
-                tmp = F.grid_sample(self.first_weight[:, :, 0].repeat_interleave(times, 0)[:self.out_channels], grid[i]) # TODO broadcast
+                tmp = F.grid_sample(self.first_weight[:, :, 0].repeat_interleave(times, 0)[:self.out_channels], grid[i])
                 new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
         elif self.project_variable.weight_transform == 'seq':
             for i in range(self.kernel_size[0] - 1):
@@ -212,7 +212,7 @@ class ConvTTN3d(conv._ConvNd):
 
 
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
-        self.weight = torch.nn.Parameter(new_weight)
+        # self.weight = torch.nn.Parameter(new_weight) # TODO: why is this here??
         return y
 
 
@@ -273,9 +273,13 @@ class LeNet5_3d(torch.nn.Module):
             _fc_in = [5, 5, 5]
         elif project_variable.k_shape == (3, 4, 4):
             _fc_in = [7, 5, 5]
+        elif project_variable.k_shape == (5, 6, 6):
+            _fc_in = [5, 4, 4]
+        elif project_variable.k_shape == (4, 6, 6):
+            _fc_in = (6, 4, 4)
         else:
             print('ERROR: k_shape %s not supported' % str(project_variable.k_shape))
-            _fc_in = None
+            _fc_in = [1, 1, 1]
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
                                    120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)
         self.fc2 = torch.nn.Linear(120, 84)  # convert matrix with 120 features to a matrix of 84 features (columns)

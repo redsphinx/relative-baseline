@@ -2038,8 +2038,6 @@ def e165_conv3dttn_mnist():
     project_variable.transformation_groups = [3, 8]
     main_file.run(project_variable)
 
-# TODO HERE
-
 def e166_conv3dttn_mnist():
     set_init_6()
     project_variable.experiment_number = 166
@@ -2083,12 +2081,10 @@ def e170_conv3dttn_mnist():
     main_file.run(project_variable)
 
 #####################################################################################################################
-#                                   model_number=2, k0.shape=(3, 4, 4)
+#                                   model_number=2, k0.shapes
 #####################################################################################################################
-def e171_conv3d_mnist():
+def set_init_7():
     project_variable.model_number = 2
-    project_variable.experiment_number = 171
-
     project_variable.batch_size = 20
     project_variable.end_epoch = 20
     project_variable.dataset = 'mov_mnist'
@@ -2098,27 +2094,101 @@ def e171_conv3d_mnist():
     project_variable.data_points = [100, 1000, 1000]
     project_variable.repeat_experiments = 10
     project_variable.sheet_number = 6
-
-    project_variable.device = 1
     project_variable.num_out_channels = [1, 1]
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.transformation_groups = project_variable.num_out_channels
-    project_variable.k_shape = (3, 4, 4)
 
+def e171_conv3d_mnist():
+    project_variable.experiment_number = 171
+    project_variable.device = 1
+    project_variable.k_shape = (3, 4, 4)
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+def e172_conv3d_mnist():
+    project_variable.experiment_number = 172
+    project_variable.device = 2
+    project_variable.k_shape = (5, 6, 6)
+    main_file.run(project_variable)
 
-# e161_conv3dttn_mnist()
-# e162_conv3dttn_mnist()
-# e163_conv3dttn_mnist()
-# e164_conv3dttn_mnist()
-# e165_conv3dttn_mnist()
-# e166_conv3dttn_mnist()
-# e167_conv3dttn_mnist()
-# e168_conv3dttn_mnist()
-# e170_conv3dttn_mnist()
-e171_conv3d_mnist()
+def e173_conv3d_mnist():
+    project_variable.experiment_number = 173
+    project_variable.device = 2
+    project_variable.k_shape = (4, 6, 6)
+    main_file.run(project_variable)
+
+#####################################################################################################################
+#                                   k0_init
+#####################################################################################################################
+def set_init_8():
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.randomize_training_data = True
+    project_variable.data_points = [100, 100, 100]
+    project_variable.repeat_experiments = 10
+    project_variable.sheet_number = 7
+
+    project_variable.theta_init = None
+    project_variable.srxy_smoothness = None
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+# --------------------------------------------------------
+#                   model_number=2
+# --------------------------------------------------------
+def e174_conv3d_mnist():
+    set_init_8()
+    project_variable.experiment_number = 174
+    project_variable.model_number = 2
+    project_variable.k0_init = 'ones'
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e175_conv35_mnist():
+    set_init_8()
+    project_variable.experiment_number = 175
+    project_variable.model_number = 2
+    project_variable.k0_init = 'uniform'
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e176_conv35_mnist():
+    set_init_8()
+    project_variable.experiment_number = 176
+    project_variable.model_number = 2
+    project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   model_number=3
+# --------------------------------------------------------
+def e177_conv3d_mnist():
+    set_init_8()
+    project_variable.experiment_number = 177
+    project_variable.model_number = 3
+    project_variable.k0_init = 'ones'
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e178_conv35_mnist():
+    set_init_8()
+    project_variable.experiment_number = 178
+    project_variable.model_number = 3
+    project_variable.k0_init = 'uniform'
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e179_conv35_mnist():
+    set_init_8()
+    project_variable.experiment_number = 179
+    project_variable.model_number = 3
+    project_variable.load_model = [25, 1, 19]  # ex, mo, ep
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
+e179_conv35_mnist()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
-# TODO: experiment with different k_0

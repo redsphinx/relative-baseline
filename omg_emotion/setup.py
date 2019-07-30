@@ -35,12 +35,36 @@ def get_model(project_variable):
         model = M.LeNet5_2d()
     elif project_variable.model_number == 2:
         model = M.LeNet5_3d(project_variable)
+        if project_variable.load_model is not None:
+            ex, mo, ep = project_variable.load_model
+            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
+
+            pretrained_dict = torch.load(path)
+            model.conv1.weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
+            model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
+            model.conv2.weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
+            model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
+
+            print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+
     elif project_variable.model_number == 3:
-        # TODO: implement transfer from 2D here
 
         model = M.LeNet5_TTN3d(project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
+
+        if project_variable.load_model is not None:
+            ex, mo, ep = project_variable.load_model
+            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
+
+            pretrained_dict = torch.load(path)
+
+            model.conv1.first_weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2))
+            model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
+            model.conv2.first_weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2))
+            model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
+
+            print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
 
         # if not initializing from theta, only update s r x y; do not update theta with backprop
         # if project_variable.theta_init is None:
