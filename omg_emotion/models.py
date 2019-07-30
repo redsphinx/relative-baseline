@@ -261,15 +261,22 @@ class LeNet5_3d(torch.nn.Module):
     def __init__(self, project_variable):
         super(LeNet5_3d, self).__init__()
         # Convolution (In LeNet-5, 32x32 images are given as input. Hence padding of 2 is done below)
-        self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=5, stride=1, padding=2, bias=True)
+        self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=project_variable.k_shape, stride=1, padding=2, bias=True)
         # Max-pooling
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         # Convolution
-        self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=5, stride=1, padding=0, bias=True)
+        self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=project_variable.k_shape, stride=1, padding=0, bias=True)
         # Max-pooling
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
         # Fully connected layer
-        self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * 5 * 5 * 5,
+        if project_variable.k_shape == (5, 5, 5):
+            _fc_in = [5, 5, 5]
+        elif project_variable.k_shape == (3, 4, 4):
+            _fc_in = [7, 5, 5]
+        else:
+            print('ERROR: k_shape %s not supported' % str(project_variable.k_shape))
+            _fc_in = None
+        self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
                                    120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)
         self.fc2 = torch.nn.Linear(120, 84)  # convert matrix with 120 features to a matrix of 84 features (columns)
         self.fc3 = torch.nn.Linear(84, 10)  # convert matrix with 84 features to a matrix of 10 features (columns)
@@ -282,7 +289,7 @@ class LeNet5_3d(torch.nn.Module):
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
         # read through https://stackoverflow.com/a/42482819/7551231
         _shape = x.shape
-        x = x.view(-1, _shape[1] * 5 * 5 * 5)
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         x = torch.nn.functional.relu(self.fc1(x))
         x = torch.nn.functional.relu(self.fc2(x))
         x = self.fc3(x)

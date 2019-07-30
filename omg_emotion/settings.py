@@ -124,6 +124,8 @@ class ProjectVariable(object):
         self._transformation_groups = self.num_out_channels
         # filters share k0
         self._k0_groups = self.num_out_channels
+        # shape of filter
+        self._k_shape = (5, 5, 5)
 
     @property
     def writer(self):
@@ -480,3 +482,11 @@ class ProjectVariable(object):
     @k0_groups.setter
     def k0_groups(self, value):
         self._k0_groups = value
+
+    @property
+    def k_shape(self):
+        return self._k_shape
+
+    @k_shape.setter
+    def k_shape(self, value):
+        self._k_shape = value

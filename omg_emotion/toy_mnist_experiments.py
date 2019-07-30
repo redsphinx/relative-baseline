@@ -2070,7 +2070,7 @@ def e168_conv3dttn_mnist():
 def e169_conv3dttn_mnist():
     set_init_6()
     project_variable.experiment_number = 169
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.k0_groups = [3, 8]
     main_file.run(project_variable)
 
@@ -2082,18 +2082,43 @@ def e170_conv3dttn_mnist():
     project_variable.k0_groups = [4, 12]
     main_file.run(project_variable)
 
+#####################################################################################################################
+#                                   model_number=2, k0.shape=(3, 4, 4)
+#####################################################################################################################
+def e171_conv3d_mnist():
+    project_variable.model_number = 2
+    project_variable.experiment_number = 171
+
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.randomize_training_data = True
+    project_variable.data_points = [100, 1000, 1000]
+    project_variable.repeat_experiments = 10
+    project_variable.sheet_number = 6
+
+    project_variable.device = 1
+    project_variable.num_out_channels = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k_shape = (3, 4, 4)
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 # e161_conv3dttn_mnist()
 # e162_conv3dttn_mnist()
 # e163_conv3dttn_mnist()
 # e164_conv3dttn_mnist()
-e165_conv3dttn_mnist()
+# e165_conv3dttn_mnist()
 # e166_conv3dttn_mnist()
 # e167_conv3dttn_mnist()
 # e168_conv3dttn_mnist()
 # e170_conv3dttn_mnist()
-
+e171_conv3d_mnist()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: experiment with different k_0

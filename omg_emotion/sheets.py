@@ -178,11 +178,11 @@ def write_results(accuracy, std, best_run, row, sheet_number):
         valueInputOption=VALUE_INPUT_OPTION, body=body).execute()
 
     values = [[
-        accuracy,  # mean accuracy                                      #E
-        std,  # std                                                     #F
-        best_run,  # best run                                           #G
+        accuracy,  # mean accuracy                                      #F
+        std,  # std                                                     #G
+        best_run,  # best run                                           #H
     ]]
-    range_name = 'Sheet%d!E%d:G%d' % (sheet_number, row, row)
+    range_name = 'Sheet%d!F%d:H%d' % (sheet_number, row, row)
     data = [
         {
             'range': range_name,
