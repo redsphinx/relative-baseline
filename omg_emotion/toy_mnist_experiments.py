@@ -2285,7 +2285,7 @@ def e187_conv3d_mnist():
     project_variable.experiment_number = 187
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e188_conv3d_mnist():
@@ -2293,7 +2293,7 @@ def e188_conv3d_mnist():
     project_variable.experiment_number = 188
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e189_conv3d_mnist():
@@ -2301,7 +2301,7 @@ def e189_conv3d_mnist():
     project_variable.experiment_number = 189
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 1
@@ -2312,7 +2312,7 @@ def e190_conv3d_mnist():
     project_variable.experiment_number = 190
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e191_conv3d_mnist():
@@ -2320,7 +2320,7 @@ def e191_conv3d_mnist():
     project_variable.experiment_number = 191
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e192_conv3d_mnist():
@@ -2328,7 +2328,7 @@ def e192_conv3d_mnist():
     project_variable.experiment_number = 192
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 2
@@ -2339,7 +2339,7 @@ def e193_conv3d_mnist():
     project_variable.experiment_number = 193
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e194_conv3d_mnist():
@@ -2347,7 +2347,7 @@ def e194_conv3d_mnist():
     project_variable.experiment_number = 194
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e195_conv3d_mnist():
@@ -2355,7 +2355,7 @@ def e195_conv3d_mnist():
     project_variable.experiment_number = 195
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 3
@@ -2366,7 +2366,7 @@ def e196_conv3d_mnist():
     project_variable.experiment_number = 196
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e197_conv3d_mnist():
@@ -2374,7 +2374,7 @@ def e197_conv3d_mnist():
     project_variable.experiment_number = 197
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e198_conv3d_mnist():
@@ -2382,7 +2382,7 @@ def e198_conv3d_mnist():
     project_variable.experiment_number = 198
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 4
@@ -2393,7 +2393,7 @@ def e199_conv3d_mnist():
     project_variable.experiment_number = 199
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e200_conv3d_mnist():
@@ -2401,7 +2401,7 @@ def e200_conv3d_mnist():
     project_variable.experiment_number = 200
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e201_conv3d_mnist():
@@ -2409,7 +2409,7 @@ def e201_conv3d_mnist():
     project_variable.experiment_number = 201
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 5
@@ -2420,7 +2420,7 @@ def e202_conv3d_mnist():
     project_variable.experiment_number = 202
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e203_conv3d_mnist():
@@ -2428,7 +2428,7 @@ def e203_conv3d_mnist():
     project_variable.experiment_number = 203
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e204_conv3d_mnist():
@@ -2436,7 +2436,7 @@ def e204_conv3d_mnist():
     project_variable.experiment_number = 204
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 6
@@ -2447,7 +2447,7 @@ def e205_conv3d_mnist():
     project_variable.experiment_number = 205
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e206_conv3d_mnist():
@@ -2455,7 +2455,7 @@ def e206_conv3d_mnist():
     project_variable.experiment_number = 206
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e207_conv3d_mnist():
@@ -2463,7 +2463,7 @@ def e207_conv3d_mnist():
     project_variable.experiment_number = 207
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 7
@@ -2474,7 +2474,7 @@ def e208_conv3d_mnist():
     project_variable.experiment_number = 208
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e209_conv3d_mnist():
@@ -2482,7 +2482,7 @@ def e209_conv3d_mnist():
     project_variable.experiment_number = 209
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e210_conv3d_mnist():
@@ -2490,7 +2490,7 @@ def e210_conv3d_mnist():
     project_variable.experiment_number = 210
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 8
@@ -2501,7 +2501,7 @@ def e211_conv3d_mnist():
     project_variable.experiment_number = 211
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e212_conv3d_mnist():
@@ -2509,7 +2509,7 @@ def e212_conv3d_mnist():
     project_variable.experiment_number = 212
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e213_conv3d_mnist():
@@ -2517,7 +2517,7 @@ def e213_conv3d_mnist():
     project_variable.experiment_number = 213
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=2; train data_points = 20,50,100; 186 run 9
@@ -2528,7 +2528,7 @@ def e214_conv3d_mnist():
     project_variable.experiment_number = 214
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e215_conv3d_mnist():
@@ -2536,7 +2536,7 @@ def e215_conv3d_mnist():
     project_variable.experiment_number = 215
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e216_conv3d_mnist():
@@ -2544,7 +2544,7 @@ def e216_conv3d_mnist():
     project_variable.experiment_number = 216
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 
@@ -2561,7 +2561,7 @@ def e217_conv3dttn_mnist():
     project_variable.experiment_number = 217
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e218_conv3dttn_mnist():
@@ -2569,7 +2569,7 @@ def e218_conv3dttn_mnist():
     project_variable.experiment_number = 218
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e219_conv3dttn_mnist():
@@ -2577,7 +2577,7 @@ def e219_conv3dttn_mnist():
     project_variable.experiment_number = 219
     project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 1
@@ -2588,7 +2588,7 @@ def e220_conv3dttn_mnist():
     project_variable.experiment_number = 220
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e221_conv3dttn_mnist():
@@ -2596,7 +2596,7 @@ def e221_conv3dttn_mnist():
     project_variable.experiment_number = 221
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e222_conv3dttn_mnist():
@@ -2604,7 +2604,7 @@ def e222_conv3dttn_mnist():
     project_variable.experiment_number = 222
     project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 2
@@ -2615,7 +2615,7 @@ def e223_conv3dttn_mnist():
     project_variable.experiment_number = 223
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e224_conv3dttn_mnist():
@@ -2623,7 +2623,7 @@ def e224_conv3dttn_mnist():
     project_variable.experiment_number = 224
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e225_conv3dttn_mnist():
@@ -2631,7 +2631,7 @@ def e225_conv3dttn_mnist():
     project_variable.experiment_number = 225
     project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 3
@@ -2642,7 +2642,7 @@ def e226_conv3dttn_mnist():
     project_variable.experiment_number = 226
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e227_conv3dttn_mnist():
@@ -2650,7 +2650,7 @@ def e227_conv3dttn_mnist():
     project_variable.experiment_number = 227
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e228_conv3dttn_mnist():
@@ -2658,7 +2658,7 @@ def e228_conv3dttn_mnist():
     project_variable.experiment_number = 228
     project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 4
@@ -2669,7 +2669,7 @@ def e229_conv3dttn_mnist():
     project_variable.experiment_number = 229
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e230_conv3dttn_mnist():
@@ -2677,7 +2677,7 @@ def e230_conv3dttn_mnist():
     project_variable.experiment_number = 230
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e231_conv3dttn_mnist():
@@ -2685,18 +2685,18 @@ def e231_conv3dttn_mnist():
     project_variable.experiment_number = 231
     project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 5
 # --------------------------------------------------------
-
+# TODO here
 def e232_conv3dttn_mnist():
     set_init_10()
     project_variable.experiment_number = 232
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e233_conv3dttn_mnist():
@@ -2704,7 +2704,7 @@ def e233_conv3dttn_mnist():
     project_variable.experiment_number = 233
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e234_conv3dttn_mnist():
@@ -2712,7 +2712,7 @@ def e234_conv3dttn_mnist():
     project_variable.experiment_number = 234
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 6
@@ -2723,7 +2723,7 @@ def e235_conv3dttn_mnist():
     project_variable.experiment_number = 235
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e236_conv3dttn_mnist():
@@ -2731,7 +2731,7 @@ def e236_conv3dttn_mnist():
     project_variable.experiment_number = 236
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e237_conv3dttn_mnist():
@@ -2739,7 +2739,7 @@ def e237_conv3dttn_mnist():
     project_variable.experiment_number = 237
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 7
@@ -2750,7 +2750,7 @@ def e238_conv3dttn_mnist():
     project_variable.experiment_number = 238
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e239_conv3dttn_mnist():
@@ -2758,7 +2758,7 @@ def e239_conv3dttn_mnist():
     project_variable.experiment_number = 239
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e240_conv3dttn_mnist():
@@ -2766,7 +2766,7 @@ def e240_conv3dttn_mnist():
     project_variable.experiment_number = 240
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 8
@@ -2777,7 +2777,7 @@ def e241_conv3dttn_mnist():
     project_variable.experiment_number = 241
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e242_conv3dttn_mnist():
@@ -2785,7 +2785,7 @@ def e242_conv3dttn_mnist():
     project_variable.experiment_number = 242
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e243_conv3dttn_mnist():
@@ -2793,7 +2793,7 @@ def e243_conv3dttn_mnist():
     project_variable.experiment_number = 243
     project_variable.load_model = [186, 1, 19, 8]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 9
@@ -2804,7 +2804,7 @@ def e244_conv3dttn_mnist():
     project_variable.experiment_number = 244
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e245_conv3dttn_mnist():
@@ -2812,7 +2812,7 @@ def e245_conv3dttn_mnist():
     project_variable.experiment_number = 245
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e246_conv3dttn_mnist():
@@ -2820,12 +2820,12 @@ def e246_conv3dttn_mnist():
     project_variable.experiment_number = 246
     project_variable.load_model = [186, 1, 19, 9]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
-e187_conv3d_mnist()
+# e187_conv3d_mnist()
 # e188_conv3d_mnist()
 # e189_conv3d_mnist()
 # e190_conv3d_mnist()
@@ -2871,7 +2871,7 @@ e187_conv3d_mnist()
 # e229_conv3dttn_mnist()
 # e230_conv3dttn_mnist()
 # e231_conv3dttn_mnist()
-# e232_conv3dttn_mnist()
+e232_conv3dttn_mnist()
 # e233_conv3dttn_mnist()
 # e234_conv3dttn_mnist()
 # e235_conv3dttn_mnist()
