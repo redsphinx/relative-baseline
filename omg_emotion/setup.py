@@ -19,60 +19,79 @@ def prepare_model(project_variable, model):
 
 def get_model(project_variable):
     # project_variable = ProjectVariable()
+    if project_variable.load_model is not None:
+        if len(project_variable.load_model) == 3:
+            ex, mo, ep = project_variable.load_model
+            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
+        else:
+            ex, mo, ep, run = project_variable.load_model
+            path = os.path.join(PP.models, 'experiment_%d_model_%d_run_%d' % (ex, mo, run), 'epoch_%d' % ep)
+
+        if not os.path.exists(path):
+            print("ERROR: saved model path '%s' does not exist" % path)
+            return None
+    else:
+        path, ex, mo, ep = None, None, None, None
 
     if project_variable.model_number == 0:
         model = resnet18(pretrained=project_variable.pretrain_resnet18_weights)
         model = prepare_model(project_variable, model)
         if project_variable.load_model is not None:
-            ex, mo, ep = project_variable.load_model
-            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
             model.load_state_dict(torch.load(path))
-            # TODO: https://cs230-stanford.github.io/pytorch-getting-started.html#training-vs-evaluation
+            # https://cs230-stanford.github.io/pytorch-getting-started.html#training-vs-evaluation
             # model.eval()
-
             print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+
     elif project_variable.model_number == 1:
         model = M.LeNet5_2d()
+        if project_variable.load_model is not None:
+            if mo == 1:
+                model.load_state_dict(torch.load(path))
+                print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            else:
+                print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
+                      % (mo, project_variable.model_number))
+
     elif project_variable.model_number == 2:
         model = M.LeNet5_3d(project_variable)
+
         if project_variable.load_model is not None:
-            ex, mo, ep = project_variable.load_model
-            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
-
-            pretrained_dict = torch.load(path)
-            model.conv1.weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
-            model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
-            model.conv2.weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
-            model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
-
-            print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            if mo == 1:
+                pretrained_dict = torch.load(path)
+                model.conv1.weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
+                model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
+                model.conv2.weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
+                model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
+                print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            elif mo == 2:
+                model.load_state_dict(torch.load(path))
+                print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            else:
+                print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
+                      % (mo, project_variable.model_number))
 
     elif project_variable.model_number == 3:
-
         model = M.LeNet5_TTN3d(project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
 
         if project_variable.load_model is not None:
-            ex, mo, ep = project_variable.load_model
-            path = os.path.join(PP.models, 'experiment_%d_model_%d' % (ex, mo), 'epoch_%d' % ep)
-
-            pretrained_dict = torch.load(path)
-
-            model.conv1.first_weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2))
-            model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
-            model.conv2.first_weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2))
-            model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
-
-            print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
-
-        # if not initializing from theta, only update s r x y; do not update theta with backprop
-        # if project_variable.theta_init is None:
-        #     model.conv1.theta.requires_grad = False
-        #     model.conv2.theta.requires_grad = False
+            if mo == 1:
+                pretrained_dict = torch.load(path)
+                model.conv1.first_weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2))
+                model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
+                model.conv2.first_weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2))
+                model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
+                print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            elif mo == 3:
+                model.load_state_dict(torch.load(path))
+                print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
+            else:
+                print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
+                      % (mo, project_variable.model_number))
 
     else:
-        print('Error: model with number %d not supported' % project_variable.model_number)
+        print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None
 
     return model

@@ -7,4 +7,3 @@ project_variable.model_number
 5   alexnet 2d my implementation
 6   alexnet 3d
 7   alexnet 3dTTN
-8   lenet5 3dconv k.shape=(3, 4, 4)
