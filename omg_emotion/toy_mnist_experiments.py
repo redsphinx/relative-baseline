@@ -2690,13 +2690,13 @@ def e231_conv3dttn_mnist():
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 5
 # --------------------------------------------------------
-# TODO here
+
 def e232_conv3dttn_mnist():
     set_init_10()
     project_variable.experiment_number = 232
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e233_conv3dttn_mnist():
@@ -2704,7 +2704,7 @@ def e233_conv3dttn_mnist():
     project_variable.experiment_number = 233
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e234_conv3dttn_mnist():
@@ -2712,7 +2712,7 @@ def e234_conv3dttn_mnist():
     project_variable.experiment_number = 234
     project_variable.load_model = [186, 1, 19, 5]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 6
@@ -2723,7 +2723,7 @@ def e235_conv3dttn_mnist():
     project_variable.experiment_number = 235
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e236_conv3dttn_mnist():
@@ -2731,7 +2731,7 @@ def e236_conv3dttn_mnist():
     project_variable.experiment_number = 236
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e237_conv3dttn_mnist():
@@ -2739,7 +2739,7 @@ def e237_conv3dttn_mnist():
     project_variable.experiment_number = 237
     project_variable.load_model = [186, 1, 19, 6]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 7
@@ -2750,7 +2750,7 @@ def e238_conv3dttn_mnist():
     project_variable.experiment_number = 238
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [20, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e239_conv3dttn_mnist():
@@ -2758,7 +2758,7 @@ def e239_conv3dttn_mnist():
     project_variable.experiment_number = 239
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [50, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e240_conv3dttn_mnist():
@@ -2766,7 +2766,7 @@ def e240_conv3dttn_mnist():
     project_variable.experiment_number = 240
     project_variable.load_model = [186, 1, 19, 7]  # ex, mo, ep, run
     project_variable.data_points = [100, 1000, 1000]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 20,50,100; 186 run 8
@@ -2825,71 +2825,9 @@ def e246_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e187_conv3d_mnist()
-# e188_conv3d_mnist()
-# e189_conv3d_mnist()
-# e190_conv3d_mnist()
-# e191_conv3d_mnist()
-# e192_conv3d_mnist()
-# e193_conv3d_mnist()
-# e194_conv3d_mnist()
-# e195_conv3d_mnist()
-# e196_conv3d_mnist()
-# e197_conv3d_mnist()
-# e198_conv3d_mnist()
-# e199_conv3d_mnist()
-# e200_conv3d_mnist()
-# e201_conv3d_mnist()
-# e202_conv3d_mnist()
-# e203_conv3d_mnist()
-# e204_conv3d_mnist()
-# e205_conv3d_mnist()
-# e206_conv3d_mnist()
-# e207_conv3d_mnist()
-# e208_conv3d_mnist()
-# e209_conv3d_mnist()
-# e210_conv3d_mnist()
-# e211_conv3d_mnist()
-# e212_conv3d_mnist()
-# e213_conv3d_mnist()
-# e214_conv3d_mnist()
-# e215_conv3d_mnist()
-# e216_conv3d_mnist()
-#
-# e217_conv3dttn_mnist()
-# e218_conv3dttn_mnist()
-# e219_conv3dttn_mnist()
-# e220_conv3dttn_mnist()
-# e221_conv3dttn_mnist()
-# e222_conv3dttn_mnist()
-# e223_conv3dttn_mnist()
-# e224_conv3dttn_mnist()
-# e225_conv3dttn_mnist()
-# e226_conv3dttn_mnist()
-# e227_conv3dttn_mnist()
-# e228_conv3dttn_mnist()
-# e229_conv3dttn_mnist()
-# e230_conv3dttn_mnist()
-# e231_conv3dttn_mnist()
-e232_conv3dttn_mnist()
-# e233_conv3dttn_mnist()
-# e234_conv3dttn_mnist()
-# e235_conv3dttn_mnist()
-# e236_conv3dttn_mnist()
-# e237_conv3dttn_mnist()
-# e238_conv3dttn_mnist()
-# e239_conv3dttn_mnist()
-# e240_conv3dttn_mnist()
-# e241_conv3dttn_mnist()
-# e242_conv3dttn_mnist()
-# e243_conv3dttn_mnist()
-# e244_conv3dttn_mnist()
-# e245_conv3dttn_mnist()
-# e246_conv3dttn_mnist()
 
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: make networks overfit by increasing channels
 # TODO: or add noise to mov_mnist
-#
