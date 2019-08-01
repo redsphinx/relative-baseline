@@ -3005,35 +3005,214 @@ def e267_conv3d_mnist():
     project_variable.num_out_channels = [15, 30]
     project_variable.data_points = [1000, 200, 200]
     main_file.run(project_variable)
+#####################################################################################################################
+#                                   OUT_CHANNELS M3 EXPERIMENT START: 268 - 288
+#####################################################################################################################
+# --------------------------------------------------------
+#                   out_channels = [9, 19]
+# --------------------------------------------------------
+
+def e268_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 268
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e269_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 269
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e270_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 270
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e271_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 271
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e272_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 272
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e273_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 273
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e274_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 274
+    project_variable.device = 0
+    project_variable.num_out_channels = [9, 19]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [10, 20]
+# --------------------------------------------------------
+
+def e275_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 275
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e276_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 276
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e277_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 277
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e278_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 278
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e279_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 279
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e280_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 280
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e281_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 281
+    project_variable.device = 1
+    project_variable.num_out_channels = [10, 20]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#                   out_channels = [15, 30]
+# --------------------------------------------------------
+
+def e282_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 282
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [20, 200, 200]
+    main_file.run(project_variable)
+
+def e283_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 283
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [30, 200, 200]
+    main_file.run(project_variable)
+
+def e284_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 284
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [40, 200, 200]
+    main_file.run(project_variable)
+
+def e285_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 285
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [50, 200, 200]
+    main_file.run(project_variable)
+
+def e286_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 286
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [100, 200, 200]
+    main_file.run(project_variable)
+
+def e287_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 287
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [500, 200, 200]
+    main_file.run(project_variable)
+
+def e288_conv3dttn_mnist():
+    set_init_5()
+    project_variable.experiment_number = 288
+    project_variable.device = 2
+    project_variable.num_out_channels = [15, 30]
+    project_variable.data_points = [1000, 200, 200]
+    main_file.run(project_variable)
 
 
 project_variable = ProjectVariable(debug_mode=False)
 
-
-# e247_conv3d_mnist()
-# e248_conv3d_mnist()
-# e249_conv3d_mnist()
-# e250_conv3d_mnist()
-# e251_conv3d_mnist()
-# e252_conv3d_mnist()
-# e253_conv3d_mnist()
-# e254_conv3d_mnist()
-# e255_conv3d_mnist()
-# e256_conv3d_mnist()
-# e257_conv3d_mnist()
-# e258_conv3d_mnist()
-# e259_conv3d_mnist()
-# e260_conv3d_mnist()
-# e261_conv3d_mnist()
-# e262_conv3d_mnist()
-# e263_conv3d_mnist()
-# e264_conv3d_mnist()
-# e265_conv3d_mnist()
-# e266_conv3d_mnist()
-e267_conv3d_mnist()
-
+# e268_conv3dttn_mnist()
+# e269_conv3dttn_mnist()
+# e270_conv3dttn_mnist()
+# e271_conv3dttn_mnist()
+# e272_conv3dttn_mnist()
+# e273_conv3dttn_mnist()
+# e274_conv3dttn_mnist()
+# e275_conv3dttn_mnist()
+# e276_conv3dttn_mnist()
+# e277_conv3dttn_mnist()
+# e278_conv3dttn_mnist()
+# e279_conv3dttn_mnist()
+# e280_conv3dttn_mnist()
+# e281_conv3dttn_mnist()
+# e282_conv3dttn_mnist()
+# e283_conv3dttn_mnist()
+# e284_conv3dttn_mnist()
+# e285_conv3dttn_mnist()
+# e286_conv3dttn_mnist()
+# e287_conv3dttn_mnist()
+# e288_conv3dttn_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
-# TODO: make networks overfit by increasing channels
 # TODO: or add noise to mov_mnist
