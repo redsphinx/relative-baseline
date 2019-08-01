@@ -3191,27 +3191,6 @@ def e288_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e268_conv3dttn_mnist()
-# e269_conv3dttn_mnist()
-# e270_conv3dttn_mnist()
-# e271_conv3dttn_mnist()
-# e272_conv3dttn_mnist()
-# e273_conv3dttn_mnist()
-# e274_conv3dttn_mnist()
-# e275_conv3dttn_mnist()
-# e276_conv3dttn_mnist()
-# e277_conv3dttn_mnist()
-# e278_conv3dttn_mnist()
-# e279_conv3dttn_mnist()
-# e280_conv3dttn_mnist()
-# e281_conv3dttn_mnist()
-# e282_conv3dttn_mnist()
-# e283_conv3dttn_mnist()
-# e284_conv3dttn_mnist()
-# e285_conv3dttn_mnist()
-# e286_conv3dttn_mnist()
-# e287_conv3dttn_mnist()
-# e288_conv3dttn_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
