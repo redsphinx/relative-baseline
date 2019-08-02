@@ -470,3 +470,8 @@ def create_moving_mnist_png(which, frames=FRAMES):
 # create_moving_mnist_png(which='test') # 01:11<00:00, 138.99it/s
 # create_moving_mnist_png(which='val') # [01:11<00:00, 143.24it/s]
 # create_moving_mnist_png(which='train') # [05:09<00:00, 161.75it/s]
+
+# indexes line numbers to classes. makes sure the sampled data is balanced
+def make_mov_mnist_dict():
+    dict = {}
+    return dict

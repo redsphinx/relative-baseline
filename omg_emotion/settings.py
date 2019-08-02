@@ -45,6 +45,7 @@ class ProjectVariable(object):
         # implemented datasets: omg_emotion, mnist, 'dummy', 'mov_mnist.  status affectnet??
         self._dataset = 'mnist'
         self._randomize_training_data = False
+        self._balance_training_data = False
         self._data_points = [100, 100, 100]  # [train, val, test]
         
         # bool, which procedures to perform
@@ -234,6 +235,14 @@ class ProjectVariable(object):
     @randomize_training_data.setter
     def randomize_training_data(self, value):
         self._randomize_training_data = value
+
+    @property
+    def balance_training_data(self):
+        return self._balance_training_data
+
+    @balance_training_data.setter
+    def balance_training_data(self, value):
+        self._balance_training_data = value
 
     @property
     def data_points(self):

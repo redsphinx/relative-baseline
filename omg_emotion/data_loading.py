@@ -455,17 +455,28 @@ def load_movmnist(project_variable):
 
         return data, labels
 
-    def load_random(which, dp):
-        total_dp = {'train':50000, 'val':10000, 'test':10000}
+    def load_random(which, dp, balanced):
+        assert(dp % 10 == 0)
 
-        chosen = np.arange(total_dp[which])
-        random.shuffle(chosen)
-        chosen = chosen[:dp]
-        chosen.sort()
+        total_dp = {'train':50000, 'val':10000, 'test':10000}
 
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
-        labels = np.genfromtxt(label_path, dtype=int)[chosen]
+        labels = np.genfromtxt(label_path, dtype=int)
+
+        if balanced:
+            chosen = []
+            for i in range(10):
+                indices = np.arange(total_dp[which])[labels == i]
+                choose_indices = random.sample(list(np.arange(len(indices))), dp//10)
+                chosen.extend(indices[choose_indices])
+        else:
+            chosen = np.arange(total_dp[which])
+            random.shuffle(chosen)
+            chosen = chosen[:dp]
+
+        chosen.sort()
+        labels = labels[chosen]
 
         num_points = len(labels)
 
@@ -490,7 +501,7 @@ def load_movmnist(project_variable):
 
     if project_variable.train:
         if project_variable.randomize_training_data:
-            data, labels = load_random('train', project_variable.data_points[0])
+            data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data)
         else:
             data, labels = load('train', project_variable.data_points[0])
         splits.append('train')
