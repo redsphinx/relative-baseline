@@ -51,7 +51,8 @@ def get_model(project_variable):
             else:
                 print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
                       % (mo, project_variable.model_number))
-
+                
+    # FIX memory leak: https://discuss.pytorch.org/t/load-state-dict-causes-memory-leak/36189/4
     elif project_variable.model_number == 2:
         model = M.LeNet5_3d(project_variable)
 
