@@ -3189,19 +3189,10 @@ def e288_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
-def debug_2():
-    set_init_5()
-    project_variable.experiment_number = 666
-    project_variable.device = 0
-    project_variable.data_points = [20, 20, 20]
-    project_variable.balance_training_data = True
-    main_file.run(project_variable)
-
 
 project_variable = ProjectVariable(debug_mode=True)
 
 
-debug_2()
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: or add noise to mov_mnist

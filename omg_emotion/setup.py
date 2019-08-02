@@ -37,7 +37,7 @@ def get_model(project_variable):
         model = resnet18(pretrained=project_variable.pretrain_resnet18_weights)
         model = prepare_model(project_variable, model)
         if project_variable.load_model is not None:
-            model.load_state_dict(torch.load(path))
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
             # https://cs230-stanford.github.io/pytorch-getting-started.html#training-vs-evaluation
             # model.eval()
             print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
@@ -46,26 +46,26 @@ def get_model(project_variable):
         model = M.LeNet5_2d()
         if project_variable.load_model is not None:
             if mo == 1:
-                model.load_state_dict(torch.load(path))
+                model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             else:
                 print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
                       % (mo, project_variable.model_number))
-                
-    # FIX memory leak: https://discuss.pytorch.org/t/load-state-dict-causes-memory-leak/36189/4
+
+
     elif project_variable.model_number == 2:
         model = M.LeNet5_3d(project_variable)
 
         if project_variable.load_model is not None:
             if mo == 1:
-                pretrained_dict = torch.load(path)
+                pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
                 model.conv1.weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
                 model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
                 model.conv2.weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2).repeat(1, 1, project_variable.k_shape[0], 1, 1))
                 model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             elif mo == 2:
-                model.load_state_dict(torch.load(path))
+                model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             else:
                 print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
@@ -78,14 +78,14 @@ def get_model(project_variable):
 
         if project_variable.load_model is not None:
             if mo == 1:
-                pretrained_dict = torch.load(path)
+                pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
                 model.conv1.first_weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2))
                 model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
                 model.conv2.first_weight = torch.nn.Parameter(pretrained_dict['conv2.weight'].unsqueeze(2))
                 model.conv2.bias = torch.nn.Parameter(pretrained_dict['conv2.bias'])
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             elif mo == 3:
-                model.load_state_dict(torch.load(path))
+                model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             else:
                 print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
