@@ -3613,7 +3613,7 @@ def e336_conv3d_mnist():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e289_conv3d_mnist()
+e289_conv3d_mnist()
 # e290_conv3d_mnist()
 # e291_conv3d_mnist()
 # e292_conv3d_mnist()
@@ -3660,7 +3660,7 @@ project_variable = ProjectVariable(debug_mode=False)
 # e333_conv3d_mnist()
 # e334_conv3d_mnist()
 # e335_conv3d_mnist()
-e336_conv3d_mnist()
+# e336_conv3d_mnist()
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
