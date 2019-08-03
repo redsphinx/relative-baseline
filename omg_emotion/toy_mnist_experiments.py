@@ -3203,6 +3203,7 @@ def set_init_11():
     project_variable.balance_training_data = True
     project_variable.model_number = 2
     project_variable.sheet_number = 9
+    project_variable.experiment_state = 'extra'
 
 # --------------------------------------------------------
 #                   out_channels = [6, 16]

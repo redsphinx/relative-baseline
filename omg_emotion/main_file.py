@@ -22,15 +22,32 @@ import shutil
 def run(project_variable):
     # write initial settings to spreadsheet
     if not project_variable.debug_mode:
-        project_variable.at_which_run = U.experiment_exists(project_variable.experiment_number,
-                                                            project_variable.model_number)
-
-        if project_variable.at_which_run != 0:  # experiment exists
-            ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
-        else:
+        if project_variable.experiment_state == 'new':
             ROW = S.write_settings(project_variable)
+        elif project_variable.experiment_state == 'crashed':
+            project_variable.at_which_run = U.experiment_exists(project_variable.experiment_number,
+                                                                project_variable.model_number)
+            ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
+        elif project_variable.experiment_state == 'extra':
+            project_variable.at_which_run = 1 + U.experiment_exists(project_variable.experiment_number,
+                                                                project_variable.model_number)
+            project_variable.repeat_experiments += project_variable.at_which_run
+            ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
 
-    # project_variable = ProjectVariable()
+    # remove duplicate log files
+    log_file = 'experiment_%d_model_%d_run_%d.txt' % (project_variable.experiment_number,
+                                                      project_variable.model_number,
+                                                      project_variable.at_which_run)
+    _which = ['train', 'val', 'test']
+    for w in _which:
+        log_path = os.path.join(PP.saving_data, w, log_file)
+        if os.path.exists(log_path):
+            if os.path.isdir(log_path):
+                shutil.rmtree(log_path)
+            else:
+                os.remove(log_path)
+
+    start = project_variable.at_which_run
 
     # load all data once
     project_variable.val = True
@@ -54,21 +71,6 @@ def run(project_variable):
     if project_variable.train:
         data_train = data[1][2]
         labels_train = data[2][2]
-
-    # remove duplicate log files
-    log_file = 'experiment_%d_model_%d_run_%d.txt' % (project_variable.experiment_number,
-                                                      project_variable.model_number,
-                                                      project_variable.at_which_run)
-    _which = ['train', 'val', 'test']
-    for w in _which:
-        log_path = os.path.join(PP.saving_data, w, log_file)
-        if os.path.exists(log_path):
-            if os.path.isdir(log_path):
-                shutil.rmtree(log_path)
-            else:
-                os.remove(log_path)
-
-    start = project_variable.at_which_run
 
     for num_runs in range(start, project_variable.repeat_experiments):
         # load the training data (which is now randomized)

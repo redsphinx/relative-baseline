@@ -106,6 +106,9 @@ class ProjectVariable(object):
 
         self._repeat_experiments = 1
         self._at_which_run = 0
+        # how to initialize experiment files and saves: 'new': new experiment, 'crashed': experiment crashed before 
+        # finishing, 'extra': experiment finished, run an additional batch of the same experiment
+        self._experiment_state = 'new'
 
         # settings only for 3dconvttn stuff
 
@@ -435,6 +438,14 @@ class ProjectVariable(object):
     @at_which_run.setter
     def at_which_run(self, value):
         self._at_which_run = value
+
+    @property
+    def experiment_state(self):
+        return self._experiment_state
+
+    @experiment_state.setter
+    def experiment_state(self, value):
+        self._experiment_state = value
 
     @property
     def theta_init(self):
