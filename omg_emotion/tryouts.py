@@ -1,28 +1,3 @@
-# from relative_baseline.omg_emotion import project_paths as PP
-# from relative_baseline.omg_emotion import utils as U
-# from relative_baseline.omg_emotion.settings import ProjectVariable
-# from relative_baseline.omg_emotion import setup
-#
-#
-# project_variable = ProjectVariable(debug_mode=True)
-# project_variable.model_number = 3
-# project_variable.num_out_channels = [6, 16]
-#
-# my_model = setup.get_model(project_variable)
-#
-# print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
-#
-# device = setup.get_device(project_variable)
-#
-# if project_variable.device is not None:
-#     my_model.cuda(device)
-#
-# my_optimizer = setup.get_optimizer(project_variable, my_model)
-#
-# print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
-
-
-# This import registers the 3D projection, but is otherwise unused.
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 import matplotlib.pyplot as plt
@@ -32,57 +7,46 @@ import numpy as np
 
 
 fig = plt.figure()
-# ax = fig.gca(projection='3d')
 
-xs = np.array([254234, 263906, 269884, 281908, 285584, 300160, 300264, 315666, 318662, 337414, 467681, 519304])
 #                                                               3        3      2        2      3         2
+
+xs = np.array([254058,	263906,	300264,	318662,	346470,	375668,	392676,	434924,	438882,	485088,	496430,	560186])
 
 # 20
 # series1 = np.array([0.4555, None, 0.5115, None, 0.4455, None, 0.513, 0.391, None, None, 0.429, None]).astype(np.double)
 # series2 = np.array([None, 0.555, None, 0.586, None, 0.6375, None, None, 0.4475, 0.4675, None, 0.428]).astype(np.double)
 
-# 30
-# series1 = np.array([0.593, None, 0.509, None, 0.564, None, 0.535, 0.5445, None, None, 0.5695, None]).astype(np.double)
-# series2 = np.array([None, 0.641, None, 0.5885, None, 0.599, None, None, 0.506, 0.498,None, 0.523]).astype(np.double)
 
-# 40
-# series1 = np.array([0.734, None, 0.6745, None, 0.6855, None, 0.7005, 0.6545, None, None, 0.7, None]).astype(np.double)
-# series2 = np.array([None, 0.753, None, 0.778, None, 0.7705, None, None, 0.6435, 0.7015,None, 0.6785]).astype(np.double)
-
-# 50
-# series1 = np.array([0.75, None, 0.7355, None, 0.744, None, 0.7235, 0.7025, None, None, 0.735, None]).astype(np.double)
-# series2 = np.array([None, 0.7725, None, 0.749, None, 0.7535, None, None, 0.6965, 0.722, None, 0.748]).astype(np.double)
-
-# 100
-# series1 = np.array([0.892, None, 0.903, None, 0.915, None, 0.8415, 0.843, None, None, 0.8635, None]).astype(np.double)
-# series2 = np.array([None, 0.9275, None, 0.9245, None, 0.936, None, None, 0.891, 0.8605,None, 0.877]).astype(np.double)
-
-# 500
-# series1 = np.array([0.972, None, 0.97, None, 0.973, None, 0.9605, 0.9805, None, None, 0.963, None]).astype(np.double)
-# series2 = np.array([None, 0.989, None, 0.995, None, 0.994, None, None, 0.9755, 0.971,None, 0.982]).astype(np.double)
-
-# 1000
-series1 = np.array([0.98, None, 0.988, None, 0.9865, None, 0.9725, 0.9825, None, None, 0.9865, None]).astype(np.double)
-series2 = np.array([None, 0.998, None, 0.997, None, 0.995, None, None, 0.993, 0.9895, None, 0.984]).astype(np.double)
-
-# 5000
-# series1 = np.array([0.9965, None, 0.9955, None, 0.995, None]).astype(np.double)
-# series2 = np.array([None, 0.999, None, 1, None, 1]).astype(np.double)
+# num = 10
+# series1 = np.array([None,	0.3575,	None,	0.351833333333333,	None,	0.400166666666667,	None,	0.383166666666667,	None,	None,	0.402,	0.4213333333]).astype(np.double)
+# series2 = np.array([0.391333333333333,	None,	0.384166666666667,	None,	0.405333333333333,	None,	0.410833333333333,	None,	0.417,	0.395,	None,	None]).astype(np.double)
+# num = 20
+# series1 = np.array([None,	0.464166666666667,	None,	0.4575,	None,	0.511166666666667,	None,	0.476833333333333,	None,	None,	0.504,	0.4775]).astype(np.double)
+# series2 = np.array([0.508,	None,	0.519333333333333,	None,	0.520833333333333,	None,	0.538666666666667,	None,	0.502833333333333,	0.529,	None,	None]).astype(np.double)
+# num = 30
+# series1 = np.array([None,	0.533666666666667,	None,	0.5275,	None,	0.5525,	None,	0.5345,	None,	None,	0.551666666666667,	0.5745]).astype(np.double)
+# series2 = np.array([0.559333333333333,	None,	0.547166666666667,	None,	0.594166666666667,	None,	0.577166666666667,	None,	0.569333333333333,	0.567333333333333,	None,	None]).astype(np.double)
+# num = 40
+# series1 = np.array([None,	0.717333333333333,	None,	0.721166666666667,	None,	0.719166666666667,	None,	0.718333333333333,	None,	None,	0.718,	0.7091666667]).astype(np.double)
+# series2 = np.array([0.741833333333333,	None,	0.718833333333333,	None,	0.759,	None,	0.7225,	None,	0.7425,	0.720166666666667,	None,	None]).astype(np.double)
+# num = 50
+# series1 = np.array([None,	0.709666666666667,	None,	0.743333333333333,	None,	0.7225,	None,	0.726166666666667,	None,	None,	0.731,	0.7276666667]).astype(np.double)
+# series2 = np.array([0.755833333333334,	None,	0.733,	None,	0.731166666666667,	None,	0.761833333333333,	None,	0.753,	0.735,	None,	None]).astype(np.double)
+# num = 100
+# series1 = np.array([None,	0.873166666666667,	None,	0.889333333333333,	None,	0.897666666666667,	None,	0.9015,	None,	None,	0.906,	0.8965]).astype(np.double)
+# series2 = np.array([0.8815,	None,	0.896666666666667,	None,	0.882666666666667,	None,	0.898,	None,	0.899666666666667,	0.898833333333334,	None,	None]).astype(np.double)
+# num = 500
+# series1 = np.array([None,	0.972,	None,	0.976166666666667,	None,	0.974666666666667,	None,	0.9805,	None,	None,	0.981333333333333,	0.981]).astype(np.double)
+# series2 = np.array([0.9695,	None,	0.9595,	None,	0.968,	None,	0.9705,	None,	0.971,	0.972166666666667,	None,	None]).astype(np.double)
+num = 1000
+series1 = np.array([None,	0.983,	None,	0.989333333333333,	None,	0.989333333333333,	None,	0.991166666666667,	None,	None,	0.991666666666667,	0.9921666667]).astype(np.double)
+series2 = np.array([0.977333333333333,	None,	0.9785,	None,	0.975666666666667,	None,	0.983,	None,	0.9825,	0.987,	None,	None]).astype(np.double)
 
 s1mask = np.isfinite(series1)
 s2mask = np.isfinite(series2)
 
-
-
-# series1 = np.array([1, 3, 3, None, None, 5, 8, 9]).astype(np.double)
-# s1mask = np.isfinite(series1)
-# series2 = np.array([2, None, 5, None, 4, None, 3, 2]).astype(np.double)
-# s2mask = np.isfinite(series2)
-
-plt.plot(xs[s1mask], series1[s1mask], linestyle='-', marker='o', label='3DConvTTN')
-plt.plot(xs[s2mask], series2[s2mask], linestyle='-', marker='o', label='3DConv')
-
-num = 1000
+plt.plot(xs[s1mask], series1[s1mask], linestyle='-', marker='o', label='3DConv')
+plt.plot(xs[s2mask], series2[s2mask], linestyle='-', marker='o', label='3DConvTTN')
 
 plt.ylabel('accuracy')
 plt.xlabel('parameters')
@@ -91,35 +55,3 @@ plt.legend(('3DConvTTN', '3DConv'))
 
 plt.savefig('picture_%d.jpg' % num)
 
-
-# # Make data.
-# X = np.array([20, 30, 40, 50, 100, 500, 1000, 5000])
-# Y = np.array([254234, 263906, 269884, 281908, 285584, 300160])
-#
-# X, Y = np.meshgrid(X, Y)
-# # R = np.sqrt(X**2 + Y**2)
-# # Z = np.sin(R)
-# Z = np.array([[0.4555, 0.593, 0.734, 0.75, 0.892, 0.972, 0.98, 0.9965],
-#               [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-#               [0.5115, 0.509, 0.6745, 0.7355, 0.903, 0.97, 0.988, 0.9955],
-#               [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
-#               [0.4455, 0.564, 0.6855, 0.744, 0.915, 0.973, 0.9865, 0.995],
-#               [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]])
-# z_mask = np.isfinite(Z)
-#
-#
-# # Plot the surface.
-# surf = ax.plot_surface(X[z_mask], Y, Z[z_mask], cmap=cm.coolwarm,
-#                        linewidth=0, antialiased=False)
-#
-# # Customize the z axis.
-# ax.set_zlim(-1.01, 1.01)
-# ax.zaxis.set_major_locator(LinearLocator(10))
-# ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-#
-#
-# # Add a color bar which maps values to colors.
-# fig.colorbar(surf, shrink=0.5, aspect=5)
-
-# plt.show()
-# plt.savefig('picture.jpg')
