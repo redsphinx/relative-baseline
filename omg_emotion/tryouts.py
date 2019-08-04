@@ -17,9 +17,9 @@ xs = np.array([254058,	263906,	300264,	318662,	346470,	375668,	392676,	434924,	4
 # series2 = np.array([None, 0.555, None, 0.586, None, 0.6375, None, None, 0.4475, 0.4675, None, 0.428]).astype(np.double)
 
 
-# num = 10
-# series1 = np.array([None,	0.3575,	None,	0.351833333333333,	None,	0.400166666666667,	None,	0.383166666666667,	None,	None,	0.402,	0.4213333333]).astype(np.double)
-# series2 = np.array([0.391333333333333,	None,	0.384166666666667,	None,	0.405333333333333,	None,	0.410833333333333,	None,	0.417,	0.395,	None,	None]).astype(np.double)
+num = 10
+series1 = np.array([None,	0.3575,	None,	0.351833333333333,	None,	0.400166666666667,	None,	0.383166666666667,	None,	None,	0.402,	0.4213333333]).astype(np.double)
+series2 = np.array([0.391333333333333,	None,	0.384166666666667,	None,	0.405333333333333,	None,	0.410833333333333,	None,	0.417,	0.395,	None,	None]).astype(np.double)
 # num = 20
 # series1 = np.array([None,	0.464166666666667,	None,	0.4575,	None,	0.511166666666667,	None,	0.476833333333333,	None,	None,	0.504,	0.4775]).astype(np.double)
 # series2 = np.array([0.508,	None,	0.519333333333333,	None,	0.520833333333333,	None,	0.538666666666667,	None,	0.502833333333333,	0.529,	None,	None]).astype(np.double)
@@ -38,9 +38,9 @@ xs = np.array([254058,	263906,	300264,	318662,	346470,	375668,	392676,	434924,	4
 # num = 500
 # series1 = np.array([None,	0.972,	None,	0.976166666666667,	None,	0.974666666666667,	None,	0.9805,	None,	None,	0.981333333333333,	0.981]).astype(np.double)
 # series2 = np.array([0.9695,	None,	0.9595,	None,	0.968,	None,	0.9705,	None,	0.971,	0.972166666666667,	None,	None]).astype(np.double)
-num = 1000
-series1 = np.array([None,	0.983,	None,	0.989333333333333,	None,	0.989333333333333,	None,	0.991166666666667,	None,	None,	0.991666666666667,	0.9921666667]).astype(np.double)
-series2 = np.array([0.977333333333333,	None,	0.9785,	None,	0.975666666666667,	None,	0.983,	None,	0.9825,	0.987,	None,	None]).astype(np.double)
+# num = 1000
+# series1 = np.array([None,	0.983,	None,	0.989333333333333,	None,	0.989333333333333,	None,	0.991166666666667,	None,	None,	0.991666666666667,	0.9921666667]).astype(np.double)
+# series2 = np.array([0.977333333333333,	None,	0.9785,	None,	0.975666666666667,	None,	0.983,	None,	0.9825,	0.987,	None,	None]).astype(np.double)
 
 s1mask = np.isfinite(series1)
 s2mask = np.isfinite(series2)
@@ -51,7 +51,7 @@ plt.plot(xs[s2mask], series2[s2mask], linestyle='-', marker='o', label='3DConvTT
 plt.ylabel('accuracy')
 plt.xlabel('parameters')
 plt.title('%d datapoints' % num)
-plt.legend(('3DConvTTN', '3DConv'))
+plt.legend(('3DConv', '3DConvTTN'))
 
 plt.savefig('picture_%d.jpg' % num)
 
