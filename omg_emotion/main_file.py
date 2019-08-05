@@ -72,13 +72,24 @@ def run(project_variable):
         data_train = data[1][2]
         labels_train = data[2][2]
 
+    if project_variable.same_training_data:
+        np.random.seed(project_variable.data_points)
+        training_seed_runs = np.random.randint(10000, project_variable.repeat_experiments)
+
+    # ====================================================================================================
+    # start with runs
+    # ====================================================================================================
     for num_runs in range(start, project_variable.repeat_experiments):
+        if project_variable.same_training_data:
+            seed = training_seed_runs[num_runs]
+        else:
+            seed = None
         # load the training data (which is now randomized)
         if project_variable.randomize_training_data:
             project_variable.test = False
             project_variable.val = False
             project_variable.train = True
-            data = D.load_data(project_variable)
+            data = D.load_data(project_variable, seed)
             if project_variable.train:
                 data_train = data[1][0]
                 labels_train = data[2][0]
@@ -134,8 +145,9 @@ def run(project_variable):
                   U.count_parameters(my_model)
                   )
         project_variable.writer.add_text('project settings', text)
-
+        # ====================================================================================================
         # start with epochs
+        # ====================================================================================================
         for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
             project_variable.current_epoch = e
 

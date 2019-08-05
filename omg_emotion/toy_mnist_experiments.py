@@ -4091,7 +4091,7 @@ project_variable = ProjectVariable(debug_mode=False)
 # e381_conv3dttn_mnist()
 # e382_conv3dttn_mnist()
 # e383_conv3dttn_mnist()
-e384_conv3dttn_mnist()
+# e384_conv3dttn_mnist()
 
 
 

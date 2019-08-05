@@ -430,7 +430,7 @@ def dummy_uniform_lenet5_3d(project_variable):
     return splits, all_data, all_labels
 
 
-def load_movmnist(project_variable):
+def load_movmnist(project_variable, seed):
     splits = []
     all_labels = []
     all_data = []
@@ -455,7 +455,7 @@ def load_movmnist(project_variable):
 
         return data, labels
 
-    def load_random(which, dp, balanced):
+    def load_random(which, dp, balanced, seed):
         assert(dp % 10 == 0)
 
         total_dp = {'train':50000, 'val':10000, 'test':10000}
@@ -468,10 +468,18 @@ def load_movmnist(project_variable):
             chosen = []
             for i in range(10):
                 indices = np.arange(total_dp[which])[labels == i]
+
+                if seed is not None:
+                    random.seed(seed)
+
                 choose_indices = random.sample(list(np.arange(len(indices))), dp//10)
                 chosen.extend(indices[choose_indices])
         else:
             chosen = np.arange(total_dp[which])
+
+            if seed is not None:
+                random.seed(seed)
+
             random.shuffle(chosen)
             chosen = chosen[:dp]
 
@@ -501,7 +509,8 @@ def load_movmnist(project_variable):
 
     if project_variable.train:
         if project_variable.randomize_training_data:
-            data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data)
+            data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data,
+                                       seed)
         else:
             data, labels = load('train', project_variable.data_points[0])
         splits.append('train')
@@ -523,7 +532,7 @@ def load_movmnist(project_variable):
     return splits, all_data, all_labels
 
 
-def load_data(project_variable):
+def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable)
     elif project_variable.dataset == 'mnist':
@@ -531,7 +540,7 @@ def load_data(project_variable):
     elif project_variable.dataset == 'dummy':
         return dummy_uniform_lenet5_3d(project_variable)
     elif project_variable.dataset == 'mov_mnist':
-        return load_movmnist(project_variable)
+        return load_movmnist(project_variable, seed)
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None

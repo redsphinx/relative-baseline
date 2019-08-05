@@ -46,6 +46,7 @@ class ProjectVariable(object):
         self._dataset = 'mnist'
         self._randomize_training_data = False
         self._balance_training_data = False
+        self._same_training_data = False
         self._data_points = [100, 100, 100]  # [train, val, test]
         
         # bool, which procedures to perform
@@ -246,6 +247,14 @@ class ProjectVariable(object):
     @balance_training_data.setter
     def balance_training_data(self, value):
         self._balance_training_data = value
+
+    @property
+    def same_training_data(self):
+        return self._same_training_data
+
+    @same_training_data.setter
+    def same_training_data(self, value):
+        self._same_training_data = value
 
     @property
     def data_points(self):
