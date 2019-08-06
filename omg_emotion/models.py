@@ -358,7 +358,7 @@ class LeNet5_TTN3d(torch.nn.Module):
 
 class AlexNet_classic(nn.Module):
 
-    def __init__(self, num_classes=1000):
+    def __init__(self, num_classes=6):
         super(AlexNet_classic, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
