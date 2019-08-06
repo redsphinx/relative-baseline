@@ -531,6 +531,7 @@ def load_kthactions(project_variable, seed):
     splits = []
     all_labels = []
     all_data = []
+    FRAMES = 300
 
     def load(which, dp, seed):
         total_dp = {'train': 191, 'val': 192, 'test': 216}
@@ -538,13 +539,16 @@ def load_kthactions(project_variable, seed):
         if dp != total_dp[which]:
             assert(dp % 6 == 0)
 
-        data = np.zeros(shape=(dp, 1, frames, 160, 120), dtype=tp)
+        data = np.zeros(shape=(dp, 1, FRAMES, 160, 120), dtype=tp)
 
         kth_png_path = os.path.join(PP.kth_png, which)
 
+        # balanced by default
         labels = np.repeat(list(labels_dict.keys()), dp // 6)
 
-        for c in range(5):
+        chosen_paths = []
+
+        for c in range(6):
             class_path = os.path.join(kth_png_path, labels_dict[c])
             options = os.listdir(class_path)
             if seed is not None:
@@ -553,73 +557,49 @@ def load_kthactions(project_variable, seed):
             chosen = random.sample(options, dp // 6) # samples without replacement
 
             for i in chosen:
+                p = os.path.join(class_path, i)
+                chosen_paths.append(p)
 
+        chosen_paths = np.array(chosen_paths)
+        shuffle_order = list(np.arange(dp))
 
+        if seed is not None:
+            random.seed(seed)
 
+        random.shuffle(shuffle_order)
 
+        labels = labels[shuffle_order]
+        chosen_paths = chosen_paths[shuffle_order]
 
-
-
-
-        if balanced:
-            chosen = []
-            for i in range(10):
-                indices = np.arange(total_dp[which])[labels == i]
-
-                if seed is not None:
-                    random.seed(seed)
-
-                choose_indices = random.sample(list(np.arange(len(indices))), dp // 10)
-                chosen.extend(indices[choose_indices])
-        else:
-            chosen = np.arange(total_dp[which])
-
-            if seed is not None:
-                random.seed(seed)
-
-            random.shuffle(chosen)
-            chosen = chosen[:dp]
-
-        chosen.sort()
-        labels = labels[chosen]
-
-        num_points = len(labels)
-
-        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
-
-        for i in tqdm(range(num_points)):
-            choose = chosen[i]
-            for j in range(frames):
-                file_path = os.path.join(path, str(choose), '%d.png' % j)
+        for i in tqdm(range(dp)):
+            choose = chosen_paths[i]
+            for j in range(1, FRAMES+1):
+                file_path = os.path.join(choose, '%d.png' % j)
                 tmp = np.array(Image.open(file_path))
+                # FIX shape
                 data[i, 0, j] = tmp
 
         return data, labels
 
-
-
     if project_variable.train:
-        data, labels = load('train', project_variable.data_points[0])
+        data, labels = load('train', project_variable.data_points[0], seed)
         splits.append('train')
         all_data.append(data)
         all_labels.append(labels)
 
     if project_variable.val:
-        data, labels = load('val', project_variable.data_points[1])
+        data, labels = load('val', project_variable.data_points[1], seed)
         splits.append('val')
         all_data.append(data)
         all_labels.append(labels)
 
     if project_variable.test:
-        data, labels = load('test', project_variable.data_points[2])
+        data, labels = load('test', project_variable.data_points[2], seed)
         splits.append('test')
         all_data.append(data)
         all_labels.append(labels)
 
     return splits, all_data, all_labels
-
-
-    pass
 
 
 def load_data(project_variable, seed):

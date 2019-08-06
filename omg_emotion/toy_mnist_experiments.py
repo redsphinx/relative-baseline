@@ -4039,62 +4039,6 @@ def e384_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e337_conv3dttn_mnist()
-# e338_conv3dttn_mnist()
-# e339_conv3dttn_mnist()
-# e340_conv3dttn_mnist()
-# e341_conv3dttn_mnist()
-# e342_conv3dttn_mnist()
-# e343_conv3dttn_mnist()
-# e344_conv3dttn_mnist()
-#
-# e345_conv3dttn_mnist()
-# e346_conv3dttn_mnist()
-# e347_conv3dttn_mnist()
-# e348_conv3dttn_mnist()
-# e349_conv3dttn_mnist()
-# e350_conv3dttn_mnist()
-# e351_conv3dttn_mnist()
-# e352_conv3dttn_mnist()
-#
-# e353_conv3dttn_mnist()
-# e354_conv3dttn_mnist()
-# e355_conv3dttn_mnist()
-# e356_conv3dttn_mnist()
-# e357_conv3dttn_mnist()
-# e358_conv3dttn_mnist()
-# e359_conv3dttn_mnist()
-# e360_conv3dttn_mnist()
-#
-# e361_conv3dttn_mnist()
-# e362_conv3dttn_mnist()
-# e363_conv3dttn_mnist()
-# e364_conv3dttn_mnist()
-# e365_conv3dttn_mnist()
-# e366_conv3dttn_mnist()
-# e367_conv3dttn_mnist()
-# e368_conv3dttn_mnist()
-#
-# e369_conv3dttn_mnist()
-# e370_conv3dttn_mnist()
-# e371_conv3dttn_mnist()
-# e372_conv3dttn_mnist()
-# e373_conv3dttn_mnist()
-# e374_conv3dttn_mnist()
-# e375_conv3dttn_mnist()
-# e376_conv3dttn_mnist()
-#
-# e377_conv3dttn_mnist()
-# e378_conv3dttn_mnist()
-# e379_conv3dttn_mnist()
-# e380_conv3dttn_mnist()
-# e381_conv3dttn_mnist()
-# e382_conv3dttn_mnist()
-# e383_conv3dttn_mnist()
-# e384_conv3dttn_mnist()
-
-
-
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: or add noise to mov_mnist

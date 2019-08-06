@@ -34,6 +34,7 @@ moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mni
 moving_mnist_png = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/png'
 kth_location = '/huge/gabras/kth_actions/avi'
 kth_png = '/huge/gabras/kth_actions/png'
+kth_metadata = '/huge/gabras/kth_actions/metadata.txt'
 
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.

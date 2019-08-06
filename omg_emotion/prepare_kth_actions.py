@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import os
 import subprocess
 import tqdm
@@ -63,3 +64,42 @@ def prepare_frames_metadata():
                 my_file.write(new_line)
 
 
+def get_statistics():
+    '''
+    boxing:         lowest 250,     highest: 701,   average: 449
+    handclapping:   lowest 284,     highest: 558,   average: 430
+    handwaving:     lowest 330,     highest: 824,   average: 534
+    jogging:        lowest 284,     highest: 660,   average: 438
+    running:        lowest 32,      highest: 686,   average: 364
+    walking:        lowest 60,      highest: 960,   average: 617
+    '''
+    metadata = np.genfromtxt(PP.kth_metadata, delimiter=',', dtype=str)
+    translate = {'boxing':0, 'handclapping':1, 'handwaving':2, 'jogging':3, 'running':4, 'walking':5}
+    translate_back = {0:'boxing', 1:'handclapping', 2:'handwaving', 3:'jogging', 4:'running', 5:'walking'}
+    meta_dict =  {0:[], 1:[], 2:[], 3:[], 4:[], 5:[]}
+
+    for i in range(len(metadata)):
+        meta_dict[translate[metadata[i][1]]].append(int(metadata[i][-1]))
+
+    for c in range(6):
+        print('%s: lowest %d, highest: %d, average: %d'
+              % (translate_back[c], min(meta_dict[c]), max(meta_dict[c]), int(np.mean(meta_dict[c])))
+              )
+
+    return meta_dict
+
+
+def plot_statistics():
+    meta_dict = get_statistics()
+    translate_back = {0: 'boxing', 1: 'handclapping', 2: 'handwaving', 3: 'jogging', 4: 'running', 5: 'walking'}
+    save_location = '/huge/gabras/kth_actions/histograms'
+    n_bins = 50
+
+    for i in meta_dict.keys():
+        fig = plt.figure()
+        plt.hist(meta_dict[i], bins=n_bins)
+        plt.title(translate_back[i])
+        plt.savefig(os.path.join(save_location, '%s_histogram.jpg' % (translate_back[i])))
+        del fig
+
+# plot_statistics()
