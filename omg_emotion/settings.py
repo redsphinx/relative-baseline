@@ -42,7 +42,7 @@ class ProjectVariable(object):
         # UNUSED? ================================================================================
         
         # instead of having 3 dataset splits, have just 1 dataset parameter
-        # implemented datasets: omg_emotion, mnist, 'dummy', 'mov_mnist.  status affectnet??
+        # implemented datasets: omg_emotion, mnist, dummy, mov_mnist, kth_action.  status affectnet??
         self._dataset = 'mnist'
         self._randomize_training_data = False
         self._balance_training_data = False

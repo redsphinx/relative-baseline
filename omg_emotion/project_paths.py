@@ -32,7 +32,8 @@ mnist_location = '/home/gabras/deployed/mnist'
 dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
 moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
 moving_mnist_png = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/png'
-kth_location = '/huge/gabras/kth_actions'
+kth_location = '/huge/gabras/kth_actions/avi'
+kth_png = '/huge/gabras/kth_actions/png'
 
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.

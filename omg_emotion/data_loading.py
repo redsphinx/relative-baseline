@@ -437,7 +437,6 @@ def load_movmnist(project_variable, seed):
     tp = np.float32
     frames = 30
 
-
     def load(which, dp):
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
@@ -500,13 +499,6 @@ def load_movmnist(project_variable, seed):
         return data, labels
 
 
-    # TODO: implement
-    def load_faster(which):
-        # first load all data into cpu memory
-        # move data from cpu to gpu as you need it
-        pass
-
-
     if project_variable.train:
         if project_variable.randomize_training_data:
             data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data,
@@ -532,6 +524,82 @@ def load_movmnist(project_variable, seed):
     return splits, all_data, all_labels
 
 
+def load_kthactions(project_variable, seed):
+    labels_dict = {0:'boxing', 1:'handclapping', 2:'handwaving', 3:'jogging', 4:'running', 5:'walking'}
+    env_list = [1, 2, 3, 4]
+    # Note: person13_handclapping_d3 missing
+    splits = []
+    all_labels = []
+    all_data = []
+
+    def load(which, dp, balanced, seed):
+        assert (dp % 6 == 0)
+
+        # total_dp = {'train': 50000, 'val': 10000, 'test': 10000}
+
+        path = os.path.join(PP.kth_png, which)
+
+        if balanced:
+            chosen = []
+            for i in range(10):
+                indices = np.arange(total_dp[which])[labels == i]
+
+                if seed is not None:
+                    random.seed(seed)
+
+                choose_indices = random.sample(list(np.arange(len(indices))), dp // 10)
+                chosen.extend(indices[choose_indices])
+        else:
+            chosen = np.arange(total_dp[which])
+
+            if seed is not None:
+                random.seed(seed)
+
+            random.shuffle(chosen)
+            chosen = chosen[:dp]
+
+        chosen.sort()
+        labels = labels[chosen]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            choose = chosen[i]
+            for j in range(frames):
+                file_path = os.path.join(path, str(choose), '%d.png' % j)
+                tmp = np.array(Image.open(file_path))
+                data[i, 0, j] = tmp
+
+        return data, labels
+
+
+
+    if project_variable.train:
+        data, labels = load('train', project_variable.data_points[0])
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.val:
+        data, labels = load('val', project_variable.data_points[1])
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.test:
+        data, labels = load('test', project_variable.data_points[2])
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    return splits, all_data, all_labels
+
+
+    pass
+
+
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable)
@@ -541,6 +609,8 @@ def load_data(project_variable, seed):
         return dummy_uniform_lenet5_3d(project_variable)
     elif project_variable.dataset == 'mov_mnist':
         return load_movmnist(project_variable, seed)
+    elif project_variable.dataset == 'kth_actions':
+        return load_kthactions(project_variable, seed)
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
