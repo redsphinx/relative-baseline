@@ -525,19 +525,41 @@ def load_movmnist(project_variable, seed):
 
 
 def load_kthactions(project_variable, seed):
+    tp = np.float32
     labels_dict = {0:'boxing', 1:'handclapping', 2:'handwaving', 3:'jogging', 4:'running', 5:'walking'}
-    env_list = [1, 2, 3, 4]
     # Note: person13_handclapping_d3 missing
     splits = []
     all_labels = []
     all_data = []
 
-    def load(which, dp, balanced, seed):
-        assert (dp % 6 == 0)
+    def load(which, dp, seed):
+        total_dp = {'train': 191, 'val': 192, 'test': 216}
 
-        # total_dp = {'train': 50000, 'val': 10000, 'test': 10000}
+        if dp != total_dp[which]:
+            assert(dp % 6 == 0)
 
-        path = os.path.join(PP.kth_png, which)
+        data = np.zeros(shape=(dp, 1, frames, 160, 120), dtype=tp)
+
+        kth_png_path = os.path.join(PP.kth_png, which)
+
+        labels = np.repeat(list(labels_dict.keys()), dp // 6)
+
+        for c in range(5):
+            class_path = os.path.join(kth_png_path, labels_dict[c])
+            options = os.listdir(class_path)
+            if seed is not None:
+                random.seed(seed)
+
+            chosen = random.sample(options, dp // 6) # samples without replacement
+
+            for i in chosen:
+
+
+
+
+
+
+
 
         if balanced:
             chosen = []
