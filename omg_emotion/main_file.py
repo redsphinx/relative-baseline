@@ -53,12 +53,13 @@ def run(project_variable):
     project_variable.val = True
     project_variable.test = True
 
+    # FIX: has to be set to True for dataset='kth_actions'
     if not project_variable.randomize_training_data:
         project_variable.train = True
     else:
         project_variable.train = False
 
-    data = D.load_data(project_variable)
+    data = D.load_data(project_variable, seed=None)
 
     if project_variable.val:
         data_val = data[1][0]

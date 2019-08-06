@@ -539,45 +539,68 @@ def load_kthactions(project_variable, seed):
         if dp != total_dp[which]:
             assert(dp % 6 == 0)
 
-        data = np.zeros(shape=(dp, 1, FRAMES, 160, 120), dtype=tp)
+        data = np.zeros(shape=(dp, 1, FRAMES, 120, 160), dtype=tp)
 
         kth_png_path = os.path.join(PP.kth_png, which)
 
         # balanced by default
         labels = np.repeat(list(labels_dict.keys()), dp // 6)
 
+        # remove missing datapoint person13_handclapping_d3
+        if which == 'train' and dp == total_dp[which]:
+            labels = list(labels)
+            labels.pop(34)
+            assert(len(labels) == dp)
+
         chosen_paths = []
 
         for c in range(6):
+            non_train_seeds = ['a', 'b', 'c', 'd', 'e', 'f']
             class_path = os.path.join(kth_png_path, labels_dict[c])
             options = os.listdir(class_path)
-            if seed is not None:
+            options.sort()
+            if seed is not None and which == 'train':
                 random.seed(seed)
+            elif seed is None and which != 'train':
+                random.seed(non_train_seeds[c])
 
-            chosen = random.sample(options, dp // 6) # samples without replacement
+            if dp == total_dp[which]:
+               chosen = options
+            else:
+                chosen = random.sample(options, dp // 6) # samples without replacement
 
             for i in chosen:
                 p = os.path.join(class_path, i)
                 chosen_paths.append(p)
 
-        chosen_paths = np.array(chosen_paths)
-        shuffle_order = list(np.arange(dp))
+        if which == 'train':
+            chosen_paths = np.array(chosen_paths)
+            shuffle_order = list(np.arange(dp))
 
-        if seed is not None:
-            random.seed(seed)
+            if seed is not None:
+                random.seed(seed)
 
-        random.shuffle(shuffle_order)
+            random.shuffle(shuffle_order)
 
-        labels = labels[shuffle_order]
-        chosen_paths = chosen_paths[shuffle_order]
+            labels = labels[shuffle_order]
+            chosen_paths = chosen_paths[shuffle_order]
 
         for i in tqdm(range(dp)):
             choose = chosen_paths[i]
-            for j in range(1, FRAMES+1):
+
+            num_frames = len(os.listdir(choose))
+
+            # pad shorter sequences with zeros
+            if FRAMES+1 > num_frames+1:
+                end = num_frames+1
+            else:
+                end = FRAMES+1
+
+            for j in range(1, end):
                 file_path = os.path.join(choose, '%d.png' % j)
                 tmp = np.array(Image.open(file_path))
-                # FIX shape
-                data[i, 0, j] = tmp
+                # channels are the same
+                data[i, 0, j-1] = tmp[:,:,0]
 
         return data, labels
 

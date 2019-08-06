@@ -281,6 +281,8 @@ class LeNet5_3d(torch.nn.Module):
             self.conv2.bias = torch.nn.init.constant_(self.conv2.bias, 1)
         # Max-pooling
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+
+        # FIX: automatically determine the required size for fc1
         # Fully connected layer
         if project_variable.k_shape == (5, 5, 5):
             _fc_in = [5, 5, 5]
@@ -293,10 +295,14 @@ class LeNet5_3d(torch.nn.Module):
         else:
             print('ERROR: k_shape %s not supported' % str(project_variable.k_shape))
             _fc_in = [1, 1, 1]
+
+        if project_variable.dataset == 'kth_actions':
+            _fc_in = [73, 28, 38]
+
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
                                    120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)
         self.fc2 = torch.nn.Linear(120, 84)  # convert matrix with 120 features to a matrix of 84 features (columns)
-        self.fc3 = torch.nn.Linear(84, 10)  # convert matrix with 84 features to a matrix of 10 features (columns)
+        self.fc3 = torch.nn.Linear(84, project_variable.label_size)  # convert matrix with 84 features to a matrix of 10 features (columns)
 
     def forward(self, x):
         x = torch.nn.functional.relu(self.conv1(x))
@@ -331,7 +337,7 @@ class LeNet5_TTN3d(torch.nn.Module):
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * 5 * 5 * 5,
                                    120)
         self.fc2 = torch.nn.Linear(120, 84)
-        self.fc3 = torch.nn.Linear(84, 10)
+        self.fc3 = torch.nn.Linear(84, project_variable.label_size)
 
     def forward(self, x, device):
         x = self.conv1(x, device)
