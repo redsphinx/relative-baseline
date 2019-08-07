@@ -4,16 +4,16 @@ from relative_baseline.omg_emotion import main_file
 
 def pilot():
     project_variable.device = 0
-    project_variable.model_number = 2
+    project_variable.model_number = 3
     project_variable.experiment_number = 666
     project_variable.batch_size = 10
-    project_variable.end_epoch = 20
+    project_variable.end_epoch = 2
     project_variable.dataset = 'kth_actions'
     # project_variable.dataset = 'mov_mnist'
     project_variable.data_points = [12, 12, 12]
     # project_variable.data_points = [10, 10, 10]
     project_variable.repeat_experiments = 1
-    project_variable.same_training_data = False
+    project_variable.same_training_data = True
     project_variable.randomize_training_data = True
     project_variable.label_size = 6
     # project_variable.label_size = 10

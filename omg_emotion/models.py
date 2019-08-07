@@ -334,7 +334,13 @@ class LeNet5_TTN3d(torch.nn.Module):
                                transformation_groups=project_variable.transformation_groups[1],
                                k0_groups=project_variable.k0_groups[1])
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
-        self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * 5 * 5 * 5,
+
+        if project_variable.dataset == 'kth_actions':
+            _fc_in = [73, 28, 38]
+        else:
+            _fc_in = [5, 5, 5]
+
+        self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
                                    120)
         self.fc2 = torch.nn.Linear(120, 84)
         self.fc3 = torch.nn.Linear(84, project_variable.label_size)
@@ -347,7 +353,9 @@ class LeNet5_TTN3d(torch.nn.Module):
         x = torch.nn.functional.relu(x)
         x = self.max_pool_2(x)
         _shape = x.shape
-        x = x.view(-1, _shape[1] * 5 * 5 * 5)
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        # _shape = x.shape
+        # x = x.view(-1, _shape[1] * 5 * 5 * 5)
         x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         x = self.fc2(x)

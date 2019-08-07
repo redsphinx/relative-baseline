@@ -75,7 +75,7 @@ def run(project_variable):
 
     if project_variable.same_training_data:
         np.random.seed(project_variable.data_points)
-        training_seed_runs = np.random.randint(10000, project_variable.repeat_experiments)
+        training_seed_runs = np.random.randint(10000, size=project_variable.repeat_experiments)
 
     # ====================================================================================================
     # start with runs

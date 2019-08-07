@@ -267,6 +267,13 @@ def load_omg_emotion(project_variable):
 
 
 def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
+
+    if project_variable.train:
+        order = np.arange(len(full_labels))
+        np.random.shuffle(order)
+        full_labels = full_labels[order]
+        full_data = full_data[order]
+
     if ts == steps - 1:
         if nice_div == 0:
             data = full_data[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
@@ -281,22 +288,6 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
     if project_variable.dataset in ['omg_emotion', 'dummy']:
         if type(data) == np.ndarray:
             data = torch.from_numpy(data)
-        # normalize image data
-        # import torchvision.transforms as transforms
-        # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-        #                                  std=[0.229, 0.224, 0.225])
-        # data = torch.from_numpy(data)
-        #
-        # if ts == steps - 1:
-        #     if nice_div == 0:
-        #         for _b in range(project_variable.batch_size):
-        #             data[_b] = normalize(data[_b])
-        #     else:
-        #         for _b in range(nice_div):
-        #             data[_b] = normalize(data[_b])
-        # else:
-        #     for _b in range(project_variable.batch_size):
-        #         data[_b] = normalize(data[_b])
 
         data = data.cuda(device)
 
@@ -554,13 +545,18 @@ def load_kthactions(project_variable, seed):
 
         chosen_paths = []
 
+        # sets seeds for each class such that different people are chosen
+        non_train_seeds = ['a', 'b', 'c', 'd', 'e', 'f']
+        if seed is not None and which == 'train':
+            np.random.seed(seed)
+            train_seeds = np.random.randint(10000, size=6)
+
         for c in range(6):
-            non_train_seeds = ['a', 'b', 'c', 'd', 'e', 'f']
             class_path = os.path.join(kth_png_path, labels_dict[c])
             options = os.listdir(class_path)
             options.sort()
             if seed is not None and which == 'train':
-                random.seed(seed)
+                random.seed(train_seeds[c])
             elif seed is None and which != 'train':
                 random.seed(non_train_seeds[c])
 
@@ -605,22 +601,22 @@ def load_kthactions(project_variable, seed):
         return data, labels
 
     if project_variable.train:
-        data, labels = load('train', project_variable.data_points[0], seed)
+        data, some_labels = load('train', project_variable.data_points[0], seed)
         splits.append('train')
         all_data.append(data)
-        all_labels.append(labels)
+        all_labels.append(some_labels)
 
     if project_variable.val:
-        data, labels = load('val', project_variable.data_points[1], seed)
+        data, some_labels = load('val', project_variable.data_points[1], seed)
         splits.append('val')
         all_data.append(data)
-        all_labels.append(labels)
+        all_labels.append(some_labels)
 
     if project_variable.test:
-        data, labels = load('test', project_variable.data_points[2], seed)
+        data, some_labels = load('test', project_variable.data_points[2], seed)
         splits.append('test')
         all_data.append(data)
-        all_labels.append(labels)
+        all_labels.append(some_labels)
 
     return splits, all_data, all_labels
 
