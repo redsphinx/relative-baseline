@@ -1,3 +1,5 @@
+import numpy as np
+
 import torch
 import torch.nn as nn
 from torch.nn.modules import conv
@@ -454,3 +456,103 @@ class AlexNet_2d(nn.Module):
         x = x.view(x.size(0), 256 * 6 * 6)
         x = self.classifier(x)
         return x
+
+
+# adapted from https://arxiv.org/abs/1907.11272
+class Sota_3d(torch.nn.Module):
+    def __init__(self, input_shape):
+        t, h, w = input_shape
+        super(Sota_3d, self).__init__()
+        self.conv_1 = torch.nn.Conv3d(in_channels=1,
+                                      out_channels=16,
+                                      kernel_size=(10, 32, 32),
+                                      stride=1,
+                                      padding=0,
+                                      bias=True)
+
+        t = t - 10 + 1
+        h = h - 32 + 1
+        w = w - 32 + 1
+
+        self.prelu_1 = torch.nn.PReLU()
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(3, 10, 10))
+
+        t = int(np.floor(t / 3))
+        h = int(np.floor(h / 10))
+        w = int(np.floor(w / 10))
+
+        if t == 0:
+            t += 1
+        if h == 0:
+            h += 1
+        if w == 0:
+            w += 1
+
+        self.conv_2 = torch.nn.Conv3d(in_channels=16,
+                                      out_channels=32,
+                                      kernel_size=(3, 10, 10),
+                                      stride=1,
+                                      padding=1,
+                                      bias=True)
+
+        t = t+2 - 3 + 1
+        h = h+2 - 10 + 1
+        w = w+2 - 10 + 1
+
+        self.prelu_2 = torch.nn.PReLU()
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(1, 3, 3))
+
+        t = int(np.floor(t / 1))
+        h = int(np.floor(h / 3))
+        w = int(np.floor(w / 3))
+
+        if t == 0:
+            t += 1
+        if h == 0:
+            h += 1
+        if w == 0:
+            w += 1
+
+        in_features = t * h * w * 32
+        self.fc_1 = torch.nn.Linear(in_features=in_features,
+                                    out_features=128)
+        self.drop_1 = torch.nn.Dropout3d(p=0.5)
+        self.fc_2 = torch.nn.Linear(in_features=128,
+                                    out_features=6)
+
+    def forward(self, x):
+        x = self.conv_1(x)
+        x = self.prelu_1(x)
+        x = self.max_pool_1(x)
+        x = self.conv_2(x)
+        x = self.prelu_2(x)
+        x = self.max_pool_2(x)
+        _shape = x.shape
+        x = x.view(-1, _shape[1]*_shape[2]*_shape[3]*_shape[4])
+        x = self.fc_1(x)
+        x = self.drop_1(x)
+        x = self.fc_2(x)
+
+        return x
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

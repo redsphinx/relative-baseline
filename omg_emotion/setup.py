@@ -90,6 +90,8 @@ def get_model(project_variable):
             else:
                 print('ERROR: loading weights from model_number=%d not supported for model_number=%d'
                       % (mo, project_variable.model_number))
+    elif project_variable.model_number == 4:
+        model = M.Sota_3d([300, 120, 160])
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)

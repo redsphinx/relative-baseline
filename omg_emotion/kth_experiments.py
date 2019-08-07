@@ -18,14 +18,29 @@ def pilot():
     project_variable.label_size = 6
     # project_variable.label_size = 10
 
+    main_file.run(project_variable)
+
+
+def pilot_2():
+    project_variable.device = 0
+    project_variable.model_number = 4
+    project_variable.experiment_number = 666
+    project_variable.batch_size = 6
+    project_variable.end_epoch = 5
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [96, 12, 12]
+    project_variable.repeat_experiments = 1
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 6
+    project_variable.optimizer = 'adam'
 
     main_file.run(project_variable)
 
 
 project_variable = ProjectVariable(debug_mode=True)
 
-pilot()
-
+pilot_2()
 
 '''
 Warning: NaN or Inf found in input tensor.
