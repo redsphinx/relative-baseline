@@ -530,9 +530,10 @@ def load_kthactions(project_variable, seed):
         if dp != total_dp[which]:
             assert(dp % 6 == 0)
 
-        data = np.zeros(shape=(dp, 1, FRAMES, 120, 160), dtype=tp)
+        # data = np.zeros(shape=(dp, 1, FRAMES, 120, 160), dtype=tp)
+        data = np.zeros(shape=(dp, 1, FRAMES, 60, 60), dtype=tp)
 
-        kth_png_path = os.path.join(PP.kth_png, which)
+        kth_png_path = os.path.join(PP.kth_png_60_60, which)
 
         # balanced by default
         labels = np.repeat(list(labels_dict.keys()), dp // 6)
