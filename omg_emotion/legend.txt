@@ -4,4 +4,5 @@ project_variable.model_number
 2   lenet5 3dconv
 3   lenet5 3dconvTTN
 4   sota 3dconv
-5   sota 3dconvTTN
+5   C3D 3dconv
+
