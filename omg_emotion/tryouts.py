@@ -113,7 +113,7 @@ def C3D_experiments():
     # print(t, h, w)
     # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
     # print(t, h, w)
-    in_features = t * h * w * 32
+    in_features = t * h * w * 64
     print(in_features)
 
 

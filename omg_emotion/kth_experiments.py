@@ -25,15 +25,18 @@ def pilot_2():
     project_variable.device = 0
     project_variable.model_number = 5
     project_variable.experiment_number = 666
-    project_variable.batch_size = 6
-    project_variable.end_epoch = 5
+    project_variable.batch_size = 16
+    # project_variable.batch_size = 6
+    project_variable.end_epoch = 10
     project_variable.dataset = 'kth_actions'
-    project_variable.data_points = [6, 6, 6]
+    project_variable.data_points = [191, 192, 216]
+    # project_variable.data_points = [6, 6, 6]
     project_variable.repeat_experiments = 1
     project_variable.same_training_data = True
     project_variable.randomize_training_data = True
     project_variable.label_size = 6
     project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.0001
 
     main_file.run(project_variable)
 
@@ -42,4 +45,14 @@ project_variable = ProjectVariable(debug_mode=True)
 
 pilot_2()
 
-# 440507654 440507654
+'''
+TODO
+
+find good learning rate
+is batch norm helpful
+figure out the number of out channels
+number of conv layers
+number of features in fc layer
+
+'''
+

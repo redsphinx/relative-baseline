@@ -536,13 +536,18 @@ def load_kthactions(project_variable, seed):
         kth_png_path = os.path.join(PP.kth_png_60_60, which)
 
         # balanced by default
-        labels = np.repeat(list(labels_dict.keys()), dp // 6)
+        if which == 'train' and dp == total_dp[which]:
+            _tmp = dp + 1
+            labels = np.repeat(list(labels_dict.keys()), _tmp // 6)
+        else:
+            labels = np.repeat(list(labels_dict.keys()), dp // 6)
 
         # remove missing datapoint person13_handclapping_d3
         if which == 'train' and dp == total_dp[which]:
             labels = list(labels)
             labels.pop(34)
             assert(len(labels) == dp)
+            labels = np.array(labels)
 
         chosen_paths = []
 
