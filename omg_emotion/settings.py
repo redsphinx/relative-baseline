@@ -77,7 +77,7 @@ class ProjectVariable(object):
         # momentum
         self._momentum = 0.9
         
-        # number of out_channels for lenet5
+        # number of out_channels in the convolution layers of CNNs
         self._num_out_channels = [6, 16]
 
         # int, seed for shuffling
@@ -111,8 +111,9 @@ class ProjectVariable(object):
         # finishing, 'extra': experiment finished, run an additional batch of the same experiment
         self._experiment_state = 'new'
 
+        # ----------------------------------------------------------------------------------------------------------
         # settings only for 3dconvttn stuff
-
+        # ----------------------------------------------------------------------------------------------------------
         # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
         # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
@@ -129,8 +130,14 @@ class ProjectVariable(object):
         self._transformation_groups = self.num_out_channels
         # filters share k0
         self._k0_groups = self.num_out_channels
-        # shape of filter
+        # shape of convolution filter
         self._k_shape = (5, 5, 5)
+        # ----------------------------------------------------------------------------------------------------------
+        # setting for video datasets
+        # ----------------------------------------------------------------------------------------------------------
+        self._load_num_frames = 3
+        
+        # ----------------------------------------------------------------------------------------------------------
 
     @property
     def writer(self):
@@ -519,3 +526,11 @@ class ProjectVariable(object):
     @k_shape.setter
     def k_shape(self, value):
         self._k_shape = value
+    
+    @property
+    def load_num_frames(self):
+        return self._load_num_frames
+
+    @load_num_frames.setter
+    def load_num_frames(self, value):
+        self._load_num_frames = value

@@ -522,16 +522,19 @@ def load_kthactions(project_variable, seed):
     splits = []
     all_labels = []
     all_data = []
-    FRAMES = 300
+    # FRAMES = project_variable.load_num_frames
 
     def load(which, dp, seed):
         total_dp = {'train': 191, 'val': 192, 'test': 216}
+        frames = {'train':project_variable.load_num_frames[0],
+                  'val':project_variable.load_num_frames[1],
+                  'test':project_variable.load_num_frames[2]}
 
         if dp != total_dp[which]:
             assert(dp % 6 == 0)
 
         # data = np.zeros(shape=(dp, 1, FRAMES, 120, 160), dtype=tp)
-        data = np.zeros(shape=(dp, 1, FRAMES, 60, 60), dtype=tp)
+        data = np.zeros(shape=(dp, 1, frames[which], 60, 60), dtype=tp)
 
         kth_png_path = os.path.join(PP.kth_png_60_60, which)
 

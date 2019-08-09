@@ -563,62 +563,64 @@ def auto_in_features(input_shape, type, params):
 
 
 class C3D(torch.nn.Module):
-    def __init__(self, input_shape):
+    def __init__(self, input_shape, project_variable):
         t, h, w = input_shape
+        channels = project_variable.num_out_channels
+        k_t, k_h, k_w = project_variable.k_shape
+
         super(C3D, self).__init__()
 
         self.conv_1 = torch.nn.Conv3d(in_channels=1,
-                                      out_channels=8,
-                                      kernel_size=(3, 3, 3),
+                                      out_channels=channels[0],
+                                      kernel_size=(k_t, k_h, k_w),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_1 = torch.nn.BatchNorm3d(8)
+        self.bn_1 = torch.nn.BatchNorm3d(channels[0])
 
-        self.conv_2 = torch.nn.Conv3d(in_channels=8,
-                                      out_channels=16,
-                                      kernel_size=(3, 3, 3),
+        self.conv_2 = torch.nn.Conv3d(in_channels=channels[0],
+                                      out_channels=channels[1],
+                                      kernel_size=(k_t, k_h, k_w),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_2 = torch.nn.BatchNorm3d(16)
+        self.bn_2 = torch.nn.BatchNorm3d(channels[1])
 
-        self.conv_3 = torch.nn.Conv3d(in_channels=16,
-                                      out_channels=32,
-                                      kernel_size=(3, 3, 3),
+        self.conv_3 = torch.nn.Conv3d(in_channels=channels[1],
+                                      out_channels=channels[2],
+                                      kernel_size=(k_t, k_h, k_w),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_2 = torch.nn.BatchNorm3d(32)
+        self.bn_2 = torch.nn.BatchNorm3d(channels[2])
 
-        self.conv_4 = torch.nn.Conv3d(in_channels=32,
-                                       out_channels=64,
-                                       kernel_size=(3, 3, 3),
+        self.conv_4 = torch.nn.Conv3d(in_channels=channels[2],
+                                       out_channels=channels[3],
+                                       kernel_size=(k_t, k_h, k_w),
                                        stride=1,
                                        padding=0,
                                        bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
         self.max_pool_4 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_4 = torch.nn.BatchNorm3d(64)
+        self.bn_4 = torch.nn.BatchNorm3d(channels[3])
 
-        in_features = t * h * w * 64
+        in_features = t * h * w * channels[3]
         self.fc_1 = torch.nn.Linear(in_features=in_features,
                                     out_features=2048)
 
         self.fc_2 = torch.nn.Linear(in_features=2048,
                                     out_features=6)
 
-        # self.softmax = torch.nn.functional.softmax()
 
     def forward(self, x):
         x = self.conv_1(x)

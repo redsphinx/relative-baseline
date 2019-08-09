@@ -88,7 +88,7 @@ def prepare_data_60_60():
                 # crop_png(png_path)
 
 
-prepare_data_60_60()
+# prepare_data_60_60()
 
 
 def prepare_frames_metadata():

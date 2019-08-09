@@ -162,6 +162,7 @@ def run(project_variable):
             #                 [arousal, valence, categories]]
 
             # ------------------------------------------------------------------------------------------------
+            # TRAINING
             # ------------------------------------------------------------------------------------------------
             project_variable.train = True
             project_variable.val = False
@@ -183,6 +184,7 @@ def run(project_variable):
                 my_model.train()
                 training.run(project_variable, data, my_model, my_optimizer, device)
             # ------------------------------------------------------------------------------------------------
+            # VALIDATION
             # ------------------------------------------------------------------------------------------------
             project_variable.train = False
             project_variable.val = True
@@ -197,21 +199,24 @@ def run(project_variable):
 
                 data = data_val, labels_val
                 validation.run(project_variable, data, my_model, device)
-            # # ------------------------------------------------------------------------------------------------
-            # # ------------------------------------------------------------------------------------------------
-            project_variable.train = False
-            project_variable.val = False
-            project_variable.test = True
+            # ------------------------------------------------------------------------------------------------
+            # TESTING
+            # ------------------------------------------------------------------------------------------------
+            # only run at the last epoch
+            if e == project_variable.end_epoch - 1:
+                project_variable.train = False
+                project_variable.val = False
+                project_variable.test = True
 
-            if project_variable.test:
-                if project_variable.model_number == 0:
-                    w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-                    w = w.astype(dtype=np.float32)
-                    w = torch.from_numpy(w).cuda(device)
-                    project_variable.loss_weights = w
+                if project_variable.test:
+                    if project_variable.model_number == 0:
+                        w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+                        w = w.astype(dtype=np.float32)
+                        w = torch.from_numpy(w).cuda(device)
+                        project_variable.loss_weights = w
 
-                data = data_test, labels_test
-                testing.run(project_variable, data, my_model, device)
+                    data = data_test, labels_test
+                    testing.run(project_variable, data, my_model, device)
             # ------------------------------------------------------------------------------------------------
             # ------------------------------------------------------------------------------------------------
         project_variable.at_which_run += 1
