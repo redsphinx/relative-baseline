@@ -42,7 +42,7 @@ def pilot_2():
 
 
 #####################################################################################################################
-#                                   OUT_CHANNELS M2 EXPERIMENT START: 337 - 384
+#                                LONG EXPERIMENT MODEL 5 FINDING DECENT PARAMETERS
 #####################################################################################################################
 def set_init_1():
     project_variable.model_number = 5
@@ -63,25 +63,316 @@ def set_init_1():
 # --------------------------------------------------------
 #                   load_num_frames = 30
 # --------------------------------------------------------
+
 def e1_C3D_kth():
     set_init_1()
     project_variable.experiment_number = 1
     project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
 
-    project_variable.load_num_frames = 50
+def e2_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 2
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+    
+def e3_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 3
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
     project_variable.learning_rate = 0.0001
-    # project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+# --
+def e4_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 4
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e5_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 5
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e6_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 6
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+# --
+def e7_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 7
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e8_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 8
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e9_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 9
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#                   load_num_frames = 50
+# --------------------------------------------------------
+
+def e10_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 10
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [4, 8, 16, 32]
     main_file.run(project_variable)
 
 
+def e11_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 11
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
 
+def e12_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 12
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+
+
+# --
+def e13_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 13
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e14_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 14
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e15_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 15
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+# --
+def e16_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 16
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e17_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 17
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e18_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 18
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#                   load_num_frames = 100
+# --------------------------------------------------------
+
+def e19_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 19
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+
+
+def e20_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 20
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+
+
+def e21_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 21
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    main_file.run(project_variable)
+
+
+# --
+def e22_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 22
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e23_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 23
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+def e24_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 24
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    main_file.run(project_variable)
+
+
+# --
+def e25_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 25
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e26_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 26
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+def e27_C3D_kth():
+    set_init_1()
+    project_variable.experiment_number = 27
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=False)
 
 e1_C3D_kth()
+e2_C3D_kth()
+e3_C3D_kth()
+e4_C3D_kth()
+e5_C3D_kth()
+e6_C3D_kth()
+e7_C3D_kth()
+e8_C3D_kth()
+e9_C3D_kth()
 
+e10_C3D_kth()
+e11_C3D_kth()
+e12_C3D_kth()
+e13_C3D_kth()
+e14_C3D_kth()
+e15_C3D_kth()
+e16_C3D_kth()
+e17_C3D_kth()
+e18_C3D_kth()
 
+e19_C3D_kth()
+e20_C3D_kth()
+e21_C3D_kth()
+e22_C3D_kth()
+e23_C3D_kth()
+e24_C3D_kth()
+e25_C3D_kth()
+e26_C3D_kth()
+e27_C3D_kth()
 
 
 

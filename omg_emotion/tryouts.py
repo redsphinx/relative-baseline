@@ -83,7 +83,7 @@ def C3D_experiments():
 
         return t, h, w
 
-    iputshep = (50, 60, 60)
+    iputshep = (100, 60, 60)
     print(iputshep)
     t, h, w = auto_in_features(iputshep, 'conv', (3, 3, 3, 0))
     print(t, h, w)
