@@ -468,7 +468,7 @@ def e38_C3D_kth():
     project_variable.device = 1
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.conv1_k_t = 5
-    # project_variable.do_batchnorm = [True, True, True, True, True]
+    project_variable.do_batchnorm = [True, True, True, True, True]
     main_file.run(project_variable)
 
 
@@ -522,7 +522,7 @@ def e43_C3D_kth():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
 
 # e32_C3D_kth()
@@ -531,9 +531,9 @@ project_variable = ProjectVariable(debug_mode=True)
 # e35_C3D_kth()
 # e36_C3D_kth()
 # e37_C3D_kth()
-e30_C3D_kth()
+# e38_C3D_kth()
 # e39_C3D_kth()
 # e40_C3D_kth()
 # e41_C3D_kth()
 # e42_C3D_kth()
-# e43_C3D_kth()
+e43_C3D_kth()
