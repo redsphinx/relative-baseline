@@ -552,12 +552,12 @@ def auto_in_features(input_shape, type, params):
         t = int(np.floor(t / k_t))
         h = int(np.floor(h / k_h))
         w = int(np.floor(w / k_w))
-        if t == 0:
-            t += 1
-        if h == 0:
-            h += 1
-        if w == 0:
-            w += 1
+        # if t == 0:
+        #     t += 1
+        # if h == 0:
+        #     h += 1
+        # if w == 0:
+        #     w += 1
 
     return t, h, w
 
@@ -565,6 +565,7 @@ def auto_in_features(input_shape, type, params):
 class C3D(torch.nn.Module):
     def __init__(self, input_shape, project_variable):
         t, h, w = input_shape
+        print(t, h, w)
         channels = project_variable.num_out_channels
         # k_t, k_h, k_w = project_variable.k_shape
         do_batchnorm = project_variable.do_batchnorm
@@ -577,9 +578,11 @@ class C3D(torch.nn.Module):
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (project_variable.conv1_k_t, 3, 3, 0))
+        print(t, h, w)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+        print(t, h, w)
         if do_batchnorm[0]:
             self.bn_1 = torch.nn.BatchNorm3d(channels[0])
 
@@ -590,8 +593,10 @@ class C3D(torch.nn.Module):
                                       padding=0,
                                       bias=True)
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        print(t, h, w)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+        print(t, h, w)
         if do_batchnorm[1]:
             self.bn_2 = torch.nn.BatchNorm3d(channels[1])
 
@@ -602,6 +607,7 @@ class C3D(torch.nn.Module):
                                       padding=0,
                                       bias=True)
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+        print(t, h, w)
         # self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         if do_batchnorm[2]:
@@ -615,11 +621,17 @@ class C3D(torch.nn.Module):
                                        bias=True)
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
 
-        t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        if t == 1:
+        # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+        print(t, h, w, int(np.floor(t / 2)))
+        if int(np.floor(t / 2)) == 0:
+            print('set 1')
             self.max_pool_4 = torch.nn.MaxPool3d(kernel_size=(1, 2, 2))
+            t, h, w = auto_in_features((t, h, w), 'pool', (1, 2, 2))
         else:
             self.max_pool_4 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
+            t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+
+        print(t, h, w)
 
         if do_batchnorm[3]:
             self.bn_4 = torch.nn.BatchNorm3d(channels[3])
@@ -681,7 +693,16 @@ class C3D(torch.nn.Module):
         return x
 
 
-
+'''
+30 60 60
+28 58 58
+14 29 29
+12 27 27
+6 13 13
+4 11 11
+2 9 9 1
+1 4 4
+'''
 
 
 

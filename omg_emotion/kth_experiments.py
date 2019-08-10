@@ -390,7 +390,7 @@ def e31_C3D_kth():
     project_variable.conv1_k_t = 7
     main_file.run(project_variable)
 #####################################################################################################################
-#                                         BATCHNORM 32 - 43
+#                                         BATCHNORM 32 - 49
 #####################################################################################################################
 def set_init_2():
     set_init_1()
@@ -521,19 +521,72 @@ def e43_C3D_kth():
     project_variable.do_batchnorm = [False, False, False, False, True]
     main_file.run(project_variable)
 
+# --------------------------------------------------------
+#              out_channels [8, 16, 32, 64]
+# --------------------------------------------------------
+def e44_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 44
+    project_variable.device = 1
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.conv1_k_t = 3
+    project_variable.do_batchnorm = [False, False, True, False, False]
+    main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+def e45_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 45
+    project_variable.device = 1
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.conv1_k_t = 3
+    project_variable.do_batchnorm = [True, True, False, False, False]
+    main_file.run(project_variable)
+
+def e46_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 46
+    project_variable.device = 1
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.conv1_k_t = 3
+    project_variable.do_batchnorm = [True, True, True, False, False]
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#              out_channels [16, 32, 64, 128]
+# --------------------------------------------------------
+def e47_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 47
+    project_variable.device = 1
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.conv1_k_t = 5
+    project_variable.do_batchnorm = [False, False, True, False, False]
+    main_file.run(project_variable)
+
+def e48_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 48
+    project_variable.device = 1
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.conv1_k_t = 5
+    project_variable.do_batchnorm = [True, True, False, False, False]
+    main_file.run(project_variable)
+
+def e49_C3D_kth():
+    set_init_2()
+    project_variable.experiment_number = 49
+    project_variable.device = 1
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.conv1_k_t = 5
+    project_variable.do_batchnorm = [True, True, True, False, False]
+    main_file.run(project_variable)
 
 
-# e32_C3D_kth()
-# e33_C3D_kth()
-# e34_C3D_kth()
-# e35_C3D_kth()
-# e36_C3D_kth()
-# e37_C3D_kth()
-# e38_C3D_kth()
-# e39_C3D_kth()
-# e40_C3D_kth()
-# e41_C3D_kth()
-# e42_C3D_kth()
-e43_C3D_kth()
+project_variable = ProjectVariable(debug_mode=True)
+
+
+e44_C3D_kth()
+# e45_C3D_kth()
+# e46_C3D_kth()
+# e47_C3D_kth()
+# e48_C3D_kth()
+# e49_C3D_kth()
