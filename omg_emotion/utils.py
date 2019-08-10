@@ -127,7 +127,10 @@ def experiment_runs_statistics(experiment, model):
         for j in range(runs):
             file_path = os.path.join(folder_path, '%s_%d.txt' % (name, j) )
             data = np.genfromtxt(file_path, str, delimiter=',')
-            acc.append(float(data[-1][1]))
+            if len(data.shape) == 1:
+                acc.append(float(data[1]))
+            else:
+                acc.append(float(data[-1][1]))
 
         print('%s   mean: %f    std: %f     runs: %d    best run: %d' % (i, np.mean(acc), np.std(acc), runs,
                                                                          acc.index(max(acc))))
@@ -155,4 +158,7 @@ def experiment_exists(experiment_number, model_number):
 # https://github.com/ysh329/deep-learning-model-convertor
 # https://github.com/albermax/innvestigate/blob/master/examples/notebooks/introduction.ipynb
 
-
+# for i in range(12, 16):
+#     print(i)
+#     experiment_runs_statistics(i, 5)
+# experiment_runs_statistics(22, 5)

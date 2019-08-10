@@ -136,6 +136,7 @@ class ProjectVariable(object):
         # setting for video datasets
         # ----------------------------------------------------------------------------------------------------------
         self._load_num_frames = 30
+        self._conv1_k_t = 3
         
         # ----------------------------------------------------------------------------------------------------------
 
@@ -534,3 +535,12 @@ class ProjectVariable(object):
     @load_num_frames.setter
     def load_num_frames(self, value):
         self._load_num_frames = value
+
+    @property
+    def conv1_k_t(self):
+        return self._conv1_k_t
+
+    @conv1_k_t.setter
+    def conv1_k_t(self, value):
+        self._conv1_k_t = value
+

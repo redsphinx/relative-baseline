@@ -1,6 +1,7 @@
 # from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
-
-# import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 # from matplotlib import cm
 # from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
@@ -83,9 +84,9 @@ def C3D_experiments():
 
         return t, h, w
 
-    iputshep = (100, 60, 60)
+    iputshep = (30, 60, 60)
     print(iputshep)
-    t, h, w = auto_in_features(iputshep, 'conv', (3, 3, 3, 0))
+    t, h, w = auto_in_features(iputshep, 'conv', (5, 3, 3, 0))
     print(t, h, w)
     t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
     print(t, h, w)
@@ -113,7 +114,7 @@ def C3D_experiments():
     # print(t, h, w)
     # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
     # print(t, h, w)
-    in_features = t * h * w * 32
+    in_features = t * h * w * 64
     print(in_features)
 
 

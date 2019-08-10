@@ -18,6 +18,8 @@ def plot_confusion_matrix(confusion_matrix, dataset):
         labels = ['anger', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
     elif dataset in ['mnist', 'mov_mnist']:
         labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    elif dataset == 'kth_actions':
+        labels = ['boxing', 'handclapping', 'handwaving', 'jogging', 'running', 'walking']
     else:
         labels = []
 

@@ -566,47 +566,48 @@ class C3D(torch.nn.Module):
     def __init__(self, input_shape, project_variable):
         t, h, w = input_shape
         channels = project_variable.num_out_channels
-        k_t, k_h, k_w = project_variable.k_shape
+        # k_t, k_h, k_w = project_variable.k_shape
+
 
         super(C3D, self).__init__()
 
         self.conv_1 = torch.nn.Conv3d(in_channels=1,
                                       out_channels=channels[0],
-                                      kernel_size=(k_t, k_h, k_w),
+                                      kernel_size=(project_variable.conv1_k_t, 3, 3),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         self.conv_2 = torch.nn.Conv3d(in_channels=channels[0],
                                       out_channels=channels[1],
-                                      kernel_size=(k_t, k_h, k_w),
+                                      kernel_size=(3, 3, 3),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         self.conv_3 = torch.nn.Conv3d(in_channels=channels[1],
                                       out_channels=channels[2],
-                                      kernel_size=(k_t, k_h, k_w),
+                                      kernel_size=(3, 3, 3),
                                       stride=1,
                                       padding=0,
                                       bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         # self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         self.conv_4 = torch.nn.Conv3d(in_channels=channels[2],
                                        out_channels=channels[3],
-                                       kernel_size=(k_t, k_h, k_w),
+                                       kernel_size=(3, 3, 3),
                                        stride=1,
                                        padding=0,
                                        bias=True)
-        t, h, w = auto_in_features((t, h, w), 'conv', (k_t, k_h, k_w, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         self.max_pool_4 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
