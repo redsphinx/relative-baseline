@@ -214,7 +214,7 @@ def write_settings(project_variable):
             '',  # best run                                                 # H
             str(project_variable.num_out_channels),  # I
             str(project_variable.conv1_k_t),  # J
-            ''  # batchnorm # K
+            str(project_variable.do_batchnorm)  # batchnorm # K
         ]]
         end_letter = 'K'
     else:

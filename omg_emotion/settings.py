@@ -137,7 +137,8 @@ class ProjectVariable(object):
         # ----------------------------------------------------------------------------------------------------------
         self._load_num_frames = 30
         self._conv1_k_t = 3
-        
+        # where to add batchnorm after each non-linear activation layer
+        self._do_batchnorm = [False, False, False, False, False]
         # ----------------------------------------------------------------------------------------------------------
 
     @property
@@ -543,4 +544,12 @@ class ProjectVariable(object):
     @conv1_k_t.setter
     def conv1_k_t(self, value):
         self._conv1_k_t = value
+
+    @property
+    def do_batchnorm(self):
+        return self._do_batchnorm
+
+    @do_batchnorm.setter
+    def do_batchnorm(self, value):
+        self._do_batchnorm = value
 
