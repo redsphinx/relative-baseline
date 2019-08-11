@@ -1,3 +1,7 @@
+import pickle
+import bz2
+import torch
+import os
 # from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 import matplotlib
 matplotlib.use('agg')
@@ -59,6 +63,7 @@ def plot_results():
     plt.savefig('picture_%d.jpg' % num)
 
 
+# TODO: update according to pytorch-1.2
 def C3D_experiments():
     def auto_in_features(input_shape, type, params):
         t, h, w = input_shape
@@ -118,4 +123,38 @@ def C3D_experiments():
     print(in_features)
 
 
-C3D_experiments()
+# C3D_experiments()
+
+
+# TODO finish sometime later
+# def compress(experiment, model, run, epoch):
+#     base = '/huge/gabras/omg_emotion/saving_data/models'
+#     name = 'experiment_%d_model_%d_run_%d' % (experiment, model, run)
+#     path = os.path.join(base, name, 'epoch_%d' % epoch)
+#
+#     if os.path.exists(path):
+#         # load the saved weights
+#         weights = torch.load(path, map_location=torch.device('cpu'))
+#         # weights = dict(weights)
+#
+#         # save as pickle
+#         pkl_path = path + '_pkl'
+#         outfile_pkl = open(pkl_path, 'wb')
+#
+#
+#         for i in range(1, 10):
+#
+#
+#
+#             path_bz2 = path + '_lvl_%d.bz2' % i
+#             # compress as bzip2
+#             output = bz2.BZ2File(path_bz2, 'wb', compresslevel=i)
+#             try:
+#                 output.write(weights)
+#             finally:
+#                 output.close()
+#                 print('created %s' % path_bz2)
+
+
+
+

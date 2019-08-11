@@ -592,7 +592,7 @@ project_variable = ProjectVariable(debug_mode=False)
 
 # e44_C3D_kth()
 # e45_C3D_kth()
-e46_C3D_kth()
+# e46_C3D_kth()
 # e47_C3D_kth()
 # e48_C3D_kth()
 # e49_C3D_kth()

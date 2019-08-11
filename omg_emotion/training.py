@@ -128,8 +128,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                                                      loss, accuracy))
 
     # save model
+    # TODO: DEBUG
     if project_variable.save_model:
-        saving.save_model(project_variable, my_model)
+        if project_variable.current_epoch == project_variable.end_epoch:
+            saving.save_model(project_variable, my_model)
 
     # add things to writer
     project_variable.writer.add_scalar('loss/train', loss, project_variable.current_epoch)

@@ -225,5 +225,10 @@ def run(project_variable):
     if not project_variable.debug_mode:
         acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
         S.write_results(acc, std, best_run, ROW, project_variable.sheet_number)
+        # TODO save only last epoch
+
+        # TODO: debug
+        if project_variable.save_only_best_run:
+            U.delete_runs(project_variable, best_run)
 
 

@@ -8,6 +8,9 @@ from relative_baseline.omg_emotion import project_paths as PP
 import os
 from relative_baseline.omg_emotion import models as M
 
+# TODO
+# bzip2: https://pymotw.com/2/bz2/
+
 
 def prepare_model(project_variable, model):
     # resnet
@@ -36,6 +39,7 @@ def get_model(project_variable):
     if project_variable.model_number == 0:
         model = resnet18(pretrained=project_variable.pretrain_resnet18_weights)
         model = prepare_model(project_variable, model)
+        # TODO: FIX WEIGHT LOADING
         if project_variable.load_model is not None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
             # https://cs230-stanford.github.io/pytorch-getting-started.html#training-vs-evaluation
@@ -44,6 +48,7 @@ def get_model(project_variable):
 
     elif project_variable.model_number == 1:
         model = M.LeNet5_2d()
+        # TODO: FIX WEIGHT LOADING
         if project_variable.load_model is not None:
             if mo == 1:
                 model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
@@ -55,7 +60,7 @@ def get_model(project_variable):
 
     elif project_variable.model_number == 2:
         model = M.LeNet5_3d(project_variable)
-
+        # TODO: FIX WEIGHT LOADING
         if project_variable.load_model is not None:
             if mo == 1:
                 pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
@@ -75,7 +80,7 @@ def get_model(project_variable):
         model = M.LeNet5_TTN3d(project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
-
+        # TODO: FIX WEIGHT LOADING
         if project_variable.load_model is not None:
             if mo == 1:
                 pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
