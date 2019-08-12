@@ -80,7 +80,6 @@ def get_model(project_variable):
         model = M.LeNet5_TTN3d(project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
-        # TODO: FIX WEIGHT LOADING
         if project_variable.load_model is not None:
             if mo == 1:
                 pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
@@ -99,6 +98,12 @@ def get_model(project_variable):
         model = M.Sota_3d([project_variable.load_num_frames, 60, 60])
     elif project_variable.model_number == 5:
         model = M.C3D([project_variable.load_num_frames, 60, 60], project_variable)
+    elif project_variable.model_number == 6:
+        model = M.C3DTTN([project_variable.load_num_frames, 60, 60], project_variable)
+        model.conv_1.weight.requires_grad = False
+        model.conv_2.weight.requires_grad = False
+        model.conv_3.weight.requires_grad = False
+        model.conv_4.weight.requires_grad = False
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None

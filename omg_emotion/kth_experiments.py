@@ -45,7 +45,7 @@ def pilot_2():
 #                   LONG EXPERIMENT MODEL 5 FINDING DECENT PARAMETERS 1 - 27
 #####################################################################################################################
 def set_init_1():
-    project_variable.model_number = 5
+    project_variable.model_number = 5 # use C3D_experiment for these experiments.
     project_variable.batch_size = 16
     # project_variable.batch_size = 6
     project_variable.end_epoch = 50
@@ -581,12 +581,687 @@ def e49_C3D_kth():
     main_file.run(project_variable)
 
 
+def pilot_3():
+    project_variable.model_number = 5
+    project_variable.batch_size = 16
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.label_size = 6
+
+    # project_variable.conv1_k_t = 3
+    # project_variable.k_shape = (3, 3, 3)
+    # project_variable.do_batchnorm = [True, False, False, False, False]
+
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    project_variable.optimizer = 'adam'
+    project_variable.experiment_number = 666
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+
+def pilot_4():
+    # project_variable.model_number = 6
+    project_variable.model_number = 5
+    project_variable.batch_size = 16
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    # project_variable.num_out_channels = [10, 18, 34, 66]
+    project_variable.label_size = 6
+
+    # project_variable.conv1_k_t = 3
+    # project_variable.k_shape = (3, 3, 3)
+    # project_variable.do_batchnorm = [True, False, False, False, False]
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    # project_variable.data_points = [12, 12, 12]
+    project_variable.end_epoch = 20
+    project_variable.optimizer = 'adam'
+    project_variable.experiment_number = 666
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+#####################################################################################################################
+#                       LONG EXPERIMENT; MODELS 5, 6; DATA_POINTS; OUT_CHANNELS; 50 - 105
+#####################################################################################################################
+def set_init_3():
+    # architecture
+    project_variable.learning_rate = 0.0001
+    project_variable.label_size = 6
+    project_variable.optimizer = 'adam'
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    # data
+    project_variable.batch_size = 16
+    project_variable.load_num_frames = 30
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.dataset = 'kth_actions'
+    # training
+    project_variable.end_epoch = 50
+    project_variable.repeat_experiments = 30
+    # misc
+    project_variable.sheet_number = 12
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [8, 16, 32, 64]
+# --------------------------------------------------------
+def e50_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 50
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e51_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 51
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e52_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 52
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e53_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 53
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [10, 20, 40, 80]
+# --------------------------------------------------------
+def e54_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 54
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e55_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 55
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e56_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 56
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e57_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 57
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [12, 24, 48, 96]
+# --------------------------------------------------------
+def e58_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 58
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e59_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 59
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e60_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 60
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e61_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 61
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [14, 28, 56, 112]
+# --------------------------------------------------------
+def e62_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 62
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e63_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 63
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e64_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 64
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e65_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 65
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [16, 32, 64, 128]
+# --------------------------------------------------------
+def e66_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 66
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e67_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 67
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e68_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 68
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e69_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 69
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [18, 36, 72, 144]
+# --------------------------------------------------------
+def e70_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 70
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e71_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 71
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e72_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 72
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e73_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 73
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [20, 40, 80, 160]
+# --------------------------------------------------------
+def e74_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 74
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e75_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 75
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e76_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 76
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e77_C3D_kth():
+    set_init_3()
+    project_variable.experiment_number = 77
+    project_variable.model_number = 5
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 5; OUT_CHANNELS [8, 16, 32, 64]
+# --------------------------------------------------------
+def e78_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 78
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e79_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 79
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e80_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 80
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e81_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 81
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [10, 20, 40, 80]
+# --------------------------------------------------------
+def e82_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 82
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e83_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 83
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e84_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 84
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e85_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 85
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [12, 24, 48, 96]
+# --------------------------------------------------------
+def e86_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 86
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e87_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 87
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e88_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 88
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e89_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 89
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [14, 28, 56, 112]
+# --------------------------------------------------------
+def e90_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 90
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e91_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 91
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e92_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 92
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e93_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 93
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [16, 32, 64, 128]
+# --------------------------------------------------------
+def e94_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 94
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e95_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 95
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e96_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 96
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e97_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 97
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [18, 36, 72, 144]
+# --------------------------------------------------------
+def e98_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 98
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e99_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 99
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e100_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 100
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e101_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 101
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          MODEL 6; OUT_CHANNELS [20, 40, 80, 160]
+# --------------------------------------------------------
+def e102_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 102
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [6, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e103_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 103
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [66, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e104_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 104
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [126, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+def e105_C3DTTN_kth():
+    set_init_3()
+    project_variable.experiment_number = 105
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.data_points = [191, 192, 216]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
-
-# e44_C3D_kth()
-# e45_C3D_kth()
-# e46_C3D_kth()
-# e47_C3D_kth()
-# e48_C3D_kth()
-e49_C3D_kth()
+e50_C3D_kth()
+# e51_C3D_kth()
+# e52_C3D_kth()
+# e53_C3D_kth()
+#
+# e54_C3D_kth()
+# e55_C3D_kth()
+# e56_C3D_kth()
+# e57_C3D_kth()
+#
+# e58_C3D_kth()
+# e59_C3D_kth()
+# e50_C3D_kth()
+# e61_C3D_kth()
+#
+# e62_C3D_kth()
+# e63_C3D_kth()
+# e64_C3D_kth()
+# e65_C3D_kth()
+#
+# e66_C3D_kth()
+# e67_C3D_kth()
+# e68_C3D_kth()
+# e69_C3D_kth()
+#
+# e70_C3D_kth()
+# e71_C3D_kth()
+# e72_C3D_kth()
+# e73_C3D_kth()
+#
+# e74_C3D_kth()
+# e75_C3D_kth()
+# e76_C3D_kth()
+# e77_C3D_kth()
+#
+# e78_C3DTTN_kth()
+# e79_C3DTTN_kth()
+# e80_C3DTTN_kth()
+# e81_C3DTTN_kth()
+#
+# e82_C3DTTN_kth()
+# e83_C3DTTN_kth()
+# e84_C3DTTN_kth()
+# e85_C3DTTN_kth()
+#
+# e86_C3DTTN_kth()
+# e87_C3DTTN_kth()
+# e88_C3DTTN_kth()
+# e89_C3DTTN_kth()
+#
+# e90_C3DTTN_kth()
+# e91_C3DTTN_kth()
+# e92_C3DTTN_kth()
+# e93_C3DTTN_kth()
+#
+# e94_C3DTTN_kth()
+# e95_C3DTTN_kth()
+# e96_C3DTTN_kth()
+# e97_C3DTTN_kth()
+#
+# e98_C3DTTN_kth()
+# e99_C3DTTN_kth()
+# e100_C3DTTN_kth()
+# e101_C3DTTN_kth()
+#
+# e102_C3DTTN_kth()
+# e103_C3DTTN_kth()
+# e104_C3DTTN_kth()
+# e105_C3DTTN_kth()

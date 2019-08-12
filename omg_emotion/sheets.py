@@ -44,7 +44,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 11
     elif sheet_number == [0, 10]:
         start = 13
-    elif sheet_number in [4, 6]:
+    elif sheet_number in [4, 6, 12]:
         start = 17
     elif sheet_number in [7, 11]:
         start = 14
@@ -172,7 +172,7 @@ def write_settings(project_variable):
             str(project_variable.data_points)                                 # K
         ]]
         end_letter = 'K'
-    elif project_variable.sheet_number in [9]:
+    elif project_variable.sheet_number in [9, 12]:
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A
             datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
