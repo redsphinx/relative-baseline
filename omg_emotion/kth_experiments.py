@@ -526,7 +526,6 @@ def e43_C3D_kth():
 # --------------------------------------------------------
 def e44_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 44
     project_variable.device = 1
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -536,7 +535,6 @@ def e44_C3D_kth():
 
 def e45_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 45
     project_variable.device = 1
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -546,7 +544,6 @@ def e45_C3D_kth():
 
 def e46_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 46
     project_variable.device = 1
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -558,9 +555,8 @@ def e46_C3D_kth():
 # --------------------------------------------------------
 def e47_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 47
-    project_variable.device = 1
+    project_variable.device = 2
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.conv1_k_t = 5
     project_variable.do_batchnorm = [False, False, True, False, False]
@@ -568,7 +564,6 @@ def e47_C3D_kth():
 
 def e48_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 48
     project_variable.device = 2
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -578,7 +573,6 @@ def e48_C3D_kth():
 
 def e49_C3D_kth():
     set_init_2()
-    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 49
     project_variable.device = 2
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -595,4 +589,4 @@ project_variable = ProjectVariable(debug_mode=False)
 # e46_C3D_kth()
 # e47_C3D_kth()
 # e48_C3D_kth()
-# e49_C3D_kth()
+e49_C3D_kth()
