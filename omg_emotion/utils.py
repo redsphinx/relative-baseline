@@ -218,18 +218,18 @@ def delete_runs(project_variable, except_run):
 # ================================================================
 # !! NOTE: be careful. this method DELETES stuff. use with care !!
 # ================================================================
-# def remove_all_files(experiment, model):
-#     base_path = PP.saving_data
-#     folders = os.listdir(base_path)
-#     name = 'experiment_%d_model_%d' % (experiment, model)
-#
-#     for i in folders:
-#         folder_path = os.path.join(base_path, i)
-#         files = os.listdir(folder_path)
-#         for j in files:
-#             if name in j:
-#                 file_path = os.path.join(folder_path, j)
-#                 if os.path.isdir(file_path):
-#                     shutil.rmtree(file_path)
-#                 elif os.path.isfile(file_path):
-#                     os.remove(file_path)
+def remove_all_files(experiment, model):
+    base_path = PP.saving_data
+    folders = os.listdir(base_path)
+    name = 'experiment_%d_model_%d' % (experiment, model)
+
+    for i in folders:
+        folder_path = os.path.join(base_path, i)
+        files = os.listdir(folder_path)
+        for j in files:
+            if name in j:
+                file_path = os.path.join(folder_path, j)
+                if os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+                elif os.path.isfile(file_path):
+                    os.remove(file_path)

@@ -754,7 +754,7 @@ def e59_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [12, 24, 48, 96]
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e60_C3D_kth():
@@ -763,7 +763,7 @@ def e60_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [12, 24, 48, 96]
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e61_C3D_kth():
@@ -772,7 +772,7 @@ def e61_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [12, 24, 48, 96]
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 5; OUT_CHANNELS [14, 28, 56, 112]
@@ -783,7 +783,7 @@ def e62_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [14, 28, 56, 112]
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e63_C3D_kth():
@@ -792,7 +792,7 @@ def e63_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [14, 28, 56, 112]
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e64_C3D_kth():
@@ -801,7 +801,7 @@ def e64_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [14, 28, 56, 112]
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e65_C3D_kth():
@@ -810,7 +810,7 @@ def e65_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [14, 28, 56, 112]
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 5; OUT_CHANNELS [16, 32, 64, 128]
@@ -821,7 +821,7 @@ def e66_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e67_C3D_kth():
@@ -830,7 +830,7 @@ def e67_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e68_C3D_kth():
@@ -839,7 +839,7 @@ def e68_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e69_C3D_kth():
@@ -848,7 +848,7 @@ def e69_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 5; OUT_CHANNELS [18, 36, 72, 144]
@@ -859,7 +859,7 @@ def e70_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e71_C3D_kth():
@@ -868,7 +868,7 @@ def e71_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e72_C3D_kth():
@@ -877,7 +877,7 @@ def e72_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e73_C3D_kth():
@@ -886,7 +886,7 @@ def e73_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 5; OUT_CHANNELS [20, 40, 80, 160]
@@ -897,7 +897,7 @@ def e74_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e75_C3D_kth():
@@ -924,18 +924,21 @@ def e77_C3D_kth():
     project_variable.model_number = 5
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 5; OUT_CHANNELS [8, 16, 32, 64]
 # --------------------------------------------------------
+
 def e78_C3DTTN_kth():
     set_init_3()
     project_variable.experiment_number = 78
     project_variable.model_number = 6
     project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e79_C3DTTN_kth():
@@ -943,6 +946,8 @@ def e79_C3DTTN_kth():
     project_variable.experiment_number = 79
     project_variable.model_number = 6
     project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -952,6 +957,8 @@ def e80_C3DTTN_kth():
     project_variable.experiment_number = 80
     project_variable.model_number = 6
     project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -961,19 +968,24 @@ def e81_C3DTTN_kth():
     project_variable.experiment_number = 81
     project_variable.model_number = 6
     project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [10, 20, 40, 80]
 # --------------------------------------------------------
+
 def e82_C3DTTN_kth():
     set_init_3()
     project_variable.experiment_number = 82
     project_variable.model_number = 6
     project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e83_C3DTTN_kth():
@@ -981,8 +993,10 @@ def e83_C3DTTN_kth():
     project_variable.experiment_number = 83
     project_variable.model_number = 6
     project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e84_C3DTTN_kth():
@@ -990,8 +1004,10 @@ def e84_C3DTTN_kth():
     project_variable.experiment_number = 84
     project_variable.model_number = 6
     project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e85_C3DTTN_kth():
@@ -999,6 +1015,8 @@ def e85_C3DTTN_kth():
     project_variable.experiment_number = 85
     project_variable.model_number = 6
     project_variable.num_out_channels = [10, 20, 40, 80]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1010,6 +1028,8 @@ def e86_C3DTTN_kth():
     project_variable.experiment_number = 86
     project_variable.model_number = 6
     project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1019,8 +1039,10 @@ def e87_C3DTTN_kth():
     project_variable.experiment_number = 87
     project_variable.model_number = 6
     project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e88_C3DTTN_kth():
@@ -1028,8 +1050,10 @@ def e88_C3DTTN_kth():
     project_variable.experiment_number = 88
     project_variable.model_number = 6
     project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e89_C3DTTN_kth():
@@ -1037,19 +1061,24 @@ def e89_C3DTTN_kth():
     project_variable.experiment_number = 89
     project_variable.model_number = 6
     project_variable.num_out_channels = [12, 24, 48, 96]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [14, 28, 56, 112]
 # --------------------------------------------------------
+
 def e90_C3DTTN_kth():
     set_init_3()
     project_variable.experiment_number = 90
     project_variable.model_number = 6
     project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e91_C3DTTN_kth():
@@ -1057,8 +1086,10 @@ def e91_C3DTTN_kth():
     project_variable.experiment_number = 91
     project_variable.model_number = 6
     project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e92_C3DTTN_kth():
@@ -1066,6 +1097,8 @@ def e92_C3DTTN_kth():
     project_variable.experiment_number = 92
     project_variable.model_number = 6
     project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1075,8 +1108,10 @@ def e93_C3DTTN_kth():
     project_variable.experiment_number = 93
     project_variable.model_number = 6
     project_variable.num_out_channels = [14, 28, 56, 112]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [16, 32, 64, 128]
@@ -1086,6 +1121,8 @@ def e94_C3DTTN_kth():
     project_variable.experiment_number = 94
     project_variable.model_number = 6
     project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1095,6 +1132,8 @@ def e95_C3DTTN_kth():
     project_variable.experiment_number = 95
     project_variable.model_number = 6
     project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1104,8 +1143,10 @@ def e96_C3DTTN_kth():
     project_variable.experiment_number = 96
     project_variable.model_number = 6
     project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e97_C3DTTN_kth():
@@ -1113,8 +1154,10 @@ def e97_C3DTTN_kth():
     project_variable.experiment_number = 97
     project_variable.model_number = 6
     project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [18, 36, 72, 144]
@@ -1124,8 +1167,10 @@ def e98_C3DTTN_kth():
     project_variable.experiment_number = 98
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e99_C3DTTN_kth():
@@ -1133,6 +1178,8 @@ def e99_C3DTTN_kth():
     project_variable.experiment_number = 99
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
     project_variable.device = 0
     main_file.run(project_variable)
@@ -1142,8 +1189,10 @@ def e100_C3DTTN_kth():
     project_variable.experiment_number = 100
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e101_C3DTTN_kth():
@@ -1151,8 +1200,10 @@ def e101_C3DTTN_kth():
     project_variable.experiment_number = 101
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 1
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [20, 40, 80, 160]
@@ -1162,8 +1213,10 @@ def e102_C3DTTN_kth():
     project_variable.experiment_number = 102
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e103_C3DTTN_kth():
@@ -1171,8 +1224,10 @@ def e103_C3DTTN_kth():
     project_variable.experiment_number = 103
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e104_C3DTTN_kth():
@@ -1180,8 +1235,10 @@ def e104_C3DTTN_kth():
     project_variable.experiment_number = 104
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e105_C3DTTN_kth():
@@ -1189,14 +1246,16 @@ def e105_C3DTTN_kth():
     project_variable.experiment_number = 105
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 0
+    project_variable.device = 2
     main_file.run(project_variable)
 
 
 project_variable = ProjectVariable(debug_mode=False)
 
-e50_C3D_kth()
+# e50_C3D_kth()
 # e51_C3D_kth()
 # e52_C3D_kth()
 # e53_C3D_kth()
@@ -1208,7 +1267,7 @@ e50_C3D_kth()
 #
 # e58_C3D_kth()
 # e59_C3D_kth()
-# e50_C3D_kth()
+# e60_C3D_kth()
 # e61_C3D_kth()
 #
 # e62_C3D_kth()
@@ -1261,7 +1320,7 @@ e50_C3D_kth()
 # e100_C3DTTN_kth()
 # e101_C3DTTN_kth()
 #
-# e102_C3DTTN_kth()
+e102_C3DTTN_kth()
 # e103_C3DTTN_kth()
 # e104_C3DTTN_kth()
 # e105_C3DTTN_kth()
