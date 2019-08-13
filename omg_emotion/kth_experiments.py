@@ -1282,17 +1282,7 @@ def bottleneck():
 
 
 project_variable = ProjectVariable(debug_mode=False)
-
 # cProfile.run('bottleneck()', sort='cumtime')
-# bottleneck()
 
 
-# e89_C3DTTN_kth()
-# e93_C3DTTN_kth()
-# e97_C3DTTN_kth()
-# e100_C3DTTN_kth()
-# e101_C3DTTN_kth()
-# e102_C3DTTN_kth()
-# e103_C3DTTN_kth()
-# e104_C3DTTN_kth()
-e105_C3DTTN_kth()
+
