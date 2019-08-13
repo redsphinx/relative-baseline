@@ -199,9 +199,10 @@ def write_settings(project_variable):
             '',  # best run                                                 # H
             str(project_variable.load_num_frames),  # I
             str(project_variable.num_out_channels),  # J
-            project_variable.learning_rate  # K
+            project_variable.learning_rate,  # K
+            project_variable.model_number # L
         ]]
-        end_letter = 'K'
+        end_letter = 'L'
     elif project_variable.sheet_number in [11]:
         values = [[
             date.today().strftime('%d-%m-%Y'),  # date                      #A

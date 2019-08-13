@@ -1281,8 +1281,395 @@ def bottleneck():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+#####################################################################################################################
+#                   LONG EXPERIMENT MODEL 6 FINDING DECENT PARAMETERS 106 - 132
+#####################################################################################################################
+def set_init_4():
+    project_variable.model_number = 6 # experiment version
+    project_variable.batch_size = 16
+    project_variable.end_epoch = 70
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    project_variable.repeat_experiments = 10
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 6
+    project_variable.optimizer = 'adam'
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 10
+
+
+# --------------------------------------------------------
+#                   load_num_frames = 30
+# --------------------------------------------------------
+
+def e106_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 106
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e107_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 107
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e108_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 108
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e109_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 109
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e110_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 110
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e111_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 111
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e112_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 112
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e113_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 113
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e114_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 114
+    project_variable.device = 0
+    project_variable.load_num_frames = 30
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#                   load_num_frames = 50
+# --------------------------------------------------------
+
+def e115_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 115
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e116_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 116
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e117_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 117
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e118_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 118
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e119_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 119
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e120_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 120
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e121_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 121
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e122_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 122
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e123_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 123
+    project_variable.device = 0
+    project_variable.load_num_frames = 50
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --------------------------------------------------------
+#                   load_num_frames = 100
+# --------------------------------------------------------
+
+def e124_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 124
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e125_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 125
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e126_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 126
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [4, 8, 16, 32]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e127_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 127
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e128_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 128
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e129_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 129
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+# --
+def e130_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 130
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e131_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 131
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.00005
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+def e132_C3DTTN_kth():
+    set_init_4()
+    project_variable.experiment_number = 132
+    project_variable.device = 0
+    project_variable.load_num_frames = 100
+    project_variable.learning_rate = 0.0001
+    project_variable.num_out_channels = [16, 32, 64, 128]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
 # cProfile.run('bottleneck()', sort='cumtime')
 
 
-
+e106_C3DTTN_kth()
+# e107_C3DTTN_kth()
+# e108_C3DTTN_kth()
+# e109_C3DTTN_kth()
+# e110_C3DTTN_kth()
+# e111_C3DTTN_kth()
+# e112_C3DTTN_kth()
+# e113_C3DTTN_kth()
+# e114_C3DTTN_kth()
+# e115_C3DTTN_kth()
+# e116_C3DTTN_kth()
+# e117_C3DTTN_kth()
+# e118_C3DTTN_kth()
+# e119_C3DTTN_kth()
+# e120_C3DTTN_kth()
+# e121_C3DTTN_kth()
+# e122_C3DTTN_kth()
+# e123_C3DTTN_kth()
+# e124_C3DTTN_kth()
+# e125_C3DTTN_kth()
+# e126_C3DTTN_kth()
+# e127_C3DTTN_kth()
+# e128_C3DTTN_kth()
+# e129_C3DTTN_kth()
+# e130_C3DTTN_kth()
+# e131_C3DTTN_kth()
+# e132_C3DTTN_kth()
