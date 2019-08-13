@@ -1568,11 +1568,11 @@ def e126_C3DTTN_kth():
     main_file.run(project_variable)
 
 
-# -- TODO
+# --
 def e127_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 127
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1584,7 +1584,7 @@ def e127_C3DTTN_kth():
 def e128_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 128
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1596,7 +1596,7 @@ def e128_C3DTTN_kth():
 def e129_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 129
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1609,7 +1609,7 @@ def e129_C3DTTN_kth():
 def e130_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 130
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1617,7 +1617,7 @@ def e130_C3DTTN_kth():
     project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
 
-
+# TODO
 def e131_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 131
@@ -1633,7 +1633,7 @@ def e131_C3DTTN_kth():
 def e132_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 132
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1667,9 +1667,9 @@ project_variable = ProjectVariable(debug_mode=False)
 # e124_C3DTTN_kth()
 # e125_C3DTTN_kth()
 # e126_C3DTTN_kth()
-e127_C3DTTN_kth()
+# e127_C3DTTN_kth()
 # e128_C3DTTN_kth()
 # e129_C3DTTN_kth()
 # e130_C3DTTN_kth()
-# e131_C3DTTN_kth()
+e131_C3DTTN_kth()
 # e132_C3DTTN_kth()
