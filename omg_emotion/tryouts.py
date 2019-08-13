@@ -15,18 +15,13 @@ def plot_results():
 
     fig = plt.figure()
 
-    #                                                               3        3      2        2      3         2
-
-    xs = np.array([254058,	263906,	300264,	318662,	346470,	375668,	392676,	434924,	438882,	485088,	496430,	560186])
-
+    # xs = np.array([254058,	263906,	300264,	318662,	346470,	375668,	392676,	434924,	438882,	485088,	496430,	560186])
     # 20
     # series1 = np.array([0.4555, None, 0.5115, None, 0.4455, None, 0.513, 0.391, None, None, 0.429, None]).astype(np.double)
     # series2 = np.array([None, 0.555, None, 0.586, None, 0.6375, None, None, 0.4475, 0.4675, None, 0.428]).astype(np.double)
-
-
-    num = 10
-    series1 = np.array([None,	0.3575,	None,	0.351833333333333,	None,	0.400166666666667,	None,	0.383166666666667,	None,	None,	0.402,	0.4213333333]).astype(np.double)
-    series2 = np.array([0.391333333333333,	None,	0.384166666666667,	None,	0.405333333333333,	None,	0.410833333333333,	None,	0.417,	0.395,	None,	None]).astype(np.double)
+    # num = 10
+    # series1 = np.array([None,	0.3575,	None,	0.351833333333333,	None,	0.400166666666667,	None,	0.383166666666667,	None,	None,	0.402,	0.4213333333]).astype(np.double)
+    # series2 = np.array([0.391333333333333,	None,	0.384166666666667,	None,	0.405333333333333,	None,	0.410833333333333,	None,	0.417,	0.395,	None,	None]).astype(np.double)
     # num = 20
     # series1 = np.array([None,	0.464166666666667,	None,	0.4575,	None,	0.511166666666667,	None,	0.476833333333333,	None,	None,	0.504,	0.4775]).astype(np.double)
     # series2 = np.array([0.508,	None,	0.519333333333333,	None,	0.520833333333333,	None,	0.538666666666667,	None,	0.502833333333333,	0.529,	None,	None]).astype(np.double)
@@ -49,11 +44,49 @@ def plot_results():
     # series1 = np.array([None,	0.983,	None,	0.989333333333333,	None,	0.989333333333333,	None,	0.991166666666667,	None,	None,	0.991666666666667,	0.9921666667]).astype(np.double)
     # series2 = np.array([0.977333333333333,	None,	0.9785,	None,	0.975666666666667,	None,	0.983,	None,	0.9825,	0.987,	None,	None]).astype(np.double)
 
+    xs = np.array([1213078,	1260646,	1851362,	1925942,	2623742,	2731382,	3530218,	3676966,	4570790,	4762694,	5745458,	5988566,	7054222,	7354582])
+    # num = 6
+    # series1 = np.array([np.nan,	0.208045977011494,	np.nan,	0.230316091954023,	np.nan,	0.227011494252874,	np.nan,	0.229310344827586,	np.nan,	0.245833333333333,	np.nan,	0.229885057471264,	np.nan,	0.2326149425])
+    # series2 = np.array([0.22183908045977,	np.nan,	0.219827586206897,	np.nan,	0.222844827586207,	np.nan,	0.229022988505747,	np.nan,	0.225862068965517,	np.nan,	0.217385057471264,	np.nan,	0.220689655172414,	np.nan])
+
+    # err1 = np.array([np.nan,	0.0520575144090395,	np.nan,	0.0612684178967938,	np.nan,	0.0578543268376306,	np.nan,	0.0463624290945777,	np.nan,	0.0597516342450405,	np.nan,	0.0467075580994916,	np.nan,	0.05159806634]) #/ 2
+    # series1_min = series1 - err1
+    # series1_max = series1 + err1
+    # err2 = np.array([0.0488514198709851,	np.nan,	0.0554679584211911,	np.nan,	0.0515219948490961,	np.nan,	0.0613396380464259,	np.nan,	0.0439091367139001,	np.nan,	0.0542793577598474,	np.nan,	0.0619591141575624,	np.nan]) #/ 2
+    # series2_min = series2 - err2
+    # series2_max = series2 + err2
+    # for i in range(len(series1_min)):
+    #     if str(series1_min[i]) == 'nan':
+    #         series1_min[i] = np.nan
+    #     if str(series1_max[i]) == 'nan':
+    #         series1_max[i] = np.nan
+    #     if str(series2_min[i]) == 'nan':
+    #         series2_min[i] = np.nan
+    #     if str(series2_max[i]) == 'nan':
+    #         series2_max[i] = np.nan
+    
+    # num = 66
+    # series1 = np.array([np.nan,	0.551580459770115,	np.nan,	0.566954022988506,	np.nan,	0.557327586206897,	np.nan,	0.55301724137931,	np.nan,	0.57801724137931,	np.nan,	0.556896551724138,	np.nan,	0.5564655172])
+    # series2 = np.array([0.330890804597701,	np.nan,	0.324856321839081,	np.nan,	0.350862068965517,	np.nan,	0.346264367816092,	np.nan,	0.349281609195402,	np.nan,	0.344827586206897,	np.nan,	0.358764367816092,	np.nan])
+    # num = 126
+    # series1 = np.array([np.nan,	0.639367816091954,	np.nan,	0.63448275862069,	np.nan,	0.63448275862069,	np.nan,	0.63448275862069,	np.nan,	0.645545977011494,	np.nan,	0.642528735632184,	np.nan,	0.6337643678])
+    # series2 = np.array([0.375862068965517,	np.nan,	0.374137931034483,	np.nan,	0.372557471264368,	np.nan,	0.403591954022989,	np.nan,	0.393103448275862,	np.nan,	0.381896551724138,	np.nan,	0.391235632183908,	np.nan])
+    num = 191
+    series1 = np.array([np.nan,	0.688505747126437,	np.nan,	0.686781609195402,	np.nan,	0.695258620689655,	np.nan,	0.685919540229885,	np.nan,	0.68448275862069,	np.nan,	0.685201149425287,	np.nan,	0.6813218391])
+    series2 = np.array([0.404166666666667,	np.nan,	0.398275862068966,	np.nan,	0.410252463054187,	np.nan,	0.404885057471264,	np.nan,	0.426005747126437,	np.nan,	0.420977011494253,	np.nan,	0.416954022988506,	np.nan])
+
     s1mask = np.isfinite(series1)
     s2mask = np.isfinite(series2)
 
     plt.plot(xs[s1mask], series1[s1mask], linestyle='-', marker='o', label='3DConv')
     plt.plot(xs[s2mask], series2[s2mask], linestyle='-', marker='o', label='3DConvTTN')
+    # plt.fill_between(xs[s1mask], series1_max[s1mask], series1_min[s1mask], alpha=0.3)
+    # plt.fill_between(xs[s2mask], series2_max[s2mask], series2_min[s2mask], alpha=0.3)
+    
+    
+
+    # plt.errorbar(xs[s1mask], series1[s1mask], yerr=err1[s1mask], linestyle='-', marker='o', label='3DConv')
+    # plt.errorbar(xs[s2mask], series2[s2mask], yerr=err2[s2mask], linestyle='-', marker='o', label='3DConvTTN')
 
     plt.ylabel('accuracy')
     plt.xlabel('parameters')
@@ -61,6 +94,9 @@ def plot_results():
     plt.legend(('3DConv', '3DConvTTN'))
 
     plt.savefig('picture_%d.jpg' % num)
+
+
+plot_results()
 
 
 # TODO: update according to pytorch-1.2

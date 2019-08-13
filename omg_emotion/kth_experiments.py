@@ -1421,7 +1421,7 @@ def e114_C3DTTN_kth():
 def e115_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 115
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1433,7 +1433,7 @@ def e115_C3DTTN_kth():
 def e116_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 116
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1445,7 +1445,7 @@ def e116_C3DTTN_kth():
 def e117_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 117
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1458,7 +1458,7 @@ def e117_C3DTTN_kth():
 def e118_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 118
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1470,7 +1470,7 @@ def e118_C3DTTN_kth():
 def e119_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 119
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1482,7 +1482,7 @@ def e119_C3DTTN_kth():
 def e120_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 120
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1495,7 +1495,7 @@ def e120_C3DTTN_kth():
 def e121_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 121
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1507,7 +1507,7 @@ def e121_C3DTTN_kth():
 def e122_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 122
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1519,7 +1519,7 @@ def e122_C3DTTN_kth():
 def e123_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 123
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 50
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1535,7 +1535,7 @@ def e123_C3DTTN_kth():
 def e124_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 124
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1547,7 +1547,7 @@ def e124_C3DTTN_kth():
 def e125_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 125
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1559,7 +1559,7 @@ def e125_C3DTTN_kth():
 def e126_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 126
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [4, 8, 16, 32]
@@ -1568,11 +1568,11 @@ def e126_C3DTTN_kth():
     main_file.run(project_variable)
 
 
-# --
+# -- TODO
 def e127_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 127
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1584,7 +1584,7 @@ def e127_C3DTTN_kth():
 def e128_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 128
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1596,7 +1596,7 @@ def e128_C3DTTN_kth():
 def e129_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 129
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [8, 16, 32, 64]
@@ -1609,7 +1609,7 @@ def e129_C3DTTN_kth():
 def e130_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 130
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1621,7 +1621,7 @@ def e130_C3DTTN_kth():
 def e131_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 131
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1633,7 +1633,7 @@ def e131_C3DTTN_kth():
 def e132_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 132
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.0001
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1642,11 +1642,11 @@ def e132_C3DTTN_kth():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 # cProfile.run('bottleneck()', sort='cumtime')
 
 
-e106_C3DTTN_kth()
+# e106_C3DTTN_kth()
 # e107_C3DTTN_kth()
 # e108_C3DTTN_kth()
 # e109_C3DTTN_kth()
@@ -1667,7 +1667,7 @@ e106_C3DTTN_kth()
 # e124_C3DTTN_kth()
 # e125_C3DTTN_kth()
 # e126_C3DTTN_kth()
-# e127_C3DTTN_kth()
+e127_C3DTTN_kth()
 # e128_C3DTTN_kth()
 # e129_C3DTTN_kth()
 # e130_C3DTTN_kth()
