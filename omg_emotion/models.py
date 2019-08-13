@@ -83,7 +83,6 @@ class ConvTTN3d(conv._ConvNd):
                 print("ERROR: srxy_init mode '%s' not supported" % self.project_variable.srxy_init)
                 self.scale, self.rotate, self.translate_x, self.translate_y = None, None, None, None
 
-
     def make_affine_matrix(self, scale, rotate, translate_x, translate_y):
         # if out_channels is used, the shape of the matrix returned is different
 
@@ -93,15 +92,15 @@ class ConvTTN3d(conv._ConvNd):
         matrix.shape = (out_channels, 2, 3)
         '''
         matrix = torch.zeros((scale.shape[0], 2, 3))
-        for i in range(scale.shape[0]):
-            matrix[i][0][0] = scale[i] * torch.cos(rotate[i])
-            matrix[i][0][1] = -scale[i] * torch.sin(rotate[i])
-            matrix[i][0][2] = translate_x[i] * scale[i] * torch.cos(rotate[i]) - translate_y[i] * \
-                              scale[i] * torch.sin(rotate[i])
-            matrix[i][1][0] = scale[i] * torch.sin(rotate[i])
-            matrix[i][1][1] = scale[i] * torch.cos(rotate[i])
-            matrix[i][1][2] = translate_x[i] * scale[i] * torch.sin(rotate[i]) + translate_y[i] * \
-                              scale[i] * torch.cos(rotate[i])
+        
+        matrix[:,0,0] = scale[:] * torch.cos(rotate[:])
+        matrix[:,0,1] = -scale[:] * torch.sin(rotate[:])
+        matrix[:,0,2] = translate_x[:] * scale[:] * torch.cos(rotate[:]) - translate_y[:] * \
+                          scale[:] * torch.sin(rotate[:])
+        matrix[:,1,0] = scale[:] * torch.sin(rotate[:])
+        matrix[:,1,1] = scale[:] * torch.cos(rotate[:])
+        matrix[:,1,2] = translate_x[:] * scale[:] * torch.sin(rotate[:]) + translate_y[:] * \
+                          scale[:] * torch.cos(rotate[:])
 
         return matrix
 

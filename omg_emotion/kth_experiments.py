@@ -1,3 +1,4 @@
+import cProfile
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 
@@ -1058,13 +1059,14 @@ def e88_C3DTTN_kth():
 
 def e89_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 89
     project_variable.model_number = 6
     project_variable.num_out_channels = [12, 24, 48, 96]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 0
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [14, 28, 56, 112]
@@ -1105,13 +1107,14 @@ def e92_C3DTTN_kth():
 
 def e93_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 93
     project_variable.model_number = 6
     project_variable.num_out_channels = [14, 28, 56, 112]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 0
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [16, 32, 64, 128]
@@ -1151,13 +1154,14 @@ def e96_C3DTTN_kth():
 
 def e97_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 97
     project_variable.model_number = 6
     project_variable.num_out_channels = [16, 32, 64, 128]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 1
+    project_variable.device = 0
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [18, 36, 72, 144]
@@ -1186,141 +1190,109 @@ def e99_C3DTTN_kth():
 
 def e100_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 100
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 0
     main_file.run(project_variable)
 
 def e101_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 101
     project_variable.model_number = 6
     project_variable.num_out_channels = [18, 36, 72, 144]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 1
+    project_variable.device = 0
     main_file.run(project_variable)
 # --------------------------------------------------------
 #          MODEL 6; OUT_CHANNELS [20, 40, 80, 160]
 # --------------------------------------------------------
 def e102_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 102
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [6, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 0
     main_file.run(project_variable)
 
 def e103_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 103
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [66, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 0
     main_file.run(project_variable)
 
 def e104_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 104
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [126, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e105_C3DTTN_kth():
     set_init_3()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 105
     project_variable.model_number = 6
     project_variable.num_out_channels = [20, 40, 80, 160]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     project_variable.data_points = [191, 192, 216]
-    project_variable.device = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+
+def bottleneck():
+    set_init_3()
+    project_variable.experiment_state = 'crashed'
+    project_variable.end_epoch = 5
+    project_variable.repeat_experiments = 1
+    project_variable.sheet_number = None
+
+    # project_variable.theta_init = 'eye'
+    project_variable.experiment_number = 666
+    project_variable.model_number = 6
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.data_points = [60, 60, 60]
+    project_variable.device = 0
     main_file.run(project_variable)
 
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e50_C3D_kth()
-# e51_C3D_kth()
-# e52_C3D_kth()
-# e53_C3D_kth()
-#
-# e54_C3D_kth()
-# e55_C3D_kth()
-# e56_C3D_kth()
-# e57_C3D_kth()
-#
-# e58_C3D_kth()
-# e59_C3D_kth()
-# e60_C3D_kth()
-# e61_C3D_kth()
-#
-# e62_C3D_kth()
-# e63_C3D_kth()
-# e64_C3D_kth()
-# e65_C3D_kth()
-#
-# e66_C3D_kth()
-# e67_C3D_kth()
-# e68_C3D_kth()
-# e69_C3D_kth()
-#
-# e70_C3D_kth()
-# e71_C3D_kth()
-# e72_C3D_kth()
-# e73_C3D_kth()
-#
-# e74_C3D_kth()
-# e75_C3D_kth()
-# e76_C3D_kth()
-# e77_C3D_kth()
-#
-# e78_C3DTTN_kth()
-# e79_C3DTTN_kth()
-# e80_C3DTTN_kth()
-# e81_C3DTTN_kth()
-#
-# e82_C3DTTN_kth()
-# e83_C3DTTN_kth()
-# e84_C3DTTN_kth()
-# e85_C3DTTN_kth()
-#
-# e86_C3DTTN_kth()
-# e87_C3DTTN_kth()
-# e88_C3DTTN_kth()
+# cProfile.run('bottleneck()', sort='cumtime')
+# bottleneck()
+
+
 # e89_C3DTTN_kth()
-#
-# e90_C3DTTN_kth()
-# e91_C3DTTN_kth()
-# e92_C3DTTN_kth()
 # e93_C3DTTN_kth()
-#
-# e94_C3DTTN_kth()
-# e95_C3DTTN_kth()
-# e96_C3DTTN_kth()
 # e97_C3DTTN_kth()
-#
-# e98_C3DTTN_kth()
-# e99_C3DTTN_kth()
 # e100_C3DTTN_kth()
 # e101_C3DTTN_kth()
-#
-e102_C3DTTN_kth()
+# e102_C3DTTN_kth()
 # e103_C3DTTN_kth()
 # e104_C3DTTN_kth()
-# e105_C3DTTN_kth()
+e105_C3DTTN_kth()
