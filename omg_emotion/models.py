@@ -922,7 +922,8 @@ class C3DTTN(torch.nn.Module):
         return x
 
 
-class C3DTTN_experimental(torch.nn.Module):
+# 30, 3
+class C3TTN1(torch.nn.Module):
     def __init__(self, input_shape, project_variable):
         t, h, w = input_shape
         print(t, h, w)
@@ -934,15 +935,7 @@ class C3DTTN_experimental(torch.nn.Module):
         conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
 
-        super(C3DTTN_experimental, self).__init__()
-
-        # calculate shape
-        # if shape is not good for the next layer, calculate padding needed
-
-
-        # have FC1 in_features be around 1000
-        self.fc2 = torch.nn.Linear(256, 128)
-        self.fc3 = torch.nn.Linear(128, 6)
+        super(C3TTN1, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
@@ -953,12 +946,6 @@ class C3DTTN_experimental(torch.nn.Module):
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-
-
-
-
-
-        # TODO add padding
         t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
         print(t, h, w)
 
@@ -970,16 +957,16 @@ class C3DTTN_experimental(torch.nn.Module):
             self.bn1 = torch.nn.BatchNorm3d(channels[0])
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
-                                      out_channels=channels[1],
-                                      kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
-                                      stride=1,
-                                      padding=0, # TODO
-                                      bias=True,
-                                project_variable=project_variable,
-                                transformation_groups=trafo_groups[1],
-                                k0_groups=k0_groups[1])
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -990,29 +977,29 @@ class C3DTTN_experimental(torch.nn.Module):
             self.bn2 = torch.nn.BatchNorm3d(channels[1])
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
-                                      out_channels=channels[2],
-                                      kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
-                                      stride=1,
-                                      padding=0,
-                                      bias=True,
-                                project_variable=project_variable,
-                                transformation_groups=trafo_groups[2],
-                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t*3, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*3, conv_k_hw, conv_k_hw, 0))
         print(t, h, w)
         if do_batchnorm[2]:
             self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
-                                       out_channels=channels[3],
-                                       kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
-                                       stride=1,
-                                       padding=0, # TODO
-                                       bias=True,
-                                project_variable=project_variable,
-                                transformation_groups=trafo_groups[3],
-                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t*4, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*4, conv_k_hw, conv_k_hw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1021,14 +1008,18 @@ class C3DTTN_experimental(torch.nn.Module):
         if do_batchnorm[3]:
             self.bn4 = torch.nn.BatchNorm3d(channels[3])
 
-        in_features = t * h * w * channels[3]
-        self.fc1 = torch.nn.Linear(in_features=in_features,
-                                    out_features=256)
+        in_features = t * h * w * channels[3]  # 4096
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
         if do_batchnorm[4]:
-            self.bn5 = torch.nn.BatchNorm1d(256)
+            self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=256,
-                                    out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
         self.fc3 = torch.nn.Linear(in_features=128,
                                    out_features=6)
 
@@ -1077,6 +1068,922 @@ class C3DTTN_experimental(torch.nn.Module):
 
         x = self.fc2(x)
         x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
         x = self.fc3(x)
 
         return x
+
+
+# 30, 5
+class C3TTN2(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN2, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t * 2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 2, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
+
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t * 2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 2, conv_k_hw, conv_k_hw, 0))
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3] # 4096
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn3(x)
+        except AttributeError:
+            pass
+
+        x = self.conv4(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+
+# 30, 7
+class C3TTN3(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN3, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
+
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3]  # 6144
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn3(x)
+        except AttributeError:
+            pass
+
+        x = self.conv4(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+
+# 30, 9
+class C3TTN4(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN4, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3] # 9600
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+# 100, 7
+class C3TTN5(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN5, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t*5, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*5, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
+
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t * 6, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 6, conv_k_hw, conv_k_hw, 0))
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3] # 6144
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn3(x)
+        except AttributeError:
+            pass
+
+        x = self.conv4(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+
+# 100, 9
+class C3TTN6(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN6, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t*4, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*4, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
+
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t * 4, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 4, conv_k_hw, conv_k_hw, 0))
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3] # 5120
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn3(x)
+        except AttributeError:
+            pass
+
+        x = self.conv4(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+
+# 100, 11
+class C3TTN7(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        print(t, h, w)
+        channels = project_variable.num_out_channels
+        do_batchnorm = project_variable.do_batchnorm
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        conv1_k_t = project_variable.conv1_k_t
+        conv_k_hw = project_variable.conv_k_hw
+        max_pool_temp = project_variable.max_pool_temporal
+
+        super(C3TTN7, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
+
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
+                               out_channels=channels[1],
+                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[1],
+                               k0_groups=k0_groups[1])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
+
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
+                               out_channels=channels[2],
+                               kernel_size=(conv1_k_t*3, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[2],
+                               k0_groups=k0_groups[2])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*3, conv_k_hw, conv_k_hw, 0))
+        print(t, h, w)
+
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
+
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
+                               out_channels=channels[3],
+                               kernel_size=(conv1_k_t * 3, conv_k_hw, conv_k_hw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[3],
+                               k0_groups=k0_groups[3])
+        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 3, conv_k_hw, conv_k_hw, 0))
+
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
+        print(t, h, w)
+
+        if do_batchnorm[3]:
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+
+        in_features = t * h * w * channels[3] # 5120
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
+                                   )
+        if do_batchnorm[4]:
+            self.bn5 = torch.nn.BatchNorm1d(1024)
+
+        self.fc2 = torch.nn.Linear(in_features=512,
+                                   out_features=128)
+
+        if do_batchnorm[5]:
+            self.bn6 = torch.nn.BatchNorm1d(1024)
+
+        self.fc3 = torch.nn.Linear(in_features=128,
+                                   out_features=6)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+
+        x = self.conv2(x, device)
+        x = self.max_pool_2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn3(x)
+        except AttributeError:
+            pass
+
+        x = self.conv4(x, device)
+        x = self.max_pool_3(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn4(x)
+        except AttributeError:
+            pass
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn5(x)
+        except AttributeError:
+            pass
+
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn6(x)
+        except AttributeError:
+            pass
+
+        x = self.fc3(x)
+
+        return x
+
+
+# TODO: fix the batchnorms!!
+# TODO: add shit in setup
+# TODO: write experiments

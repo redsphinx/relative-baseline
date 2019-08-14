@@ -118,26 +118,28 @@ def C3D_experiments():
         w = h
         return t, h, w
 
-    conv_k_t = [3, 5, 7, 9]
-    max_pool_temp = [1, 2]
-    conv_k_hw = [3, 5]
+    conv_k_t = [3, 5, 7, 9, 11]
+
+    max_pool_temp = [1]
+
+    conv_k_hw = [3]
+
     ip = [30, 100]
 
-
-    iputshep = (ip[0], 60, 60)
+    iputshep = (ip[1], 60, 60)
 
     print(iputshep)
-    t, h, w = auto_in_features(iputshep, 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
+    t, h, w = auto_in_features(iputshep, 'conv', (conv_k_t[4], conv_k_hw[0], 0, 1))
     print(t, h, w)
     t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[4]*2, conv_k_hw[0], 0, 1))
     print(t, h, w)
     t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[4]*3, conv_k_hw[0], 0, 1))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[4]*3, conv_k_hw[0], 0, 1))
     print(t, h, w)
     t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)

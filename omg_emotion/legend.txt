@@ -6,5 +6,12 @@ project_variable.model_number
 4   sota 3dconv
 5   C3D 3dconv v1
 6   C3D 3dconvTTN v1
-7   experimental C3DTTN
+7.1   C3TTN1    conv_k_t=3  load_num_frames=30
+7.2   C3TTN2    conv_k_t=5  load_num_frames=30
+7.3   C3TTN3    conv_k_t=7  load_num_frames=30
+7.4   C3TTN4    conv_k_t=9  load_num_frames=30
+7.6   C3TTN7    conv_k_t=7  load_num_frames=100
+7.7   C3TTN8    conv_k_t=9  load_num_frames=100
+7.8   C3TTN9    conv_k_t=11  load_num_frames=100
+
 
