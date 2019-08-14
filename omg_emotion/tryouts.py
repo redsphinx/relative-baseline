@@ -192,5 +192,3 @@ def C3D_experiments():
 #                 print('created %s' % path_bz2)
 
 
-
-

@@ -365,104 +365,12 @@ class LeNet5_TTN3d(torch.nn.Module):
         return x
 
 
-class AlexNet_classic(nn.Module):
-
-    def __init__(self, num_classes=6):
-        super(AlexNet_classic, self).__init__()
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 192, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(192, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-        )
-        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
-        self.classifier = nn.Sequential(
-            nn.Dropout(),
-            nn.Linear(256 * 6 * 6, 4096),
-            nn.ReLU(inplace=True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(inplace=True),
-            nn.Linear(4096, num_classes),
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = self.avgpool(x)
-        x = x.view(x.size(0), 256 * 6 * 6)
-        x = self.classifier(x)
-        return x
-    
-
-class AlexNet_2d(nn.Module):
-
-    def __init__(self, num_classes=1000):
-        super(AlexNet_2d, self).__init__()
-
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2)
-        # self. = nn.ReLU(inplace=True)
-        self.max_pool_1 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.conv2 = nn.Conv2d(64, 192, kernel_size=5, padding=2)
-        # self. = nn.ReLU(inplace=True)
-        self.max_pool_2 = nn.MaxPool2d(kernel_size=3, stride=2)
-        self.conv3 = nn.Conv2d(192, 384, kernel_size=3, padding=1)
-        # self. = nn.ReLU(inplace=True)
-        self.conv4 = nn.Conv2d(384, 256, kernel_size=3, padding=1)
-        # self. = nn.ReLU(inplace=True)
-        self.conv5 = nn.Conv2d(256, 256, kernel_size=3, padding=1)
-        # self. = nn.ReLU(inplace=True)
-        self.max_pool_3 = nn.MaxPool2d(kernel_size=3, stride=2)
-        
-        # TODO: finish alexnet implementation, do the RELUs
-        self.features = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 192, kernel_size=5, padding=2),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(192, 384, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=3, stride=2),
-        )
-        self.avgpool = nn.AdaptiveAvgPool2d((6, 6))
-        self.classifier = nn.Sequential(
-            nn.Dropout(),
-            nn.Linear(256 * 6 * 6, 4096),
-            nn.ReLU(inplace=True),
-            nn.Dropout(),
-            nn.Linear(4096, 4096),
-            nn.ReLU(inplace=True),
-            nn.Linear(4096, num_classes),
-        )
-
-    def forward(self, x):
-        x = self.features(x)
-        x = self.avgpool(x)
-        x = x.view(x.size(0), 256 * 6 * 6)
-        x = self.classifier(x)
-        return x
-
-
 # adapted from https://arxiv.org/abs/1907.11272
 class Sota_3d(torch.nn.Module):
     def __init__(self, input_shape):
         t, h, w = input_shape
         super(Sota_3d, self).__init__()
-        self.conv_1 = torch.nn.Conv3d(in_channels=1,
+        self.conv1 = torch.nn.Conv3d(in_channels=1,
                                       out_channels=16,
                                       kernel_size=(10, 32, 32),
                                       stride=1,
@@ -487,7 +395,7 @@ class Sota_3d(torch.nn.Module):
         if w == 0:
             w += 1
 
-        self.conv_2 = torch.nn.Conv3d(in_channels=16,
+        self.conv2 = torch.nn.Conv3d(in_channels=16,
                                       out_channels=32,
                                       kernel_size=(3, 10, 10),
                                       stride=1,
@@ -513,24 +421,24 @@ class Sota_3d(torch.nn.Module):
             w += 1
 
         in_features = t * h * w * 32
-        self.fc_1 = torch.nn.Linear(in_features=in_features,
+        self.fc1 = torch.nn.Linear(in_features=in_features,
                                     out_features=128)
         self.drop_1 = torch.nn.Dropout3d(p=0.5)
-        self.fc_2 = torch.nn.Linear(in_features=128,
+        self.fc2 = torch.nn.Linear(in_features=128,
                                     out_features=6)
 
     def forward(self, x):
-        x = self.conv_1(x)
+        x = self.conv1(x)
         x = self.prelu_1(x)
         x = self.max_pool_1(x)
-        x = self.conv_2(x)
+        x = self.conv2(x)
         x = self.prelu_2(x)
         x = self.max_pool_2(x)
         _shape = x.shape
         x = x.view(-1, _shape[1]*_shape[2]*_shape[3]*_shape[4])
-        x = self.fc_1(x)
+        x = self.fc1(x)
         x = self.drop_1(x)
-        x = self.fc_2(x)
+        x = self.fc2(x)
 
         return x
 
@@ -570,7 +478,7 @@ class C3D_experiment(torch.nn.Module):
 
         super(C3D_experiment, self).__init__()
 
-        self.conv_1 = torch.nn.Conv3d(in_channels=1,
+        self.conv1 = torch.nn.Conv3d(in_channels=1,
                                       out_channels=channels[0],
                                       kernel_size=(project_variable.conv1_k_t, 3, 3),
                                       stride=1,
@@ -582,9 +490,9 @@ class C3D_experiment(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         print(t, h, w)
         if do_batchnorm[0]:
-            self.bn_1 = torch.nn.BatchNorm3d(channels[0])
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
 
-        self.conv_2 = torch.nn.Conv3d(in_channels=channels[0],
+        self.conv2 = torch.nn.Conv3d(in_channels=channels[0],
                                       out_channels=channels[1],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -596,9 +504,9 @@ class C3D_experiment(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         print(t, h, w)
         if do_batchnorm[1]:
-            self.bn_2 = torch.nn.BatchNorm3d(channels[1])
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
 
-        self.conv_3 = torch.nn.Conv3d(in_channels=channels[1],
+        self.conv3 = torch.nn.Conv3d(in_channels=channels[1],
                                       out_channels=channels[2],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -609,9 +517,9 @@ class C3D_experiment(torch.nn.Module):
         # self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         if do_batchnorm[2]:
-            self.bn_3 = torch.nn.BatchNorm3d(channels[2])
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
-        self.conv_4 = torch.nn.Conv3d(in_channels=channels[2],
+        self.conv4 = torch.nn.Conv3d(in_channels=channels[2],
                                        out_channels=channels[3],
                                        kernel_size=(3, 3, 3),
                                        stride=1,
@@ -632,61 +540,61 @@ class C3D_experiment(torch.nn.Module):
         print(t, h, w)
 
         if do_batchnorm[3]:
-            self.bn_4 = torch.nn.BatchNorm3d(channels[3])
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
 
         in_features = t * h * w * channels[3]
-        self.fc_1 = torch.nn.Linear(in_features=in_features,
+        self.fc1 = torch.nn.Linear(in_features=in_features,
                                     out_features=in_features+128)
         if do_batchnorm[4]:
-            self.bn_5 = torch.nn.BatchNorm1d(in_features+128)
+            self.bn5 = torch.nn.BatchNorm1d(in_features+128)
 
-        self.fc_2 = torch.nn.Linear(in_features=in_features+128,
+        self.fc2 = torch.nn.Linear(in_features=in_features+128,
                                     out_features=6)
 
 
     def forward(self, x):
-        x = self.conv_1(x)
+        x = self.conv1(x)
         x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_1(x)
+            x = self.bn1(x)
         except AttributeError:
             pass
 
-        x = self.conv_2(x)
+        x = self.conv2(x)
         x = self.max_pool_2(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_2(x)
+            x = self.bn2(x)
         except AttributeError:
             pass
 
-        x = self.conv_3(x)
+        x = self.conv3(x)
         # x = self.max_pool_3(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_3(x)
+            x = self.bn3(x)
         except AttributeError:
             pass
 
-        x = self.conv_4(x)
+        x = self.conv4(x)
         x = self.max_pool_4(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_4(x)
+            x = self.bn4(x)
         except AttributeError:
             pass
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        x = self.fc_1(x)
+        x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_5(x)
+            x = self.bn5(x)
         except AttributeError:
             pass
 
-        x = self.fc_2(x)
+        x = self.fc2(x)
 
         return x
 
@@ -698,7 +606,7 @@ class C3D(torch.nn.Module):
 
         super(C3D, self).__init__()
 
-        self.conv_1 = torch.nn.Conv3d(in_channels=1,
+        self.conv1 = torch.nn.Conv3d(in_channels=1,
                                       out_channels=channels[0],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -707,9 +615,9 @@ class C3D(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_1 = torch.nn.BatchNorm3d(channels[0])
+        self.bn1 = torch.nn.BatchNorm3d(channels[0])
 
-        self.conv_2 = torch.nn.Conv3d(in_channels=channels[0],
+        self.conv2 = torch.nn.Conv3d(in_channels=channels[0],
                                       out_channels=channels[1],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -719,7 +627,7 @@ class C3D(torch.nn.Module):
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
-        self.conv_3 = torch.nn.Conv3d(in_channels=channels[1],
+        self.conv3 = torch.nn.Conv3d(in_channels=channels[1],
                                       out_channels=channels[2],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -727,7 +635,7 @@ class C3D(torch.nn.Module):
                                       bias=True)
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
 
-        self.conv_4 = torch.nn.Conv3d(in_channels=channels[2],
+        self.conv4 = torch.nn.Conv3d(in_channels=channels[2],
                                        out_channels=channels[3],
                                        kernel_size=(3, 3, 3),
                                        stride=1,
@@ -739,37 +647,37 @@ class C3D(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         in_features = t * h * w * channels[3]
-        self.fc_1 = torch.nn.Linear(in_features=in_features,
+        self.fc1 = torch.nn.Linear(in_features=in_features,
                                     out_features=in_features+128)
 
-        self.fc_2 = torch.nn.Linear(in_features=in_features+128,
+        self.fc2 = torch.nn.Linear(in_features=in_features+128,
                                     out_features=6)
 
 
     def forward(self, x):
-        x = self.conv_1(x)
+        x = self.conv1(x)
         x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
-        x = self.bn_1(x)
+        x = self.bn1(x)
 
-        x = self.conv_2(x)
+        x = self.conv2(x)
         x = self.max_pool_2(x)
         x = torch.nn.functional.relu(x)
 
-        x = self.conv_3(x)
+        x = self.conv3(x)
         # x = self.max_pool_3(x)
         x = torch.nn.functional.relu(x)
 
-        x = self.conv_4(x)
+        x = self.conv4(x)
         x = self.max_pool_4(x)
         x = torch.nn.functional.relu(x)
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        x = self.fc_1(x)
+        x = self.fc1(x)
         x = torch.nn.functional.relu(x)
 
-        x = self.fc_2(x)
+        x = self.fc2(x)
 
         return x
 
@@ -783,7 +691,7 @@ class C3DTTN_after(torch.nn.Module):
 
         super(C3DTTN_after, self).__init__()
 
-        self.conv_1 = ConvTTN3d(in_channels=1,
+        self.conv1 = ConvTTN3d(in_channels=1,
                                 out_channels=channels[0],
                                 kernel_size=(3, 3, 3),
                                 stride=1,
@@ -795,9 +703,9 @@ class C3DTTN_after(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-        self.bn_1 = torch.nn.BatchNorm3d(channels[0])
+        self.bn1 = torch.nn.BatchNorm3d(channels[0])
 
-        self.conv_2 = ConvTTN3d(in_channels=channels[0],
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
                                 out_channels=channels[1],
                                 kernel_size=(3, 3, 3),
                                 stride=1,
@@ -810,7 +718,7 @@ class C3DTTN_after(torch.nn.Module):
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
-        self.conv_3 = ConvTTN3d(in_channels=channels[1],
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
                                 out_channels=channels[2],
                                 kernel_size=(3, 3, 3),
                                 stride=1,
@@ -821,7 +729,7 @@ class C3DTTN_after(torch.nn.Module):
                                 k0_groups=k0_groups[2])
         t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
 
-        self.conv_4 = ConvTTN3d(in_channels=channels[2],
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
                                 out_channels=channels[3],
                                 kernel_size=(3, 3, 3),
                                 stride=1,
@@ -836,36 +744,36 @@ class C3DTTN_after(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         in_features = t * h * w * channels[3]
-        self.fc_1 = torch.nn.Linear(in_features=in_features,
+        self.fc1 = torch.nn.Linear(in_features=in_features,
                                     out_features=in_features + 128)
 
-        self.fc_2 = torch.nn.Linear(in_features=in_features + 128,
+        self.fc2 = torch.nn.Linear(in_features=in_features + 128,
                                     out_features=6)
 
 
     def forward(self, x, device):
-        x = self.conv_1(x, device)
+        x = self.conv1(x, device)
         x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
-        x = self.bn_1(x)
+        x = self.bn1(x)
 
-        x = self.conv_2(x, device)
+        x = self.conv2(x, device)
         x = self.max_pool_2(x)
         x = torch.nn.functional.relu(x)
 
-        x = self.conv_3(x, device)
+        x = self.conv3(x, device)
         x = torch.nn.functional.relu(x)
 
-        x = self.conv_4(x, device)
+        x = self.conv4(x, device)
         x = self.max_pool_4(x)
         x = torch.nn.functional.relu(x)
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        x = self.fc_1(x)
+        x = self.fc1(x)
         x = torch.nn.functional.relu(x)
 
-        x = self.fc_2(x)
+        x = self.fc2(x)
 
         return x
 
@@ -881,7 +789,7 @@ class C3DTTN(torch.nn.Module):
         super(C3DTTN, self).__init__()
 
 
-        self.conv_1 = ConvTTN3d(in_channels=1,
+        self.conv1 = ConvTTN3d(in_channels=1,
                                       out_channels=channels[0],
                                       kernel_size=(project_variable.conv1_k_t, 3, 3),
                                       stride=1,
@@ -896,9 +804,9 @@ class C3DTTN(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         print(t, h, w)
         if do_batchnorm[0]:
-            self.bn_1 = torch.nn.BatchNorm3d(channels[0])
+            self.bn1 = torch.nn.BatchNorm3d(channels[0])
 
-        self.conv_2 = ConvTTN3d(in_channels=channels[0],
+        self.conv2 = ConvTTN3d(in_channels=channels[0],
                                       out_channels=channels[1],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -913,9 +821,9 @@ class C3DTTN(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         print(t, h, w)
         if do_batchnorm[1]:
-            self.bn_2 = torch.nn.BatchNorm3d(channels[1])
+            self.bn2 = torch.nn.BatchNorm3d(channels[1])
 
-        self.conv_3 = ConvTTN3d(in_channels=channels[1],
+        self.conv3 = ConvTTN3d(in_channels=channels[1],
                                       out_channels=channels[2],
                                       kernel_size=(3, 3, 3),
                                       stride=1,
@@ -929,9 +837,9 @@ class C3DTTN(torch.nn.Module):
         # self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
         # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
         if do_batchnorm[2]:
-            self.bn_3 = torch.nn.BatchNorm3d(channels[2])
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
-        self.conv_4 = ConvTTN3d(in_channels=channels[2],
+        self.conv4 = ConvTTN3d(in_channels=channels[2],
                                        out_channels=channels[3],
                                        kernel_size=(3, 3, 3),
                                        stride=1,
@@ -955,60 +863,60 @@ class C3DTTN(torch.nn.Module):
         print(t, h, w)
 
         if do_batchnorm[3]:
-            self.bn_4 = torch.nn.BatchNorm3d(channels[3])
+            self.bn4 = torch.nn.BatchNorm3d(channels[3])
 
         in_features = t * h * w * channels[3]
-        self.fc_1 = torch.nn.Linear(in_features=in_features,
+        self.fc1 = torch.nn.Linear(in_features=in_features,
                                     out_features=in_features+128)
         if do_batchnorm[4]:
-            self.bn_5 = torch.nn.BatchNorm1d(in_features+128)
+            self.bn5 = torch.nn.BatchNorm1d(in_features+128)
 
-        self.fc_2 = torch.nn.Linear(in_features=in_features+128,
+        self.fc2 = torch.nn.Linear(in_features=in_features+128,
                                     out_features=6)
 
 
     def forward(self, x, device):
-        x = self.conv_1(x, device)
+        x = self.conv1(x, device)
         x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_1(x)
+            x = self.bn1(x)
         except AttributeError:
             pass
 
-        x = self.conv_2(x, device)
+        x = self.conv2(x, device)
         x = self.max_pool_2(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_2(x)
+            x = self.bn2(x)
         except AttributeError:
             pass
 
-        x = self.conv_3(x, device)
+        x = self.conv3(x, device)
         # x = self.max_pool_3(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_3(x)
+            x = self.bn3(x)
         except AttributeError:
             pass
 
-        x = self.conv_4(x, device)
+        x = self.conv4(x, device)
         x = self.max_pool_4(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_4(x)
+            x = self.bn4(x)
         except AttributeError:
             pass
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        x = self.fc_1(x)
+        x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn_5(x)
+            x = self.bn5(x)
         except AttributeError:
             pass
 
-        x = self.fc_2(x)
+        x = self.fc2(x)
 
         return x

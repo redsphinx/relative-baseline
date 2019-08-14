@@ -4,7 +4,7 @@ import torch
 from tqdm import tqdm
 from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import data_loading as DL
-from relative_baseline.omg_emotion import visualization as VZ
+from relative_baseline.omg_emotion import tensorboard_manager as TM
 
 
 def run(project_variable, all_data, my_model, device):
@@ -55,13 +55,8 @@ def run(project_variable, all_data, my_model, device):
                                                    project_variable.loss_function,
                                                    loss, accuracy))
 
-    # add things to writer
-    # project_variable.writer.add_scalars('metrics/test', {"loss": loss,
-    #                                                     "accuracy": accuracy},
-    #                                     project_variable.current_epoch)
-    project_variable.writer.add_scalar('loss/test', loss, project_variable.current_epoch)
-    project_variable.writer.add_scalar('accuracy/test', accuracy, project_variable.current_epoch)
-
-    fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
-    project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
-
+    # project_variable.writer.add_scalar('loss/test', loss, project_variable.current_epoch)
+    # project_variable.writer.add_scalar('accuracy/test', accuracy, project_variable.current_epoch)
+    # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
+    # project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
+    TM.add_standard_info(project_variable, 'val', (loss, accuracy, confusion_epoch))

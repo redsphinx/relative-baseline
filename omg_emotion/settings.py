@@ -116,7 +116,7 @@ class ProjectVariable(object):
         # ----------------------------------------------------------------------------------------------------------
         # settings only for 3dconvttn stuff
         # ----------------------------------------------------------------------------------------------------------
-        # how to initialize theta: 'normal', 'eye' or None. if None, theta is created from affine params
+        # how to initialize theta: 'normal', 'eye', 'eye-like' or None. if None, theta is created from affine params
         self._theta_init = 'eye'
         # how to initialize SRXY: 'normal', 'eye'=[1,0,0,0], 'eye-like'=[1+e,e,e,e]
         self._srxy_init = 'normal'

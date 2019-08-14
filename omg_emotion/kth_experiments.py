@@ -1617,11 +1617,11 @@ def e130_C3DTTN_kth():
     project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
 
-# TODO
+
 def e131_C3DTTN_kth():
     set_init_4()
     project_variable.experiment_number = 131
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.load_num_frames = 100
     project_variable.learning_rate = 0.00005
     project_variable.num_out_channels = [16, 32, 64, 128]
@@ -1671,5 +1671,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e128_C3DTTN_kth()
 # e129_C3DTTN_kth()
 # e130_C3DTTN_kth()
-e131_C3DTTN_kth()
+# e131_C3DTTN_kth()
 # e132_C3DTTN_kth()
