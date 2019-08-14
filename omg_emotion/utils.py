@@ -233,3 +233,5 @@ def remove_all_files(experiment, model):
                     shutil.rmtree(file_path)
                 elif os.path.isfile(file_path):
                     os.remove(file_path)
+
+

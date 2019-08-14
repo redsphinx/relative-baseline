@@ -134,10 +134,15 @@ class ProjectVariable(object):
         self._k0_groups = self.num_out_channels
         # shape of convolution filter
         self._k_shape = (5, 5, 5)
+        # time dimension of the 3D max pooling
+        self._max_pool_temporal = 2
+        # height=width dimension of the convolutional kernels
+        self._conv_k_hw = 3
         # ----------------------------------------------------------------------------------------------------------
         # setting for video datasets
         # ----------------------------------------------------------------------------------------------------------
         self._load_num_frames = 30
+        # time dimension of the kernel in conv1
         self._conv1_k_t = 3
         # where to add batchnorm after each non-linear activation layer
         self._do_batchnorm = [False, False, False, False, False]
@@ -538,7 +543,23 @@ class ProjectVariable(object):
     @k_shape.setter
     def k_shape(self, value):
         self._k_shape = value
+
+    @property
+    def max_pool_temporal(self):
+        return self._max_pool_temporal
+
+    @max_pool_temporal.setter
+    def max_pool_temporal(self, value):
+        self._max_pool_temporal = value
     
+    @property
+    def conv_k_hw(self):
+        return self._conv_k_hw
+
+    @conv_k_hw.setter
+    def conv_k_hw(self, value):
+        self._conv_k_hw = value
+        
     @property
     def load_num_frames(self):
         return self._load_num_frames

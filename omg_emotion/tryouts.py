@@ -107,88 +107,44 @@ def C3D_experiments():
         assert type in ['conv', 'pool']
 
         if type == 'conv':
-            k_t, k_h, k_w, pad = params
-            t = t + 2 * pad - k_t + 1
-            h = h + 2 * pad - k_h + 1
-            w = w + 2 * pad - k_w + 1
+            k_t, k_h, pad, stride = params
+            t = (t + 2 * pad - k_t) / stride + 1
+            h = (h + 2 * pad - k_h) / stride + 1
         elif type == 'pool':
-            k_t, k_h, k_w = params
+            k_t, k_h = params
             t = int(np.floor(t / k_t))
             h = int(np.floor(h / k_h))
-            w = int(np.floor(w / k_w))
-            if t == 0:
-                t += 1
-            if h == 0:
-                h += 1
-            if w == 0:
-                w += 1
 
+        w = h
         return t, h, w
 
-    iputshep = (30, 60, 60)
+    conv_k_t = [3, 5, 7, 9]
+    max_pool_temp = [1, 2]
+    conv_k_hw = [3, 5]
+    ip = [30, 100]
+
+
+    iputshep = (ip[0], 60, 60)
+
     print(iputshep)
-    t, h, w = auto_in_features(iputshep, 'conv', (5, 3, 3, 0))
+    t, h, w = auto_in_features(iputshep, 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+    t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+    t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
     print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-    # print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
+    t, h, w = auto_in_features((t, h, w), 'conv', (conv_k_t[1], conv_k_hw[0], 0, 1))
     print(t, h, w)
-    t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+    t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp[0], 2))
     print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
-    # print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
-    # print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-    # print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
-    # print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'conv', (3, 3, 3, 0))
-    # print(t, h, w)
-    # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-    # print(t, h, w)
     in_features = t * h * w * 64
     print(in_features)
 
 
-# C3D_experiments()
-
-
-# TODO finish sometime later
-# def compress(experiment, model, run, epoch):
-#     base = '/huge/gabras/omg_emotion/saving_data/models'
-#     name = 'experiment_%d_model_%d_run_%d' % (experiment, model, run)
-#     path = os.path.join(base, name, 'epoch_%d' % epoch)
-#
-#     if os.path.exists(path):
-#         # load the saved weights
-#         weights = torch.load(path, map_location=torch.device('cpu'))
-#         # weights = dict(weights)
-#
-#         # save as pickle
-#         pkl_path = path + '_pkl'
-#         outfile_pkl = open(pkl_path, 'wb')
-#
-#
-#         for i in range(1, 10):
-#
-#
-#
-#             path_bz2 = path + '_lvl_%d.bz2' % i
-#             # compress as bzip2
-#             output = bz2.BZ2File(path_bz2, 'wb', compresslevel=i)
-#             try:
-#                 output.write(weights)
-#             finally:
-#                 output.close()
-#                 print('created %s' % path_bz2)
+C3D_experiments()
 
 
