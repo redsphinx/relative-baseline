@@ -2188,11 +2188,11 @@ def e171_C3DTTN_kth():
     project_variable.weight_transform = 'naive'
 
     main_file.run(project_variable)
-# TODO
+
 def e172_C3DTTN_kth():
     set_init_5()
     project_variable.experiment_number = 172
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.model_number = 77
     project_variable.load_num_frames = 100
@@ -2205,7 +2205,7 @@ def e172_C3DTTN_kth():
 def e173_C3DTTN_kth():
     set_init_5()
     project_variable.experiment_number = 173
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.model_number = 77
     project_variable.load_num_frames = 100
@@ -2218,7 +2218,7 @@ def e173_C3DTTN_kth():
 def e174_C3DTTN_kth():
     set_init_5()
     project_variable.experiment_number = 174
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.model_number = 77
     project_variable.load_num_frames = 100
@@ -2277,6 +2277,6 @@ project_variable = ProjectVariable(debug_mode=False)
 # e169_C3DTTN_kth()
 # e170_C3DTTN_kth()
 # e171_C3DTTN_kth()
-e172_C3DTTN_kth()
+# e172_C3DTTN_kth()
 # e173_C3DTTN_kth()
-# e174_C3DTTN_kth()
+e174_C3DTTN_kth()
