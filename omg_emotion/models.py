@@ -47,11 +47,17 @@ class ConvTTN3d(conv._ConvNd):
             self.theta = torch.zeros((kernel_size[0] - 1, self.transformation_groups, 2, 3))
             if self.project_variable.theta_init == 'eye':
                 for i in range(kernel_size[0] - 1):
-                    # for j in range(out_channels):
                     for j in range(self.transformation_groups):
                         self.theta[i][j] = torch.eye(3)[:2, ]
+
             elif self.project_variable.theta_init == 'normal':
-                self.theta = torch.nn.init.normal_(self.theta)
+                self.theta = torch.abs(torch.nn.init.normal_(self.theta))
+
+            elif self.project_variable.theta_init == 'eye-like':
+                for i in range(kernel_size[0] - 1):
+                    for j in range(self.transformation_groups):
+                        self.theta[i][j] = torch.eye(3)[:2, ] + torch.nn.init.normal_(torch.zeros(2, 3), mean=0, std=1e-5)
+
             else:
                 print("ERROR: theta_init mode '%s' not supported" % self.project_variable.theta_init)
                 self.theta = None
@@ -931,22 +937,21 @@ class C3TTN1(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN1, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -958,7 +963,7 @@ class C3TTN1(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -966,7 +971,7 @@ class C3TTN1(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*2, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -978,28 +983,28 @@ class C3TTN1(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t*3, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*3, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*3, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*3, kh, kw, 0))
         print(t, h, w)
         if do_batchnorm[2]:
             self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t*4, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*4, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*4, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*4, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1014,13 +1019,13 @@ class C3TTN1(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
 
@@ -1087,22 +1092,21 @@ class C3TTN2(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN2, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1114,7 +1118,7 @@ class C3TTN2(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1122,7 +1126,7 @@ class C3TTN2(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1134,28 +1138,28 @@ class C3TTN2(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t * 2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt * 2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt * 2, kh, kw, 0))
         print(t, h, w)
         if do_batchnorm[2]:
             self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t * 2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt * 2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt * 2, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1170,13 +1174,13 @@ class C3TTN2(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1241,22 +1245,21 @@ class C3TTN3(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN3, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1268,7 +1271,7 @@ class C3TTN3(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1276,7 +1279,7 @@ class C3TTN3(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1288,28 +1291,28 @@ class C3TTN3(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
         if do_batchnorm[2]:
             self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1324,13 +1327,13 @@ class C3TTN3(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1395,22 +1398,21 @@ class C3TTN4(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN4, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1422,7 +1424,7 @@ class C3TTN4(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1430,7 +1432,7 @@ class C3TTN4(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1442,36 +1444,36 @@ class C3TTN4(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
         print(t, h, w)
 
-        if do_batchnorm[3]:
-            self.bn4 = torch.nn.BatchNorm3d(channels[3])
+        if do_batchnorm[2]:
+            self.bn3 = torch.nn.BatchNorm3d(channels[2])
 
-        in_features = t * h * w * channels[3] # 9600
+        in_features = t * h * w * channels[2] # 9600
         self.fc1 = torch.nn.Linear(in_features=in_features, out_features=1024
                                    )
         if do_batchnorm[4]:
-            self.bn5 = torch.nn.BatchNorm1d(1024)
+            self.bn4 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn5 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1495,7 +1497,7 @@ class C3TTN4(torch.nn.Module):
         x = self.max_pool_3(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn4(x)
+            x = self.bn3(x)
         except AttributeError:
             pass
 
@@ -1504,14 +1506,14 @@ class C3TTN4(torch.nn.Module):
         x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn5(x)
+            x = self.bn4(x)
         except AttributeError:
             pass
 
         x = self.fc2(x)
         x = torch.nn.functional.relu(x)
         try:
-            x = self.bn6(x)
+            x = self.bn5(x)
         except AttributeError:
             pass
 
@@ -1528,22 +1530,21 @@ class C3TTN5(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN5, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1555,7 +1556,7 @@ class C3TTN5(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1563,7 +1564,7 @@ class C3TTN5(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*2, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1575,14 +1576,14 @@ class C3TTN5(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t*5, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*5, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*5, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*5, kh, kw, 0))
         print(t, h, w)
 
         if do_batchnorm[2]:
@@ -1590,14 +1591,14 @@ class C3TTN5(torch.nn.Module):
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t * 6, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt * 6, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 6, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt * 6, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1612,13 +1613,13 @@ class C3TTN5(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1683,22 +1684,21 @@ class C3TTN6(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN6, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1710,7 +1710,7 @@ class C3TTN6(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1718,7 +1718,7 @@ class C3TTN6(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*2, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1730,14 +1730,14 @@ class C3TTN6(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t*4, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*4, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*4, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*4, kh, kw, 0))
         print(t, h, w)
 
         if do_batchnorm[2]:
@@ -1745,14 +1745,14 @@ class C3TTN6(torch.nn.Module):
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t * 4, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt * 4, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 4, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt * 4, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1767,13 +1767,13 @@ class C3TTN6(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1838,22 +1838,21 @@ class C3TTN7(torch.nn.Module):
         do_batchnorm = project_variable.do_batchnorm
         trafo_groups = project_variable.transformation_groups
         k0_groups = project_variable.k0_groups
-        conv1_k_t = project_variable.conv1_k_t
-        conv_k_hw = project_variable.conv_k_hw
         max_pool_temp = project_variable.max_pool_temporal
+        kt, kh, kw = project_variable.k_shape
 
         super(C3TTN7, self).__init__()
 
         self.conv1 = ConvTTN3d(in_channels=1,
                                out_channels=channels[0],
-                               kernel_size=(conv1_k_t, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[0],
                                k0_groups=k0_groups[0])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1865,7 +1864,7 @@ class C3TTN7(torch.nn.Module):
 
         self.conv2 = ConvTTN3d(in_channels=channels[0],
                                out_channels=channels[1],
-                               kernel_size=(conv1_k_t*2, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*2, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
@@ -1873,7 +1872,7 @@ class C3TTN7(torch.nn.Module):
                                transformation_groups=trafo_groups[1],
                                k0_groups=k0_groups[1])
 
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*2, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*2, kh, kw, 0))
         print(t, h, w)
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
@@ -1885,14 +1884,14 @@ class C3TTN7(torch.nn.Module):
 
         self.conv3 = ConvTTN3d(in_channels=channels[1],
                                out_channels=channels[2],
-                               kernel_size=(conv1_k_t*3, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt*3, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[2],
                                k0_groups=k0_groups[2])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t*3, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt*3, kh, kw, 0))
         print(t, h, w)
 
         if do_batchnorm[2]:
@@ -1900,14 +1899,14 @@ class C3TTN7(torch.nn.Module):
 
         self.conv4 = ConvTTN3d(in_channels=channels[2],
                                out_channels=channels[3],
-                               kernel_size=(conv1_k_t * 3, conv_k_hw, conv_k_hw),
+                               kernel_size=(kt * 3, kh, kw),
                                stride=1,
                                padding=0,
                                bias=True,
                                project_variable=project_variable,
                                transformation_groups=trafo_groups[3],
                                k0_groups=k0_groups[3])
-        t, h, w = auto_in_features((t, h, w), 'conv', (conv1_k_t * 3, conv_k_hw, conv_k_hw, 0))
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt * 3, kh, kw, 0))
 
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=(max_pool_temp, 2, 2))
         t, h, w = auto_in_features((t, h, w), 'pool', (max_pool_temp, 2, 2))
@@ -1922,13 +1921,13 @@ class C3TTN7(torch.nn.Module):
         if do_batchnorm[4]:
             self.bn5 = torch.nn.BatchNorm1d(1024)
 
-        self.fc2 = torch.nn.Linear(in_features=512,
-                                   out_features=128)
+        self.fc2 = torch.nn.Linear(in_features=1024,
+                                   out_features=512)
 
         if do_batchnorm[5]:
-            self.bn6 = torch.nn.BatchNorm1d(1024)
+            self.bn6 = torch.nn.BatchNorm1d(512)
 
-        self.fc3 = torch.nn.Linear(in_features=128,
+        self.fc3 = torch.nn.Linear(in_features=512,
                                    out_features=6)
 
     def forward(self, x, device):
@@ -1984,6 +1983,5 @@ class C3TTN7(torch.nn.Module):
         return x
 
 
-# TODO: fix the batchnorms!!
 # TODO: add shit in setup
 # TODO: write experiments

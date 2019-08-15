@@ -1640,36 +1640,640 @@ def e132_C3DTTN_kth():
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
+#####################################################################################################################
+#          133-174  LONG EXPERIMENT MODEL 7.x NO MAX-POOL IN TEMPORAL DIMENSION. THETA_INIT NOT NONE
+#####################################################################################################################
+def set_init_5():
+    project_variable.batch_size = 20
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    project_variable.repeat_experiments = 10
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 6
+    project_variable.optimizer = 'adam'
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 13
+    project_variable.max_pool_temporal = 1
+    project_variable.num_out_channels = [8, 16, 32, 64]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+# --------------------------------------------------------
+#     model_number=7.1;load_num_frames=30;k_shape[0]=3
+# --------------------------------------------------------
+def e133_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number =133
+    project_variable.device = 0
 
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e134_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 134
+    project_variable.device = 0
+
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e135_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 135
+    project_variable.device = 0
+
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e136_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 136
+    project_variable.device = 0
+
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e137_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 137
+    project_variable.device = 0
+
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e138_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 138
+    project_variable.device = 0
+
+    project_variable.model_number = 7.1
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (3, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#     model_number=7.2;load_num_frames=30;k_shape[0]=5
+# --------------------------------------------------------
+def e139_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 139
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e140_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 140
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e141_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 141
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e142_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 142
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e143_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 143
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e144_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 144
+    project_variable.device = 0
+
+    project_variable.model_number = 7.2
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (5, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+#     model_number=7.3;load_num_frames=30;k_shape[0]=7
+# --------------------------------------------------------
+def e145_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 145
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e146_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 146
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e147_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 147
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e148_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 148
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e149_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 149
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e150_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 150
+    project_variable.device = 0
+
+    project_variable.model_number = 7.3
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#     model_number=7.4;load_num_frames=30;k_shape[0]=9
+# --------------------------------------------------------
+
+def e151_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 151
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e152_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 152
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e153_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 153
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e154_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 154
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e155_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 155
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e156_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 156
+    project_variable.device = 0
+
+    project_variable.model_number = 7.4
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#    model_number=7.5;load_num_frames=100;k_shape[0]=7
+# --------------------------------------------------------
+
+def e157_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 157
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e158_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 158
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e159_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 159
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e160_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 160
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e161_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 161
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e162_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 162
+    project_variable.device = 0
+
+    project_variable.model_number = 7.5
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#    model_number=7.6;load_num_frames=100;k_shape[0]=9
+# --------------------------------------------------------
+
+def e163_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 163
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e164_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 164
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e165_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 165
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e166_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 166
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e167_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 167
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (9, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e168_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 168
+    project_variable.device = 0
+
+    project_variable.model_number = 7.6
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#   model_number=7.7;load_num_frames=100;k_shape[0]=11
+# --------------------------------------------------------
+def e169_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 169
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (11, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e170_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 170
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (11, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e171_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 171
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (11, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e172_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 172
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (11, 3, 3)
+    project_variable.theta_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e173_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 173
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (11, 3, 3)
+    project_variable.theta_init = 'eye-like'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e174_C3DTTN_kth():
+    set_init_5()
+    project_variable.experiment_number = 174
+    project_variable.device = 0
+
+    project_variable.model_number = 7.7
+    project_variable.load_num_frames = 100
+    project_variable.k_shape = (7, 3, 3)
+    project_variable.theta_init = 'normal'
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
 # cProfile.run('bottleneck()', sort='cumtime')
 
 
-# e106_C3DTTN_kth()
-# e107_C3DTTN_kth()
-# e108_C3DTTN_kth()
-# e109_C3DTTN_kth()
-# e110_C3DTTN_kth()
-# e111_C3DTTN_kth()
-# e112_C3DTTN_kth()
-# e113_C3DTTN_kth()
-# e114_C3DTTN_kth()
-# e115_C3DTTN_kth()
-# e116_C3DTTN_kth()
-# e117_C3DTTN_kth()
-# e118_C3DTTN_kth()
-# e119_C3DTTN_kth()
-# e120_C3DTTN_kth()
-# e121_C3DTTN_kth()
-# e122_C3DTTN_kth()
-# e123_C3DTTN_kth()
-# e124_C3DTTN_kth()
-# e125_C3DTTN_kth()
-# e126_C3DTTN_kth()
-# e127_C3DTTN_kth()
-# e128_C3DTTN_kth()
-# e129_C3DTTN_kth()
-# e130_C3DTTN_kth()
-# e131_C3DTTN_kth()
-# e132_C3DTTN_kth()
+e133_C3DTTN_kth()
+e134_C3DTTN_kth()
+e135_C3DTTN_kth()
+e136_C3DTTN_kth()
+e137_C3DTTN_kth()
+e138_C3DTTN_kth()
+
+e139_C3DTTN_kth()
+e140_C3DTTN_kth()
+e141_C3DTTN_kth()
+e142_C3DTTN_kth()
+e143_C3DTTN_kth()
+e144_C3DTTN_kth()
+
+e145_C3DTTN_kth()
+e146_C3DTTN_kth()
+e147_C3DTTN_kth()
+e148_C3DTTN_kth()
+e149_C3DTTN_kth()
+e150_C3DTTN_kth()
+
+e151_C3DTTN_kth()
+e152_C3DTTN_kth()
+e153_C3DTTN_kth()
+e154_C3DTTN_kth()
+e155_C3DTTN_kth()
+e156_C3DTTN_kth()
+
+e157_C3DTTN_kth()
+e158_C3DTTN_kth()
+e159_C3DTTN_kth()
+e160_C3DTTN_kth()
+e161_C3DTTN_kth()
+e162_C3DTTN_kth()
+
+e163_C3DTTN_kth()
+e164_C3DTTN_kth()
+e165_C3DTTN_kth()
+e166_C3DTTN_kth()
+e167_C3DTTN_kth()
+e168_C3DTTN_kth()
+
+e169_C3DTTN_kth()
+e170_C3DTTN_kth()
+e171_C3DTTN_kth()
+e172_C3DTTN_kth()
+e173_C3DTTN_kth()
+e174_C3DTTN_kth()
