@@ -1983,5 +1983,3 @@ class C3TTN7(torch.nn.Module):
         return x
 
 
-# TODO: add shit in setup
-# TODO: write experiments

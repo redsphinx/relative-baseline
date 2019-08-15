@@ -4,7 +4,7 @@ from relative_baseline.omg_emotion import visualization as VZ
 def add_kernels(project_variable, my_model):
     model_number = project_variable.model_number
 
-    if model_number in [2, 3, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7]:
+    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77]:
         kernel = my_model.conv1.weight.data
         kernel = kernel.transpose(1, 2)
 
@@ -26,7 +26,7 @@ def add_kernels(project_variable, my_model):
 def add_histograms(project_variable, my_model):
     model_number = project_variable.model_number
 
-    if model_number in [1, 2, 3, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7]:
+    if model_number in [1, 2, 3, 71, 72, 73, 74, 75, 76, 77]:
         project_variable.writer.add_histogram('fc1/weight', my_model.fc1.weight, project_variable.current_epoch)
         project_variable.writer.add_histogram('fc2/weight', my_model.fc2.weight, project_variable.current_epoch)
         project_variable.writer.add_histogram('fc3/weight', my_model.fc3.weight, project_variable.current_epoch)
@@ -70,7 +70,7 @@ def add_histograms(project_variable, my_model):
             project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
 
-    elif model_number in [7.1, 7.2, 7.3, 7.5, 7.6, 7.7]:
+    elif model_number in [71, 72, 73, 75, 76, 77]:
         if project_variable.theta_init is None:
             # TODO: implement
             pass
@@ -84,7 +84,7 @@ def add_histograms(project_variable, my_model):
             project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv3.bias', my_model.conv3.bias, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv4.bias', my_model.conv4.bias, project_variable.current_epoch)
-    elif model_number in [7.4]:
+    elif model_number in [74]:
         if project_variable.theta_init is None:
             # TODO: implement
             pass

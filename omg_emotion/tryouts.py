@@ -99,7 +99,6 @@ def plot_results():
 plot_results()
 
 
-# TODO: update according to pytorch-1.2
 def C3D_experiments():
     def auto_in_features(input_shape, type, params):
         t, h, w = input_shape

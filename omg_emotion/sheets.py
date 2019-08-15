@@ -38,7 +38,7 @@ def initialize():
 def get_specific_row(experiment_number, sheet_number):
     initialize()
 
-    if sheet_number in [1, 3, 5, 9]:
+    if sheet_number in [1, 3, 5, 9, 13]:
         start = 16
     elif sheet_number == 2:
         start = 11
@@ -50,7 +50,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 14
     elif sheet_number == 666:
         start = 10
-    elif sheet_number in [8, 13]:
+    elif sheet_number in [8]:
         start = 15
     else:
         print('ERROR: Sheet number %d not supported' % sheet_number)
@@ -230,12 +230,11 @@ def write_settings(project_variable):
             '',  # best run                                                 # H
             project_variable.theta_init,  # I
             project_variable.weight_transform,  # J
-            project_variable.max_pool_temporal,  # K
-            str(project_variable.k_shape), # L
-            str(project_variable.load_num_frames), #M
-            project_variable.model_number # N
+            str(project_variable.k_shape), # K
+            str(project_variable.load_num_frames), #L
+            project_variable.model_number #M
         ]]
-        end_letter = 'N'
+        end_letter = 'M'
     else:
         print('Error: sheet_number not supported')
         return None

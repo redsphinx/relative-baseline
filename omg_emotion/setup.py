@@ -99,24 +99,24 @@ def get_model(project_variable):
         model.conv2.weight.requires_grad = False
         model.conv3.weight.requires_grad = False
         model.conv4.weight.requires_grad = False
-    elif project_variable.model_number in [7.1, 7.2, 7.3, 7.5, 7.6, 7.7]:
-        if project_variable.model_number == 7.1:
+    elif project_variable.model_number in [71, 72, 73, 75, 76, 77]:
+        if project_variable.model_number == 71:
             model = M.C3TTN1([project_variable.load_num_frames, 60, 60], project_variable)
-        elif project_variable.model_number == 7.2:
+        elif project_variable.model_number == 72:
             model = M.C3TTN2([project_variable.load_num_frames, 60, 60], project_variable)
-        elif project_variable.model_number == 7.3:
+        elif project_variable.model_number == 73:
             model = M.C3TTN3([project_variable.load_num_frames, 60, 60], project_variable)
-        elif project_variable.model_number == 7.5:
+        elif project_variable.model_number == 75:
             model = M.C3TTN5([project_variable.load_num_frames, 60, 60], project_variable)
-        elif project_variable.model_number == 7.6:
+        elif project_variable.model_number == 76:
             model = M.C3TTN6([project_variable.load_num_frames, 60, 60], project_variable)
-        elif project_variable.model_number == 7.7:
+        elif project_variable.model_number == 77:
             model = M.C3TTN7([project_variable.load_num_frames, 60, 60], project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
         model.conv3.weight.requires_grad = False
         model.conv4.weight.requires_grad = False
-    elif project_variable.model_number == 7.4:
+    elif project_variable.model_number == 74:
         model = M.C3TTN4([project_variable.load_num_frames, 60, 60], project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
