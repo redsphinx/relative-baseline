@@ -4037,8 +4037,9 @@ def e384_conv3dttn_mnist():
     project_variable.data_points = [1000, 200, 200]
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 
 # TODO: train first_weight and srxy parameters in alternating cycles
 # TODO: or add noise to mov_mnist
+# conv3dttn_mmnist_pilot()
