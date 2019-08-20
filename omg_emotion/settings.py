@@ -134,6 +134,7 @@ class ProjectVariable(object):
         self._k0_groups = self.num_out_channels
         # shape of convolution filter
         self._k_shape = (5, 5, 5)
+        #
         # time dimension of the 3D max pooling
         self._max_pool_temporal = 2
         # height=width dimension of the convolutional kernels

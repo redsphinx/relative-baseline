@@ -2228,55 +2228,49 @@ def e174_C3DTTN_kth():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+
+#####################################################################################################################
+#          back to beginnings: experiments with 1 layer Conv TTN
+#####################################################################################################################
+def set_init_6():
+    project_variable.model_number = 8
+    project_variable.end_epoch = 70
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    # project_variable.data_points = [6, 6, 6]
+    project_variable.repeat_experiments = 1
+    # project_variable.repeat_experiments = 10
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 6
+    project_variable.optimizer = 'sgd'
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 14
+
+
+def e175_C3DTTN_1L_kth():
+    set_init_6()
+    project_variable.experiment_number = 175
+    project_variable.device = 0
+    project_variable.model_number = 8
+
+    project_variable.batch_size = 32
+    project_variable.learning_rate = 0.000001
+    project_variable.data_points = [190, 190, 210]
+
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.k_shape = (5, 5, 5)
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+    project_variable.num_out_channels = [16, 16]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+
+project_variable = ProjectVariable(debug_mode=True)
 # cProfile.run('bottleneck()', sort='cumtime')
 
-
-# e133_C3DTTN_kth()
-# e134_C3DTTN_kth()
-# e135_C3DTTN_kth()
-# e136_C3DTTN_kth()
-# e137_C3DTTN_kth()
-# e138_C3DTTN_kth()
-#
-# e139_C3DTTN_kth()
-# e140_C3DTTN_kth()
-# e141_C3DTTN_kth()
-# e142_C3DTTN_kth()
-# e143_C3DTTN_kth()
-# e144_C3DTTN_kth()
-#
-# e145_C3DTTN_kth()
-# e146_C3DTTN_kth()
-# e147_C3DTTN_kth()
-# e148_C3DTTN_kth()
-# e149_C3DTTN_kth()
-# e150_C3DTTN_kth()
-#
-# e151_C3DTTN_kth()
-# e152_C3DTTN_kth()
-# e153_C3DTTN_kth()
-# e154_C3DTTN_kth()
-# e155_C3DTTN_kth()
-# e156_C3DTTN_kth()
-#
-# e157_C3DTTN_kth()
-# e158_C3DTTN_kth()
-# e159_C3DTTN_kth()
-# e160_C3DTTN_kth()
-# e161_C3DTTN_kth()
-# e162_C3DTTN_kth()
-#
-# e163_C3DTTN_kth()
-# e164_C3DTTN_kth()
-# e165_C3DTTN_kth()
-# e166_C3DTTN_kth()
-# e167_C3DTTN_kth()
-# e168_C3DTTN_kth()
-#
-# e169_C3DTTN_kth()
-# e170_C3DTTN_kth()
-# e171_C3DTTN_kth()
-# e172_C3DTTN_kth()
-# e173_C3DTTN_kth()
-e174_C3DTTN_kth()
+e175_C3DTTN_1L_kth()

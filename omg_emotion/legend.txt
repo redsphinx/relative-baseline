@@ -13,5 +13,5 @@ project_variable.model_number
 75   C3TTN5    conv_k_t=7  load_num_frames=100     4 conv layers
 76   C3TTN6    conv_k_t=9  load_num_frames=100
 77   C3TTN7    conv_k_t=11  load_num_frames=100
-
-
+8   C3DTTN_1L
+9   C3D_1L

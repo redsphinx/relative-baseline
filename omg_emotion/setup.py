@@ -121,8 +121,11 @@ def get_model(project_variable):
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
         model.conv3.weight.requires_grad = False
-
-
+    elif project_variable.model_number == 8:
+        model = M.C3DTTN_1L([project_variable.load_num_frames, 60, 60], project_variable)
+        model.conv1.weight.requires_grad = False
+    elif project_variable.model_number == 9:
+        model = M.C3D_1L([project_variable.load_num_frames, 60, 60], project_variable)
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None

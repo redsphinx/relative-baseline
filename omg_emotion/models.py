@@ -41,6 +41,10 @@ class ConvTTN3d(conv._ConvNd):
             self.first_weight = torch.nn.init.normal_(first_w, mean=1., std=0.5)
         elif project_variable.k0_init == 'uniform':
             self.first_weight = torch.nn.init.uniform(first_w)
+        elif project_variable.k0_init == 'kaiming-uniform':
+            self.first_weight = torch.nn.init.kaiming_uniform_(first_w)
+        elif project_variable.k0_init == 'kaiming-normal':
+            self.first_weight = torch.nn.init.kaiming_normal_(first_w)
 
         if self.project_variable.theta_init is not None:
             # self.theta = torch.zeros((kernel_size[0] - 1, out_channels, 2, 3))
@@ -1983,3 +1987,82 @@ class C3TTN7(torch.nn.Module):
         return x
 
 
+class C3DTTN_1L(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        channels = project_variable.num_out_channels
+        trafo_groups = project_variable.transformation_groups
+        k0_groups = project_variable.k0_groups
+        kt, kh, kw = project_variable.k_shape
+
+        super(C3DTTN_1L, self).__init__()
+
+        self.conv1 = ConvTTN3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(kt, kh, kw),
+                               stride=1,
+                               padding=0,
+                               bias=True,
+                               project_variable=project_variable,
+                               transformation_groups=trafo_groups[0],
+                               k0_groups=k0_groups[0])
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
+        #
+        # self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
+        # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+
+        in_features = t * h * w * channels[0]
+        # self.fc1 = torch.nn.Linear(in_features=in_features, out_features=2048)
+        # self.fc2 = torch.nn.Linear(in_features=2048, out_features=1024)
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=10)
+
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        # x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        # x = torch.nn.functional.relu(x)
+        # x = self.fc2(x)
+        # x = torch.nn.functional.relu(x)
+        # x = self.fc3(x)
+
+        return x
+
+
+class C3D_1L(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        channels = project_variable.num_out_channels
+        kt, kh, kw = project_variable.k_shape
+
+        super(C3D_1L, self).__init__()
+
+        self.conv1 = torch.nn.Conv3d(in_channels=1,
+                               out_channels=channels[0],
+                               kernel_size=(kt, kh, kw),
+                               stride=1,
+                               padding=0,
+                               bias=True)
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
+        t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+
+        in_features = t * h * w * channels[0]
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=6)
+
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.max_pool_1(x)
+        x = torch.nn.functional.relu(x)
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        return x

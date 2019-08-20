@@ -4,7 +4,7 @@ from relative_baseline.omg_emotion import visualization as VZ
 def add_kernels(project_variable, my_model):
     model_number = project_variable.model_number
 
-    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77]:
+    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
         kernel = my_model.conv1.weight.data
         kernel = kernel.transpose(1, 2)
 
@@ -67,8 +67,8 @@ def add_histograms(project_variable, my_model):
         else:
             project_variable.writer.add_histogram('conv1.theta', my_model.conv1.theta, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv2.theta', my_model.conv2.theta, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
 
     elif model_number in [71, 72, 73, 75, 76, 77]:
         if project_variable.theta_init is None:
@@ -80,10 +80,17 @@ def add_histograms(project_variable, my_model):
             project_variable.writer.add_histogram('conv3.theta', my_model.conv3.theta, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv4.theta', my_model.conv4.theta, project_variable.current_epoch)
 
-            project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv3.bias', my_model.conv3.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv4.bias', my_model.conv4.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv3.bias', my_model.conv3.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv4.bias', my_model.conv4.bias, project_variable.current_epoch)
+
+        project_variable.writer.add_histogram('conv1.k0', my_model.conv1.first_weight, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.k0', my_model.conv2.first_weight, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv3.k0', my_model.conv3.first_weight, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv4.k0', my_model.conv4.first_weight, project_variable.current_epoch)
+
+
     elif model_number in [74]:
         if project_variable.theta_init is None:
             # TODO: implement
@@ -93,17 +100,36 @@ def add_histograms(project_variable, my_model):
             project_variable.writer.add_histogram('conv2.theta', my_model.conv2.theta, project_variable.current_epoch)
             project_variable.writer.add_histogram('conv3.theta', my_model.conv3.theta, project_variable.current_epoch)
 
-            project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
-            project_variable.writer.add_histogram('conv3.bias', my_model.conv3.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.bias', my_model.conv2.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv3.bias', my_model.conv3.bias, project_variable.current_epoch)
 
+        project_variable.writer.add_histogram('conv1.k0', my_model.conv1.first_weight, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv2.k0', my_model.conv2.first_weight, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv3.k0', my_model.conv3.first_weight, project_variable.current_epoch)
+
+    elif model_number in [8]:
+        if project_variable.theta_init is None:
+            project_variable.writer.add_histogram('conv1.weight/scale', my_model.conv1.scale,
+                                                  project_variable.current_epoch)
+            project_variable.writer.add_histogram('conv1.weight/rotate', my_model.conv1.rotate,
+                                                  project_variable.current_epoch)
+            project_variable.writer.add_histogram('conv1.weight/translate_x', my_model.conv1.translate_x,
+                                                  project_variable.current_epoch)
+            project_variable.writer.add_histogram('conv1.weight/translate_y', my_model.conv1.translate_y,
+                                                  project_variable.current_epoch)
+        else:
+            project_variable.writer.add_histogram('conv1.theta', my_model.conv1.theta, project_variable.current_epoch)
+
+        project_variable.writer.add_histogram('conv1.bias', my_model.conv1.bias, project_variable.current_epoch)
+        project_variable.writer.add_histogram('conv1.k0', my_model.conv1.first_weight, project_variable.current_epoch)
 
 
 
 def add_scalars(project_variable, my_model):
     model_number = project_variable.model_number
 
-    if model_number == [3]:
+    if model_number in [3, 8]:
         if project_variable.theta_init is None:
             s = my_model.conv1.scale.data
             r = my_model.conv1.rotate.data
@@ -125,7 +151,7 @@ def add_scalars(project_variable, my_model):
                                                     project_variable.current_epoch)
 
         else:
-            theta = my_model.theta.data
+            theta = my_model.conv1.theta.data
             for i in range(theta.shape[1]):
                 for j in range(theta.shape[0]):
                     project_variable.writer.add_scalars('k%d/theta[0, 0]' % i, {"t%d" % j: theta[j, i, 0, 0]},
@@ -140,6 +166,7 @@ def add_scalars(project_variable, my_model):
                                                         project_variable.current_epoch)
                     project_variable.writer.add_scalars('k%d/theta[1, 2]' % i, {"t%d" % j: theta[j, i, 1, 2]},
                                                         project_variable.current_epoch)
+
 
 
 def add_standard_info(project_variable, which, parameters):
