@@ -116,7 +116,7 @@ def save_architecture_as_dot(model, file_name, save_location):
     dot.save(file_name, save_location)
 
 
-def experiment_runs_statistics(experiment, model):
+def experiment_runs_statistics(experiment, model, mode='test'):
 
     test_acc, test_std, test_best = 0, 0, 0
 
@@ -139,7 +139,7 @@ def experiment_runs_statistics(experiment, model):
         # print('%s   mean: %f    std: %f     runs: %d    best run: %d' % (i, np.mean(acc), np.std(acc), runs,
         #                                                                  acc.index(max(acc))))
 
-        if i == 'test':
+        if i == mode:
             test_acc = np.mean(acc)
             test_std = np.std(acc)
             test_best = acc.index(max(acc))
@@ -233,3 +233,4 @@ def remove_all_files(experiment, model):
                     shutil.rmtree(file_path)
                 elif os.path.isfile(file_path):
                     os.remove(file_path)
+

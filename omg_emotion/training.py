@@ -44,14 +44,15 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
     confusion_flatten = U.flatten_confusion(confusion_epoch)
 
+    # TODO
     # if project_variable.model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
     #     TM.add_kernels(project_variable, my_model)
     #
-    # if project_variable.model_number in [1, 2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
-    #     TM.add_histograms(project_variable, my_model)
-    #
-    # if project_variable.model_number in [3, 71, 72, 73, 74, 75, 76, 77, 8]:
-    #     TM.add_scalars(project_variable, my_model)
+    if project_variable.model_number in [1, 2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
+        TM.add_histograms(project_variable, my_model)
+
+    if project_variable.model_number in [3, 71, 72, 73, 74, 75, 76, 77, 8]:
+        TM.add_scalars(project_variable, my_model)
 
     if project_variable.save_data:
         saving.update_logs(project_variable, 'train', [loss, accuracy, confusion_flatten])

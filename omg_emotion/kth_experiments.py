@@ -2230,47 +2230,1509 @@ def e174_C3DTTN_kth():
 
 
 #####################################################################################################################
-#          back to beginnings: experiments with 1 layer Conv TTN
+#                       175-       back to beginnings: experiments with 1 layer Conv TTN
 #####################################################################################################################
 def set_init_6():
     project_variable.model_number = 8
-    project_variable.end_epoch = 70
+    project_variable.end_epoch = 150
     project_variable.dataset = 'kth_actions'
     project_variable.data_points = [191, 192, 216]
-    # project_variable.data_points = [6, 6, 6]
-    project_variable.repeat_experiments = 1
-    # project_variable.repeat_experiments = 10
+    project_variable.repeat_experiments = 10
     project_variable.same_training_data = True
     project_variable.randomize_training_data = True
     project_variable.label_size = 6
     project_variable.optimizer = 'sgd'
     project_variable.experiment_state = 'new'
     project_variable.sheet_number = 14
-
-
-def e175_C3DTTN_1L_kth():
-    set_init_6()
-    project_variable.experiment_number = 175
-    project_variable.device = 0
     project_variable.model_number = 8
-
-    project_variable.batch_size = 32
-    project_variable.learning_rate = 0.000001
-    project_variable.data_points = [190, 190, 210]
-
-    project_variable.k0_init = 'kaiming-normal'
-    project_variable.k_shape = (5, 5, 5)
+    project_variable.weight_transform = 'seq'
     project_variable.theta_init = 'eye'
     project_variable.srxy_init = 'eye'
-    project_variable.weight_transform = 'seq'
-    project_variable.num_out_channels = [16, 16]
+# --------------------------------------------------------
+#  find good LR, batchsize, out_channels, k_shape 175-280
+# --------------------------------------------------------
+def finding_good_values():
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 30
+    
+# --------------------------------------------------------
+#                   LR = 0.000001
+# --------------------------------------------------------
+#------ 1
+def e175_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 175
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e176_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 176
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e177_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 177
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e178_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 178
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e179_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 179
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e180_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 180
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e181_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 181
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e182_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 182
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e183_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 183
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e184_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 184
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e185_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 185
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e186_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 186
+    project_variable.device = 1
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e187_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 187
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e188_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 188
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e189_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 189
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e190_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 190
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# TODO
+def e191_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 191
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e192_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 192
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e193_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 193
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e194_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 194
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e195_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 195
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e196_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 196
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e197_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 197
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e198_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 198
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e199_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 199
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e200_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 200
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e201_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 201
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   LR = 0.0000001
+# --------------------------------------------------------
+#------ 1
+def e202_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 202
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e203_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 203
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e204_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 204
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e205_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 205
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e206_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 206
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e207_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 207
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e208_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 208
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e209_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 209
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e210_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 210
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e211_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 211
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e212_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 212
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e213_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 213
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e214_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 214
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e215_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 215
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e216_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 216
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e217_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 217
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e218_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 218
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e219_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 219
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e220_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 220
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e221_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 221
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e222_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 222
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e223_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 223
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e224_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 224
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e225_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 225
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e226_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 226
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e227_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 227
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e228_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 228
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.0000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   LR = 0.00000001
+# --------------------------------------------------------
+#------ 1
+def e229_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 229
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e230_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 230
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e231_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 231
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e232_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 232
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e233_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 233
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e234_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 234
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e235_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 235
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e236_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 236
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e237_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 237
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (3, 3, 3)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e238_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 238
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e239_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 239
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e240_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 240
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e241_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 241
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e242_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 242
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e243_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 243
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e244_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 244
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e245_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 245
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e246_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 246
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (5, 5, 5)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+#------ 1
+def e247_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 247
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e248_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 248
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e249_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 249
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [6]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 2
+def e250_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 250
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e251_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 251
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e252_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 252
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [12]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+# ------ 3
+def e253_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 253
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 12
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e254_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 254
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+def e255_C3DTTN_1L_kth():
+    set_init_6()
+    finding_good_values()
+    project_variable.experiment_number = 255
+    project_variable.device = 2
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 32
+    project_variable.num_out_channels = [18]
+    project_variable.k_shape = (7, 7, 7)
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
 
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=True)
+    
+project_variable = ProjectVariable(debug_mode=False)
 # cProfile.run('bottleneck()', sort='cumtime')
 
-e175_C3DTTN_1L_kth()
+# e175_C3DTTN_1L_kth()
+# e176_C3DTTN_1L_kth()
+# e177_C3DTTN_1L_kth()
+# e178_C3DTTN_1L_kth()
+# e179_C3DTTN_1L_kth()
+#
+# e180_C3DTTN_1L_kth()
+# e181_C3DTTN_1L_kth()
+# e182_C3DTTN_1L_kth()
+# e183_C3DTTN_1L_kth()
+# e184_C3DTTN_1L_kth()
+# e185_C3DTTN_1L_kth()
+# e186_C3DTTN_1L_kth()
+# e187_C3DTTN_1L_kth()
+# e188_C3DTTN_1L_kth()
+# e189_C3DTTN_1L_kth()
+#
+# e190_C3DTTN_1L_kth()
+e191_C3DTTN_1L_kth()
+# e192_C3DTTN_1L_kth()
+# e193_C3DTTN_1L_kth()
+# e194_C3DTTN_1L_kth()
+# e195_C3DTTN_1L_kth()
+# e196_C3DTTN_1L_kth()
+# e197_C3DTTN_1L_kth()
+# e198_C3DTTN_1L_kth()
+# e199_C3DTTN_1L_kth()
+#
+# e200_C3DTTN_1L_kth()
+# e201_C3DTTN_1L_kth()
+# e202_C3DTTN_1L_kth()
+# e203_C3DTTN_1L_kth()
+# e204_C3DTTN_1L_kth()
+# e205_C3DTTN_1L_kth()
+# e206_C3DTTN_1L_kth()
+# e207_C3DTTN_1L_kth()
+# e208_C3DTTN_1L_kth()
+# e209_C3DTTN_1L_kth()
+#
+# e210_C3DTTN_1L_kth()
+# e211_C3DTTN_1L_kth()
+# e212_C3DTTN_1L_kth()
+# e213_C3DTTN_1L_kth()
+# e214_C3DTTN_1L_kth()
+# e215_C3DTTN_1L_kth()
+# e216_C3DTTN_1L_kth()
+# e217_C3DTTN_1L_kth()
+# e218_C3DTTN_1L_kth()
+# e219_C3DTTN_1L_kth()
+#
+# e220_C3DTTN_1L_kth()
+# e221_C3DTTN_1L_kth()
+# e222_C3DTTN_1L_kth()
+# e223_C3DTTN_1L_kth()
+# e224_C3DTTN_1L_kth()
+# e225_C3DTTN_1L_kth()
+# e226_C3DTTN_1L_kth()
+# e227_C3DTTN_1L_kth()
+# e228_C3DTTN_1L_kth()
+# e229_C3DTTN_1L_kth()
+#
+# e230_C3DTTN_1L_kth()
+# e231_C3DTTN_1L_kth()
+# e232_C3DTTN_1L_kth()
+# e233_C3DTTN_1L_kth()
+# e234_C3DTTN_1L_kth()
+# e235_C3DTTN_1L_kth()
+# e236_C3DTTN_1L_kth()
+# e237_C3DTTN_1L_kth()
+# e238_C3DTTN_1L_kth()
+# e239_C3DTTN_1L_kth()
+#
+# e240_C3DTTN_1L_kth()
+# e241_C3DTTN_1L_kth()
+# e242_C3DTTN_1L_kth()
+# e243_C3DTTN_1L_kth()
+# e244_C3DTTN_1L_kth()
+# e245_C3DTTN_1L_kth()
+# e246_C3DTTN_1L_kth()
+# e247_C3DTTN_1L_kth()
+# e248_C3DTTN_1L_kth()
+# e249_C3DTTN_1L_kth()
+#
+# e250_C3DTTN_1L_kth()
+# e251_C3DTTN_1L_kth()
+# e252_C3DTTN_1L_kth()
+# e253_C3DTTN_1L_kth()
+# e254_C3DTTN_1L_kth()
+# e255_C3DTTN_1L_kth()

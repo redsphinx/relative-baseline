@@ -129,12 +129,13 @@ class ProjectVariable(object):
         # share transformation parameters across all filters in a layer.
         # here we set how many sets of transformations are learned.
         # note that 1 <= transformation_groups <= num_out_channels
-        self._transformation_groups = self.num_out_channels
+        self._transformation_groups = self.num_out_channels # across filters
         # filters share k0
         self._k0_groups = self.num_out_channels
         # shape of convolution filter
         self._k_shape = (5, 5, 5)
-        #
+        # transformation groups within t of a single filter
+        self._transformations_per_filter = self.k_shape[0] - 1
         # time dimension of the 3D max pooling
         self._max_pool_temporal = 2
         # height=width dimension of the convolutional kernels
@@ -544,6 +545,14 @@ class ProjectVariable(object):
     @k_shape.setter
     def k_shape(self, value):
         self._k_shape = value
+
+    @property
+    def transformations_per_filter(self):
+        return self._transformations_per_filter
+
+    @transformations_per_filter.setter
+    def transformations_per_filter(self, value):
+        self._transformations_per_filter = value
 
     @property
     def max_pool_temporal(self):
