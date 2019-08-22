@@ -2890,12 +2890,12 @@ def e211_C3DTTN_1L_kth():
     project_variable.k0_groups = project_variable.num_out_channels
 
     main_file.run(project_variable)
-# TODO
+
 def e212_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 212
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 16
@@ -2912,7 +2912,7 @@ def e213_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 213
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 32
@@ -2929,7 +2929,7 @@ def e214_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 214
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 12
@@ -2946,7 +2946,7 @@ def e215_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 215
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 16
@@ -2963,7 +2963,7 @@ def e216_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 216
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 32
@@ -2980,7 +2980,7 @@ def e217_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 217
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 12
@@ -2997,7 +2997,7 @@ def e218_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 218
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 16
@@ -3014,7 +3014,7 @@ def e219_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 219
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 32
@@ -3031,7 +3031,7 @@ def e220_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 220
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 12
@@ -3048,7 +3048,7 @@ def e221_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 221
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 16
@@ -3065,7 +3065,7 @@ def e222_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 222
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 32
@@ -3082,7 +3082,7 @@ def e223_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 223
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 12
@@ -3099,7 +3099,7 @@ def e224_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 224
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.0000001
     project_variable.batch_size = 16
@@ -3255,7 +3255,7 @@ def e233_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 233
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3272,7 +3272,7 @@ def e234_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 234
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 32
@@ -3289,7 +3289,7 @@ def e235_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 235
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3306,7 +3306,7 @@ def e236_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 236
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3323,7 +3323,7 @@ def e237_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 237
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 32
@@ -3340,7 +3340,7 @@ def e238_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 238
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3357,7 +3357,7 @@ def e239_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 239
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3442,7 +3442,7 @@ def e244_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 244
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3454,12 +3454,12 @@ def e244_C3DTTN_1L_kth():
     project_variable.k0_groups = project_variable.num_out_channels
 
     main_file.run(project_variable)
-
+# TODO
 def e245_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 245
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3476,7 +3476,7 @@ def e246_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 246
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 32
@@ -3493,7 +3493,7 @@ def e247_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 247
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3510,7 +3510,7 @@ def e248_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 248
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3527,7 +3527,7 @@ def e249_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 249
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 32
@@ -3544,7 +3544,7 @@ def e250_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 250
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3561,7 +3561,7 @@ def e251_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 251
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 16
@@ -3578,7 +3578,7 @@ def e252_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 252
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 32
@@ -3595,7 +3595,7 @@ def e253_C3DTTN_1L_kth():
     set_init_6()
     finding_good_values()
     project_variable.experiment_number = 253
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.learning_rate = 0.00000001
     project_variable.batch_size = 12
@@ -3688,7 +3688,7 @@ project_variable = ProjectVariable(debug_mode=False)
 #
 # e210_C3DTTN_1L_kth()
 # e211_C3DTTN_1L_kth()
-e212_C3DTTN_1L_kth()
+# e212_C3DTTN_1L_kth()
 # e213_C3DTTN_1L_kth()
 # e214_C3DTTN_1L_kth()
 # e215_C3DTTN_1L_kth()
@@ -3735,4 +3735,4 @@ e212_C3DTTN_1L_kth()
 # e252_C3DTTN_1L_kth()
 # e253_C3DTTN_1L_kth()
 # e254_C3DTTN_1L_kth()
-# e255_C3DTTN_1L_kth()
+e255_C3DTTN_1L_kth()
