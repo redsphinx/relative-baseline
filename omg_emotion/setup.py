@@ -1,5 +1,3 @@
-import math
-from relative_baseline.omg_emotion.settings import ProjectVariable
 from torchvision.models import resnet18
 from torch.optim.adam import Adam
 from torch.optim.sgd import SGD

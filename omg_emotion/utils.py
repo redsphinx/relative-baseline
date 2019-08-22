@@ -1,3 +1,4 @@
+import math
 import tqdm
 import os
 import shutil
@@ -28,8 +29,8 @@ def initialize(project_variable, all_data):
 
 
 def cyclical_lr(project_variable, stepsize):
-    min_lr = project_variable.learning_rate / 10
-    max_lr = project_variable.learning_rate * 10
+    min_lr = project_variable.learning_rate / 100
+    max_lr = project_variable.learning_rate * 100
 
     # Scaler: we can adapt this if we do not want the triangular CLR
     scaler = lambda x: 1.

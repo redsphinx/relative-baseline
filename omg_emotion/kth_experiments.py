@@ -3855,8 +3855,46 @@ def e267_C3DTTN_1L_kth():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+def set_init_8():
+    project_variable.model_number = 8
+    project_variable.end_epoch = 100
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    project_variable.repeat_experiments = 10
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 6
+    project_variable.optimizer = 'sgd'
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 14
+    project_variable.model_number = 8
+    project_variable.weight_transform = 'seq'
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 30
+    project_variable.k_shape = (7, 7, 7)
+
+def e666_C3DTTN_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 666
+    project_variable.device = 0
+
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.use_clr = True
+
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
 # cProfile.run('bottleneck()', sort='cumtime')
+
+e666_C3DTTN_1L_kth()
 
 # e256_C3DTTN_1L_kth()
 # e257_C3DTTN_1L_kth()
