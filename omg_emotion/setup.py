@@ -1,3 +1,4 @@
+import math
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from torchvision.models import resnet18
 from torch.optim.adam import Adam
@@ -175,4 +176,5 @@ def get_device(project_variable):
     device = torch.device(_dev)
 
     return device
+
 

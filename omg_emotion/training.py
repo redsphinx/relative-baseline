@@ -18,6 +18,12 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
+    if project_variable.use_clr:
+        # CLR: https://towardsdatascience.com/adaptive-and-cyclical-learning-rates-using-pytorch-2bf904d18dee
+        step_size = 4 * steps
+        clr = U.cyclical_lr(project_variable, step_size)
+        clr_scheduler = torch.optim.lr_scheduler.LambdaLR(my_optimizer, [clr])
+
     for ts in tqdm(range(steps)):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
@@ -30,6 +36,9 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         loss = U.calculate_loss(project_variable, predictions, labels)
         # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         loss.backward()
+
+        if project_variable.use_clr:
+            clr_scheduler.step()
 
         my_optimizer.step()
 

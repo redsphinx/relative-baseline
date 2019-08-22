@@ -69,6 +69,8 @@ class ProjectVariable(object):
 
         # float, learning rate
         self._learning_rate = 0.001
+        # use cyclical learning rate
+        self._use_clr = False
         # str, loss function
         self._loss_function = 'cross_entropy'
         # list, weights for balanced loss, necessary for resnet18
@@ -337,6 +339,14 @@ class ProjectVariable(object):
     @learning_rate.setter
     def learning_rate(self, value):
         self._learning_rate = value
+
+    @property
+    def use_clr(self):
+        return self._use_clr
+
+    @use_clr.setter
+    def use_clr(self, value):
+        self._use_clr = value
 
     @property
     def loss_function(self):
