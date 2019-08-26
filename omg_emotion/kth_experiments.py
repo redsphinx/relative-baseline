@@ -2,7 +2,7 @@ import cProfile
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 
-
+# cProfile.run('bottleneck()', sort='cumtime')
 def pilot():
     project_variable.device = 0
     project_variable.model_number = 3
@@ -3657,7 +3657,6 @@ def set_init_7():
     project_variable.optimizer = 'sgd'
     project_variable.experiment_state = 'new'
     project_variable.sheet_number = 14
-    project_variable.model_number = 8
     project_variable.weight_transform = 'seq'
     project_variable.theta_init = 'eye'
     project_variable.srxy_init = 'eye'
@@ -3909,7 +3908,7 @@ def e271_C3D_1L_kth():
     project_variable.num_out_channels = [24]
     main_file.run(project_variable)
 ########
-
+########
 def e272_C3D_1L_kth():
     set_init_8()
     project_variable.experiment_number = 272
@@ -3950,11 +3949,554 @@ def e275_C3D_1L_kth():
     project_variable.end_epoch = 150
     main_file.run(project_variable)
 
+
+def e666_clr():
+    project_variable.use_clr = True
+    project_variable.device = 2
+    project_variable.learning_rate = 0.00000001
+    project_variable.model_number = 9
+    project_variable.end_epoch = 20
+    project_variable.batch_size = 10
+    project_variable.dataset = 'mov_mnist'
+    project_variable.data_points = [50, 20, 20]
+    project_variable.repeat_experiments = 1
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.label_size = 10
+    project_variable.optimizer = 'sgd'
+    project_variable.experiment_number = 666
+    main_file.run(project_variable)
+########
+########
+def e276_C3D_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 276
+    project_variable.device = 1
+    project_variable.learning_rate = 0.000000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.end_epoch = 150
+    project_variable.use_clr = True
+    main_file.run(project_variable)
+
+def e277_C3D_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 277
+    project_variable.device = 1
+    project_variable.learning_rate = 0.000000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.end_epoch = 150
+    project_variable.use_clr = True
+    main_file.run(project_variable)
+
+def e278_C3DTTN_1L_kth():
+    set_init_7()
+    project_variable.experiment_number = 278
+    project_variable.device = 1
+    project_variable.learning_rate = 0.000000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.end_epoch = 150
+    project_variable.use_clr = True
+    main_file.run(project_variable)
+
+def e279_C3DTTN_1L_kth():
+    set_init_7()
+    project_variable.experiment_number = 279
+    project_variable.device = 1
+    project_variable.learning_rate = 0.000000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.end_epoch = 150
+    project_variable.use_clr = True
+    main_file.run(project_variable)
+
+#####################################################################################################################
+#                  280-309       k0, load_num_frames, transformation_per_filter, out_channels
+#####################################################################################################################
+def set_init_9():
+    project_variable.model_number = 8
+    project_variable.end_epoch = 300
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 216]
+    project_variable.repeat_experiments = 10
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.learning_rate = 0.000000001
+    project_variable.label_size = 6
+    project_variable.optimizer = 'sgd'
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 14
+    project_variable.weight_transform = 'seq'
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.batch_size = 16
+    project_variable.k_shape = (7, 7, 7)
+# --------------------------------------------------------
+#                   load_num_frames = 30
+# --------------------------------------------------------
+def e280_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 280
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e281_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 281
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e282_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 282
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e283_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 283
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e284_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 284
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e285_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 285
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e286_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 286
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e287_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 287
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e288_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 288
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e289_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 289
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e290_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 290
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e291_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 1
+    project_variable.experiment_number = 291
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e292_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 292
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e293_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 293
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 30
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   load_num_frames = 60
+# --------------------------------------------------------
+# --- 1
+def e294_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 294
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e295_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 295
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e296_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 296
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e297_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 297
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e298_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 298
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e299_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 299
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e300_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 300
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e301_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 301
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'kaiming-uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e302_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 302
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e303_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 303
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e304_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 304
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e305_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 305
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 1
+def e306_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 306
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e307_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 307
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+# --- 2
+def e308_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 308
+
+    project_variable.num_out_channels = [18]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
+def e309_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 2
+    project_variable.experiment_number = 309
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'uniform'
+    project_variable.load_num_frames = 60
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+    
 project_variable = ProjectVariable(debug_mode=False)
-# cProfile.run('bottleneck()', sort='cumtime')
 
 
-# e272_C3D_1L_kth()
-# e273_C3D_1L_kth()
-# e274_C3D_1L_kth()
-# e275_C3D_1L_kth()
+# e280_C3DTTN_1L_kth()
+# e281_C3DTTN_1L_kth()
+# e282_C3DTTN_1L_kth()
+# e283_C3DTTN_1L_kth()
+# e284_C3DTTN_1L_kth()
+# e285_C3DTTN_1L_kth()
+# e286_C3DTTN_1L_kth()
+# e287_C3DTTN_1L_kth()
+# e288_C3DTTN_1L_kth()
+# e289_C3DTTN_1L_kth()
+#
+# e290_C3DTTN_1L_kth()
+# e291_C3DTTN_1L_kth()
+# e292_C3DTTN_1L_kth()
+# e293_C3DTTN_1L_kth()
+# e294_C3DTTN_1L_kth()
+# e295_C3DTTN_1L_kth()
+# e296_C3DTTN_1L_kth()
+# e297_C3DTTN_1L_kth()
+e298_C3DTTN_1L_kth() # TODO HERE
+# e299_C3DTTN_1L_kth()
+#
+# e300_C3DTTN_1L_kth()
+# e301_C3DTTN_1L_kth()
+# e302_C3DTTN_1L_kth()
+# e303_C3DTTN_1L_kth()
+# e304_C3DTTN_1L_kth()
+# e305_C3DTTN_1L_kth()
+# e306_C3DTTN_1L_kth()
+# e307_C3DTTN_1L_kth()
+# e308_C3DTTN_1L_kth()
+# e309_C3DTTN_1L_kth()

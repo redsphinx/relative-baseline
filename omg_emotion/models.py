@@ -2077,7 +2077,7 @@ class C3D_1L(torch.nn.Module):
         t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
 
         in_features = t * h * w * channels[0]
-        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=6)
+        self.fc1 = torch.nn.Linear(in_features=in_features, out_features=project_variable.label_size)
 
 
     def forward(self, x):

@@ -19,10 +19,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         U.initialize(project_variable, all_data)
 
     if project_variable.use_clr:
-        # CLR: https://towardsdatascience.com/adaptive-and-cyclical-learning-rates-using-pytorch-2bf904d18dee
-        step_size = 8 * steps
-        clr = U.cyclical_lr(project_variable, step_size)
-        clr_scheduler = torch.optim.lr_scheduler.LambdaLR(my_optimizer, [clr])
+        clr_scheduler = torch.optim.lr_scheduler.CyclicLR(my_optimizer,
+                                                          base_lr=project_variable.learning_rate/10,
+                                                          max_lr=project_variable.learning_rate*10,
+                                                          step_size_up= steps/2)
 
     for ts in tqdm(range(steps)):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
@@ -41,9 +41,9 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         if project_variable.use_clr:
             clr_scheduler.step()
-            print(clr_scheduler.get_lr())
+            # print('CLR LR: ', clr_scheduler.get_lr())
 
-
+        # my_optimizer.step()
 
         accuracy = U.calculate_accuracy(predictions, labels)
         confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
