@@ -4299,7 +4299,7 @@ def e297_C3DTTN_1L_kth():
 # --- 1
 def e298_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.experiment_number = 298
 
     project_variable.num_out_channels = [18]
@@ -4313,7 +4313,7 @@ def e298_C3DTTN_1L_kth():
 
 def e299_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.experiment_number = 299
 
     project_variable.num_out_channels = [24]
@@ -4327,7 +4327,7 @@ def e299_C3DTTN_1L_kth():
 # --- 2
 def e300_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.experiment_number = 300
 
     project_variable.num_out_channels = [18]
@@ -4341,7 +4341,7 @@ def e300_C3DTTN_1L_kth():
 
 def e301_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.experiment_number = 301
 
     project_variable.num_out_channels = [24]
@@ -4355,7 +4355,7 @@ def e301_C3DTTN_1L_kth():
 # --- 1
 def e302_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 0
     project_variable.experiment_number = 302
 
     project_variable.num_out_channels = [18]
@@ -4369,7 +4369,7 @@ def e302_C3DTTN_1L_kth():
 
 def e303_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.experiment_number = 303
 
     project_variable.num_out_channels = [24]
@@ -4383,7 +4383,7 @@ def e303_C3DTTN_1L_kth():
 # --- 2
 def e304_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.experiment_number = 304
 
     project_variable.num_out_channels = [18]
@@ -4397,7 +4397,7 @@ def e304_C3DTTN_1L_kth():
 
 def e305_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.experiment_number = 305
 
     project_variable.num_out_channels = [24]
@@ -4411,7 +4411,7 @@ def e305_C3DTTN_1L_kth():
 # --- 1
 def e306_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.experiment_number = 306
 
     project_variable.num_out_channels = [18]
@@ -4425,7 +4425,7 @@ def e306_C3DTTN_1L_kth():
 
 def e307_C3DTTN_1L_kth():
     set_init_9()
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.experiment_number = 307
 
     project_variable.num_out_channels = [24]
@@ -4487,7 +4487,7 @@ project_variable = ProjectVariable(debug_mode=False)
 # e295_C3DTTN_1L_kth()
 # e296_C3DTTN_1L_kth()
 # e297_C3DTTN_1L_kth()
-e298_C3DTTN_1L_kth() # TODO HERE
+# e298_C3DTTN_1L_kth()
 # e299_C3DTTN_1L_kth()
 #
 # e300_C3DTTN_1L_kth()
@@ -4499,4 +4499,4 @@ e298_C3DTTN_1L_kth() # TODO HERE
 # e306_C3DTTN_1L_kth()
 # e307_C3DTTN_1L_kth()
 # e308_C3DTTN_1L_kth()
-# e309_C3DTTN_1L_kth()
+e309_C3DTTN_1L_kth() # TODO HERE
