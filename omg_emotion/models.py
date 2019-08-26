@@ -2044,28 +2044,17 @@ class C3DTTN_1L(torch.nn.Module):
                                transformations_per_filter=trafo_per_filter)
 
         t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
-        #
-        # self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
-        # t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
         in_features = t * h * w * channels[0]
-        # self.fc1 = torch.nn.Linear(in_features=in_features, out_features=2048)
-        # self.fc2 = torch.nn.Linear(in_features=2048, out_features=1024)
         self.fc1 = torch.nn.Linear(in_features=in_features, out_features=project_variable.label_size)
 
 
     def forward(self, x, device):
         x = self.conv1(x, device)
-        # x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
-
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         x = self.fc1(x)
-        # x = torch.nn.functional.relu(x)
-        # x = self.fc2(x)
-        # x = torch.nn.functional.relu(x)
-        # x = self.fc3(x)
 
         return x
 
@@ -2087,16 +2076,12 @@ class C3D_1L(torch.nn.Module):
 
         t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
 
-        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=(2, 2, 2))
-        t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
-
         in_features = t * h * w * channels[0]
         self.fc1 = torch.nn.Linear(in_features=in_features, out_features=6)
 
 
     def forward(self, x):
         x = self.conv1(x)
-        x = self.max_pool_1(x)
         x = torch.nn.functional.relu(x)
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
