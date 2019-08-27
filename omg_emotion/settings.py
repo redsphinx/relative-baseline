@@ -114,6 +114,8 @@ class ProjectVariable(object):
         # how to initialize experiment files and saves: 'new': new experiment, 'crashed': experiment crashed before 
         # finishing, 'extra': experiment finished, run an additional batch of the same experiment
         self._experiment_state = 'new'
+        # which dataset to evaluate on
+        self._eval_on = 'test'
 
         # ----------------------------------------------------------------------------------------------------------
         # settings only for 3dconvttn stuff
@@ -491,6 +493,14 @@ class ProjectVariable(object):
     @experiment_state.setter
     def experiment_state(self, value):
         self._experiment_state = value
+
+    @property
+    def eval_on(self):
+        return self._eval_on
+
+    @eval_on.setter
+    def eval_on(self, value):
+        self._eval_on = value
 
     @property
     def theta_init(self):

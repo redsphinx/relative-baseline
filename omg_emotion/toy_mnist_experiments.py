@@ -4037,9 +4037,80 @@ def e384_conv3dttn_mnist():
     project_variable.data_points = [1000, 200, 200]
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
+
+#####################################################################################################################
+#                                   basics LeNet5 3DTTN revisit
+#####################################################################################################################
+def set_init_13():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'sgd'
+    project_variable.eval_on = 'test'
+    project_variable.weight_transform = 'seq'
+
+    project_variable.data_points = [100, 200, 200]
+    project_variable.k0_init = 'normal'
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+    project_variable.repeat_experiments = 20
+    project_variable.end_epoch = 100
+    project_variable.label_size = 10
+    project_variable.sheet_number = 0
+
+# --------------------------------------------------------
+#                   finding good LR
+# --------------------------------------------------------
+def e385_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 385
+    project_variable.device = 1
+
+    project_variable.learning_rate = 1e-9
+    project_variable.theta_init = 'eye'
+
+    main_file.run(project_variable)
 
 
-# TODO: train first_weight and srxy parameters in alternating cycles
-# TODO: or add noise to mov_mnist
-# conv3dttn_mmnist_pilot()
+def e386_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 386
+    project_variable.device = 1
+
+    project_variable.learning_rate = 1e-8
+    project_variable.theta_init = 'eye'
+
+    main_file.run(project_variable)
+
+def e387_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 387
+    project_variable.device = 1
+
+    project_variable.learning_rate = 1e-7
+    project_variable.theta_init = 'eye'
+
+    main_file.run(project_variable)
+
+
+def e388_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 388
+    project_variable.device = 1
+
+    project_variable.learning_rate = 1e-6
+    project_variable.theta_init = 'eye'
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
+
+# e385_conv3dttn_mnist()
+# e386_conv3dttn_mnist()
+# e387_conv3dttn_mnist()
+e388_conv3dttn_mnist()
+
+
+
+

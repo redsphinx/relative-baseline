@@ -366,18 +366,20 @@ class LeNet5_3d(torch.nn.Module):
 
 
 class LeNet5_TTN3d(torch.nn.Module):
-
+# transformation_groups, k0_groups, transformations_per_filter
     def __init__(self, project_variable):
         super(LeNet5_TTN3d, self).__init__()
         self.conv1 = ConvTTN3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=5, padding=2,
                                project_variable=project_variable, 
                                transformation_groups=project_variable.transformation_groups[0],
-                               k0_groups=project_variable.k0_groups[0])
+                               k0_groups=project_variable.k0_groups[0],
+                               transformations_per_filter=project_variable.transformations_per_filter)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
         self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
                                project_variable=project_variable, 
                                transformation_groups=project_variable.transformation_groups[1],
-                               k0_groups=project_variable.k0_groups[1])
+                               k0_groups=project_variable.k0_groups[1],
+                               transformations_per_filter=project_variable.transformations_per_filter)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
 
         if project_variable.dataset == 'kth_actions':

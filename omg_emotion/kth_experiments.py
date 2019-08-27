@@ -4039,6 +4039,7 @@ def set_init_9():
     project_variable.srxy_init = 'eye'
     project_variable.batch_size = 16
     project_variable.k_shape = (7, 7, 7)
+    project_variable.eval_on = 'val'
 # --------------------------------------------------------
 #                   load_num_frames = 30
 # --------------------------------------------------------
@@ -4524,4 +4525,3 @@ def e313_C3DTTN_1L_kth():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-e313_C3DTTN_1L_kth()

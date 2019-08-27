@@ -51,10 +51,11 @@ def run(project_variable):
 
     # load all data once
     project_variable.val = True
-    # TODO
-    project_variable.test = False
+    if project_variable.eval_on == 'test':
+        project_variable.test = True
+    else:
+        project_variable.test = False
 
-    # FIX: has to be set to True for dataset='kth_actions'
     if not project_variable.randomize_training_data:
         project_variable.train = True
     else:
@@ -207,8 +208,10 @@ def run(project_variable):
             if e == project_variable.end_epoch - 1:
                 project_variable.train = False
                 project_variable.val = False
-                # TODO
-                project_variable.test = False
+                if project_variable.eval_on == 'test':
+                    project_variable.test = True
+                else:
+                    project_variable.test = False
 
                 if project_variable.test:
                     if project_variable.model_number == 0:
@@ -227,7 +230,7 @@ def run(project_variable):
     if not project_variable.debug_mode:
         # acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
         acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number,
-                                                          project_variable.model_number, mode='val')
+                                                          project_variable.model_number, mode=project_variable.eval_on)
         S.write_results(acc, std, best_run, ROW, project_variable.sheet_number)
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
