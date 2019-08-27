@@ -4106,10 +4106,6 @@ def e388_conv3dttn_mnist():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e385_conv3dttn_mnist()
-# e386_conv3dttn_mnist()
-# e387_conv3dttn_mnist()
-e388_conv3dttn_mnist()
 
 
 
