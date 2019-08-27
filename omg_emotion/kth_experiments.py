@@ -4464,39 +4464,64 @@ def e309_C3DTTN_1L_kth():
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
-    
+
+#####################################################################################################################
+#                             310-312       model 9: load_num_frames, k_shape
+#####################################################################################################################
+
+def e310_C3D_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 310
+    project_variable.device = 0
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.end_epoch = 150
+    project_variable.load_num_frames = 60
+    main_file.run(project_variable)
+
+def e311_C3D_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 311
+    project_variable.device = 1
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.end_epoch = 150
+    project_variable.load_num_frames = 60
+    project_variable.k_shape = (5, 5, 5)
+    main_file.run(project_variable)
+
+def e312_C3D_1L_kth():
+    set_init_8()
+    project_variable.experiment_number = 312
+    project_variable.device = 2
+    project_variable.learning_rate = 0.00000001
+    project_variable.batch_size = 16
+    project_variable.num_out_channels = [24]
+    project_variable.end_epoch = 150
+    project_variable.load_num_frames = 60
+    project_variable.k_shape = (3, 3, 3)
+    main_file.run(project_variable)
+#####################################################################################################################
+#                             313 theta_init=None
+#####################################################################################################################
+def e313_C3DTTN_1L_kth():
+    set_init_9()
+    project_variable.device = 0
+    project_variable.experiment_number = 313
+
+    project_variable.num_out_channels = [24]
+    project_variable.transformations_per_filter = 1
+    project_variable.k0_init = 'normal'
+    project_variable.load_num_frames = 60
+    project_variable.theta_init = None
+
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e280_C3DTTN_1L_kth()
-# e281_C3DTTN_1L_kth()
-# e282_C3DTTN_1L_kth()
-# e283_C3DTTN_1L_kth()
-# e284_C3DTTN_1L_kth()
-# e285_C3DTTN_1L_kth()
-# e286_C3DTTN_1L_kth()
-# e287_C3DTTN_1L_kth()
-# e288_C3DTTN_1L_kth()
-# e289_C3DTTN_1L_kth()
-#
-# e290_C3DTTN_1L_kth()
-# e291_C3DTTN_1L_kth()
-# e292_C3DTTN_1L_kth()
-# e293_C3DTTN_1L_kth()
-# e294_C3DTTN_1L_kth()
-# e295_C3DTTN_1L_kth()
-# e296_C3DTTN_1L_kth()
-# e297_C3DTTN_1L_kth()
-# e298_C3DTTN_1L_kth()
-# e299_C3DTTN_1L_kth()
-#
-# e300_C3DTTN_1L_kth()
-# e301_C3DTTN_1L_kth()
-# e302_C3DTTN_1L_kth()
-# e303_C3DTTN_1L_kth()
-# e304_C3DTTN_1L_kth()
-# e305_C3DTTN_1L_kth()
-# e306_C3DTTN_1L_kth()
-# e307_C3DTTN_1L_kth()
-# e308_C3DTTN_1L_kth()
-e309_C3DTTN_1L_kth() # TODO HERE
+e313_C3DTTN_1L_kth()

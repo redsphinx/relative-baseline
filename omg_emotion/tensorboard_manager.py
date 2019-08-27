@@ -136,19 +136,26 @@ def add_scalars(project_variable, my_model):
             x = my_model.conv1.translate_x.data
             y = my_model.conv1.translate_y.data
 
-            for i in range(s.shape[1]):
-                project_variable.writer.add_scalars('k%d/scale' % i,
-                                                    {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]},
-                                                    project_variable.current_epoch)
-                project_variable.writer.add_scalars('k%d/rotate' % i,
-                                                    {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]},
-                                                    project_variable.current_epoch)
-                project_variable.writer.add_scalars('k%d/translate_x' % i,
-                                                    {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]},
-                                                    project_variable.current_epoch)
-                project_variable.writer.add_scalars('k%d/translate_y' % i,
-                                                    {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]},
-                                                    project_variable.current_epoch)
+            if s.shape[0] == 1:
+                for i in range(s.shape[1]):
+                    project_variable.writer.add_scalar('k%d/scale' % i, s[0, i], project_variable.current_epoch)
+                    project_variable.writer.add_scalar('k%d/rotate' % i, r[0, i], project_variable.current_epoch)
+                    project_variable.writer.add_scalar('k%d/translate_x' % i, x[0, i], project_variable.current_epoch)
+                    project_variable.writer.add_scalar('k%d/translate_y' % i, y[0, i], project_variable.current_epoch)
+            else:
+                for i in range(s.shape[1]):
+                    project_variable.writer.add_scalars('k%d/scale' % i,
+                                                        {"t0": s[0, i], "t1": s[1, i], "t2": s[2, i], "t3": s[3, i]},
+                                                        project_variable.current_epoch)
+                    project_variable.writer.add_scalars('k%d/rotate' % i,
+                                                        {"t0": r[0, i], "t1": r[1, i], "t2": r[2, i], "t3": r[3, i]},
+                                                        project_variable.current_epoch)
+                    project_variable.writer.add_scalars('k%d/translate_x' % i,
+                                                        {"t0": x[0, i], "t1": x[1, i], "t2": x[2, i], "t3": x[3, i]},
+                                                        project_variable.current_epoch)
+                    project_variable.writer.add_scalars('k%d/translate_y' % i,
+                                                        {"t0": y[0, i], "t1": y[1, i], "t2": y[2, i], "t3": y[3, i]},
+                                                        project_variable.current_epoch)
 
         else:
             theta = my_model.conv1.theta.data
