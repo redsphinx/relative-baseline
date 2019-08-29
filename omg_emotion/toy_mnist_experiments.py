@@ -4066,47 +4066,107 @@ def e385_conv3dttn_mnist():
     set_init_13()
     project_variable.experiment_number = 385
     project_variable.device = 1
-
     project_variable.learning_rate = 1e-9
     project_variable.theta_init = 'eye'
-
     main_file.run(project_variable)
-
 
 def e386_conv3dttn_mnist():
     set_init_13()
     project_variable.experiment_number = 386
     project_variable.device = 1
-
     project_variable.learning_rate = 1e-8
     project_variable.theta_init = 'eye'
-
     main_file.run(project_variable)
 
 def e387_conv3dttn_mnist():
     set_init_13()
     project_variable.experiment_number = 387
     project_variable.device = 1
-
     project_variable.learning_rate = 1e-7
     project_variable.theta_init = 'eye'
-
     main_file.run(project_variable)
-
 
 def e388_conv3dttn_mnist():
     set_init_13()
     project_variable.experiment_number = 388
     project_variable.device = 1
-
     project_variable.learning_rate = 1e-6
     project_variable.theta_init = 'eye'
+    main_file.run(project_variable)
+#####
+#####
+def e389_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 389
+    project_variable.device = 1
+    project_variable.learning_rate = 5e-8
+    project_variable.theta_init = 'eye'
+    main_file.run(project_variable)
 
+def e390_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 390
+    project_variable.device = 1
+    project_variable.learning_rate = 5e-7
+    project_variable.theta_init = 'eye'
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   finding good LR
+# --------------------------------------------------------
+def e391_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 391
+    project_variable.device = 2
+    project_variable.learning_rate = 1e-9
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    main_file.run(project_variable)
+
+def e392_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 392
+    project_variable.device = 2
+    project_variable.learning_rate = 1e-8
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    main_file.run(project_variable)
+
+def e393_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 393
+    project_variable.device = 2
+    project_variable.learning_rate = 1e-7
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    main_file.run(project_variable)
+
+def e394_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 394
+    project_variable.device = 2
+    project_variable.learning_rate = 1e-6
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    main_file.run(project_variable)
+#####
+#####
+def e395_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 395
+    project_variable.device = 2
+    project_variable.learning_rate = 5e-8
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    main_file.run(project_variable)
+
+def e396_conv3dttn_mnist():
+    set_init_13()
+    project_variable.experiment_number = 396
+    project_variable.device = 2
+    project_variable.learning_rate = 5e-7
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
     main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
-
-
-
-
 
