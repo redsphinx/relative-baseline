@@ -4148,8 +4148,7 @@ def e394_conv3dttn_mnist():
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
     main_file.run(project_variable)
-#####
-#####
+
 def e395_conv3dttn_mnist():
     set_init_13()
     project_variable.experiment_number = 395
@@ -4167,6 +4166,487 @@ def e396_conv3dttn_mnist():
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
     main_file.run(project_variable)
+#####################################################################################################################
+#                         397-426          experiments basics LeNet5 3DTTN revisit
+#####################################################################################################################
+def set_init_14():
+    project_variable.model_number = 3
+    project_variable.batch_size = 20
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'sgd'
+    project_variable.eval_on = 'test'
+    project_variable.data_points = [100, 200, 200]
+    project_variable.k0_init = 'normal'
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+    project_variable.repeat_experiments = 20
+    project_variable.end_epoch = 100
+    project_variable.label_size = 10
+    project_variable.sheet_number = 0
+    project_variable.learning_rate = 5e-8
+
+# 2
+def e397_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 397
+    project_variable.device = 0
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e398_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 398
+    project_variable.device = 0
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# ----
+# 1
+def e399_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 399
+    project_variable.device = 0
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1] 
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e400_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 400
+    project_variable.device = 0
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# 2
+def e401_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 401
+    project_variable.device = 0
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e402_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 402
+    project_variable.device = 0
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'seq'
+    main_file.run(project_variable)
+# ------
+# ------
+# 1
+def e403_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 403
+    project_variable.device = 0
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e404_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 404
+    project_variable.device = 0
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# 2
+def e405_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 405
+    project_variable.device = 0
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e406_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 406
+    project_variable.device = 1
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# ----
+# 1
+def e407_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 407
+    project_variable.device = 1
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e408_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 408
+    project_variable.device = 1
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+# 2
+def e409_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 409
+    project_variable.device = 1
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+
+    main_file.run(project_variable)
+
+def e410_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 410
+    project_variable.device = 1
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'seq'
+    main_file.run(project_variable)
+# -----
+# -----
+# -----
+# 1
+def e411_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 411
+    project_variable.device = 1
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e412_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 412
+    project_variable.device = 1
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# 2
+def e413_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 413
+    project_variable.device = 1
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e414_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 414
+    project_variable.device = 1
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# ----
+# 1
+def e415_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 415
+    project_variable.device = 1
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e416_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 416
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# 2
+def e417_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 417
+    project_variable.device = 2
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e418_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 418
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.weight_transform = 'naive'
+    main_file.run(project_variable)
+# ------
+# ------
+# 1
+def e419_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 419
+    project_variable.device = 2
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e420_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 420
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# 2
+def e421_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 421
+    project_variable.device = 2
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e422_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 422
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# ----
+# 1
+def e423_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 423
+    project_variable.device = 2
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e424_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 424
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = project_variable.k_shape[0] - 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+# 2
+def e425_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 425
+    project_variable.device = 2
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+
+    main_file.run(project_variable)
+
+def e426_conv3dttn_mnist():
+    set_init_14()
+    project_variable.experiment_number = 426
+    project_variable.device = 2
+
+    project_variable.theta_init = 'eye'
+    project_variable.srxy_init = 'eye'
+    project_variable.transformations_per_filter = 1
+    project_variable.transformation_groups = [1, 1]
+    project_variable.k0_groups = [1, 1]
+    project_variable.weight_transform = 'naive'
+    main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
 
+
+# e397_conv3dttn_mnist()
+# e398_conv3dttn_mnist()
+# e399_conv3dttn_mnist()
+#
+# e400_conv3dttn_mnist()
+# e401_conv3dttn_mnist()
+# e402_conv3dttn_mnist()
+# e403_conv3dttn_mnist()
+# e404_conv3dttn_mnist()
+# e405_conv3dttn_mnist()
+# e406_conv3dttn_mnist()
+# e407_conv3dttn_mnist()
+# e408_conv3dttn_mnist()
+# e409_conv3dttn_mnist()
+#
+# e410_conv3dttn_mnist()
+# e411_conv3dttn_mnist()
+# e412_conv3dttn_mnist()
+# e413_conv3dttn_mnist()
+# e414_conv3dttn_mnist()
+# e415_conv3dttn_mnist()
+# e416_conv3dttn_mnist()
+# e417_conv3dttn_mnist()
+# e418_conv3dttn_mnist()
+# e419_conv3dttn_mnist()
+#
+# e420_conv3dttn_mnist()
+# e421_conv3dttn_mnist()
+# e422_conv3dttn_mnist()
+# e423_conv3dttn_mnist()
+# e424_conv3dttn_mnist()
+# e425_conv3dttn_mnist()
+e426_conv3dttn_mnist() # TODO here
