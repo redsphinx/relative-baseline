@@ -5528,17 +5528,21 @@ def e530_conv3d_mnist():
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+def e666_conv3d_mnist():
+    set_init_16()
+    project_variable.experiment_number = 666
+    project_variable.device = 1
+    project_variable.num_out_channels = [21, 31]
+    project_variable.data_points = [100, 200, 200]
+    project_variable.learning_rate = 5e-8
+    print(project_variable.learning_rate)
+    project_variable.repeat_experiments = 10
+    main_file.run(project_variable)
 
+project_variable = ProjectVariable(debug_mode=True)
 
-# e483_conv3d_mnist()
-# e484_conv3d_mnist()
-# e485_conv3d_mnist()
-# e486_conv3d_mnist()
-# e487_conv3d_mnist()
-# e488_conv3d_mnist()
-# e489_conv3d_mnist()
-
+e666_conv3d_mnist()
+#
 # e490_conv3d_mnist()
 # e491_conv3d_mnist()
 # e492_conv3d_mnist()
@@ -5549,38 +5553,3 @@ project_variable = ProjectVariable(debug_mode=False)
 # e497_conv3d_mnist()
 # e498_conv3d_mnist()
 # e499_conv3d_mnist()
-
-# e500_conv3d_mnist()
-# e501_conv3d_mnist()
-# e502_conv3d_mnist()
-# e503_conv3d_mnist()
-# e504_conv3d_mnist()
-# e505_conv3d_mnist()
-# e506_conv3d_mnist()
-# e507_conv3d_mnist()
-# e508_conv3d_mnist()
-# e509_conv3d_mnist()
-
-# e510_conv3d_mnist()
-# e511_conv3d_mnist()
-# e512_conv3d_mnist()
-# e513_conv3d_mnist()
-# e514_conv3d_mnist()
-# e515_conv3d_mnist()
-# e516_conv3d_mnist()
-# e517_conv3d_mnist()
-# e518_conv3d_mnist()
-# e519_conv3d_mnist()
-
-# e520_conv3d_mnist()
-# e521_conv3d_mnist()
-# e522_conv3d_mnist()
-# e523_conv3d_mnist()
-# e524_conv3d_mnist()
-# e525_conv3d_mnist()
-# e526_conv3d_mnist()
-# e527_conv3d_mnist()
-# e528_conv3d_mnist()
-# e529_conv3d_mnist()
-
-# e530_conv3d_mnist()
