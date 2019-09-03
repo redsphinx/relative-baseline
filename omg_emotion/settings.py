@@ -153,6 +153,14 @@ class ProjectVariable(object):
         # where to add batchnorm after each non-linear activation layer
         self._do_batchnorm = [False, False, False, False, False]
         # ----------------------------------------------------------------------------------------------------------
+        # settings for adaptive learning rate
+        # ----------------------------------------------------------------------------------------------------------
+        self._use_adaptive_lr = False
+        self._adapt_eval_on = 'val'
+        self._reduction_factor = 2
+        self._divide_by = 10
+        self._decrease_after_epochs = self.end_epoch // self.divide_by
+
 
     @property
     def writer(self):
@@ -614,3 +622,42 @@ class ProjectVariable(object):
     def do_batchnorm(self, value):
         self._do_batchnorm = value
 
+    @property
+    def use_adaptive_lr(self):
+        return self._use_adaptive_lr
+    
+    @use_adaptive_lr.setter
+    def use_adaptive_lr(self, value):
+        self._use_adaptive_lr = value
+
+    @property
+    def adapt_eval_on(self):
+        return self._adapt_eval_on
+
+    @adapt_eval_on.setter
+    def adapt_eval_on(self, value):
+        self._adapt_eval_on = value
+
+    @property
+    def reduction_factor(self):
+        return self._reduction_factor
+
+    @reduction_factor.setter
+    def reduction_factor(self, value):
+        self._reduction_factor = value
+        
+    @property
+    def divide_by(self):
+        return self._divide_by
+
+    @divide_by.setter
+    def divide_by(self, value):
+        self._divide_by = value
+
+    @property
+    def decrease_after_epochs(self):
+        return self._decrease_after_epochs
+
+    @decrease_after_epochs.setter
+    def decrease_after_epochs(self, value):
+        self._decrease_after_epochs = value

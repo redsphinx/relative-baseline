@@ -20,6 +20,8 @@ import shutil
 
 
 def run(project_variable):
+    START_LR = project_variable.learning_rate
+
     # write initial settings to spreadsheet
     if not project_variable.debug_mode:
         if project_variable.experiment_state == 'new':
@@ -151,7 +153,26 @@ def run(project_variable):
         # ====================================================================================================
         # start with epochs
         # ====================================================================================================
+
+        # setup performance tracking for adapting learning rate
+        # index 0   which epoch to check
+        # index 1   the performance metric
+        if project_variable.use_adaptive_lr:
+            reduction_epochs = project_variable.end_epoch // project_variable.decrease_after_epochs
+            track_performance = np.zeros((reduction_epochs))
+            check_epochs = []
+            for r in range(reduction_epochs):
+                check_epochs.append(r * project_variable.decrease_after_epochs)
+        else:
+            check_epochs = None
+            track_performance = None
+
         for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
+            print('--------------------------------------------------------------------------\n'
+                  'STARTING LEARNING RATE: %s\n'
+                  '--------------------------------------------------------------------------'
+                  % str(project_variable.learning_rate))
+
             project_variable.current_epoch = e
 
             # get data
@@ -184,7 +205,7 @@ def run(project_variable):
                 # labels is list because can be more than one type of labels
                 data = data_train, labels_train
                 my_model.train()
-                training.run(project_variable, data, my_model, my_optimizer, device)
+                train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
             # ------------------------------------------------------------------------------------------------
             # VALIDATION
             # ------------------------------------------------------------------------------------------------
@@ -200,7 +221,7 @@ def run(project_variable):
                     project_variable.loss_weights = w
 
                 data = data_val, labels_val
-                validation.run(project_variable, data, my_model, device)
+                val_accuracy = validation.run(project_variable, data, my_model, device)
             # ------------------------------------------------------------------------------------------------
             # TESTING
             # ------------------------------------------------------------------------------------------------
@@ -222,10 +243,36 @@ def run(project_variable):
 
                     data = data_test, labels_test
                     testing.run(project_variable, data, my_model, device)
+
             # ------------------------------------------------------------------------------------------------
             # ------------------------------------------------------------------------------------------------
+
+            # at the end of an epoch
+            if project_variable.use_adaptive_lr:
+                if e in check_epochs:
+                    idx = check_epochs.index(e)
+                    # update epoch with performance information
+                    if project_variable.adapt_eval_on == 'train':
+                        track_performance[idx] = train_accuracy
+                    elif project_variable.adapt_eval_on == 'val':
+                        track_performance[idx] = val_accuracy
+                    if idx > 0:
+                        if track_performance[idx] > track_performance[idx - 1]:
+                            pass
+                        else:
+                            print('--------------------------------------------------------------------------\n'
+                                  'LEARNING RATE REDUCED: from %s to %s\n'
+                                  '--------------------------------------------------------------------------'
+                                  % (str(project_variable.learning_rate),
+                                     str(project_variable.learning_rate / project_variable.reduction_factor)))
+
+                            project_variable.learning_rate /= project_variable.reduction_factor
+
+
+        # at the end of a run
         project_variable.at_which_run += 1
         project_variable.writer.close()
+        project_variable.learning_rate = START_LR  # reset the learning rate
 
     if not project_variable.debug_mode:
         # acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
