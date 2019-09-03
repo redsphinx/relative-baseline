@@ -5532,11 +5532,11 @@ def e666_conv3d_mnist():
     set_init_16()
     project_variable.experiment_number = 666
     project_variable.device = 1
-    project_variable.num_out_channels = [21, 31]
-    project_variable.data_points = [100, 200, 200]
+    project_variable.num_out_channels = [6, 16]
+    project_variable.data_points = [500, 200, 200]
     project_variable.learning_rate = 5e-8
     print(project_variable.learning_rate)
-    project_variable.repeat_experiments = 10
+    project_variable.repeat_experiments = 1
     main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=True)
