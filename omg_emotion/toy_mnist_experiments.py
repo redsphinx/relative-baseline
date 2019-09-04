@@ -5805,28 +5805,518 @@ def e546_conv3d_mnist():
     project_variable.num_out_channels = [6, 16]
     project_variable.model_number = 2
     main_file.run(project_variable)
+# --------------------------------------------------------
+#                   learning_rate = 5e-8
+# --------------------------------------------------------
+def e547_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 547
+    project_variable.device = 2
+    project_variable.batch_size = 10
 
+    project_variable.data_points[0] = 10
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e548_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 548
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 20
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e549_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 549
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 30
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e550_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 550
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 40
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e551_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 551
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 50
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e552_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 552
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 100
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e553_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 553
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 500
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e554_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 554
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 1000
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   learning_rate = 5e-9
+# --------------------------------------------------------
+def e555_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 555
+    project_variable.device = 0
+    project_variable.batch_size = 10
+
+    project_variable.data_points[0] = 10
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e556_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 556
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 20
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e557_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 557
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 30
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e558_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 558
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 40
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e559_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 559
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 50
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e560_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 560
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 100
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e561_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 561
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 500
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e562_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 562
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 1000
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [12, 22]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#          [18, 28]         learning_rate = 5e-8
+# --------------------------------------------------------
+def e563_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 563
+    project_variable.device = 0
+    project_variable.batch_size = 10
+
+    project_variable.data_points[0] = 10
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e564_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 564
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 20
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e565_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 565
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 30
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e566_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 566
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 40
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e567_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 567
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 50
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e568_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 568
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 100
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e569_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 569
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 500
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e570_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 570
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 1000
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+# --------------------------------------------------------
+#                   learning_rate = 5e-9
+# --------------------------------------------------------
+def e571_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 571
+    project_variable.device = 1
+    project_variable.batch_size = 10
+
+    project_variable.data_points[0] = 10
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e572_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 572
+    project_variable.device = 1
+
+    project_variable.data_points[0] = 20
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e573_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 573
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 30
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e574_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 574
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 40
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e575_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 575
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 50
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e576_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 576
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 100
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e577_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 577
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 500
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
+
+def e578_conv3d_mnist():
+    set_init_17()
+    project_variable.experiment_number = 578
+    project_variable.device = 2
+
+    project_variable.data_points[0] = 1000
+    project_variable.learning_rate = 5e-9
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [18, 28]
+    project_variable.model_number = 2
+    main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e530_conv3d_mnist() DON'T USE
 
+# e563_conv3d_mnist()
+# e564_conv3d_mnist()
+# e565_conv3d_mnist()
+# e566_conv3d_mnist()
+# e567_conv3d_mnist()
+# e568_conv3d_mnist()
+# e569_conv3d_mnist()
 
-# e531_conv3d_mnist()
-# e532_conv3d_mnist()
-# e533_conv3d_mnist()
-# e534_conv3d_mnist()
-# e535_conv3d_mnist()
-# e536_conv3d_mnist()
-# e537_conv3d_mnist()
-# e538_conv3d_mnist()
-# e539_conv3d_mnist()
-#
-# e540_conv3d_mnist()
-# e541_conv3d_mnist()
-# e542_conv3d_mnist()
-# e543_conv3d_mnist()
-# e544_conv3d_mnist()
-# e545_conv3d_mnist()
-e546_conv3d_mnist()
+# e570_conv3d_mnist()
+# e571_conv3d_mnist()
+# e572_conv3d_mnist()
+# e573_conv3d_mnist()
+# e574_conv3d_mnist()
+# e575_conv3d_mnist()
+# e576_conv3d_mnist()
+# e577_conv3d_mnist()
+# e578_conv3d_mnist()
+
