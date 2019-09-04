@@ -12,7 +12,7 @@ class ProjectVariable(object):
         self._writer = None
 
         self._debug_mode = debug_mode
-        
+
         # int, which gpu to use {None, 0, 1, etc}
         self._device = None
 
@@ -25,16 +25,16 @@ class ProjectVariable(object):
         self._model_number = None
         # int, experiment data for log
         self._experiment_number = None
-        
+
         # which google sheet to write to
         self._sheet_number = None
-        
+
         # bool
         self._pretrain_resnet18_weights = True
-        
+
         # int, the current epoch
         self._current_epoch = None
-    
+
         # UNUSED? ================================================================================
         # list of str, which datasets to train, val and test on
         # implemented sets: omg_emotion, affectnet
@@ -42,7 +42,7 @@ class ProjectVariable(object):
         self._dataset_val = ['omg_emotion']
         self._dataset_test = ['omg_emotion']
         # UNUSED? ================================================================================
-        
+
         # instead of having 3 dataset splits, have just 1 dataset parameter
         # implemented datasets: omg_emotion, mnist, dummy, mov_mnist, kth_actions.  status affectnet??
         self._dataset = 'mnist'
@@ -50,12 +50,12 @@ class ProjectVariable(object):
         self._balance_training_data = False
         self._same_training_data = False
         self._data_points = [100, 100, 100]  # [train, val, test]
-        
+
         # bool, which procedures to perform
         self._train = None
         self._val = None
         self._test = None
-        
+
         # list of str, which labels to use.
         # omg_emotion: ['categories', 'arousal', 'valence']
         # affect_net: [categories, arousal, valence, face, landmarks]
@@ -80,7 +80,7 @@ class ProjectVariable(object):
         self._optimizer = 'sgd'
         # momentum
         self._momentum = 0.9
-        
+
         # number of out_channels in the convolution layers of CNNs
         self._num_out_channels = [6, 16]
 
@@ -111,7 +111,7 @@ class ProjectVariable(object):
 
         self._repeat_experiments = 1
         self._at_which_run = 0
-        # how to initialize experiment files and saves: 'new': new experiment, 'crashed': experiment crashed before 
+        # how to initialize experiment files and saves: 'new': new experiment, 'crashed': experiment crashed before
         # finishing, 'extra': experiment finished, run an additional batch of the same experiment
         self._experiment_state = 'new'
         # which dataset to evaluate on
@@ -158,8 +158,7 @@ class ProjectVariable(object):
         self._use_adaptive_lr = False
         self._adapt_eval_on = 'val'
         self._reduction_factor = 2
-        self._divide_by = 10
-        self._decrease_after_epochs = self.end_epoch // self.divide_by
+        self._decrease_after_num_epochs = 10
 
 
     @property
@@ -177,7 +176,7 @@ class ProjectVariable(object):
     @property
     def device(self):
         return self._device
-    
+
     @device.setter
     def device(self, value):
         self._device = value
@@ -229,7 +228,7 @@ class ProjectVariable(object):
     @pretrain_resnet18_weights.setter
     def pretrain_resnet18_weights(self, value):
         self._pretrain_resnet18_weights = value
-    
+
     @property
     def current_epoch(self):
         return self._current_epoch
@@ -301,7 +300,7 @@ class ProjectVariable(object):
     @data_points.setter
     def data_points(self, value):
         self._data_points = value
-    
+
     @property
     def train(self):
         return self._train
@@ -341,7 +340,7 @@ class ProjectVariable(object):
     @label_size.setter
     def label_size(self, value):
         self._label_size = value
-    
+
     @property
     def learning_rate(self):
         return self._learning_rate
@@ -421,7 +420,7 @@ class ProjectVariable(object):
     @start_epoch.setter
     def start_epoch(self, value):
         self._start_epoch = value
-        
+
     @property
     def end_epoch(self):
         return self._end_epoch
@@ -557,7 +556,7 @@ class ProjectVariable(object):
     @transformation_groups.setter
     def transformation_groups(self, value):
         self._transformation_groups = value
-    
+
     @property
     def k0_groups(self):
         return self._k0_groups
@@ -589,7 +588,7 @@ class ProjectVariable(object):
     @max_pool_temporal.setter
     def max_pool_temporal(self, value):
         self._max_pool_temporal = value
-    
+
     @property
     def conv_k_hw(self):
         return self._conv_k_hw
@@ -597,7 +596,7 @@ class ProjectVariable(object):
     @conv_k_hw.setter
     def conv_k_hw(self, value):
         self._conv_k_hw = value
-        
+
     @property
     def load_num_frames(self):
         return self._load_num_frames
@@ -625,7 +624,7 @@ class ProjectVariable(object):
     @property
     def use_adaptive_lr(self):
         return self._use_adaptive_lr
-    
+
     @use_adaptive_lr.setter
     def use_adaptive_lr(self, value):
         self._use_adaptive_lr = value
@@ -645,19 +644,11 @@ class ProjectVariable(object):
     @reduction_factor.setter
     def reduction_factor(self, value):
         self._reduction_factor = value
-        
-    @property
-    def divide_by(self):
-        return self._divide_by
-
-    @divide_by.setter
-    def divide_by(self, value):
-        self._divide_by = value
 
     @property
-    def decrease_after_epochs(self):
-        return self._decrease_after_epochs
+    def decrease_after_num_epochs(self):
+        return self._decrease_after_num_epochs
 
-    @decrease_after_epochs.setter
-    def decrease_after_epochs(self, value):
-        self._decrease_after_epochs = value
+    @decrease_after_num_epochs.setter
+    def decrease_after_num_epochs(self, value):
+        self._decrease_after_num_epochs = value

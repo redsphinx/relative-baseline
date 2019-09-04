@@ -42,7 +42,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 16
     elif sheet_number == 2:
         start = 11
-    elif sheet_number == [0, 10]:
+    elif sheet_number == [0, 10, 15]:
         start = 13
     elif sheet_number in [4, 6, 12]:
         start = 17
@@ -252,6 +252,25 @@ def write_settings(project_variable):
             project_variable.k0_init, #M
             project_variable.transformations_per_filter, # N
             project_variable.load_num_frames # O
+        ]]
+        end_letter = 'O'
+    elif project_variable.sheet_number in [15]:
+        values = [[
+            date.today().strftime('%d-%m-%Y'),  # date                      #A
+            datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
+            '',  # end time experiment                                      #C
+            project_variable.experiment_number,  # D
+            '',  # parameters                                               #E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.data_points),  # I
+            project_variable.learning_rate,  # J
+            project_variable.adapt_eval_on, # K
+            project_variable.decrease_after_num_epochs, #L
+            project_variable.reduction_factor, #M
+            str(project_variable.num_out_channels), # N
+            project_variable.model_number # O
         ]]
         end_letter = 'O'
     else:

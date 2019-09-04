@@ -158,11 +158,11 @@ def run(project_variable):
         # index 0   which epoch to check
         # index 1   the performance metric
         if project_variable.use_adaptive_lr:
-            reduction_epochs = project_variable.end_epoch // project_variable.decrease_after_epochs
+            reduction_epochs = project_variable.end_epoch // project_variable.decrease_after_num_epochs
             track_performance = np.zeros((reduction_epochs))
             check_epochs = []
             for r in range(reduction_epochs):
-                check_epochs.append(r * project_variable.decrease_after_epochs)
+                check_epochs.append(r * project_variable.decrease_after_num_epochs)
         else:
             check_epochs = None
             track_performance = None

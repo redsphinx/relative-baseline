@@ -316,6 +316,9 @@ class LeNet5_3d(torch.nn.Module):
             self.conv1.bias = torch.nn.init.constant_(self.conv1.bias, 1)
         # Max-pooling
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        if project_variable.do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(project_variable.num_out_channels[0])
+        
         # Convolution
         self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=project_variable.k_shape, stride=1, padding=0, bias=True)
         if project_variable.k0_init == 'normal':
@@ -326,8 +329,10 @@ class LeNet5_3d(torch.nn.Module):
             self.conv2.bias = torch.nn.init.constant_(self.conv2.bias, 1)
         # Max-pooling
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+        
+        if project_variable.do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(project_variable.num_out_channels[1])
 
-        # FIX: automatically determine the required size for fc1
         # Fully connected layer
         if project_variable.k_shape == (5, 5, 5):
             _fc_in = [5, 5, 5]
@@ -350,10 +355,24 @@ class LeNet5_3d(torch.nn.Module):
         self.fc3 = torch.nn.Linear(84, project_variable.label_size)  # convert matrix with 84 features to a matrix of 10 features (columns)
 
     def forward(self, x):
-        x = torch.nn.functional.relu(self.conv1(x))
+        x = self.conv1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
         x = self.max_pool_1(x)
-        x = torch.nn.functional.relu(self.conv2(x))
+
+
+        x = self.conv2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
         x = self.max_pool_2(x)
+
+
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
         # read through https://stackoverflow.com/a/42482819/7551231
         _shape = x.shape
@@ -375,12 +394,17 @@ class LeNet5_TTN3d(torch.nn.Module):
                                k0_groups=project_variable.k0_groups[0],
                                transformations_per_filter=project_variable.transformations_per_filter)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        if project_variable.do_batchnorm[0]:
+            self.bn1 = torch.nn.BatchNorm3d(project_variable.num_out_channels[0])
+        
         self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0], out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
                                project_variable=project_variable, 
                                transformation_groups=project_variable.transformation_groups[1],
                                k0_groups=project_variable.k0_groups[1],
                                transformations_per_filter=project_variable.transformations_per_filter)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+        if project_variable.do_batchnorm[1]:
+            self.bn2 = torch.nn.BatchNorm3d(project_variable.num_out_channels[1])
 
         if project_variable.dataset == 'kth_actions':
             _fc_in = [73, 28, 38]
