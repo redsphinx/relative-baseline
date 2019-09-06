@@ -7253,17 +7253,489 @@ def e634_conv3dttn_mnist():
 
     project_variable.model_number = 3
     main_file.run(project_variable)
+#####################################################################################################################
+#                                              transfer learning revisit
+#####################################################################################################################
+def set_init_19():
+    project_variable.end_epoch = 50
+    project_variable.dataset = 'mov_mnist'
+    project_variable.optimizer = 'sgd'
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+    project_variable.same_training_data = True
+    project_variable.repeat_experiments = 30
 
-project_variable = ProjectVariable(debug_mode=False)
+    project_variable.sheet_number = 16
+    project_variable.experiment_state = 'new'
+    project_variable.use_adaptive_lr = True
+    project_variable.eval_on = 'val'
+    project_variable.data_points = [10, 1000, 1000]
+    project_variable.num_out_channels = [6, 16]
+    project_variable.learning_rate = 5e-4
 
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
 
-# e610_conv3dttn_mnist()
-# e611_conv3dttn_mnist()
-# e612_conv3dttn_mnist()
-# e613_conv3dttn_mnist()
-# e614_conv3dttn_mnist()
-# e615_conv3dttn_mnist()
-# e616_conv3dttn_mnist()
-# e617_conv3dttn_mnist()
-# e618_conv3dttn_mnist()
-# e619_conv3dttn_mnist()
+# --------------------------------------------------------
+# model_number=2; train data_points = 10,40,100; 186 run 0
+# --------------------------------------------------------
+def e635_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 635
+    project_variable.experiment_state = 'crashed'
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e636_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 636
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e637_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 637
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=2; train data_points = 10,40,100; 186 run 1
+# --------------------------------------------------------
+def e638_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 638
+    project_variable.experiment_state = 'crashed'
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e639_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 639
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e640_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 640
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=2; train data_points = 10,40,100; 186 run 2
+# --------------------------------------------------------
+def e641_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 641
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e642_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 642
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e643_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 643
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=2; train data_points = 10,40,100; 186 run 3
+# --------------------------------------------------------
+def e644_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 644
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e645_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 645
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e646_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 646
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=2; train data_points = 10,40,100; 186 run 4
+# --------------------------------------------------------
+def e647_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 647
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e648_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 648
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e649_conv3d_mnist():
+    set_init_19()
+    project_variable.experiment_number = 649
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 2
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+# --------------------------------------------------------
+# model_number=3; train data_points = 10,40,100; 186 run 0
+# --------------------------------------------------------
+def e650_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 650
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e651_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 651
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e652_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 652
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 0]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=3; train data_points = 10,40,100; 186 run 1
+# --------------------------------------------------------
+def e653_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 653
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e654_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 654
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e655_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 655
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 1]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=3; train data_points = 10,40,100; 186 run 2
+# --------------------------------------------------------
+def e656_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 656
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e657_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 657
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e658_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 658
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 2]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=3; train data_points = 10,40,100; 186 run 3
+# --------------------------------------------------------
+def e659_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 659
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 1
+    main_file.run(project_variable)
+
+def e660_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 660
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e661_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 661
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 3]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+# --------------------------------------------------------
+# model_number=3; train data_points = 10,40,100; 186 run 4
+# --------------------------------------------------------
+def e662_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 662
+
+    project_variable.data_points[0] = 10
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e663_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 663
+
+    project_variable.data_points[0] = 40
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+def e664_conv3dttn_mnist():
+    set_init_19()
+    project_variable.experiment_number = 664
+
+    project_variable.data_points[0] = 100
+    project_variable.load_model = [186, 1, 19, 4]  # ex, mo, ep, run
+    project_variable.batch_size = project_variable.data_points[0]
+    project_variable.reduction_factor = 2
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.model_number = 3
+    project_variable.device = 2
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
+
+e650_conv3dttn_mnist()
+# e651_conv3dttn_mnist()
+# e652_conv3dttn_mnist()
+# e653_conv3dttn_mnist()
+# e654_conv3dttn_mnist()
+# e655_conv3dttn_mnist()
+# e656_conv3dttn_mnist()
+# e657_conv3dttn_mnist()
+# e658_conv3dttn_mnist()
+# e659_conv3dttn_mnist()
+# e660_conv3dttn_mnist()
+# e661_conv3dttn_mnist()
+# e662_conv3dttn_mnist()
+# e663_conv3dttn_mnist()
+# e664_conv3dttn_mnist()
