@@ -25,6 +25,8 @@ class ProjectVariable(object):
         self._model_number = None
         # int, experiment data for log
         self._experiment_number = None
+        # run in inference mode only on the entire test split
+        self._inference_only_mode = False
 
         # which google sheet to write to
         self._sheet_number = None
@@ -212,6 +214,14 @@ class ProjectVariable(object):
     @experiment_number.setter
     def experiment_number(self, value):
         self._experiment_number = value
+
+    @property
+    def inference_only_mode(self):
+        return self._inference_only_mode
+
+    @inference_only_mode.setter
+    def inference_only_mode(self, value):
+        self._inference_only_mode = value
 
     @property
     def sheet_number(self):

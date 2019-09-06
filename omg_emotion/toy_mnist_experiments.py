@@ -7515,7 +7515,7 @@ def e650_conv3dttn_mnist():
     project_variable.decrease_after_num_epochs = 5
 
     project_variable.model_number = 3
-    project_variable.device = 2
+    project_variable.device = 1
     main_file.run(project_variable)
 
 def e651_conv3dttn_mnist():
@@ -7631,7 +7631,7 @@ def e658_conv3dttn_mnist():
     project_variable.decrease_after_num_epochs = 5
 
     project_variable.model_number = 3
-    project_variable.device = 1
+    project_variable.device = 2
     main_file.run(project_variable)
 # --------------------------------------------------------
 # model_number=3; train data_points = 10,40,100; 186 run 3
@@ -7647,7 +7647,7 @@ def e659_conv3dttn_mnist():
     project_variable.decrease_after_num_epochs = 5
 
     project_variable.model_number = 3
-    project_variable.device = 1
+    project_variable.device = 2
     main_file.run(project_variable)
 
 def e660_conv3dttn_mnist():
@@ -7722,9 +7722,9 @@ def e664_conv3dttn_mnist():
     project_variable.device = 2
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
-e650_conv3dttn_mnist()
+# e650_conv3dttn_mnist()
 # e651_conv3dttn_mnist()
 # e652_conv3dttn_mnist()
 # e653_conv3dttn_mnist()

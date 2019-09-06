@@ -180,7 +180,8 @@ def delete_runs(project_variable, except_run):
                                                   project_variable.model_number, i)
         if i != except_run:
             to_be_del = os.path.join(base_path, name)
-            shutil.rmtree(to_be_del)
+            if os.path.exists(to_be_del):
+                shutil.rmtree(to_be_del)
 
 
 # ================================================================
