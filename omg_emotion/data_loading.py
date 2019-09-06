@@ -428,6 +428,24 @@ def load_movmnist(project_variable, seed):
     tp = np.float32
     frames = 30
 
+    # def load_specific(s, e):
+    #     which = 'test'
+    #     path = os.path.join(PP.moving_mnist_png, which)
+    #     label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+    #     labels = np.genfromtxt(label_path, dtype=int)[s:e]
+    #
+    #     num_points = len(labels)
+    #
+    #     data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+    #
+    #     for i in tqdm(range(num_points)):
+    #         for j in range(frames):
+    #             file_path = os.path.join(path, str(i), '%d.png' % j)
+    #             tmp = np.array(Image.open(file_path))
+    #             data[i, 0, j] = tmp
+    #
+    #     return data, labels
+
     def load(which, dp):
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)

@@ -5528,7 +5528,7 @@ def e530_conv3d_mnist():
     main_file.run(project_variable)
 
 
-def e666_conv3d_mnist():
+def etest_conv3d_mnist():
     set_init_16()
     project_variable.experiment_number = 666
     project_variable.device = 1
@@ -7721,21 +7721,215 @@ def e664_conv3dttn_mnist():
     project_variable.model_number = 3
     project_variable.device = 2
     main_file.run(project_variable)
+#####################################################################################################################
+#                                              inference only
+#####################################################################################################################
+def set_init_20():
+    project_variable.end_epoch = 1
+    project_variable.dataset = 'mov_mnist'
+    project_variable.inference_only_mode = True
+    project_variable.sheet_number = 17
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.batch_size = 100
+    project_variable.eval_on = 'test'
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+
+# 10
+def e665_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 665
+    project_variable.model_number = 2
+    project_variable.load_model = [547, 2, 99, 15]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 20
+def e666_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 666
+    project_variable.model_number = 2
+    project_variable.load_model = [564, 2, 99, 20]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 30
+def e667_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 667
+    project_variable.model_number = 2
+    project_variable.load_model = [565, 2, 99, 23]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 40
+def e668_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 668
+    project_variable.model_number = 2
+    project_variable.load_model = [566, 2, 99, 8]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 50
+def e669_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 669
+    project_variable.model_number = 2
+    project_variable.load_model = [567, 2, 99, 6]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 100
+def e670_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 670
+    project_variable.model_number = 2
+    project_variable.load_model = [568, 2, 99, 1]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 500
+def e671_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 671
+    project_variable.model_number = 2
+    project_variable.load_model = [569, 2, 99, 2]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 1000
+def e672_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 672
+    project_variable.model_number = 2
+    project_variable.load_model = [570, 2, 99, 22]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 10
+def e673_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 673
+    project_variable.model_number = 3
+    project_variable.load_model = [595, 3, 99, 24]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = [6, 16]
+    project_variable.transformation_groups = [6, 16]
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 20
+def e674_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 674
+    project_variable.model_number = 3
+    project_variable.load_model = [620, 3, 99, 19]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 30
+def e675_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 675
+    project_variable.model_number = 3
+    project_variable.load_model = [629, 3, 99, 7]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 40
+def e676_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 676
+    project_variable.model_number = 3
+    project_variable.load_model = [630, 3, 99, 27]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 50
+def e677_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 677
+    project_variable.model_number = 3
+    project_variable.load_model = [631, 3, 99, 27]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 100
+def e678_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 678
+    project_variable.model_number = 3
+    project_variable.load_model = [600, 3, 99, 27]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = [6, 16]
+    project_variable.transformation_groups = [6, 16]
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 500
+def e679_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 679
+    project_variable.model_number = 3
+    project_variable.load_model = [593, 3, 99, 1]
+    project_variable.num_out_channels = [6, 16]
+    project_variable.k0_groups = [6, 16]
+    project_variable.transformation_groups = [6, 16]
+
+    project_variable.device = 0
+    main_file.run(project_variable)
+
+# 1000
+def e680_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 680
+    project_variable.model_number = 3
+    project_variable.load_model = [594, 3, 99, 11]
+    project_variable.num_out_channels = [6, 16]
+    project_variable.k0_groups = [6, 16]
+    project_variable.transformation_groups = [6, 16]
+
+    project_variable.device = 0
+    main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e650_conv3dttn_mnist()
-# e651_conv3dttn_mnist()
-# e652_conv3dttn_mnist()
-# e653_conv3dttn_mnist()
-# e654_conv3dttn_mnist()
-# e655_conv3dttn_mnist()
-# e656_conv3dttn_mnist()
-# e657_conv3dttn_mnist()
-# e658_conv3dttn_mnist()
-# e659_conv3dttn_mnist()
-# e660_conv3dttn_mnist()
-# e661_conv3dttn_mnist()
-# e662_conv3dttn_mnist()
-# e663_conv3dttn_mnist()
-# e664_conv3dttn_mnist()
+
+# e673_conv3dttn_mnist()
+# e674_conv3dttn_mnist()
+# e675_conv3dttn_mnist()
+# e676_conv3dttn_mnist()
+# e677_conv3dttn_mnist()
+# e678_conv3dttn_mnist()
+# e679_conv3dttn_mnist()
+e680_conv3dttn_mnist()
