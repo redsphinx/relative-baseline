@@ -8262,32 +8262,193 @@ def e705_conv3dttn_mnist():
     project_variable.model_number = 3
     main_file.run(project_variable)
 
+#####################################################################################################################
+#                                         inferencing all models from a run
+#####################################################################################################################
+def e706_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 706
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 681, 2]
+    project_variable.num_out_channels = [12, 22]
+    main_file.run_test_batch(project_variable)
+
+def e736_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 736
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 682, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e766_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 766
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 683, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e796_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 796
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 684, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e826_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 826
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 685, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e856_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 856
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 686, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e886_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 886
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 687, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+
+def e916_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 916
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 688, 2]
+    project_variable.num_out_channels = [18, 28]
+    main_file.run_test_batch(project_variable)
+#####################################################################################################################
+#                                         retraining + saving all specific models
+#####################################################################################################################
+def e946_conv3dttn_mnist():
+    set_init_21()
+    project_variable.experiment_number = 946
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 50
+    project_variable.num_out_channels = [6, 16]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.model_number = 3
+    main_file.run(project_variable)
+
+def e947_conv3dttn_mnist():
+    set_init_21()
+    project_variable.experiment_number = 947
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 100
+    project_variable.num_out_channels = [6, 16]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.model_number = 3
+    main_file.run(project_variable)
+
+def e948_conv3dttn_mnist():
+    set_init_21()
+    project_variable.experiment_number = 948
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-8
+
+    project_variable.data_points[0] = 100
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.model_number = 3
+    main_file.run(project_variable)
+
+def e949_conv3dttn_mnist():
+    set_init_21()
+    project_variable.experiment_number = 949
+    project_variable.device = 0
+
+    project_variable.data_points[0] = 1000
+    project_variable.num_out_channels = [6, 16]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+
+    project_variable.model_number = 3
+    main_file.run(project_variable)
+#####################################################################################################################
+#                                         inferencing all models from a run
+#####################################################################################################################
+def e950_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 950
+    project_variable.device = 2
+    project_variable.model_number = 3
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 691, 3]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
+def e980_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 980
+    project_variable.device = 2
+    project_variable.model_number = 3
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 692, 3]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
+def e1010_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 1010
+    project_variable.device = 2
+    project_variable.model_number = 3
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 694, 3]
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
+def e1040_conv3dttn_mnist():
+    set_init_20()
+    project_variable.experiment_number = 1040
+    project_variable.device = 2
+    project_variable.model_number = 3
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 702, 3]
+    project_variable.num_out_channels = [4, 14]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
-
-# e681_conv3d_mnist()
-# e682_conv3d_mnist()
-# e683_conv3d_mnist()
-# e684_conv3d_mnist()
-# e685_conv3d_mnist()
-# e686_conv3d_mnist()
-# e687_conv3d_mnist()
-# e688_conv3d_mnist()
-# e689_conv3d_mnist()
-# e690_conv3d_mnist()
-
-# e691_conv3dttn_mnist()
-# e692_conv3dttn_mnist()
-# e693_conv3dttn_mnist()
-# e694_conv3dttn_mnist()
-# e695_conv3dttn_mnist()
-# e696_conv3dttn_mnist()
-# e697_conv3dttn_mnist()
-# e698_conv3dttn_mnist()
-# e699_conv3dttn_mnist()
-# e700_conv3dttn_mnist()
-# e701_conv3dttn_mnist()
-# e702_conv3dttn_mnist()
-# e703_conv3dttn_mnist()
-# e704_conv3dttn_mnist()
-# e705_conv3dttn_mnist()

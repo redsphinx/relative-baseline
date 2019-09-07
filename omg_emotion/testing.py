@@ -60,3 +60,6 @@ def run(project_variable, all_data, my_model, device):
     # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     # project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
     TM.add_standard_info(project_variable, 'test', (loss, accuracy, confusion_epoch))
+
+    if project_variable.inference_in_batches[0]:
+        return accuracy

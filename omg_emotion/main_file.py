@@ -310,3 +310,81 @@ def run(project_variable):
             U.delete_runs(project_variable, best_run)
 
 
+def run_test_batch(project_variable):
+    experiment_number_start = project_variable.experiment_number
+    all_accuracies = []
+
+    if not project_variable.debug_mode:
+        if project_variable.experiment_state == 'new':
+            project_variable.experiment_number = [experiment_number_start,
+                                                  experiment_number_start+project_variable.inference_in_batches[1]-1]
+            project_variable.load_model = [project_variable.inference_in_batches[2], project_variable.inference_in_batches[3]]
+            ROW = S.write_settings(project_variable)
+
+    project_variable.test = True
+    project_variable.val = False
+    project_variable.train = False
+
+    project_variable.current_epoch = 0
+
+    data = D.load_data(project_variable, seed=None)
+    data_test = data[1][0]
+    labels_test = data[2][0]
+    device = setup.get_device(project_variable)
+
+
+    for _i in range(project_variable.inference_in_batches[1]):
+        project_variable.experiment_number = experiment_number_start + _i
+
+        # remove duplicate log files
+        log_file = 'experiment_%d_model_%d_run_%d.txt' % (project_variable.experiment_number,
+                                                          project_variable.model_number,
+                                                          project_variable.at_which_run)
+        log_path = os.path.join(PP.saving_data, 'test', log_file)
+        if os.path.exists(log_path):
+            if os.path.isdir(log_path):
+                shutil.rmtree(log_path)
+            else:
+                os.remove(log_path)
+
+        if not project_variable.debug_mode:
+            path = os.path.join(PP.writer_path, 'experiment_%d_model_%d' % (project_variable.experiment_number,
+                                                                            project_variable.model_number))
+            subfolder = os.path.join(path, 'run_%d' % project_variable.at_which_run)
+
+            path = subfolder
+
+        else:
+            path = os.path.join(PP.writer_path, 'debugging')
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+        else:
+            # clear directory before writing new events
+            shutil.rmtree(path)
+            time.sleep(2)
+            os.mkdir(path)
+
+        project_variable.writer = SummaryWriter(path)
+        print('tensorboardX writer path: %s' % path)
+
+        # --------------------------------------------------------------------------------------
+        load_this = [project_variable.inference_in_batches[2],
+                     project_variable.inference_in_batches[3],
+                     99, _i]
+        print('loading model %s' % str(load_this))
+        project_variable.load_model = load_this
+        my_model = setup.get_model(project_variable)
+        my_model.cuda(device)
+
+        the_data = data_test, labels_test
+        accuracy = testing.run(project_variable, the_data, my_model, device)
+        all_accuracies.append(accuracy)
+
+        project_variable.writer.close()
+
+    if not project_variable.debug_mode:
+        acc = np.mean(all_accuracies)
+        std = np.std(all_accuracies)
+        best_run = all_accuracies.index(max(all_accuracies))
+        S.write_results(acc, std, best_run, ROW, project_variable.sheet_number)

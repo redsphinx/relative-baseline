@@ -296,7 +296,7 @@ def write_settings(project_variable):
             date.today().strftime('%d-%m-%Y'),  # date                      #A
             datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
             '',  # end time experiment                                      #C
-            project_variable.experiment_number,                             # D
+            str(project_variable.experiment_number),                             # D
             '',  # parameters                                               # E
             '',  # mean accuracy                                            #F
             '',  # std                                                      #G
