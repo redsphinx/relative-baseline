@@ -8239,7 +8239,8 @@ def e703_conv3dttn_mnist():
 def e704_conv3dttn_mnist():
     set_init_21()
     project_variable.experiment_number = 704
-    project_variable.device = 2
+    project_variable.device = 0
+    project_variable.experiment_state = 'crashed'
 
     project_variable.data_points[0] = 2000
     project_variable.num_out_channels = [4, 14]
@@ -8542,4 +8543,4 @@ def e1192_conv3dttn_mnist():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-e1192_conv3dttn_mnist()
+# e704_conv3dttn_mnist()
