@@ -120,7 +120,7 @@ def plot_results():
     plt.savefig('picture_%d.jpg' % num)
 
 
-plot_results()
+# plot_results()
 
 
 def C3D_experiments():
@@ -173,3 +173,112 @@ def C3D_experiments():
 # C3D_experiments()
 
 
+def plot_results_datapoints_accuracy():
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000])
+    # xs = 10.0**np.linspace(xs)
+
+    model_2_acc = np.array(
+        [0.3737833333, 0.4982566667, 0.6247766667, 0.6710766667, 0.7495833333, 0.8366866667, 0.9592766667, 0.97637])
+    labels_2 = [0.374, 0.498, 0.625, 0.671, 0.75, 0.837, 0.96, 0.977]
+    loc_2_y = [-0.03, -0.04, -0.04, -0.04, -0.04, 0.02, 0.01, 0.01]
+    loc_2_x = [1, 0, 0, 0, 0, -10, -50, -250]
+    model_2_stde = np.array([0.0122180041  ,0.01310738272 ,0.01074435116 ,0.009515661574,0.008344632451,0.005919209282,0.002494984673,0.001364422141])
+    # model_2_stde = np.array([0.06692076451,0.07179209187,0.05884923496,0.05211942494,0.04570543427,0.03242084446,0.01366559386,0.007473247844])
+
+    model_3_acc = np.array(
+        [0.47685, 0.58781, 0.6681366667, 0.7206133333, 0.7725033333, 0.8287233333, 0.9254366667, 0.9677166667])
+    labels_3 = [0.477, 0.588, 0.669, 0.721, 0.773, 0.829, 0.925, 0.968]
+    loc_3_y = [0.03, 0.03, 0.015, 0.015, 0.02, -0.05, -0.04, -0.04]
+    loc_3_x = [-2, -5, -9, -15, -10, -10, -50, -200]
+    model_3_stde = np.array([0.01387213494 ,0.01078555964 ,0.009109147397,0.007932831543,0.006682841184,0.007343126315,0.005807509474,0.002008161588])
+    # model_3_stde = np.array([0.07598081227,0.05907494308,0.04989285509,0.04344990781,0.03660342865,0.04021995925,0.03180903942,0.01099915401])
+
+    plt.errorbar(xs, model_2_acc, yerr=model_2_stde, linestyle='--', color='g', marker='o', markersize=4, elinewidth=1, barsabove=True, ecolor='black', capsize=3, label='LeNet-5-3DConv')
+    for k in range(len(model_2_acc)):
+        i = xs[k]
+        t = i + loc_2_x[k]
+        j = labels_2[k]
+        s = j + loc_2_y[k]
+        print(type(j))
+        ax.annotate(str(j), xy=(t, s), color='g')
+
+    plt.errorbar(xs, model_3_acc, yerr=model_3_stde,  linestyle='-', color='r', marker='o', markersize=4, elinewidth=1, barsabove=True, ecolor='black', capsize=3, label='LeNet-5-3DConvTTN')
+    for k in range(len(model_3_acc)):
+        i = xs[k]
+        t = i + loc_3_x[k]
+        j = labels_3[k]
+        s = j + loc_3_y[k]
+        print(type(j))
+        ax.annotate(str(j), xy=(t, s), color='r')
+
+    plt.xscale('log')
+    plt.grid(True)
+
+
+    plt.ylabel('Accuracy')
+    plt.xlabel('Training videos')
+    plt.title('Training Videos vs. Accuracy')
+    plt.legend(('LeNet-5-3DConv', 'LeNet-5-3DConvTTN'))
+
+    plt.savefig('picture_666_9.jpg')#eps', format='eps')
+
+
+plot_results_datapoints_accuracy()
+
+
+'''
+$0.01387213494$
+$0.01078555964$
+$0.009109147397$
+$0.007932831543$
+$0.006682841184$
+$0.007343126315$
+$0.005807509474$
+$0.002008161588$
+'''
+
+
+'''
+import scipy.stats as stats
+m2_mean = [0.3737833333, 0.4982566667, 0.6247766667, 0.6710766667, 0.7495833333, 0.8366866667, 0.9592766667, 0.97637]
+m2_std = [0.06692076451,0.07179209187,0.05884923496,0.05211942494,0.04570543427,0.03242084446,0.01366559386,0.007473247844]
+m3_mean = [0.47685, 0.58781, 0.6681366667, 0.7206133333, 0.7725033333, 0.8287233333, 0.9254366667, 0.9677166667]
+m3_std = [0.07598081227,0.05907494308,0.04989285509,0.04344990781,0.03660342865,0.04021995925,0.03180903942,0.01099915401]
+nums = [10, 20, 30, 40, 50, 100, 500, 1000]
+for i in range(8):
+    print(nums[i])
+    t, p = stats.ttest_ind_from_stats(m2_mean[i], m2_std[i], 30, m3_mean[i], m3_std[i], 30, False)
+    if np.abs(t) > 2 and p < 0.05:
+        print('result is significant')
+    else:
+        print('result is not significant')
+    print('t = ', t, ' p = ', p)
+
+10
+result is significant
+t =  -5.575524535942804  p =  7.022023942185273e-07
+20
+result is significant
+t =  -5.275773906508184  p =  2.2187817134151176e-06
+30
+result is significant
+t =  -3.078216237373812  p =  0.00321100439889691
+40
+result is significant
+t =  -3.998565685300635  p =  0.0001879498764672029
+50
+result is significant
+t =  -2.143898936230878  p =  0.0364484729844081
+100
+result is not significant
+t =  0.8443083202512734  p =  0.4021219806985964
+500
+result is significant
+t =  5.353779344764144  p =  3.982411409788355e-06
+1000
+result is significant
+t =  3.564224702921899  p =  0.0008020691407754687
+'''
