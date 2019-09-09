@@ -8566,7 +8566,20 @@ def e1252_conv3d_mnist():
     project_variable.transformation_groups = project_variable.num_out_channels
     main_file.run_test_batch(project_variable)
 
+def e1282_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 1282
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 690, 2]
+    project_variable.num_out_channels = [18, 28]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-e1252_conv3d_mnist()
+# e1282_conv3d_mnist()
