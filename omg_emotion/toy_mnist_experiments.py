@@ -8050,8 +8050,9 @@ def e689_conv3d_mnist():
 
 def e690_conv3d_mnist():
     set_init_21()
+    project_variable.experiment_state = 'crashed'
     project_variable.experiment_number = 690
-    project_variable.device = 1
+    project_variable.device = 0
 
     project_variable.data_points[0] = 5000
     project_variable.num_out_channels = [18, 28]
@@ -8239,7 +8240,7 @@ def e703_conv3dttn_mnist():
 def e704_conv3dttn_mnist():
     set_init_21()
     project_variable.experiment_number = 704
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.experiment_state = 'crashed'
 
     project_variable.data_points[0] = 2000
@@ -8254,6 +8255,7 @@ def e705_conv3dttn_mnist():
     set_init_21()
     project_variable.experiment_number = 705
     project_variable.device = 2
+    project_variable.experiment_state = 'crashed'
 
     project_variable.data_points[0] = 5000
     project_variable.num_out_channels = [4, 14]
@@ -8540,7 +8542,31 @@ def e1192_conv3dttn_mnist():
     project_variable.transformation_groups = project_variable.num_out_channels
     main_file.run_test_batch(project_variable)
 
+def e1222_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 1222
+    project_variable.device = 0
+    project_variable.model_number = 2
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 689, 2]
+    project_variable.num_out_channels = [18, 28]
+    # project_variable.k0_groups = project_variable.num_out_channels
+    # project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
+def e1252_conv3d_mnist():
+    set_init_20()
+    project_variable.experiment_number = 1252
+    project_variable.device = 0
+    project_variable.model_number = 3
+    project_variable.data_points = [0, 0, 10000]
+    project_variable.inference_in_batches = [True, 30, 704, 3]
+    project_variable.num_out_channels = [4, 14]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    main_file.run_test_batch(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e704_conv3dttn_mnist()
+e1252_conv3d_mnist()

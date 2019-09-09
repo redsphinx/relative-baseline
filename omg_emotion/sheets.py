@@ -42,7 +42,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 16
     elif sheet_number in [2, 17]:
         start = 11
-    elif sheet_number == [0, 10, 15]:
+    elif sheet_number in [0, 10, 15]:
         start = 13
     elif sheet_number in [4, 6, 12]:
         start = 17
