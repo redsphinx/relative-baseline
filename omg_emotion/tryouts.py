@@ -178,6 +178,7 @@ def plot_results_datapoints_accuracy():
     ax = fig.add_subplot(111)
 
     xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000, 2000])
+
     # xs = 10.0**np.linspace(xs)
 
     model_2_acc = np.array(
@@ -202,7 +203,6 @@ def plot_results_datapoints_accuracy():
         t = i + loc_2_x[k]
         j = labels_2[k]
         s = j + loc_2_y[k]
-        print(type(j))
         ax.annotate(str(j), xy=(t, s), color='g')
 
     plt.errorbar(xs, model_3_acc, yerr=model_3_stde,  linestyle='-', color='r', marker='o', markersize=4, elinewidth=1, barsabove=True, ecolor='black', capsize=3, label='LeNet-5-3DConvTTN')
@@ -211,8 +211,13 @@ def plot_results_datapoints_accuracy():
         t = i + loc_3_x[k]
         j = labels_3[k]
         s = j + loc_3_y[k]
-        print(type(j))
         ax.annotate(str(j), xy=(t, s), color='r')
+
+    star = [9.8, 19, 29, 37, 47, 490, 950, 1900]
+    y_loc_star = [0.53, 0.64, 0.71, 0.75, 0.81, 0.86, 0.90, 0.92]
+    for k in range(len(star)):
+        i = star[k]
+        ax.annotate(str('*'), xy=(i, y_loc_star[k]), color='b')
 
     plt.xscale('log')
     plt.grid(True)
@@ -223,7 +228,7 @@ def plot_results_datapoints_accuracy():
     plt.title('Training Videos vs. Accuracy')
     plt.legend(('LeNet-5-3DConv', 'LeNet-5-3DConvTTN'))
 
-    plt.savefig('picture_666_10.eps', format='eps')
+    plt.savefig('picture_666_11.eps', format='eps')
 
 
 plot_results_datapoints_accuracy()
