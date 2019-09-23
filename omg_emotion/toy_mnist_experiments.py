@@ -8590,7 +8590,27 @@ def e1312_conv3dttn_mnist():
     project_variable.transformation_groups = project_variable.num_out_channels
     main_file.run_test_batch(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
 
+def e_standalone_conv3dttn_mnist():
+    project_variable.end_epoch = 1
+    project_variable.dataset = 'mov_mnist'
+    project_variable.sheet_number = 17
+    project_variable.batch_size = 20
+    project_variable.eval_on = 'test'
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 5e-8
 
-e1312_conv3dttn_mnist()
+    project_variable.experiment_number = 111111
+    project_variable.device = 0
+    project_variable.model_number = 10
+    project_variable.data_points = [20, 20, 20]
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
+
+e_standalone_conv3dttn_mnist()
+

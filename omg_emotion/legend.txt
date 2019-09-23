@@ -15,3 +15,4 @@ project_variable.model_number
 77   C3TTN7    conv_k_t=11  load_num_frames=100
 8   C3DTTN_1L
 9   C3D_1L
+10  standalone LeNet-5 3DTTN version

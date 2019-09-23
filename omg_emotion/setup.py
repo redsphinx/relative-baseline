@@ -6,6 +6,7 @@ from torch import nn
 from relative_baseline.omg_emotion import project_paths as PP
 import os
 from relative_baseline.omg_emotion import models as M
+from relative_baseline.omg_emotion import factorized_convolution as C3D
 
 
 
@@ -138,6 +139,10 @@ def get_model(project_variable):
     elif project_variable.model_number == 9:
         model = M.C3D_1L([project_variable.load_num_frames, 60, 60], project_variable)
         # model = M.C3D_1L([project_variable.load_num_frames, 28, 28], project_variable)
+    elif project_variable.model_number == 10:
+        model = C3D.LeNet5_TTN3d()
+        model.conv1.weight.requires_grad = False
+        model.conv2.weight.requires_grad = False
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None
