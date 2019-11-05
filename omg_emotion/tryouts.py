@@ -177,12 +177,13 @@ def plot_results_datapoints_accuracy():
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-<<<<<<< HEAD
-    xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000, 2000])
+    # xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000, 2000])
 
-=======
-    xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000, 2000, 5000])
->>>>>>> 4ab5eedb398c09b5f205f93333ee4d70ee301f4c
+    # xs = np.array([10, 20, 30, 40, 50, 100, 500, 1000, 2000, 5000])
+    # xs = np.array([1,2,3,4,5,10,50,100,200,5000])
+    xs = np.array([1,2,3,4,5,6,7,8,9,10])
+    xs_2 = ['1', '2', '3', '4', '5', '10', '50', '100', '200', '500']
+    # xs = np.array([1, 2, 3, 4, 5, 10, 50, 100, 200, 500])
     # xs = 10.0**np.linspace(xs)
 
 
@@ -203,49 +204,51 @@ def plot_results_datapoints_accuracy():
     # model_3_stde = np.array([0.07598081227,0.05907494308,0.04989285509,0.04344990781,0.03660342865,0.04021995925,0.03180903942,0.01099915401])
 
     plt.errorbar(xs, model_2_acc, yerr=model_2_stde, linestyle='--', color='g', marker='o', markersize=4, elinewidth=1, barsabove=True, ecolor='black', capsize=3, label='LeNet-5-3DConv')
-    for k in range(len(model_2_acc)):
-        i = xs[k]
-        t = i + loc_2_x[k]
-        j = labels_2[k]
-        s = j + loc_2_y[k]
-        ax.annotate(str(j), xy=(t, s), color='g')
+    # for k in range(len(model_2_acc)):
+    #     i = xs[k]
+    #     t = i + loc_2_x[k]
+    #     j = labels_2[k]
+    #     s = j + loc_2_y[k]
+    #     ax.annotate(str(j), xy=(t, s), color='g')
 
     plt.errorbar(xs, model_3_acc, yerr=model_3_stde,  linestyle='-', color='r', marker='o', markersize=4, elinewidth=1, barsabove=True, ecolor='black', capsize=3, label='LeNet-5-3DConvTTN')
-    for k in range(len(model_3_acc)):
-        i = xs[k]
-        t = i + loc_3_x[k]
-        j = labels_3[k]
-        s = j + loc_3_y[k]
-        ax.annotate(str(j), xy=(t, s), color='r')
+    # for k in range(len(model_3_acc)):
+    #     i = xs[k]
+    #     t = i + loc_3_x[k]
+    #     j = labels_3[k]
+    #     s = j + loc_3_y[k]
+    #     ax.annotate(str(j), xy=(t, s), color='r')
 
-<<<<<<< HEAD
-    star = [9.8, 19, 29, 37, 47, 490, 950, 1900]
-    y_loc_star = [0.53, 0.64, 0.71, 0.75, 0.81, 0.86, 0.90, 0.92]
-    for k in range(len(star)):
-        i = star[k]
-        ax.annotate(str('*'), xy=(i, y_loc_star[k]), color='b')
-=======
-    star_loc_x = [9.5, 18, 27, 36, 46, 450, 900, 1800, 4500]
-    star_loc_y = [0.54, 0.64, 0.70, 0.75, 0.82, 0.86, 0.90, 0.92, 0.93]
+    # --------
+    # not used
+    # star = [9.8, 19, 29, 37, 47, 490, 950, 1900]
+    # y_loc_star = [0.53, 0.64, 0.71, 0.75, 0.81, 0.86, 0.90, 0.92]
+    # for k in range(len(star)):
+    #     i = star[k]
+    #     ax.annotate(str('*'), xy=(i, y_loc_star[k]), color='b')
+    # --------
 
-    for k in range(len(star_loc_x)):
-        ax.annotate(str(' * '), xy=(star_loc_x[k], star_loc_y[k]), color='b')
->>>>>>> 4ab5eedb398c09b5f205f93333ee4d70ee301f4c
+    # star_loc_x = [9.5, 18, 27, 36, 46, 450, 900, 1800, 4500]
+    # star_loc_y = [0.54, 0.64, 0.70, 0.75, 0.82, 0.86, 0.90, 0.92, 0.93]
+    #
+    # for k in range(len(star_loc_x)):
+    #     ax.annotate(str(' * '), xy=(star_loc_x[k], star_loc_y[k]), color='b')
 
-    plt.xscale('log')
+    # plt.xscale('log')
     plt.grid(True)
+
+    plt.xticks(xs, xs_2)
 
 
     plt.ylabel('Accuracy')
-    plt.xlabel('Training videos')
-    plt.title('Training Videos vs. Accuracy')
+    # plt.xlabel('Training videos')
+    # plt.title('Training Videos vs. Accuracy')
+    plt.xlabel('Samples per class')
+    plt.title('Samples per class vs. Accuracy')
     plt.legend(('LeNet-5-3DConv', 'LeNet-5-3DConvTTN'))
 
-<<<<<<< HEAD
-    plt.savefig('picture_666_11.eps', format='eps')
-=======
-    plt.savefig('picture_666_12.eps', format='eps')
->>>>>>> 4ab5eedb398c09b5f205f93333ee4d70ee301f4c
+    plt.savefig('presentation_1.jpg', format='jpg')
+    # plt.savefig('picture_666_12.eps', format='eps')
 
 
 plot_results_datapoints_accuracy()
