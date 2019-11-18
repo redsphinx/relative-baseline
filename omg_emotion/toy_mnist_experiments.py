@@ -8610,7 +8610,36 @@ def e_standalone_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
+
+def e1342_conv3dttn_mnist():
+    project_variable.end_epoch = 1
+    project_variable.dataset = 'mov_mnist'
+    project_variable.sheet_number = 18
+    project_variable.data_points = [50, 50, 50]
+    project_variable.batch_size = 20
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+
+    project_variable.learning_rate = 5e-4
+    project_variable.theta_learning_rate = 5e-8
+
+    project_variable.use_adaptive_lr = True
+    project_variable.decrease_after_num_epochs = 5
+
+    project_variable.experiment_number = 111111
+    project_variable.device = 0
+    project_variable.model_number = 10
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=True)
 
-e_standalone_conv3dttn_mnist()
 
+e1342_conv3dttn_mnist()

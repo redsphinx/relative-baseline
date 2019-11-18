@@ -22,6 +22,8 @@ import shutil
 def run(project_variable):
 
     START_LR = project_variable.learning_rate
+    if project_variable.theta_learning_rate is not None:
+        START_LR_THETA = project_variable.theta_learning_rate
 
     # write initial settings to spreadsheet
     if not project_variable.debug_mode:
@@ -295,11 +297,20 @@ def run(project_variable):
 
                             project_variable.learning_rate /= project_variable.reduction_factor
 
+                            if project_variable.theta_learning_rate is not None:
+                                print('--------------------------------------------------------------------------\n'
+                                      'THETA LEARNING RATE REDUCED: from %s to %s\n'
+                                      '--------------------------------------------------------------------------'
+                                      % (str(project_variable.theta_learning_rate),
+                                         str(project_variable.theta_learning_rate / project_variable.reduction_factor)))
+
+                                project_variable.theta_learning_rate /= project_variable.reduction_factor
 
         # at the end of a run
         project_variable.at_which_run += 1
         project_variable.writer.close()
         project_variable.learning_rate = START_LR  # reset the learning rate
+        project_variable.theta_learning_rate = START_LR_THETA # reset theta learning rate
 
     if not project_variable.debug_mode:
         # acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)

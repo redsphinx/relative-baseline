@@ -172,7 +172,33 @@ def get_optimizer(project_variable, model):
             optimizer = Adam(model.parameters(), lr=project_variable.learning_rate)
 
     elif project_variable.optimizer == 'sgd':
-        optimizer = SGD(model.parameters(), lr=project_variable.learning_rate, momentum=project_variable.momentum)
+        if project_variable.theta_learning_rate is not None:
+            optimizer = SGD(
+                [
+                    # Use theta learning rate for SRXY parameters
+                    # Use normal learning rate for other things
+
+                    {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate},
+                    {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                    {'params': model.conv2.parameters(), 'lr': project_variable.learning_rate},
+                    {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
+                    {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                    {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                    {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                    {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                ],
+                lr=project_variable.learning_rate
+            )
+
+        else:
+            optimizer = SGD(model.parameters(), lr=project_variable.learning_rate, momentum=project_variable.momentum)
 
     else:
         print('Error: optimizer %s not supported' % project_variable.optimizer)

@@ -163,6 +163,10 @@ class ProjectVariable(object):
         self._adapt_eval_on = 'val'
         self._reduction_factor = 2
         self._decrease_after_num_epochs = 10
+        # ----------------------------------------------------------------------------------------------------------
+        # separate learning rate for theta
+        # ----------------------------------------------------------------------------------------------------------
+        self._theta_learning_rate = None
 
 
     @property
@@ -672,3 +676,11 @@ class ProjectVariable(object):
     @decrease_after_num_epochs.setter
     def decrease_after_num_epochs(self, value):
         self._decrease_after_num_epochs = value
+
+    @property
+    def theta_learning_rate(self):
+        return self._theta_learning_rate
+
+    @theta_learning_rate.setter
+    def theta_learning_rate(self, value):
+        self._theta_learning_rate = value
