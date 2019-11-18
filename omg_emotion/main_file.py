@@ -195,6 +195,12 @@ def run(project_variable):
                       '--------------------------------------------------------------------------'
                       % str(project_variable.learning_rate))
 
+                if project_variable.theta_learning_rate is not None:
+                    print('--------------------------------------------------------------------------\n'
+                          'STARTING THETA LEARNING RATE: %s\n'
+                          '--------------------------------------------------------------------------'
+                          % str(project_variable.theta_learning_rate))
+
             project_variable.current_epoch = e
 
             # get data

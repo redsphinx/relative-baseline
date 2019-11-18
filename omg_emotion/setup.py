@@ -173,29 +173,53 @@ def get_optimizer(project_variable, model):
 
     elif project_variable.optimizer == 'sgd':
         if project_variable.theta_learning_rate is not None:
-            optimizer = SGD(
-                [
-                    # Use theta learning rate for SRXY parameters
-                    # Use normal learning rate for other things
+            if project_variable.theta_init is None: # using SRXY to make theta
+                optimizer = SGD(
+                    [
+                        # Use theta learning rate for SRXY parameters
+                        # Use normal learning rate for other things
 
-                    {'params': model.conv1.parameters(), 'lr': project_variable.learning_rate},
-                    {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
 
-                    {'params': model.conv2.parameters(), 'lr': project_variable.learning_rate},
-                    {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
-                    {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
+                        {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
 
-                    {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
-                    {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
-                    {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
-                ],
-                lr=project_variable.learning_rate
-            )
+                        {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                        {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                        {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                    ],
+                    lr=project_variable.learning_rate
+                )
+
+            else:
+                optimizer = SGD(
+                    [
+                        # Use theta learning rate for theta parameters
+                        # Use normal learning rate for other things
+
+                        {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.theta, 'lr': project_variable.theta_learning_rate},
+
+                        {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.theta, 'lr': project_variable.theta_learning_rate},
+
+                        {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                        {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                        {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                    ],
+                    lr=project_variable.learning_rate
+                )
 
         else:
             optimizer = SGD(model.parameters(), lr=project_variable.learning_rate, momentum=project_variable.momentum)
