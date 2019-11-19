@@ -316,7 +316,8 @@ def run(project_variable):
         project_variable.at_which_run += 1
         project_variable.writer.close()
         project_variable.learning_rate = START_LR  # reset the learning rate
-        project_variable.theta_learning_rate = START_LR_THETA # reset theta learning rate
+        if project_variable.theta_learning_rate is not None:
+            project_variable.theta_learning_rate = START_LR_THETA # reset theta learning rate
 
     if not project_variable.debug_mode:
         # acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)

@@ -8719,9 +8719,23 @@ def e1347_conv3dttn_mnist():
     project_variable.theta_learning_rate = 2.5e-8
     main_file.run(project_variable)
 
+def e1348_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1348
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-8
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-e1347_conv3dttn_mnist()
+# e1348_conv3dttn_mnist()
 
-# e702_conv3dttn_mnist()
+e702_conv3dttn_mnist()
