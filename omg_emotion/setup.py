@@ -179,15 +179,19 @@ def get_optimizer(project_variable, model):
                         # Use theta learning rate for SRXY parameters
                         # Use normal learning rate for other things
 
-                        {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
-                        {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                        # {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.first_weight, 'lr': project_variable.theta_learning_rate},
+                        # {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv1.bias, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
 
-                        {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
-                        {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                        # {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.first_weight, 'lr': project_variable.theta_learning_rate},
+                        # {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                        {'params': model.conv2.bias, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
                         {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},

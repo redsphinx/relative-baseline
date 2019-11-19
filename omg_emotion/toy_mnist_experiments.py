@@ -8214,7 +8214,7 @@ def e701_conv3dttn_mnist():
 def e702_conv3dttn_mnist():
     set_init_21()
     project_variable.experiment_number = 702
-    project_variable.device = 2
+    project_variable.device = 0
 
     project_variable.data_points[0] = 500
     project_variable.num_out_channels = [4, 14]
@@ -8610,39 +8610,118 @@ def e_standalone_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-
-def e1342_conv3dttn_mnist():
-    project_variable.end_epoch = 40
+#####################################################################################################################
+#                                         experiments with separate learning rates
+#####################################################################################################################
+def set_init_22():
+    project_variable.end_epoch = 100
     project_variable.dataset = 'mov_mnist'
     project_variable.sheet_number = 18
-    project_variable.data_points = [500, 500, 50]
-    project_variable.num_out_channels = [4, 14]
-    project_variable.k0_groups = project_variable.num_out_channels
-    project_variable.transformation_groups = project_variable.num_out_channels
-    project_variable.batch_size = 20
+    project_variable.eval_on = 'val'
+    project_variable.save_only_best_run = True
     project_variable.same_training_data = True
     project_variable.randomize_training_data = True
     project_variable.balance_training_data = True
-
     project_variable.theta_init = None
     project_variable.srxy_init = 'eye'
     project_variable.srxy_smoothness = None
     project_variable.weight_transform = 'seq'
-
-    project_variable.learning_rate = 5e-7
-    project_variable.theta_learning_rate = 5e-8
-
+    project_variable.data_points = [100, 1000, 0]
     project_variable.use_adaptive_lr = True
     project_variable.decrease_after_num_epochs = 10
+    project_variable.batch_size = 20
 
-    project_variable.experiment_number = 111111
-    project_variable.device = 0
+
+def e1342_conv3dttn_mnist():
+    # SRXY has theta_lr
+    set_init_22()
+    project_variable.experiment_number = 1342
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.model_number = 3
-
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-7
+    project_variable.theta_learning_rate = 2.5e-8
     main_file.run(project_variable)
 
+def e1343_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1343
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-6
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
+def e1344_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1344
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-5
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
+
+def e1345_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1345
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-4
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
+
+def e1346_conv3dttn_mnist():
+    # SRXY + k0 have theta_lr
+    set_init_22()
+    project_variable.experiment_number = 1346
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-7
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
+
+def e1347_conv3dttn_mnist():
+    # SRXY + k0 + bias have theta_lr
+    set_init_22()
+    project_variable.experiment_number = 1347
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 1
+    project_variable.learning_rate = 2.5e-7
+    project_variable.theta_learning_rate = 2.5e-8
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
 
 
-e1342_conv3dttn_mnist()
+e1347_conv3dttn_mnist()
+
+# e702_conv3dttn_mnist()
