@@ -8734,7 +8734,7 @@ def e1348_conv3dttn_mnist():
     main_file.run(project_variable)
 
 def e1349_conv3dttn_mnist():
-    # same as experiment 702
+    # same as experiment 702, verifying reproducibility
     set_init_21()
     project_variable.experiment_number = 1349
     project_variable.device = 0
@@ -8748,8 +8748,63 @@ def e1349_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
+def e1350_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1350
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 0
+    project_variable.learning_rate = 2.5e-8
+    project_variable.sheet_number = 18
+    project_variable.use_adaptive_lr = False
+
+    project_variable.optimizer = 'adam'
+
+    main_file.run(project_variable)
+
+
+def e1351_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1351
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 1
+    project_variable.learning_rate = 2.5e-6
+    project_variable.sheet_number = 18
+    project_variable.use_adaptive_lr = False
+
+    project_variable.optimizer = 'adam'
+
+    main_file.run(project_variable)
+
+
+def e1352_conv3dttn_mnist():
+    set_init_22()
+    project_variable.experiment_number = 1352
+    project_variable.repeat_experiments = 10
+    project_variable.experiment_state = 'new'
+    project_variable.num_out_channels = [12, 22]
+    project_variable.k0_groups = project_variable.num_out_channels
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.model_number = 3
+    project_variable.device = 1
+    project_variable.learning_rate = 2.5e-4
+    project_variable.sheet_number = 18
+    project_variable.use_adaptive_lr = False
+
+    project_variable.optimizer = 'adam'
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
-
-# e1349_conv3dttn_mnist()
 
