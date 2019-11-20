@@ -20,6 +20,8 @@ import shutil
 
 
 def run(project_variable):
+    # only one of these can be True at a time
+    # assert(project_variable.use_adaptive_lr and project_variable.use_clr is False)
 
     START_LR = project_variable.learning_rate
     if project_variable.theta_learning_rate is not None:

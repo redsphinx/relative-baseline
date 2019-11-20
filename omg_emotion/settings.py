@@ -167,6 +167,14 @@ class ProjectVariable(object):
         # separate learning rate for theta
         # ----------------------------------------------------------------------------------------------------------
         self._theta_learning_rate = None
+        # ----------------------------------------------------------------------------------------------------------
+        # stuff for the CLR: https://arxiv.org/pdf/1506.01186.pdf
+        # ----------------------------------------------------------------------------------------------------------
+        # self._use_clr = False
+        # self._num_cycles = 2
+        # self._min_learning_rate = 1e-5
+        # self._max_learning_rate = 1e-2
+        # self._mode = 'triangle'
 
 
     @property
@@ -684,3 +692,10 @@ class ProjectVariable(object):
     @theta_learning_rate.setter
     def theta_learning_rate(self, value):
         self._theta_learning_rate = value
+        
+        
+#         self._use_clr = False
+#         self._num_cycles = 2
+#         self._min_learning_rate = 1e-5
+#         self._max_learning_rate = 1e-2
+#         self._mode = 'triangle'
