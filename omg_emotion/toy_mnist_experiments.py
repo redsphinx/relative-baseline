@@ -8806,5 +8806,3 @@ def e1352_conv3dttn_mnist():
 
 
 project_variable = ProjectVariable(debug_mode=False)
-
-
