@@ -169,7 +169,103 @@ def get_optimizer(project_variable, model):
                 lr=project_variable.learning_rate
             )
         else:
-            optimizer = Adam(model.parameters(), lr=project_variable.learning_rate)
+            if project_variable.theta_learning_rate is not None:
+                if project_variable.theta_init is None:  # using SRXY to make theta
+                    if project_variable.k0_theta_learning_rate and not project_variable.bias_theta_learning_rate:
+                        # SRXY + k0
+                        optimizer = Adam(
+                            [
+                                {'params': model.conv1.first_weight, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                                {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.conv2.first_weight, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                                {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                            ],
+                            lr=project_variable.learning_rate
+                        )
+                    elif project_variable.k0_theta_learning_rate and project_variable.bias_theta_learning_rate:
+                        # SRXY + k0 + bias
+                        optimizer = Adam(
+                            [
+                                {'params': model.conv1.first_weight, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.bias, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.conv2.first_weight, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.bias, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                            ],
+                            lr=project_variable.learning_rate
+                        )
+                    else:
+                        # only SRXY
+                        optimizer = Adam(
+                            [
+                                {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
+                                {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                                {'params': model.conv1.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv1.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
+                                {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                                {'params': model.conv2.scale, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.rotate, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_x, 'lr': project_variable.theta_learning_rate},
+                                {'params': model.conv2.translate_y, 'lr': project_variable.theta_learning_rate},
+
+                                {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                                {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                            ],
+                            lr=project_variable.learning_rate
+                        )
+
+                else:
+                    optimizer = Adam(
+                        [
+                            # Use theta learning rate for theta parameters
+                            # Use normal learning rate for other things
+
+                            {'params': model.conv1.first_weight, 'lr': project_variable.learning_rate},
+                            {'params': model.conv1.bias, 'lr': project_variable.learning_rate},
+                            {'params': model.conv1.theta, 'lr': project_variable.theta_learning_rate},
+
+                            {'params': model.conv2.first_weight, 'lr': project_variable.learning_rate},
+                            {'params': model.conv2.bias, 'lr': project_variable.learning_rate},
+                            {'params': model.conv2.theta, 'lr': project_variable.theta_learning_rate},
+
+                            {'params': model.fc1.parameters(), 'lr': project_variable.learning_rate},
+                            {'params': model.fc2.parameters(), 'lr': project_variable.learning_rate},
+                            {'params': model.fc3.parameters(), 'lr': project_variable.learning_rate},
+                        ],
+                        lr=project_variable.learning_rate
+                    )
+            else:
+                optimizer = Adam(model.parameters(), lr=project_variable.learning_rate)
 
     elif project_variable.optimizer == 'sgd':
         if project_variable.theta_learning_rate is not None:
