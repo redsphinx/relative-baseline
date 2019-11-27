@@ -4522,6 +4522,36 @@ def e313_C3DTTN_1L_kth():
     project_variable.k0_groups = project_variable.num_out_channels
     main_file.run(project_variable)
 
+#####################################################################################################################
+#                             standard LeNet-5 3DTTN and 3D to get baseline
+#####################################################################################################################
+def set_init_10():
+    project_variable.model_number = 3
+    project_variable.end_epoch = 150
+    project_variable.dataset = 'kth_actions'
+    project_variable.data_points = [191, 192, 0]
+    project_variable.repeat_experiments = 20
+    project_variable.save_only_best_run = True
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+    project_variable.label_size = 6
+    project_variable.experiment_state = 'new'
+    project_variable.sheet_number = 19
+    project_variable.weight_transform = 'seq'
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.batch_size = 20
+    project_variable.eval_on = 'val'
+
+
+def e314_C3DTTN_kth():
+    set_init_10()
+    project_variable.experiment_number = 314
+
+
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
