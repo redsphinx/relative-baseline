@@ -126,7 +126,7 @@ def parallel_load(items, number_processes=20):
     return pool
 
 
-def load_omg_emotion(project_variable):
+def load_omg_emotion_OLD(project_variable):
     # maybe better model: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
     # project_variable = ProjectVariable()
@@ -266,6 +266,101 @@ def load_omg_emotion(project_variable):
 
     return splits, final_data, final_labels
 
+
+
+def load_omg_emotion(project_variable, seed):
+    splits = []
+    all_labels = []
+    all_data = []
+    tp = np.float32
+    frames = project_variable.load_num_frames
+
+    def load(which, dp):
+        path = os.path.join(PP.moving_mnist_png, which)
+        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+        labels = np.genfromtxt(label_path, dtype=int)[:dp]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            for j in range(frames):
+                file_path = os.path.join(path, str(i), '%d.png' % j)
+                tmp = np.array(Image.open(file_path))
+                data[i, 0, j] = tmp
+
+        return data, labels
+
+    def load_random(which, dp, balanced, seed):
+        assert (dp % 10 == 0)
+
+        total_dp = {'train': 50000, 'val': 10000, 'test': 10000}
+
+        path = os.path.join(PP.moving_mnist_png, which)
+        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
+        labels = np.genfromtxt(label_path, dtype=int)
+
+        if balanced:
+            chosen = []
+            for i in range(10):
+                indices = np.arange(total_dp[which])[labels == i]
+
+                if seed is not None:
+                    random.seed(seed)
+
+                choose_indices = random.sample(list(np.arange(len(indices))), dp // 10)
+                chosen.extend(indices[choose_indices])
+        else:
+            chosen = np.arange(total_dp[which])
+
+            if seed is not None:
+                random.seed(seed)
+
+            random.shuffle(chosen)
+            chosen = chosen[:dp]
+
+        chosen.sort()
+        labels = labels[chosen]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            choose = chosen[i]
+            for j in range(frames):
+                file_path = os.path.join(path, str(choose), '%d.png' % j)
+                tmp = np.array(Image.open(file_path))
+                data[i, 0, j] = tmp
+
+        return data, labels
+
+    if project_variable.train:
+        if project_variable.randomize_training_data:
+            data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data,
+                                       seed)
+        else:
+            data, labels = load('train', project_variable.data_points[0])
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.val:
+        data, labels = load('val', project_variable.data_points[1])
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    if project_variable.test:
+        data, labels = load('test', project_variable.data_points[2])
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(labels)
+
+    return splits, all_data, all_labels
+
+    pass
 
 def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
 
