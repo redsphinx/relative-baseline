@@ -127,9 +127,10 @@ def parallel_load(items, number_processes=20):
 
 
 def load_omg_emotion(project_variable):
-    # TODO: https://pytorch.org/docs/stable/torchvision/models.html
+    # maybe better model: https://pytorch.org/docs/stable/torchvision/models.html
     # normalize the data
     # project_variable = ProjectVariable()
+    # fix the pipe like load_movmnist!
 
     all_labels = []
     splits = []

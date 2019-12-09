@@ -348,6 +348,10 @@ class LeNet5_3d(torch.nn.Module):
 
         if project_variable.dataset == 'kth_actions':
             _fc_in = [73, 28, 38]
+        elif project_variable.dataset == 'omg_emotions':
+            # TODO
+            pass
+
 
         self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
                                    120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)

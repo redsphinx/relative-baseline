@@ -6,9 +6,13 @@ def e1_C3D_omgemo():
     project_variable.model_number = 2
     project_variable.end_epoch = 10
     project_variable.dataset = 'omg_emotion'
+    project_variable.device = 0
+    project_variable.loss_function = 'adam'
 
-    project_variable.data_points = [191, 192, 0]
+    project_variable.data_points = [20, 20, 0]
     project_variable.label_size = 6
+    project_variable.batch_size = 20
+    project_variable.load_num_frames = 30
 
     project_variable.repeat_experiments = 1
     project_variable.save_only_best_run = True
@@ -25,5 +29,7 @@ def e1_C3D_omgemo():
     main_file.run(project_variable)
 
 
-
 project_variable = ProjectVariable(debug_mode=True)
+
+
+e1_C3D_omgemo()
