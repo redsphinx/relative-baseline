@@ -94,5 +94,3 @@ def make_easy_labels_from_annotations():
 
                             my_file.write(line)
 
-
-make_easy_labels_from_annotations()
