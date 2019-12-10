@@ -152,6 +152,7 @@ class ProjectVariable(object):
         # setting for video datasets
         # ----------------------------------------------------------------------------------------------------------
         self._load_num_frames = 30
+        self._skip_frames
         # time dimension of the kernel in conv1
         self._conv1_k_t = 3
         # where to add batchnorm after each non-linear activation layer

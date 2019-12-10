@@ -273,9 +273,22 @@ def load_omg_emotion(project_variable, seed):
     all_labels = []
     all_data = []
     tp = np.float32
+    # TODO: figure out how to deal with variable sequence length
     frames = project_variable.load_num_frames
 
+
     def load(which, dp):
+        if which == 'train':
+            folder_name = 'Training'
+        elif which == 'val':
+            folder_name = 'Validation'
+        elif which == 'test':
+            folder_name = 'Testing'
+        else:
+            print('problem with variable which')
+
+        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
+
         path = os.path.join(PP.moving_mnist_png, which)
         label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
         labels = np.genfromtxt(label_path, dtype=int)[:dp]
