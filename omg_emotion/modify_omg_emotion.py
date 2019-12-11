@@ -2,6 +2,10 @@ import os
 import numpy as np
 from relative_baseline.omg_emotion import project_paths as PP
 import tqdm
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+
 
 
 def check_for_data_overlap():
@@ -93,4 +97,36 @@ def make_easy_labels_from_annotations():
                                                             og_annotations[i][4])
 
                             my_file.write(line)
+
+
+def get_num_frames(plot_histogram=False):
+    which = ['Training', 'Test', 'Validation']
+
+    for w in which:
+
+        new_labels_path = os.path.join(PP.data_path, w, 'easy_labels.txt')
+        all_labels = np.genfromtxt(new_labels_path, delimiter=',', dtype=str)
+        frames = all_labels[:, 2]
+        frames = [int(i) for i in frames]
+        frames = np.array(frames)
+        print('%s\n'
+              'max: %d      min: %d     avg: %f     median: %d' % (w, frames.max(), frames.min(), frames.mean(),
+                                                                   np.median(frames)))
+
+        limit = 100
+        c = 0
+        count_less_than_limit = [c+=1 if i < limit for i in frames]
+
+        if plot_histogram:
+            fig = plt.figure()
+            save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images/omg_emotion_frames'
+            save_path = os.path.join(save_path, '%s_frames_distribution.jpg' % w)
+            print(save_path)
+            plt.hist(frames, bins=20)
+            plt.title('%s frames distribution' % w)
+            plt.savefig(save_path)
+
+
+get_num_frames(plot_histogram=False)
+
 

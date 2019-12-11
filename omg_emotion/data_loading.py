@@ -286,6 +286,7 @@ def load_omg_emotion(project_variable, seed):
             folder_name = 'Testing'
         else:
             print('problem with variable which')
+            folder_name = None
 
         path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
 
