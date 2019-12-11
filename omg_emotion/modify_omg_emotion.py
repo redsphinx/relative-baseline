@@ -5,7 +5,9 @@ import tqdm
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-
+import dlib # TODO: install this
+import cv2
+from PIL import Image
 
 
 def check_for_data_overlap():
@@ -63,8 +65,80 @@ def check_for_data_overlap():
         print('no overlap')
 
 
-# TODO: crop out the faces to like 96 x 96
+def find_largest_face(face_rectangles):
+    number_rectangles = len(face_rectangles)
+
+    if number_rectangles == 0:
+        return None
+    elif number_rectangles == 1:
+        return face_rectangles[0]
+    else:
+        largest = 0
+        which_rectangle = None
+        for i in range(number_rectangles):
+            r = face_rectangles[i]
+            # it's a square so only one side needs to be checked
+            width = r.right() - r.left()
+            if width > largest:
+                largest = width
+                which_rectangle = i
+        # print('rectangle %d is largest with a side of %d' % (which_rectangle, largest))
+        return face_rectangles[which_rectangle]
+
+
+def crop_face(path, side):
+
+    frame = np.array(Image.open(path))
+    detector = dlib.get_frontal_face_detector()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    face_rectangles = detector(gray, 2)
+    if len(face_rectangles) == 0:
+        print('no face detected in the generated image')
+        return None
+        # return xp.zeros((image.shape), dtype=xp.uint8)
+    largest_face_rectangle = find_largest_face(face_rectangles)
+
+    # TODO: crop face using the rectangle, make sure it's 96x96
+    new_frame = None
+
+    # if no face detected, copy face from previous frame
+    if new_frame is None:
+        print('no face detected')
+        return None
+    else:
+        new_frame = np.array(new_frame, dtype='uint8')
+        return new_frame
+
+
 # use methods from chalearn
+def crop_all_faces_in(which, b, e):
+    side = 96
+    total_dp = {'Training': 1955, 'Validation': 481, 'Test': 1989}
+    assert(which in ['Training', 'Validation', 'Test'])
+    assert(e < total_dp[which] and b > -1)
+
+    og_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg)
+    face_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg_face)
+
+    # get list of all names
+    label_path = os.path.join(PP.data_path, which, 'easy_labels.txt')
+    all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)[b:e]
+    data_names = all_labels[:, 0:2]
+
+    for i in range(len(data_names)):
+        og_utterance_path = os.path.join(og_data_path, data_names[i][0], data_names[i][1])
+
+        face_utterance_path = os.path.join(face_data_path, data_names[i][0], data_names[i][1])
+        if not os.path.exists(face_utterance_path):
+            os.makedirs(face_utterance_path)
+
+        frames = os.listdir(og_utterance_path)
+        for f in range(len(frames)):
+            pic_path = os.path.join(og_utterance_path, frames[f])
+            cropped_face = crop_face(pic_path, side) # assume it's array
+            # convert to image
+            # save image
+            save_path = os.path.join(face_utterance_path, frames[f])
 
 
 def make_easy_labels_from_annotations():
@@ -131,4 +205,5 @@ def get_num_frames(plot_histogram=False):
             plt.hist(frames, bins=20)
             plt.title('%s frames distribution' % w)
             plt.savefig(save_path)
+
 

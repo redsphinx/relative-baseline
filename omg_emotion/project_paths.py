@@ -17,9 +17,12 @@ saving_data = os.path.join(server_path, 'omg_emotion/saving_data')
 data_path = os.path.join(server_path, 'omg_emotion')
 omg_emotion_jpg = 'jpg_full_body_background_1280_720'
 # TODO
-omg_emotion_jpg_face = 'jpg_face_cropped_xx_xx'
+omg_emotion_jpg_face = 'jpg_face_cropped_96_96'
 models = os.path.join(saving_data, 'models')
 writer_path = os.path.join(saving_data, 'tensorboardX')
+
+# for dlib cropping face
+predictor = '/home/gabras/deployed/relative_baseline/omg_emotion/shape_predictor_68_face_landmarks.dat'
 
 # affect net
 affectnet_base = os.path.join(server_path, 'AffectNet/manually_annotated')
