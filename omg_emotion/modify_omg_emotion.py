@@ -109,13 +109,19 @@ def get_num_frames(plot_histogram=False):
         frames = all_labels[:, 2]
         frames = [int(i) for i in frames]
         frames = np.array(frames)
-        print('%s\n'
+        print('.\n%s\n'
               'max: %d      min: %d     avg: %f     median: %d' % (w, frames.max(), frames.min(), frames.mean(),
                                                                    np.median(frames)))
+        limit = 60
+        count_less_than_limit = 0
+        short_clips = []
+        for i in frames:
+            if i < limit:
+                count_less_than_limit += 1
+                short_clips.append(i)
+        print('%d out of %d clips have less than %d frames' % (count_less_than_limit, len(frames), limit))
+        print('on average these have %f frames' % np.median(short_clips))
 
-        limit = 100
-        c = 0
-        count_less_than_limit = [c+=1 if i < limit for i in frames]
 
         if plot_histogram:
             fig = plt.figure()
@@ -126,7 +132,5 @@ def get_num_frames(plot_histogram=False):
             plt.title('%s frames distribution' % w)
             plt.savefig(save_path)
 
-
-get_num_frames(plot_histogram=False)
 
 
