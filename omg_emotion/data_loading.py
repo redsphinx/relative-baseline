@@ -273,9 +273,7 @@ def load_omg_emotion(project_variable, seed):
     all_labels = []
     all_data = []
     tp = np.float32
-    # TODO: figure out how to deal with variable sequence length
-    frames = project_variable.load_num_frames
-
+    frames = project_variable.load_num_frames # should be 60 for omg_emotions
 
     def load(which, dp):
         if which == 'train':
@@ -289,20 +287,45 @@ def load_omg_emotion(project_variable, seed):
             folder_name = None
 
         path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
+        label_path = os.path.join(PP.data_path, folder_name, 'easy_labels.txt')
+        all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)[:dp]
+        data_names = all_labels[:, 0:2]
 
-        path = os.path.join(PP.moving_mnist_png, which)
-        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
-        labels = np.genfromtxt(label_path, dtype=int)[:dp]
+        if project_variable.label_type == 'categories':
+            labels = all_labels[:, 5]
+        elif project_variable.label_type == 'arousal':
+            labels = all_labels[:, 3]
+        elif project_variable.label_type == 'valence':
+            labels = all_labels[:, 4]
+        else:
+            print('label type not valid')
+            labels = None
 
         num_points = len(labels)
 
-        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+        # data = np.zeros(shape=(num_points, 1, frames, 96, 96), dtype=tp) # for cropped faces
+        data = np.zeros(shape=(num_points, 1, frames, 1280, 720), dtype=tp)
 
         for i in tqdm(range(num_points)):
-            for j in range(frames):
-                file_path = os.path.join(path, str(i), '%d.png' % j)
-                tmp = np.array(Image.open(file_path))
-                data[i, 0, j] = tmp
+            num_frames = int(all_labels[i][2])
+            if num_frames < frames:
+                diff = frames - num_frames
+
+                new_list = [j_ for j_ in range(num_frames)]
+                for j_ in range(diff):
+                    new_list.append(j_)
+
+                assert(len(new_list) == frames)
+
+                for j in range(frames):
+                    frame_path = os.path.join(path, data_names[i][0], data_names[i][1], '%d.jpg' % new_list[j])
+                    tmp = np.array(Image.open(frame_path))
+                    data[i, 0, j] = tmp
+            else:
+                for j in range(frames):
+                    frame_path = os.path.join(path, data_names[i][0], data_names[i][1], '%d.jpg' % j)
+                    tmp = np.array(Image.open(frame_path))
+                    data[i, 0, j] = tmp
 
         return data, labels
 
