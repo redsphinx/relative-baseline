@@ -12,12 +12,13 @@ def e1_C3D_omgemo():
     project_variable.data_points = [20, 20, 0]
     project_variable.label_size = 6
     project_variable.batch_size = 20
-    project_variable.load_num_frames = 30
+    project_variable.load_num_frames = 2
+    project_variable.label_type = 'categories'
 
     project_variable.repeat_experiments = 1
     project_variable.save_only_best_run = True
     project_variable.same_training_data = True
-    project_variable.randomize_training_data = True
+    project_variable.randomize_training_data = False
     project_variable.balance_training_data = True
 
     project_variable.experiment_state = 'new'

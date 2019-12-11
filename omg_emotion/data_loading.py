@@ -292,11 +292,11 @@ def load_omg_emotion(project_variable, seed):
         data_names = all_labels[:, 0:2]
 
         if project_variable.label_type == 'categories':
-            labels = all_labels[:, 5]
+            labels = all_labels[:, 5].astype(int)
         elif project_variable.label_type == 'arousal':
-            labels = all_labels[:, 3]
+            labels = all_labels[:, 3].astype(int)
         elif project_variable.label_type == 'valence':
-            labels = all_labels[:, 4]
+            labels = all_labels[:, 4].astype(int)
         else:
             print('label type not valid')
             labels = None
@@ -304,28 +304,29 @@ def load_omg_emotion(project_variable, seed):
         num_points = len(labels)
 
         # data = np.zeros(shape=(num_points, 1, frames, 96, 96), dtype=tp) # for cropped faces
-        data = np.zeros(shape=(num_points, 1, frames, 1280, 720), dtype=tp)
+        data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
 
         for i in tqdm(range(num_points)):
             num_frames = int(all_labels[i][2])
             if num_frames < frames:
-                diff = frames - num_frames
-
                 new_list = [j_ for j_ in range(num_frames)]
-                for j_ in range(diff):
-                    new_list.append(j_)
+                times = frames // num_frames + 1
+                new_list = np.tile(new_list, times)
+                new_list = new_list[:frames]
 
                 assert(len(new_list) == frames)
 
                 for j in range(frames):
                     frame_path = os.path.join(path, data_names[i][0], data_names[i][1], '%d.jpg' % new_list[j])
                     tmp = np.array(Image.open(frame_path))
-                    data[i, 0, j] = tmp
+                    tmp = tmp.transpose((2, 0, 1))
+                    data[i, :, j] = tmp
             else:
                 for j in range(frames):
                     frame_path = os.path.join(path, data_names[i][0], data_names[i][1], '%d.jpg' % j)
                     tmp = np.array(Image.open(frame_path))
-                    data[i, 0, j] = tmp
+                    tmp = tmp.transpose((2, 0, 1))
+                    data[i, :, j] = tmp
 
         return data, labels
 
@@ -783,7 +784,7 @@ def load_kthactions(project_variable, seed):
 
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
-        return load_omg_emotion(project_variable)
+        return load_omg_emotion(project_variable, seed)
     elif project_variable.dataset == 'mnist':
         return load_mnist(project_variable)
     elif project_variable.dataset == 'dummy':
