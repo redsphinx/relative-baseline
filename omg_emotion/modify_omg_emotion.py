@@ -132,5 +132,3 @@ def get_num_frames(plot_histogram=False):
             plt.title('%s frames distribution' % w)
             plt.savefig(save_path)
 
-
-

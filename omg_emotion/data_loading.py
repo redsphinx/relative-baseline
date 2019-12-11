@@ -331,23 +331,58 @@ def load_omg_emotion(project_variable, seed):
         return data, labels
 
     def load_random(which, dp, balanced, seed):
-        assert (dp % 10 == 0)
+        # balancing of classes is only implemented for categorical labels
+        assert(project_variable.label_type == 'categories')
+        if balanced:
+            num_categories = 7
+            assert (dp % num_categories == 0)
 
-        total_dp = {'train': 50000, 'val': 10000, 'test': 10000}
+        total_dp = {'train': 1955, 'val': 481, 'test': 1989}
 
-        path = os.path.join(PP.moving_mnist_png, which)
-        label_path = os.path.join(PP.moving_mnist_location, 'labels_%s.csv' % which)
-        labels = np.genfromtxt(label_path, dtype=int)
+        if which == 'train':
+            folder_name = 'Training'
+        elif which == 'val':
+            folder_name = 'Validation'
+        elif which == 'test':
+            folder_name = 'Testing'
+        else:
+            print('problem with variable which')
+            folder_name = None
+
+        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
+        label_path = os.path.join(PP.data_path, folder_name, 'easy_labels.txt')
+        all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)
+        data_names = all_labels[:, 0:2]
+
+        if project_variable.label_type == 'categories':
+            labels = all_labels[:, 5].astype(int)
+        elif project_variable.label_type == 'arousal':
+            labels = all_labels[:, 3].astype(int)
+        elif project_variable.label_type == 'valence':
+            labels = all_labels[:, 4].astype(int)
+        else:
+            print('label type not valid')
+            labels = None
 
         if balanced:
             chosen = []
-            for i in range(10):
+            for i in range(num_categories):
                 indices = np.arange(total_dp[which])[labels == i]
 
                 if seed is not None:
                     random.seed(seed)
 
-                choose_indices = random.sample(list(np.arange(len(indices))), dp // 10)
+                num_samples_per_category = dp // num_categories
+
+                if num_samples_per_category > len(indices):
+                    chosen.extend(indices)
+
+                    diff = num_samples_per_category - len(indices)
+                    assert(len(indices) + diff == num_samples_per_category)
+                    choose_indices = random.choices(list(np.arange(len(indices))), k=diff)
+                else:
+                    choose_indices = random.sample(list(np.arange(len(indices))), num_samples_per_category)
+
                 chosen.extend(indices[choose_indices])
         else:
             chosen = np.arange(total_dp[which])
@@ -363,14 +398,32 @@ def load_omg_emotion(project_variable, seed):
 
         num_points = len(labels)
 
-        data = np.zeros(shape=(num_points, 1, frames, 28, 28), dtype=tp)
+        data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
 
         for i in tqdm(range(num_points)):
-            choose = chosen[i]
-            for j in range(frames):
-                file_path = os.path.join(path, str(choose), '%d.png' % j)
-                tmp = np.array(Image.open(file_path))
-                data[i, 0, j] = tmp
+            choose = chosen[i] # this is the index of the line you need
+
+            num_frames = int(all_labels[choose][2])
+
+            if num_frames < frames:
+                new_list = [j_ for j_ in range(num_frames)]
+                times = frames // num_frames + 1
+                new_list = np.tile(new_list, times)
+                new_list = new_list[:frames]
+
+                assert (len(new_list) == frames)
+
+                for j in range(frames):
+                    frame_path = os.path.join(path, data_names[choose][0], data_names[choose][1], '%d.jpg' % new_list[j])
+                    tmp = np.array(Image.open(frame_path))
+                    tmp = tmp.transpose((2, 0, 1))
+                    data[i, :, j] = tmp
+            else:
+                for j in range(frames):
+                    frame_path = os.path.join(path, data_names[choose][0], data_names[choose][1], '%d.jpg' % j)
+                    tmp = np.array(Image.open(frame_path))
+                    tmp = tmp.transpose((2, 0, 1))
+                    data[i, :, j] = tmp
 
         return data, labels
 
@@ -398,7 +451,6 @@ def load_omg_emotion(project_variable, seed):
 
     return splits, all_data, all_labels
 
-    pass
 
 def prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div):
 
