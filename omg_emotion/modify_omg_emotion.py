@@ -5,9 +5,10 @@ import tqdm
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-import dlib # TODO: install this
+import dlib
 import cv2
 from PIL import Image
+from PIL.ImageStat import Stat
 
 
 def check_for_data_overlap():
@@ -86,28 +87,18 @@ def find_largest_face(face_rectangles):
         return face_rectangles[which_rectangle]
 
 
-def crop_face(path, side):
+def get_face_bb(path):
 
     frame = np.array(Image.open(path))
     detector = dlib.get_frontal_face_detector()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    face_rectangles = detector(gray, 2)
+    face_rectangles = detector(gray, 2) # top-left(x, y), bot-right(x, y)
     if len(face_rectangles) == 0:
         print('no face detected in the generated image')
         return None
         # return xp.zeros((image.shape), dtype=xp.uint8)
     largest_face_rectangle = find_largest_face(face_rectangles)
-
-    # TODO: crop face using the rectangle, make sure it's 96x96
-    new_frame = None
-
-    # if no face detected, copy face from previous frame
-    if new_frame is None:
-        print('no face detected')
-        return None
-    else:
-        new_frame = np.array(new_frame, dtype='uint8')
-        return new_frame
+    return largest_face_rectangle
 
 
 # use methods from chalearn
@@ -133,12 +124,103 @@ def crop_all_faces_in(which, b, e):
             os.makedirs(face_utterance_path)
 
         frames = os.listdir(og_utterance_path)
-        for f in range(len(frames)):
+        frame_names_int = [int(n.split('.')[0]) for n in frames]
+        frame_names_int, frames = zip(*sorted(zip(frame_names_int, frames)))
+
+        largest_rectangle = None # (w, h)
+        all_mid_points = [] # (x, y)
+
+        frames = frames[:10]
+
+        for f in tqdm.tqdm(range(len(frames))):
+
             pic_path = os.path.join(og_utterance_path, frames[f])
-            cropped_face = crop_face(pic_path, side) # assume it's array
-            # convert to image
-            # save image
+            face_bb = get_face_bb(pic_path)
+
+
+            if f == 0:
+                largest_rectangle = [0, 0]
+            else:
+                if face_bb is not None:
+                    if face_bb.width() > largest_rectangle[0]:
+                        largest_rectangle[0] = face_bb.width()
+                    if face_bb.height() > largest_rectangle[1]:
+                        largest_rectangle[1] = face_bb.height()
+
+            if face_bb is None and f == 0:
+                mid_point = [640, 360]
+
+            elif face_bb is None and f != 0:
+                mid_point = all_mid_points[-1]
+
+            elif face_bb is not None:
+                mid_point = face_bb.center()
+                mid_point = [mid_point.x, mid_point.y]
+            else:
+                mid_point = None
+
+            assert (mid_point is not None)
+            all_mid_points.append(mid_point)
+
+        # add 10 pixel border
+        largest_rectangle = list(np.array(largest_rectangle) + np.array([10, 10]))
+        # make sure it's a square
+        largest_side = largest_rectangle[0] if largest_rectangle[0] > largest_rectangle[1] else largest_rectangle[1]
+
+        for f in tqdm.tqdm(range(len(frames))):
+            pic_path = os.path.join(og_utterance_path, frames[f])
+            frame = np.array(Image.open(pic_path))
+
+            top = all_mid_points[f][1] - largest_side // 2
+            bot = all_mid_points[f][1] + largest_side // 2
+            left = all_mid_points[f][0] - largest_side // 2
+            right = all_mid_points[f][0] + largest_side // 2
+
+            if top < 0:
+                top = 0
+            if bot > frame.shape[0]:
+                bot = frame.shape[0]
+            if left < 0:
+                left = 0
+            if right > frame.shape[1]:
+                right = frame.shape[1]
+
+            cropped_face = frame[top:bot, left:right]
+            # cropped_face = frame[left:right, top:bot]
+            cropped_face = Image.fromarray(cropped_face, mode='RGB')
+
+            # resize
+            cropped_face_w = cropped_face.width
+            cropped_face_h = cropped_face.height
+
+            factor = min(cropped_face_w / side, cropped_face_h / side)
+            new_w = int(cropped_face_w / factor)
+            assert(new_w <= side)
+            new_h = int(cropped_face_h / factor)
+            assert (new_h <= side)
+
+            cropped_face = cropped_face.resize((new_w, new_h))
+
+            m1 = np.array(cropped_face)
+            mean_pixel = m1.mean(axis=0).mean(axis=0)
+
+            background = Image.new('RGB', (96, 96), (int(mean_pixel[0]), int(mean_pixel[1]), int(mean_pixel[2])))
+
+            offset = [0, 0]
+
+            if new_w != side:
+                offset[0] = (side - new_w) // 2
+            if new_h != side:
+                offset[1] = (side - new_h) // 2
+
+            background.paste(cropped_face, offset)
+
             save_path = os.path.join(face_utterance_path, frames[f])
+            background.save(save_path)
+
+
+
+crop_all_faces_in('Test', 0, 3)
 
 
 def make_easy_labels_from_annotations():
