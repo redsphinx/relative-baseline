@@ -108,7 +108,7 @@ def crop_all_faces_in(which, b, e):
     side = 96
     total_dp = {'Training': 1955, 'Validation': 481, 'Test': 1989}
     assert(which in ['Training', 'Validation', 'Test'])
-    assert(e < total_dp[which] and b > -1)
+    # assert(e < total_dp[which] and b > -1)
 
     og_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg)
     face_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg_face)
@@ -166,19 +166,26 @@ def crop_all_faces_in(which, b, e):
             assert (mid_point is not None)
             all_mid_points.append(mid_point)
 
-        # add 10 pixel border
-        largest_rectangle = list(np.array(largest_rectangle) + np.array([10, 10]))
+        # add 20 pixel border
+        largest_rectangle = list(np.array(largest_rectangle) + np.array([20, 20]))
         # make sure it's a square
         largest_side = largest_rectangle[0] if largest_rectangle[0] > largest_rectangle[1] else largest_rectangle[1]
+        all_mid_points = np.array(all_mid_points)
+        avg_mid_point = [int(np.mean(all_mid_points[:,0])), int(np.mean(all_mid_points[:,1]))]
 
         for f in range(len(frames)):
             pic_path = os.path.join(og_utterance_path, frames[f])
             frame = np.array(Image.open(pic_path))
 
-            top = all_mid_points[f][1] - largest_side // 2
-            bot = all_mid_points[f][1] + largest_side // 2
-            left = all_mid_points[f][0] - largest_side // 2
-            right = all_mid_points[f][0] + largest_side // 2
+            # top = all_mid_points[f][1] - largest_side // 2
+            # bot = all_mid_points[f][1] + largest_side // 2
+            # left = all_mid_points[f][0] - largest_side // 2
+            # right = all_mid_points[f][0] + largest_side // 2
+
+            top =  avg_mid_point[1] - largest_side // 2
+            bot =  avg_mid_point[1] + largest_side // 2
+            left = avg_mid_point[0] - largest_side // 2
+            right =avg_mid_point[0] + largest_side // 2
 
             if top < 0:
                 top = 0
@@ -289,7 +296,8 @@ def get_num_frames(plot_histogram=False):
             plt.savefig(save_path)
 
 
-crop_all_faces_in('Validation', 0, 100)
+# crop_all_faces_in('Validation', 0, 2)
+# crop_all_faces_in('Validation', 2, 100)
 # crop_all_faces_in('Validation', 100, 200)
 # crop_all_faces_in('Validation', 200, 300)
 # crop_all_faces_in('Validation', 300, 400)
@@ -315,4 +323,4 @@ crop_all_faces_in('Validation', 0, 100)
 # crop_all_faces_in('Test', 1200, 1400)
 # crop_all_faces_in('Test', 1400, 1600)
 # crop_all_faces_in('Test', 1600, 1800)
-# crop_all_faces_in('Test', 1800, 2000)
+crop_all_faces_in('Test', 1800, 2000)
