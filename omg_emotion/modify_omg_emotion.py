@@ -94,15 +94,17 @@ def get_face_bb(path):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     face_rectangles = detector(gray, 2) # top-left(x, y), bot-right(x, y)
     if len(face_rectangles) == 0:
-        print('no face detected in the generated image')
+        # print('no face detected in the generated image')
         return None
         # return xp.zeros((image.shape), dtype=xp.uint8)
     largest_face_rectangle = find_largest_face(face_rectangles)
     return largest_face_rectangle
 
 
-# use methods from chalearn
+# cropping first 100 frames
 def crop_all_faces_in(which, b, e):
+    print('%s, b=%d, e=%d\n' % (which, b, e))
+
     side = 96
     total_dp = {'Training': 1955, 'Validation': 481, 'Test': 1989}
     assert(which in ['Training', 'Validation', 'Test'])
@@ -119,6 +121,8 @@ def crop_all_faces_in(which, b, e):
     for i in range(len(data_names)):
         og_utterance_path = os.path.join(og_data_path, data_names[i][0], data_names[i][1])
 
+        print(og_utterance_path, i, len(data_names))
+
         face_utterance_path = os.path.join(face_data_path, data_names[i][0], data_names[i][1])
         if not os.path.exists(face_utterance_path):
             os.makedirs(face_utterance_path)
@@ -130,9 +134,9 @@ def crop_all_faces_in(which, b, e):
         largest_rectangle = None # (w, h)
         all_mid_points = [] # (x, y)
 
-        frames = frames[:10]
+        frames = frames[:100]
 
-        for f in tqdm.tqdm(range(len(frames))):
+        for f in range(len(frames)):
 
             pic_path = os.path.join(og_utterance_path, frames[f])
             face_bb = get_face_bb(pic_path)
@@ -167,7 +171,7 @@ def crop_all_faces_in(which, b, e):
         # make sure it's a square
         largest_side = largest_rectangle[0] if largest_rectangle[0] > largest_rectangle[1] else largest_rectangle[1]
 
-        for f in tqdm.tqdm(range(len(frames))):
+        for f in range(len(frames)):
             pic_path = os.path.join(og_utterance_path, frames[f])
             frame = np.array(Image.open(pic_path))
 
@@ -217,10 +221,6 @@ def crop_all_faces_in(which, b, e):
 
             save_path = os.path.join(face_utterance_path, frames[f])
             background.save(save_path)
-
-
-
-crop_all_faces_in('Test', 0, 3)
 
 
 def make_easy_labels_from_annotations():
@@ -289,3 +289,30 @@ def get_num_frames(plot_histogram=False):
             plt.savefig(save_path)
 
 
+crop_all_faces_in('Validation', 0, 100)
+# crop_all_faces_in('Validation', 100, 200)
+# crop_all_faces_in('Validation', 200, 300)
+# crop_all_faces_in('Validation', 300, 400)
+# crop_all_faces_in('Validation', 400, 500)
+#
+# crop_all_faces_in('Training', 0, 200)
+# crop_all_faces_in('Training', 200, 400)
+# crop_all_faces_in('Training', 400, 600)
+# crop_all_faces_in('Training', 600, 800)
+# crop_all_faces_in('Training', 800, 1000)
+# crop_all_faces_in('Training', 1000, 1200)
+# crop_all_faces_in('Training', 1200, 1400)
+# crop_all_faces_in('Training', 1400, 1600)
+# crop_all_faces_in('Training', 1600, 1800)
+# crop_all_faces_in('Training', 1800, 2000)
+#
+# crop_all_faces_in('Test', 0, 200)
+# crop_all_faces_in('Test', 200, 400)
+# crop_all_faces_in('Test', 400, 600)
+# crop_all_faces_in('Test', 600, 800)
+# crop_all_faces_in('Test', 800, 1000)
+# crop_all_faces_in('Test', 1000, 1200)
+# crop_all_faces_in('Test', 1200, 1400)
+# crop_all_faces_in('Test', 1400, 1600)
+# crop_all_faces_in('Test', 1600, 1800)
+# crop_all_faces_in('Test', 1800, 2000)
