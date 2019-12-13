@@ -101,6 +101,33 @@ def get_face_bb(path):
     return largest_face_rectangle
 
 
+def get_fail_point(which, b, e):
+    print('%s, b=%d, e=%d' % (which, b, e))
+
+    side = 96
+    total_dp = {'Training': 1955, 'Validation': 481, 'Test': 1989}
+    assert (which in ['Training', 'Validation', 'Test'])
+    # assert(e < total_dp[which] and b > -1)
+
+    og_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg)
+    face_data_path = os.path.join(PP.data_path, which, PP.omg_emotion_jpg_face)
+
+    # get list of all names
+    label_path = os.path.join(PP.data_path, which, 'easy_labels.txt')
+    all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)[b:e]
+    data_names = all_labels[:, 0:2]
+
+    for i in range(len(data_names)):
+        face_utterance_path = os.path.join(face_data_path, data_names[i][0], data_names[i][1])
+
+        # this is the check
+        if len(os.listdir(face_utterance_path)) == 0:
+            print('!!! fail point is %d\n' % i)
+            return i
+
+    print('no fail point\n')
+
+
 # cropping first 100 frames
 def crop_all_faces_in(which, b, e):
     print('%s, b=%d, e=%d\n' % (which, b, e))
@@ -119,6 +146,7 @@ def crop_all_faces_in(which, b, e):
     data_names = all_labels[:, 0:2]
 
     for i in range(len(data_names)):
+
         og_utterance_path = os.path.join(og_data_path, data_names[i][0], data_names[i][1])
 
         print(og_utterance_path, i, len(data_names))
@@ -204,7 +232,7 @@ def crop_all_faces_in(which, b, e):
             cropped_face_w = cropped_face.width
             cropped_face_h = cropped_face.height
 
-            factor = min(cropped_face_w / side, cropped_face_h / side)
+            factor = max(cropped_face_w / side, cropped_face_h / side)
             new_w = int(cropped_face_w / factor)
             assert(new_w <= side)
             new_h = int(cropped_face_h / factor)
@@ -296,31 +324,24 @@ def get_num_frames(plot_histogram=False):
             plt.savefig(save_path)
 
 
-# crop_all_faces_in('Validation', 0, 2)
-# crop_all_faces_in('Validation', 2, 100)
-# crop_all_faces_in('Validation', 100, 200)
-# crop_all_faces_in('Validation', 200, 300)
-# crop_all_faces_in('Validation', 300, 400)
-# crop_all_faces_in('Validation', 400, 500)
-#
-# crop_all_faces_in('Training', 0, 200)
-# crop_all_faces_in('Training', 200, 400)
-# crop_all_faces_in('Training', 400, 600)
-# crop_all_faces_in('Training', 600, 800)
-# crop_all_faces_in('Training', 800, 1000)
-# crop_all_faces_in('Training', 1000, 1200)
-# crop_all_faces_in('Training', 1200, 1400)
-# crop_all_faces_in('Training', 1400, 1600)
-# crop_all_faces_in('Training', 1600, 1800)
-# crop_all_faces_in('Training', 1800, 2000)
-#
-# crop_all_faces_in('Test', 0, 200)
-# crop_all_faces_in('Test', 200, 400)
-# crop_all_faces_in('Test', 400, 600)
-# crop_all_faces_in('Test', 600, 800)
-# crop_all_faces_in('Test', 800, 1000)
-# crop_all_faces_in('Test', 1000, 1200)
-# crop_all_faces_in('Test', 1200, 1400)
-# crop_all_faces_in('Test', 1400, 1600)
-# crop_all_faces_in('Test', 1600, 1800)
-crop_all_faces_in('Test', 1800, 2000)
+
+
+# crop_all_faces_in('Validation', 200+13, 300)
+
+# crop_all_faces_in('Training', 0+36, 200)
+# crop_all_faces_in('Training', 200+19, 400)
+# crop_all_faces_in('Training', 400+114, 600)
+# crop_all_faces_in('Training', 600+54, 800)
+# crop_all_faces_in('Training', 800+168, 1000)
+# crop_all_faces_in('Training', 1000+20, 1200)
+# crop_all_faces_in('Training', 1400+124, 1600)
+
+# crop_all_faces_in('Test', 0+62, 200)
+# crop_all_faces_in('Test', 400+83, 600)
+# crop_all_faces_in('Test', 600+122, 800)
+# crop_all_faces_in('Test', 800+31, 1000)
+# crop_all_faces_in('Test', 1000+95, 1200)
+# crop_all_faces_in('Test', 1200+29, 1400)
+# crop_all_faces_in('Test', 1400+107, 1600)
+# crop_all_faces_in('Test', 1600+111, 1800)
+# crop_all_faces_in('Test', 1800+172, 2000)
