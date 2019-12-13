@@ -126,7 +126,6 @@ def parallel_load(items, number_processes=20):
     return pool
 
 
-# TODO: switch full images with cropped face images
 def load_omg_emotion(project_variable, seed):
     splits = []
     all_labels = []
@@ -145,7 +144,7 @@ def load_omg_emotion(project_variable, seed):
             print('problem with variable which')
             folder_name = None
 
-        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
+        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg_face)
         label_path = os.path.join(PP.data_path, folder_name, 'easy_labels.txt')
         all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)[:dp]
         data_names = all_labels[:, 0:2]
@@ -162,8 +161,8 @@ def load_omg_emotion(project_variable, seed):
 
         num_points = len(labels)
 
-        # data = np.zeros(shape=(num_points, 1, frames, 96, 96), dtype=tp) # for cropped faces
-        data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
+        data = np.zeros(shape=(num_points, 1, frames, 96, 96), dtype=tp) # for cropped faces
+        # data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
 
         for i in tqdm(range(num_points)):
             num_frames = int(all_labels[i][2])
@@ -208,7 +207,7 @@ def load_omg_emotion(project_variable, seed):
             print('problem with variable which')
             folder_name = None
 
-        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg)
+        path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg_face)
         label_path = os.path.join(PP.data_path, folder_name, 'easy_labels.txt')
         all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)
         data_names = all_labels[:, 0:2]
@@ -257,7 +256,7 @@ def load_omg_emotion(project_variable, seed):
 
         num_points = len(labels)
 
-        data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
+        data = np.zeros(shape=(num_points, 3, frames, 96, 96), dtype=tp)
 
         for i in tqdm(range(num_points)):
             choose = chosen[i] # this is the index of the line you need

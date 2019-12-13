@@ -16,7 +16,6 @@ else:
 saving_data = os.path.join(server_path, 'omg_emotion/saving_data')
 data_path = os.path.join(server_path, 'omg_emotion')
 omg_emotion_jpg = 'jpg_full_body_background_1280_720'
-# TODO
 omg_emotion_jpg_face = 'jpg_face_cropped_96_96'
 models = os.path.join(saving_data, 'models')
 writer_path = os.path.join(saving_data, 'tensorboardX')
