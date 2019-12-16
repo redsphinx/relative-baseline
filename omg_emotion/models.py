@@ -388,6 +388,7 @@ class LeNet5_3d(torch.nn.Module):
         return x
 
 
+# works with data with 1 color channel
 class LeNet5_TTN3d(torch.nn.Module):
 # transformation_groups, k0_groups, transformations_per_filter
     def __init__(self, project_variable):
@@ -2117,3 +2118,84 @@ class C3D_1L(torch.nn.Module):
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         x = self.fc1(x)
         return x
+
+
+# works for data with more than one channel
+class LeNet5_TTN3d_xD(torch.nn.Module):
+    def __init__(self, input_shape, project_variable):
+        t, h, w = input_shape
+        kt, kh, kw = project_variable.k_shape
+
+        super(LeNet5_TTN3d_xD, self).__init__()
+        self.conv1 = ConvTTN3d(in_channels=project_variable.num_in_channels, out_channels=project_variable.num_out_channels[0], kernel_size=5,
+                               padding=2,
+                               project_variable=project_variable,
+                               transformation_groups=project_variable.transformation_groups[0],
+                               k0_groups=project_variable.k0_groups[0],
+                               transformations_per_filter=project_variable.transformations_per_filter)
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+
+        t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+
+
+        self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0],
+                               out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
+                               project_variable=project_variable,
+                               transformation_groups=project_variable.transformation_groups[1],
+                               k0_groups=project_variable.k0_groups[1],
+                               transformations_per_filter=project_variable.transformations_per_filter)
+
+        t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+
+        t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
+
+        if project_variable.dataset == 'kth_actions':
+            _fc_in = [73, 28, 38]
+        elif project_variable.dataset == 'omg_emotion':
+            in_features = 100672
+        else:
+            _fc_in = [5, 5, 5]
+
+        in_features_tmp = t * h * w * project_variable.num_out_channels[1]
+        self.fc1 = torch.nn.Linear(in_features, 120)
+        # self.fc1 = torch.nn.Linear(project_variable.num_out_channels[1] * _fc_in[0] * _fc_in[1] * _fc_in[2],
+        #                            120)
+        self.fc2 = torch.nn.Linear(120, 84)
+        self.fc3 = torch.nn.Linear(84, project_variable.label_size)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.max_pool_1(x)
+        x = self.conv2(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.max_pool_2(x)
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        # _shape = x.shape
+        # x = x.view(-1, _shape[1] * 5 * 5 * 5)
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc3(x)
+        return x
+
+# frames = 15
+# torch.Size([14, 3, 10, 96, 96])
+# torch.Size([14, 6, 10, 96, 96])
+# torch.Size([14, 6, 5, 48, 48])
+# torch.Size([14, 16, 1, 44, 44])
+
+# frames = 20
+# torch.Size([14, 3, 20, 96, 96])
+# torch.Size([14, 6, 20, 96, 96])
+# torch.Size([14, 6, 10, 48, 48])
+# torch.Size([14, 16, 6, 44, 44])
+# torch.Size([14, 16, 3, 22, 22])
+#

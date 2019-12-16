@@ -44,3 +44,4 @@ kth_metadata = '/huge/gabras/kth_actions/metadata.txt'
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
 # todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py
+

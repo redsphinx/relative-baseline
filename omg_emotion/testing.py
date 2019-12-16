@@ -25,7 +25,7 @@ def run(project_variable, all_data, my_model, device):
         with torch.no_grad():
             # my_optimizer.zero_grad()
             # predictions = my_model.forward(data)
-            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10]:
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11]:
                 predictions = my_model(data, device)
             else:
                 predictions = my_model(data)

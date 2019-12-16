@@ -127,6 +127,9 @@ def get_fail_point(which, b, e):
 
     print('no fail point\n')
 
+get_fail_point('Training', 0, 2000)
+get_fail_point('Validation', 0, 500)
+get_fail_point('Test', 0, 2000)
 
 # cropping first 100 frames
 def crop_all_faces_in(which, b, e):

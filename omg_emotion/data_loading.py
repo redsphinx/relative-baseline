@@ -139,7 +139,7 @@ def load_omg_emotion(project_variable, seed):
         elif which == 'val':
             folder_name = 'Validation'
         elif which == 'test':
-            folder_name = 'Testing'
+            folder_name = 'Test'
         else:
             print('problem with variable which')
             folder_name = None
@@ -161,7 +161,7 @@ def load_omg_emotion(project_variable, seed):
 
         num_points = len(labels)
 
-        data = np.zeros(shape=(num_points, 1, frames, 96, 96), dtype=tp) # for cropped faces
+        data = np.zeros(shape=(num_points, 3, frames, 96, 96), dtype=tp) # for cropped faces
         # data = np.zeros(shape=(num_points, 3, frames, 720, 1280), dtype=tp)
 
         for i in tqdm(range(num_points)):

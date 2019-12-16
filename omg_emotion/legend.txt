@@ -16,3 +16,4 @@ project_variable.model_number
 8   C3DTTN_1L
 9   C3D_1L
 10  standalone LeNet-5 3DTTN version
+11  lenet5 3dconvTTN xD

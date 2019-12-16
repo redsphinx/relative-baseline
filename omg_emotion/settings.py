@@ -88,6 +88,9 @@ class ProjectVariable(object):
         # number of out_channels in the convolution layers of CNNs
         self._num_out_channels = [6, 16]
 
+        # number of color channels in the input
+        self._num_in_channels = 3
+
         # int, seed for shuffling
         self._seed = 6
 
@@ -433,6 +436,14 @@ class ProjectVariable(object):
     @num_out_channels.setter
     def num_out_channels(self, value):
         self._num_out_channels = value
+
+    @property
+    def num_in_channels(self):
+        return self._num_in_channels
+
+    @num_in_channels.setter
+    def num_in_channels(self, value):
+        self._num_in_channels = value
 
     @property
     def seed(self):
