@@ -2157,7 +2157,10 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         if project_variable.dataset == 'kth_actions':
             _fc_in = [73, 28, 38]
         elif project_variable.dataset == 'omg_emotion':
-            in_features = 100672
+            if project_variable.num_out_channels == [6, 16]:
+                in_features = 100672
+            elif project_variable.num_out_channels == [12, 22]:
+                in_features = 138424
         else:
             _fc_in = [5, 5, 5]
 

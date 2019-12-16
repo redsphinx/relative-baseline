@@ -7,9 +7,10 @@ def e1_C3D_omgemo():
     project_variable.end_epoch = 100
     project_variable.dataset = 'omg_emotion'
     project_variable.device = 2
-    project_variable.loss_function = 'sgd'
-    project_variable.learning_rate = 5e-8
-    project_variable.use_adaptive_lr = True
+    project_variable.loss_function = 'adam'
+    project_variable.learning_rate = 5e-5
+    # project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [12, 22]
 
     project_variable.data_points = [50*7, 3*7, 5*7]
     project_variable.label_size = 7
