@@ -147,6 +147,8 @@ def get_model(project_variable):
         model = M.LeNet5_TTN3d_xD([project_variable.load_num_frames, 96, 96], project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
+    elif project_variable.model_number == 12:
+        model = M.LeNet5_3d_xD(project_variable)
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None

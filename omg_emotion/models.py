@@ -2189,16 +2189,66 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         x = self.fc3(x)
         return x
 
-# frames = 15
-# torch.Size([14, 3, 10, 96, 96])
-# torch.Size([14, 6, 10, 96, 96])
-# torch.Size([14, 6, 5, 48, 48])
-# torch.Size([14, 16, 1, 44, 44])
 
-# frames = 20
-# torch.Size([14, 3, 20, 96, 96])
-# torch.Size([14, 6, 20, 96, 96])
-# torch.Size([14, 6, 10, 48, 48])
-# torch.Size([14, 16, 6, 44, 44])
-# torch.Size([14, 16, 3, 22, 22])
-#
+class LeNet5_3d_xD(torch.nn.Module):
+
+    def __init__(self, project_variable):
+        super(LeNet5_3d_xD, self).__init__()
+        self.conv1 = torch.nn.Conv3d(in_channels=project_variable.num_in_channels, out_channels=project_variable.num_out_channels[0],
+                                     kernel_size=project_variable.k_shape, stride=1, padding=2, bias=True)
+        if project_variable.k0_init == 'normal':
+            self.conv1.weight = torch.nn.init.normal_(self.conv1.weight)
+            self.conv1.bias = torch.nn.init.normal_(self.conv1.bias)
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+
+
+        self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0],
+                                     out_channels=project_variable.num_out_channels[1],
+                                     kernel_size=project_variable.k_shape, stride=1, padding=0, bias=True)
+        if project_variable.k0_init == 'normal':
+            self.conv2.weight = torch.nn.init.normal_(self.conv2.weight)
+            self.conv2.bias = torch.nn.init.normal_(self.conv2.bias)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+
+
+        if project_variable.dataset == 'kth_actions':
+            _fc_in = [73, 28, 38]
+        elif project_variable.dataset == 'omg_emotions':
+            if project_variable.num_out_channels == [6, 16]:
+                in_features = 100672
+            elif project_variable.num_out_channels == [12, 22]:
+                in_features = 138424
+
+        self.fc1 = torch.nn.Linear(in_features,
+                                   120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)
+        self.fc2 = torch.nn.Linear(120, 84)  # convert matrix with 120 features to a matrix of 84 features (columns)
+        self.fc3 = torch.nn.Linear(84,
+                                   project_variable.label_size)  # convert matrix with 84 features to a matrix of 10 features (columns)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn1(x)
+        except AttributeError:
+            pass
+        x = self.max_pool_1(x)
+
+        x = self.conv2(x)
+        x = torch.nn.functional.relu(x)
+        try:
+            x = self.bn2(x)
+        except AttributeError:
+            pass
+        x = self.max_pool_2(x)
+
+        # first flatten 'max_pool_2_out' to contain 16*5*5 columns
+        # read through https://stackoverflow.com/a/42482819/7551231
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = torch.nn.functional.relu(self.fc1(x))
+        x = torch.nn.functional.relu(self.fc2(x))
+        x = self.fc3(x)
+
+        return x
