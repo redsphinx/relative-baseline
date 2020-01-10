@@ -337,9 +337,10 @@ def write_settings(project_variable):
             '',  # best run                                                 # H
             project_variable.learning_rate,
             str(project_variable.num_out_channels),
-            str(project_variable.use_adaptive_lr)
+            str(project_variable.use_adaptive_lr),
+            project_variable.model_number
         ]]
-        end_letter = 'K'
+        end_letter = 'L'
     else:
         print('Error: sheet_number not supported')
         return None
