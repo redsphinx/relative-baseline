@@ -169,6 +169,12 @@ def experiment_exists(experiment_number, model_number):
 # experiment_runs_statistics(22, 5)
 
 
+def get_attributes(project_variable):
+    for i in dir(project_variable):
+        if i[0] != "_":
+            print(i, project_variable.__getattribute__(i))
+
+
 # ================================================================
 # !! NOTE: be careful. this method DELETES stuff. use with care !!
 # ================================================================

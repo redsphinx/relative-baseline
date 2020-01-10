@@ -2189,6 +2189,9 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         x = self.fc3(x)
         return x
 
+def isnan(x, name):
+    if True in np.ravel(np.array(torch.isnan(x).cpu())) or True in np.ravel(np.array(torch.isinf(x).cpu())):
+        print('NaN or Inf in %s' % name)
 
 class LeNet5_3d_xD(torch.nn.Module):
 
@@ -2214,7 +2217,7 @@ class LeNet5_3d_xD(torch.nn.Module):
 
         if project_variable.dataset == 'kth_actions':
             _fc_in = [73, 28, 38]
-        elif project_variable.dataset == 'omg_emotions':
+        elif project_variable.dataset == 'omg_emotion':
             if project_variable.num_out_channels == [6, 16]:
                 in_features = 100672
             elif project_variable.num_out_channels == [12, 22]:
@@ -2228,27 +2231,28 @@ class LeNet5_3d_xD(torch.nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
+        # if sum(np.isnan(x)) + sum(np.inf(x)) > 0:
+        #     print('NaN or inf in conv1')
+        # maybe shouldnt check here, too many input
+
         x = torch.nn.functional.relu(x)
-        try:
-            x = self.bn1(x)
-        except AttributeError:
-            pass
         x = self.max_pool_1(x)
+        isnan(x, 'max_pool_1')
 
         x = self.conv2(x)
-        x = torch.nn.functional.relu(x)
-        try:
-            x = self.bn2(x)
-        except AttributeError:
-            pass
+        isnan(x, 'conv2')
         x = self.max_pool_2(x)
+        isnan(x, 'max_pool_2')
 
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
         # read through https://stackoverflow.com/a/42482819/7551231
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         x = torch.nn.functional.relu(self.fc1(x))
+        isnan(x, 'fc1')
         x = torch.nn.functional.relu(self.fc2(x))
+        isnan(x, 'fc2')
         x = self.fc3(x)
+        isnan(x, 'fc3')
 
         return x
