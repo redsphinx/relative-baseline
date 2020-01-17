@@ -29,7 +29,7 @@ affectnet_jpgs = os.path.join(affectnet_base, 'all_images')
 affectnet_labels_train = os.path.join(affectnet_base, 'training.csv')
 affectnet_labels_val = os.path.join(affectnet_base, 'validation.csv')
 
-# MNIST stuff on lovalace
+# MNIST stuff on lovelace
 mnist_location = '/home/gabras/deployed/mnist'
 dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
 moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
@@ -40,6 +40,13 @@ kth_location = '/huge/gabras/kth_actions/avi'
 kth_png = '/huge/gabras/kth_actions/png'
 kth_png_60_60 = '/huge/gabras/kth_actions/png6060'
 kth_metadata = '/huge/gabras/kth_actions/metadata.txt'
+
+# Marcel gestures
+marcel_gestures_location = '/huge/gabras/marcel_gestures'
+
+# DHG
+dhg_location = '/huge/gabras/DHG'
+
 
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.

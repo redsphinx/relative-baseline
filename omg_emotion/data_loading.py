@@ -674,6 +674,23 @@ def load_kthactions(project_variable, seed):
     return splits, all_data, all_labels
 
 
+def load_dhg(project_variable, seed):
+    tp = np.float32
+    labels_dict = {0:'Clic', 1:'Rotate', 2:'StopGraspOK', 3:'No'}
+    splits = []
+    all_labels = []
+    all_data = []
+    FRAMES = project_variable.load_num_frames
+
+
+
+
+
+
+
+
+    return splits, all_data, all_labels
+
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable, seed)
