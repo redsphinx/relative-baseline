@@ -46,6 +46,7 @@ marcel_gestures_location = '/huge/gabras/marcel_gestures'
 
 # DHG
 dhg_location = '/huge/gabras/DHG'
+dhg_hand_only_28_28 = '/huge/gabras/DHG_hand_only_28_28'
 
 
 
