@@ -676,7 +676,6 @@ def load_kthactions(project_variable, seed):
 
 def load_dhg(project_variable, seed):
     tp = np.float32
-    labels_dict = {0:'Clic', 1:'Rotate', 2:'StopGraspOK', 3:'No'}
     splits = []
     all_labels = []
     all_data = []

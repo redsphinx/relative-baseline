@@ -1,6 +1,9 @@
 import numpy as np
 import os
 from PIL import Image, ImageDraw
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 
 from relative_baseline.omg_emotion import project_paths as PP
 
@@ -110,8 +113,43 @@ def extract_hand_from_1_sequence(gesture, finger, subject, essai):
         img.save(img_path, 'PNG')
 
 
-for i in range(1, 15):
-    for j in range(1, 3):
-        for k in range(1, 21):
-            for l in range(1, 6):
-                extract_hand_from_1_sequence(i, j, k, l)
+def extract_whole_DHG():
+    for i in range(1, 15):
+        for j in range(1, 3):
+            for k in range(1, 21):
+                for l in range(1, 6):
+                    extract_hand_from_1_sequence(i, j, k, l)
+
+
+# split in train, val, test
+def generate_labels():
+    # TODO
+    pass
+
+# statistics
+def get_statistics():
+    # avg num frames per sequence
+    base_path = PP.dhg_hand_only_28_28
+    len_seq = []
+
+    for i in range(1, 15):
+        for j in range(1, 3):
+            for k in range(1, 21):
+                for l in range(1, 6):
+                    path = os.path.join(base_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
+                    len_seq.append(len(os.listdir(path)))
+    print('min num frames in seq:   %d\n'
+          'max num frames in seq:   %d\n'
+          'avg num frames in seq:   %d\n'
+          % (min(len_seq), max(len_seq), int(np.mean(len_seq))))
+
+    # plot histogram num frames
+    fig = plt.figure()
+    save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images'
+    save_path = os.path.join(save_path, 'frames_distribution.jpg')
+    plt.hist(len_seq, bins=20)
+    plt.title('frames distribution')
+    plt.savefig(save_path)
+
+
+# get_statistics()
