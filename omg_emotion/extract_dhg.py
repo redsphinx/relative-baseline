@@ -146,6 +146,48 @@ def generate_labels():
                             my_file.write(line)
 
 
+def create_difference_frames_graph(a_path, name):
+    all_names = os.listdir(a_path)
+    all_avg_diff = []
+    x = [i for i in range(1, len(all_names))]
+
+    for i in range(1, len(all_names)):
+        current_img_path = os.path.join(a_path, all_names[i])
+        current_img = Image.open(current_img_path)
+        current_img = np.array(current_img.convert('L'))
+
+        prev_img_path = os.path.join(a_path, all_names[i-1])
+        prev_img = Image.open(prev_img_path)
+        prev_img = np.array(prev_img.convert('L'))
+
+        diff = current_img - prev_img
+        all_avg_diff.append(np.mean(diff))
+
+    all_avg_diff = np.array(all_avg_diff)
+    all_avg_diff = all_avg_diff - np.mean(all_avg_diff)
+
+
+    new_avg_diff = []
+
+    for i in range(len(all_avg_diff)):
+        if all_avg_diff[i] > 0:
+            new_avg_diff.append(all_avg_diff[i])
+        else:
+            new_avg_diff.append(0)
+
+    title = 'difference per frame %s' % name
+    save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images'
+    save_path = os.path.join(save_path, 'diff_frame_%s.png' % name)
+
+
+    fig = plt.figure()
+    # plt.plot(x, all_avg_diff)
+    plt.plot(x, new_avg_diff)
+    plt.title(title)
+    plt.xlabel('frame_num')
+    plt.ylabel('avg diff per pixel')
+    plt.savefig(save_path)
+
 
 # statistics
 def get_statistics():
@@ -155,12 +197,21 @@ def get_statistics():
     short = 0
     limit = 50
 
+
     for i in range(1, 15):
         for j in range(1, 3):
             for k in range(1, 21):
                 for l in range(1, 6):
                     path = os.path.join(base_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
                     len_seq.append(len(os.listdir(path)))
+
+                    if len_seq[-1] == 26:
+                        print('short', [i, j, k, l])
+                        create_difference_frames_graph(path, '%d_%d_%d_%d' % (i, j, k, l))
+
+                    if len_seq[-1] == 280:
+                        print('long', [i, j, k, l])
+                        create_difference_frames_graph(path, '%d_%d_%d_%d' % (i, j, k, l))
 
                     if len(os.listdir(path)) < limit:
                         short += 1
@@ -173,7 +224,6 @@ def get_statistics():
           % (min(len_seq), max(len_seq), int(np.mean(len_seq)), limit, short))
 
 
-
     # plot histogram num frames
     # fig = plt.figure()
     # save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images'
@@ -182,5 +232,14 @@ def get_statistics():
     # plt.title('frames distribution')
     # plt.savefig(save_path)
 
+"""
+min num frames in seq:   26
+max num frames in seq:   280
+avg num frames in seq:   80
+frames shorter than 50:  222
+"""
 
-# get_statistics()
+
+get_statistics()
+
+# def create_fixed_sequence():
