@@ -123,14 +123,37 @@ def extract_whole_DHG():
 
 # split in train, val, test
 def generate_labels():
-    # TODO
-    pass
+    splits = ['train', 'val', 'test']
+
+    for s in range(3):
+
+        base_path = PP.dhg_hand_only_28_28
+        label_txt_path = os.path.join(base_path, 'labels_%s.txt' % splits[s])
+
+        if s == 0:
+            kb, ke = 1, 15 # train
+        elif s ==1:
+            kb, ke = 15, 17 # val
+        else:
+            kb, ke = 17, 21 # test
+
+        with open(label_txt_path, 'w') as my_file:
+            for i in range(1, 15):
+                for j in range(1, 3):
+                    for k in range(kb, ke):
+                        for l in range(1, 6):
+                            line = '%d,%d,%d,%d\n' % (i, j, k, l)
+                            my_file.write(line)
+
+
 
 # statistics
 def get_statistics():
     # avg num frames per sequence
     base_path = PP.dhg_hand_only_28_28
     len_seq = []
+    short = 0
+    limit = 50
 
     for i in range(1, 15):
         for j in range(1, 3):
@@ -138,18 +161,26 @@ def get_statistics():
                 for l in range(1, 6):
                     path = os.path.join(base_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
                     len_seq.append(len(os.listdir(path)))
+
+                    if len(os.listdir(path)) < limit:
+                        short += 1
+
+
     print('min num frames in seq:   %d\n'
           'max num frames in seq:   %d\n'
           'avg num frames in seq:   %d\n'
-          % (min(len_seq), max(len_seq), int(np.mean(len_seq))))
+          'frames shorter than %d:  %d'
+          % (min(len_seq), max(len_seq), int(np.mean(len_seq)), limit, short))
+
+
 
     # plot histogram num frames
-    fig = plt.figure()
-    save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images'
-    save_path = os.path.join(save_path, 'frames_distribution.jpg')
-    plt.hist(len_seq, bins=20)
-    plt.title('frames distribution')
-    plt.savefig(save_path)
+    # fig = plt.figure()
+    # save_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images'
+    # save_path = os.path.join(save_path, 'frames_distribution.jpg')
+    # plt.hist(len_seq, bins=20)
+    # plt.title('frames distribution')
+    # plt.savefig(save_path)
 
 
 # get_statistics()
