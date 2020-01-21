@@ -329,7 +329,7 @@ def prepare_data(project_variable, full_data, full_labels, device, ts, steps, ni
         data = full_data[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
         labels = full_labels[ts * project_variable.batch_size:(ts + 1) * project_variable.batch_size]
 
-    if project_variable.dataset in ['omg_emotion', 'dummy']:
+    if project_variable.dataset in ['dhg', 'omg_emotion', 'dummy']:
         if type(data) == np.ndarray:
             data = torch.from_numpy(data)
 
@@ -681,6 +681,109 @@ def load_dhg(project_variable, seed):
     all_data = []
     FRAMES = project_variable.load_num_frames
 
+
+    def load(which, dp):
+
+        label_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'labels_%s.txt' % which)
+        labels = np.genfromtxt(label_path, dtype=int)[:dp]
+        # TODO: could be that we need startindex 0
+
+        data = np.zeros(shape=(dp, 1, FRAMES, 28, 28), dtype=tp)
+
+        for i in tqdm(range(dp)):
+            for j in range(FRAMES):
+
+                img_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'gesture_%d/finger_%d/subject_%s/essai_%d/depth_%d.png'
+                                        % (labels[i][0], labels[i][1], labels[i][2], labels[i][3], j+1))
+                tmp = Image.open(img_path)
+                tmp = np.array(tmp.convert('L'))
+                data[i, 0, j] = tmp
+
+        labels = labels[:, 0]
+
+        return data, labels
+
+    def load_random(which, dp, balanced, seed):
+        num_categories = 14
+        total_dp = {'train': 1960, 'val': 280, 'test': 560}
+        if dp != total_dp[which]:
+            assert(dp % 14 == 0)
+
+        label_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'labels_%s.txt' % which)
+        all_labels = np.genfromtxt(label_path, dtype=int)[:dp]
+        labels = all_labels[:, 0]
+
+        if balanced:
+            chosen = []
+            for i in range(num_categories):
+                indices = np.arange(total_dp[which])[labels == i+1]
+
+                if seed is not None:
+                    random.seed(seed)
+
+                num_samples_per_category = dp // num_categories
+
+                if num_samples_per_category > len(indices):
+                    chosen.extend(indices)
+
+                    diff = num_samples_per_category - len(indices)
+                    assert(len(indices) + diff == num_samples_per_category)
+                    choose_indices = random.choices(list(np.arange(len(indices))), k=diff)
+                else:
+                    choose_indices = random.sample(list(np.arange(len(indices))), num_samples_per_category)
+
+                chosen.extend(indices[choose_indices])
+        else:
+            chosen = np.arange(total_dp[which])
+
+            if seed is not None:
+                random.seed(seed)
+
+            random.shuffle(chosen)
+            chosen = chosen[:dp]
+
+        chosen.sort()
+        labels = labels[chosen]
+        all_labels = all_labels[chosen]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(num_points, 1, FRAMES, 28, 28), dtype=tp)
+
+        for i in tqdm(range(num_points)):
+            for j in range(FRAMES):
+                img_path = os.path.join(PP.dhg_hand_only_28_28_50_frames,
+                                        'gesture_%d/finger_%d/subject_%s/essai_%d/depth_%d.png'
+                                        % (all_labels[i][0], all_labels[i][1], all_labels[i][2], all_labels[i][3], j + 1))
+                tmp = Image.open(img_path)
+                tmp = np.array(tmp.convert('L'))
+                tmp = tmp.transpose((2, 0, 1))
+                data[i, :, j] = tmp
+
+        return data, labels
+
+
+    if project_variable.train:
+        if project_variable.randomize_training_data:
+            data, some_labels = load_random('train', project_variable.data_points[0],
+                                            project_variable.balance_training_data, seed)
+        else:
+            data, some_labels = load('train', project_variable.data_points[0])
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.val:
+        data, some_labels = load('val', project_variable.data_points[1])
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.test:
+        data, some_labels = load('test', project_variable.data_points[2])
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(some_labels)
 
 
 
