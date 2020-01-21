@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import shutil
+import random
 
 from relative_baseline.omg_emotion import project_paths as PP
 
@@ -245,10 +246,7 @@ frames shorter than 50:  222
 
 def create_fixed_sequence(frames=50):
     base_path = PP.dhg_hand_only_28_28
-
     save_path = PP.dhg_hand_only_28_28_50_frames
-
-
 
     for i in range(1, 15):
         for j in range(1, 3):
@@ -258,24 +256,52 @@ def create_fixed_sequence(frames=50):
                     num_frames = len(os.listdir(path))
 
                     if num_frames < frames:
-                        pass
-                    elif num_frames > frames:
-                        frames_to_copy = [n for n in range(1, num_frames, num_frames//frames+1)]
+                        missing_frames = frames - num_frames
+                        # duplicate first frame and last frame
+                        dupl_1 = [1 for n in range(missing_frames//2)]
+                        dupl_2 = [num_frames for n in range(missing_frames-missing_frames//2)]
+                        dupl_mid = [n+1 for n in range(num_frames)]
+                        frames_to_copy = dupl_1 + dupl_mid + dupl_2
 
                         if len(frames_to_copy) != frames:
                             print('num frames not good')
 
-                        # copy correct frames to new folder
-                        new_path = os.path.join(save_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
-                        if not os.path.exists(new_path):
-                            os.makedirs(new_path)
+                    elif num_frames > frames:
+                        frames_to_remove = [n for n in range(1, num_frames, num_frames//(num_frames-frames))]
+                        # frames_to_copy = [n for n in range(1, num_frames, num_frames//frames+1)]
+                        leftover = num_frames - len(frames_to_remove)
 
-                        for n in range(len(frames_to_copy)):
-                            src_path = os.path.join(path, 'depth_%d.png' % frames_to_copy[n])
-                            dest_path = os.path.join(new_path, 'depth_%d.png' % frames_to_copy[n])
+                        if leftover < frames:
+                            random_indices = random.sample(frames_to_remove, k=(frames-leftover))
+                            for n in random_indices:
+                                frames_to_remove.remove(n)
 
-                            shutil.copy(src_path, dest_path)
+                            assert(num_frames - len(frames_to_remove) == frames)
+
+                        elif leftover > frames:
+                            pass
+
+                        frames_to_copy = [n+1 for n in range(num_frames)]
+                        for n in frames_to_remove:
+                            frames_to_copy.remove(n)
+
+                        if len(frames_to_copy) != frames:
+                            print('num frames not good')
 
                     else:
-                        print('nothing to shorten, copy as is')
+                        frames_to_copy = [n + 1 for n in range(num_frames)]
 
+                    # copy correct frames to new folder
+                    new_path = os.path.join(save_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
+                    if not os.path.exists(new_path):
+                        os.makedirs(new_path)
+
+                    for n in range(len(frames_to_copy)):
+                        src_path = os.path.join(path, 'depth_%d.png' % frames_to_copy[n])
+                        dest_path = os.path.join(new_path, 'depth_%d.png' % (n+1))
+
+                        shutil.copy(src_path, dest_path)
+
+
+
+# create_fixed_sequence()
