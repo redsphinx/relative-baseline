@@ -64,9 +64,127 @@ def e8_3D_dhg():
     main_file.run(project_variable)
 
 
+# -----------------------------------------------------------------------------------------------
+
+def e9_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 9
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 5e-7
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e10_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 10
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 1e-8
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e11_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 11
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 5e-8
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+# -----------------------------------------------------------------------------------------------
+
+def e12_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 12
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 5e-7
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e13_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 13
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 1e-8
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e14_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 14
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 5e-8
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+
+def e15_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 15
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 1e-7
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+
+def e16_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 16
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.optimizer = 'sgd'
+    project_variable.learning_rate = 1e-7
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
 # e6_3D_dhg()
 # e7_3D_dhg()
-e8_3D_dhg()
+# e8_3D_dhg()
+# e9_3D_dhg()
+# e10_3D_dhg()
+# e11_3D_dhg()
+# e12_3D_dhg()
+# e13_3D_dhg()
+# e14_3D_dhg()
+# e15_3D_dhg()
+e16_3D_dhg()
