@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+import shutil
 
 from relative_baseline.omg_emotion import project_paths as PP
 
@@ -240,6 +241,41 @@ frames shorter than 50:  222
 """
 
 
-get_statistics()
+# get_statistics()
 
-# def create_fixed_sequence():
+def create_fixed_sequence(frames=50):
+    base_path = PP.dhg_hand_only_28_28
+
+    save_path = PP.dhg_hand_only_28_28_50_frames
+
+
+
+    for i in range(1, 15):
+        for j in range(1, 3):
+            for k in range(1, 21):
+                for l in range(1, 6):
+                    path = os.path.join(base_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
+                    num_frames = len(os.listdir(path))
+
+                    if num_frames < frames:
+                        pass
+                    elif num_frames > frames:
+                        frames_to_copy = [n for n in range(1, num_frames, num_frames//frames+1)]
+
+                        if len(frames_to_copy) != frames:
+                            print('num frames not good')
+
+                        # copy correct frames to new folder
+                        new_path = os.path.join(save_path, 'gesture_%d/finger_%d/subject_%s/essai_%d' % (i, j, k, l))
+                        if not os.path.exists(new_path):
+                            os.makedirs(new_path)
+
+                        for n in range(len(frames_to_copy)):
+                            src_path = os.path.join(path, 'depth_%d.png' % frames_to_copy[n])
+                            dest_path = os.path.join(new_path, 'depth_%d.png' % frames_to_copy[n])
+
+                            shutil.copy(src_path, dest_path)
+
+                    else:
+                        print('nothing to shorten, copy as is')
+
