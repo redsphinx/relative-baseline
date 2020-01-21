@@ -2214,6 +2214,7 @@ class LeNet5_3d_xD(torch.nn.Module):
 
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
 
+        in_features = None
 
         if project_variable.dataset == 'kth_actions':
             _fc_in = [73, 28, 38]
@@ -2222,6 +2223,9 @@ class LeNet5_3d_xD(torch.nn.Module):
                 in_features = 100672
             elif project_variable.num_out_channels == [12, 22]:
                 in_features = 138424
+        elif project_variable.dataset == 'dhg':
+            if project_variable.num_out_channels == [6, 16]:
+                in_features = 4000
 
         self.fc1 = torch.nn.Linear(in_features,
                                    120)  # convert matrix with 16*5*5 (= 400) features to a matrix of 120 features (columns)

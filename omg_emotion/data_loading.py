@@ -209,15 +209,15 @@ def load_omg_emotion(project_variable, seed):
 
         path = os.path.join(PP.data_path, folder_name, PP.omg_emotion_jpg_face)
         label_path = os.path.join(PP.data_path, folder_name, 'easy_labels.txt')
-        all_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)
-        data_names = all_labels[:, 0:2]
+        full_labels = np.genfromtxt(label_path, delimiter=',', dtype=str)
+        data_names = full_labels[:, 0:2]
 
         if project_variable.label_type == 'categories':
-            labels = all_labels[:, 5].astype(int)
+            labels = full_labels[:, 5].astype(int)
         elif project_variable.label_type == 'arousal':
-            labels = all_labels[:, 3].astype(int)
+            labels = full_labels[:, 3].astype(int)
         elif project_variable.label_type == 'valence':
-            labels = all_labels[:, 4].astype(int)
+            labels = full_labels[:, 4].astype(int)
         else:
             print('label type not valid')
             labels = None
@@ -261,7 +261,7 @@ def load_omg_emotion(project_variable, seed):
         for i in tqdm(range(num_points)):
             choose = chosen[i] # this is the index of the line you need
 
-            num_frames = int(all_labels[choose][2])
+            num_frames = int(full_labels[choose][2])
 
             if num_frames < frames:
                 new_list = [j_ for j_ in range(num_frames)]
@@ -685,7 +685,7 @@ def load_dhg(project_variable, seed):
     def load(which, dp):
 
         label_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'labels_%s.txt' % which)
-        labels = np.genfromtxt(label_path, dtype=int)[:dp]
+        labels = np.genfromtxt(label_path, delimiter=',', dtype=int)[:dp]
         # TODO: could be that we need startindex 0
 
         data = np.zeros(shape=(dp, 1, FRAMES, 28, 28), dtype=tp)
@@ -700,6 +700,7 @@ def load_dhg(project_variable, seed):
                 data[i, 0, j] = tmp
 
         labels = labels[:, 0]
+        labels = labels - 1
 
         return data, labels
 
@@ -710,16 +711,19 @@ def load_dhg(project_variable, seed):
             assert(dp % 14 == 0)
 
         label_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'labels_%s.txt' % which)
-        all_labels = np.genfromtxt(label_path, dtype=int)[:dp]
-        labels = all_labels[:, 0]
+        full_labels = np.genfromtxt(label_path, delimiter=',', dtype=int)
+        labels = full_labels[:, 0]
 
         if balanced:
+            if seed is not None:
+                random.seed(seed)
+
             chosen = []
             for i in range(num_categories):
                 indices = np.arange(total_dp[which])[labels == i+1]
 
-                if seed is not None:
-                    random.seed(seed)
+                # if seed is not None:
+                #     random.seed(seed)
 
                 num_samples_per_category = dp // num_categories
 
@@ -744,7 +748,7 @@ def load_dhg(project_variable, seed):
 
         chosen.sort()
         labels = labels[chosen]
-        all_labels = all_labels[chosen]
+        full_labels = full_labels[chosen]
 
         num_points = len(labels)
 
@@ -754,11 +758,13 @@ def load_dhg(project_variable, seed):
             for j in range(FRAMES):
                 img_path = os.path.join(PP.dhg_hand_only_28_28_50_frames,
                                         'gesture_%d/finger_%d/subject_%s/essai_%d/depth_%d.png'
-                                        % (all_labels[i][0], all_labels[i][1], all_labels[i][2], all_labels[i][3], j + 1))
+                                        % (full_labels[i][0], full_labels[i][1], full_labels[i][2], full_labels[i][3], j + 1))
                 tmp = Image.open(img_path)
                 tmp = np.array(tmp.convert('L'))
-                tmp = tmp.transpose((2, 0, 1))
+                # tmp = tmp.transpose((2, 0, 1))
                 data[i, :, j] = tmp
+
+        labels = labels - 1
 
         return data, labels
 
@@ -785,12 +791,6 @@ def load_dhg(project_variable, seed):
         all_data.append(data)
         all_labels.append(some_labels)
 
-
-
-
-
-
-
     return splits, all_data, all_labels
 
 def load_data(project_variable, seed):
@@ -804,6 +804,8 @@ def load_data(project_variable, seed):
         return load_movmnist(project_variable, seed)
     elif project_variable.dataset == 'kth_actions':
         return load_kthactions(project_variable, seed)
+    elif project_variable.dataset == 'dhg':
+        return load_dhg(project_variable, seed)
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
