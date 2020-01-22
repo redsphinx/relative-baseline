@@ -20,6 +20,9 @@ def plot_confusion_matrix(confusion_matrix, dataset):
         labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     elif dataset == 'kth_actions':
         labels = ['boxing', 'handclapping', 'handwaving', 'jogging', 'running', 'walking']
+    elif dataset == 'dhg':
+        labels = ['grab', 'tap', 'expand', 'pinch', 'rotation CW', 'rotation CCW', 'swipe R', 'swipe L',
+                  'swipe U', 'swipe D', 'swipe X', 'swipe Y', 'swipe +', 'shake']
     else:
         labels = []
 

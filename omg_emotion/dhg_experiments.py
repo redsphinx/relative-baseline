@@ -174,17 +174,21 @@ def e16_3D_dhg():
 
     main_file.run(project_variable)
 
+def e17_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 17
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.randomize_training_data = False
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e6_3D_dhg()
-# e7_3D_dhg()
-# e8_3D_dhg()
-# e9_3D_dhg()
-# e10_3D_dhg()
-# e11_3D_dhg()
-# e12_3D_dhg()
-# e13_3D_dhg()
-# e14_3D_dhg()
-# e15_3D_dhg()
-e16_3D_dhg()
+e17_3D_dhg()

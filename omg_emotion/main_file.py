@@ -75,22 +75,19 @@ def run(project_variable):
             project_variable.train = False
 
     data = D.load_data(project_variable, seed=None)
-
-    if project_variable.inference_only_mode:
-        data_test = data[1][0]
-        labels_test = data[2][0]
-    else:
-        if project_variable.val:
-            data_val = data[1][0]
-            labels_val = data[2][0]
-
-        if project_variable.test:
-            data_test = data[1][1]
-            labels_test = data[2][1]
-
-        if project_variable.train:
-            data_train = data[1][2]
-            labels_train = data[2][2]
+    
+    if project_variable.inference_only_mode or project_variable.eval_on == 'test':
+        data_test = D.get_data('test', data)
+        labels_test = D.get_labels('test', data)
+    
+    if not project_variable.inference_only_mode:
+        data_val = D.get_data('val', data)
+        labels_val = D.get_labels('val', data)
+        
+        if not project_variable.randomize_training_data:
+            data_train = D.get_data('train', data)
+            labels_train = D.get_labels('train', data) 
+            
 
     if project_variable.same_training_data:
         np.random.seed(project_variable.data_points)
@@ -114,9 +111,9 @@ def run(project_variable):
                 project_variable.train = True
                 data = D.load_data(project_variable, seed)
                 if project_variable.train:
-                    data_train = data[1][0]
-                    labels_train = data[2][0]
-
+                    data_train = D.get_data('train', data)
+                    labels_train = D.get_labels('train', data)
+                    
         print('-------------------------------------------------------\n\n'
               'RUN: %d / %d\n\n'
               '-------------------------------------------------------'
@@ -348,8 +345,8 @@ def run_test_batch(project_variable):
     project_variable.current_epoch = 0
 
     data = D.load_data(project_variable, seed=None)
-    data_test = data[1][0]
-    labels_test = data[2][0]
+    data_test= D.get_data('test', data)
+    labels_test= D.get_labels('test', data)
     device = setup.get_device(project_variable)
 
 

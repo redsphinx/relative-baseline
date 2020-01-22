@@ -34,6 +34,16 @@ global_queue = Queue()
 # when q is filled
 # q.get()
 
+def get_data(which, everything):
+    ind = everything[0].index(which)
+    return everything[1][ind]
+
+
+def get_labels(which, everything):
+    ind = everything[0].index(which)
+    return everything[2][ind]
+
+
 def load_labels(which, project_variable):
     # project_variable = ProjectVariable
     assert which in ['Training', 'Validation', 'Test']
