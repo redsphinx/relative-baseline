@@ -2161,6 +2161,9 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
                 in_features = 100672
             elif project_variable.num_out_channels == [12, 22]:
                 in_features = 138424
+        elif project_variable.dataset == 'dhg':
+            if project_variable.num_out_channels == [6, 16]:
+                in_features = 4000
         else:
             _fc_in = [5, 5, 5]
 
