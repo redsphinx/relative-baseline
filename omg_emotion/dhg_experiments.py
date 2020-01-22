@@ -188,7 +188,24 @@ def e17_3D_dhg():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
+
+def e18_3D_dhg():
+    set_init_1()
+    project_variable.experiment_number = 18
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.data_points = [1 * 14, 1 * 14, 1 * 14]
+
+    project_variable.randomize_training_data = False
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
 
 
-e17_3D_dhg()
+e18_3D_dhg()
