@@ -22,6 +22,29 @@ def add_kernels(project_variable, my_model):
                                               global_step=project_variable.current_epoch)
 
 
+def add_temporal_visualizations(project_variable, my_model):
+    model_number = project_variable.model_number
+    
+    if model_number in [11]:
+        # conv 1
+        scale = my_model.conv1.scale.data
+        rotate = my_model.conv1.rotate.data
+        translate_x = my_model.conv1.translate_x.data
+        translate_y = my_model.conv1.translate_y.data
+
+        # TODO FINISH
+        '''
+        1) get the SRXY parameters
+        2) transform them into the transformation matrix
+        3) apply matrix on the pacman
+        4) save pacman
+        
+        Do this for all the kernels for all timesteps
+        
+        add these videos in the tensorboard images
+        '''
+
+
 
 def add_histograms(project_variable, my_model):
     model_number = project_variable.model_number

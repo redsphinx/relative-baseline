@@ -656,18 +656,15 @@ def e48_3D_dhg():
 
     main_file.run(project_variable)
 # --------------------------------------------------------------------------------------------------------------
-#                       LESS DATA
+#                                       EXPERIMENTS WITH LESS DATA
 # --------------------------------------------------------------------------------------------------------------
 
 def set_init_3():
-    # project_variable.model_number = 11
     project_variable.end_epoch = 100
     project_variable.dataset = 'dhg'
 
     project_variable.num_in_channels = 1
-    # project_variable.data_points = [140 * 14,  20 * 14, 40 * 14]
     project_variable.label_size = 14
-    # project_variable.batch_size = 2 * 14
     project_variable.load_num_frames = 50  # 50
     project_variable.label_type = 'categories'
 
@@ -684,13 +681,341 @@ def set_init_3():
     project_variable.srxy_init = 'eye'
     project_variable.weight_transform = 'seq'
 
+# -----------------------------------------------
+#           MODEL 12 Normal 3D Conv
+# -----------------------------------------------
+
+def e49_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 49
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [1 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 1 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e50_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 50
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [2 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e51_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 51
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [3 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e52_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 52
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [4 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e53_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 53
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [5 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e54_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 54
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [10 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e55_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 55
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [60 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e56_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 56
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [100 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e57_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 57
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 12
+    project_variable.data_points = [140 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+# -----------------------------------------------
+#           MODEL 11 Factorized 3D Conv
+# -----------------------------------------------
+
+def e58_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 58
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [1 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 1 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+
+    main_file.run(project_variable)
+
+def e59_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 59
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [2 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e60_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 60
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [3 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e61_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 61
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [4 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e62_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 62
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [5 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e63_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 63
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [10 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e64_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 64
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [60 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e65_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 65
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [100 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
+def e66_3D_dhg():
+    set_init_3()
+    project_variable.experiment_number = 66
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 11
+    project_variable.data_points = [140 * 14,  20 * 14, 40 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
 
 
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e45_3D_dhg()
-# e46_3D_dhg()
-# e47_3D_dhg()
-e48_3D_dhg()
-
+# e49_3D_dhg()
+# e50_3D_dhg()
+# e51_3D_dhg()
+# e52_3D_dhg()
+# e53_3D_dhg()
+# e54_3D_dhg()
+# e55_3D_dhg()
+# e56_3D_dhg()
+# e57_3D_dhg()
+# e58_3D_dhg()
+# e59_3D_dhg()
+# e60_3D_dhg()
+# e61_3D_dhg()
+# e62_3D_dhg()
+# e63_3D_dhg()
+# e64_3D_dhg()
+# e65_3D_dhg()
+# e66_3D_dhg()
