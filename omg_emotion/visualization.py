@@ -66,3 +66,6 @@ def visualize_network(model, file_name, save_location):
     # dot.save('resnet18_emotion.dot', '/huge/gabras/AffectNet/misc')
     dot.save(file_name, save_location)
 
+
+def make_pacman_animation(matrix):
+    pacman_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'

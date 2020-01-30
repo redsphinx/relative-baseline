@@ -49,7 +49,7 @@ dhg_location = '/huge/gabras/DHG'
 dhg_hand_only_28_28 = '/huge/gabras/DHG_hand_only_28_28'
 dhg_hand_only_28_28_50_frames = '/huge/gabras/DHG_hand_only_28_28_50_frames'
 
-
+pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
 # todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py

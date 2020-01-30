@@ -1,4 +1,6 @@
 from relative_baseline.omg_emotion import visualization as VZ
+import numpy as np
+import torch
 
 
 def add_kernels(project_variable, my_model):
@@ -23,14 +25,46 @@ def add_kernels(project_variable, my_model):
 
 
 def add_temporal_visualizations(project_variable, my_model):
-    model_number = project_variable.model_number
+    def make_affine_matrix(ss, rr, xx, yy):
+        # FIX ss.shape[0]
+        matrix = torch.zeros((ss.shape[0], 2, 3))
+
+        matrix[:, 0, 0] = ss[:] * torch.cos(rr[:])
+        matrix[:, 0, 1] = -ss[:] * torch.sin(rr[:])
+        matrix[:, 0, 2] = xx[:] * ss[:] * torch.cos(rr[:]) - yy[:] * ss[:] * torch.sin(rr[:])
+        matrix[:, 1, 0] = ss[:] * torch.sin(rr[:])
+        matrix[:, 1, 1] = ss[:] * torch.cos(rr[:])
+        matrix[:, 1, 2] = xx[:] * ss[:] * torch.sin(rr[:]) + yy[:] * ss[:] * torch.cos(rr[:])
+
+        return matrix
     
+    model_number = project_variable.model_number
+
     if model_number in [11]:
         # conv 1
         scale = my_model.conv1.scale.data
         rotate = my_model.conv1.rotate.data
         translate_x = my_model.conv1.translate_x.data
         translate_y = my_model.conv1.translate_y.data
+
+        # for each channel
+        for i in range(scale.shape[1]):
+        # for each time-step
+            for j in range(scale.shape[0]):
+        # take SRXY and transform into affine matrix
+                s = scale[j, i]
+                r = rotate[j, i]
+                x = translate_x[j, i]
+                y = translate_y[j, i]
+                
+                affine_matrix = make_affine_matrix(s, r, x, y)
+
+
+
+
+        # apply matrix on the pacman image
+        # save the image as a video
+        # add the video to the TB
 
         # TODO FINISH
         '''

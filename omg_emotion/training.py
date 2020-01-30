@@ -80,6 +80,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # add things to writer
     TM.add_standard_info(project_variable, 'train', (loss, accuracy, confusion_epoch))
+    TM.add_temporal_visualizations(project_variable, my_model)
 
     # project_variable.writer.add_scalar('loss/train', loss, project_variable.current_epoch)
     # project_variable.writer.add_scalar('accuracy/train', accuracy, project_variable.current_epoch)

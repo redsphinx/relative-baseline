@@ -51,7 +51,7 @@ class ConvTTN3d(conv._ConvNd):
         assert scale.shape == rotate.shape == translate_x.shape == translate_y.shape
 
         '''
-        matrix.shape = (out_channels, 2, 3)
+        matrix.shape = (kernel_size-1, 2, 3)
         '''
         matrix = torch.zeros((scale.shape[0], 2, 3))
 
