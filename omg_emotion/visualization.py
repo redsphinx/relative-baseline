@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import torch
 from torchviz import make_dot
+import cv2 as cv
 
 
 # def plot_confusion_matrix(correct_labels, predict_labels, labels, title='Confusion matrix', tensor_name = 'MyFigure/image', normalize=False):
@@ -67,5 +68,29 @@ def visualize_network(model, file_name, save_location):
     dot.save(file_name, save_location)
 
 
-def make_pacman_animation(matrix):
+def load_og_pacman():
     pacman_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
+    img = cv.imread(pacman_path)
+    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    return img
+
+
+def make_pacman_frame(pacman_img, matrix):
+    # pacman_path = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
+    # pacman_img = cv.imread(pacman_path)
+
+    # pacman_img = cv.cvtColor(pacman_img, cv.COLOR_RGB2BGR)
+    rows, cols = pacman_img.shape
+
+    pacman_trnsfrm = cv.warpAffine(pacman_img, matrix, (cols, rows))
+
+    # pacman_trnsfrm = cv.cvtColor(pacman_trnsfrm, cv.COLOR_BGR2RGB)
+
+    return pacman_trnsfrm
+
+    # img = cv2.imread('messi5.jpg',0)
+    # rows,cols = img.shape
+    #
+    # M = np.float32([[1,0,100],[0,1,50]])
+    # dst = cv2.warpAffine(img,M,(cols,rows))
+

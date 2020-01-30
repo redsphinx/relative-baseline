@@ -26,15 +26,14 @@ def add_kernels(project_variable, my_model):
 
 def add_temporal_visualizations(project_variable, my_model):
     def make_affine_matrix(ss, rr, xx, yy):
-        # FIX ss.shape[0]
-        matrix = torch.zeros((ss.shape[0], 2, 3))
+        matrix = np.zeros((2, 3))
 
-        matrix[:, 0, 0] = ss[:] * torch.cos(rr[:])
-        matrix[:, 0, 1] = -ss[:] * torch.sin(rr[:])
-        matrix[:, 0, 2] = xx[:] * ss[:] * torch.cos(rr[:]) - yy[:] * ss[:] * torch.sin(rr[:])
-        matrix[:, 1, 0] = ss[:] * torch.sin(rr[:])
-        matrix[:, 1, 1] = ss[:] * torch.cos(rr[:])
-        matrix[:, 1, 2] = xx[:] * ss[:] * torch.sin(rr[:]) + yy[:] * ss[:] * torch.cos(rr[:])
+        matrix[0, 0] = ss * np.cos(rr)
+        matrix[0, 1] = -ss * np.sin(rr)
+        matrix[0, 2] = xx * ss * np.cos(rr) - yy * ss * np.sin(rr)
+        matrix[1, 0] = ss * np.sin(rr)
+        matrix[1, 1] = ss * np.cos(rr)
+        matrix[1, 2] = xx * ss * np.sin(rr) + yy * ss * np.cos(rr)
 
         return matrix
     
@@ -49,15 +48,26 @@ def add_temporal_visualizations(project_variable, my_model):
 
         # for each channel
         for i in range(scale.shape[1]):
+            pacman_frames = np.zeros((scale.shape[0]+1, 100, 100))
+            pacman_frames[0] = VZ.load_og_pacman()
+
         # for each time-step
             for j in range(scale.shape[0]):
         # take SRXY and transform into affine matrix
-                s = scale[j, i]
-                r = rotate[j, i]
-                x = translate_x[j, i]
-                y = translate_y[j, i]
+                s = float(scale[j, i].cpu())
+                r = float(rotate[j, i].cpu())
+                x = float(translate_x[j, i].cpu())
+                y = float(translate_y[j, i].cpu())
                 
                 affine_matrix = make_affine_matrix(s, r, x, y)
+                pacman_frames[j+1] = VZ.make_pacman_frame(pacman_frames[j], affine_matrix)
+
+            # save img as video
+            pacman_frames = np.expand_dims(pacman_frames, axis=0)
+            pacman_frames = np.expand_dims(pacman_frames, axis=2)
+            project_variable.writer.add_video(tag='channel/%d' % i, vid_tensor=pacman_frames,
+                                          global_step=project_variable.current_epoch, fps=10)
+
 
 
 
