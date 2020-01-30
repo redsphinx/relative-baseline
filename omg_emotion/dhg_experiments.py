@@ -1001,21 +1001,29 @@ def e66_3D_dhg():
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e49_3D_dhg()
-# e50_3D_dhg()
-# e51_3D_dhg()
-# e52_3D_dhg()
-# e53_3D_dhg()
-# e54_3D_dhg()
-# e55_3D_dhg()
-# e56_3D_dhg()
-# e57_3D_dhg()
-# e58_3D_dhg()
-# e59_3D_dhg()
-# e60_3D_dhg()
-# e61_3D_dhg()
-# e62_3D_dhg()
-# e63_3D_dhg()
-# e64_3D_dhg()
-# e65_3D_dhg()
-# e66_3D_dhg()
+# e49_3D_dhg()  #1
+# e58_3D_dhg()  #1
+
+# e50_3D_dhg()  #2
+# e59_3D_dhg()  #2
+
+# e51_3D_dhg()  #3
+# e60_3D_dhg()  #3
+
+# e52_3D_dhg()  #4
+# e61_3D_dhg()  #4
+
+# e53_3D_dhg()  #5
+# e62_3D_dhg()  #5
+
+# e54_3D_dhg()  #10
+# e63_3D_dhg()  #10
+
+# e55_3D_dhg()  #60
+# e64_3D_dhg()  #60
+
+# e56_3D_dhg()  #100
+# e65_3D_dhg()  #100
+
+# e57_3D_dhg()  #140
+e66_3D_dhg()  #140
