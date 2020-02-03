@@ -70,26 +70,6 @@ def add_temporal_visualizations(project_variable, my_model):
 
 
 
-
-
-        # apply matrix on the pacman image
-        # save the image as a video
-        # add the video to the TB
-
-        # TODO FINISH
-        '''
-        1) get the SRXY parameters
-        2) transform them into the transformation matrix
-        3) apply matrix on the pacman
-        4) save pacman
-        
-        Do this for all the kernels for all timesteps
-        
-        add these videos in the tensorboard images
-        '''
-
-
-
 def add_histograms(project_variable, my_model):
     model_number = project_variable.model_number
 
@@ -250,3 +230,8 @@ def add_standard_info(project_variable, which, parameters):
     project_variable.writer.add_scalar('accuracy/%s' % which, accuracy, project_variable.current_epoch)
     fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     project_variable.writer.add_figure(tag='confusion/%s' % which, figure=fig, global_step=project_variable.current_epoch)
+
+
+def add_xai(project_variable, my_model):
+    # visualize the filters
+
