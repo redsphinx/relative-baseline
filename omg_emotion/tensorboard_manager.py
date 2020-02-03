@@ -6,7 +6,7 @@ import torch
 def add_kernels(project_variable, my_model):
     model_number = project_variable.model_number
 
-    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
+    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8, 11]:
         kernel = my_model.conv1.weight.data
         kernel = kernel.transpose(1, 2)
 
