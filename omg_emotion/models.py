@@ -256,6 +256,7 @@ class ConvTTN3d(conv._ConvNd):
             else:
                 print('ERROR: weight_transform with value %s not supported' % self.project_variable.weight_transform)
 
+        self.weight = torch.nn.Parameter(new_weight)
 
         y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y

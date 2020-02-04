@@ -1002,15 +1002,15 @@ def e66_3D_dhg():
 
 def e_test_3D_dhg():
     set_init_3()
-    project_variable.end_epoch = 100
+    project_variable.end_epoch = 50
     project_variable.repeat_experiments = 1
 
     project_variable.experiment_number = 5800
     project_variable.sheet_number = 21
-    project_variable.device = 0
+    project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [60 * 14,  1 * 14, 1 * 14]
+    project_variable.data_points = [100 * 14,  1 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'

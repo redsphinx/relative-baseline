@@ -1,4 +1,6 @@
 from relative_baseline.omg_emotion import visualization as VZ
+from relative_baseline.omg_emotion.xai_tools import layer_visualization_2 as layer_vis
+
 import numpy as np
 import torch
 
@@ -7,6 +9,7 @@ def add_kernels(project_variable, my_model):
     model_number = project_variable.model_number
 
     if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8, 11]:
+        # FIX this, wrong weight matrix
         kernel = my_model.conv1.weight.data
         kernel = kernel.transpose(1, 2)
 
@@ -232,6 +235,6 @@ def add_standard_info(project_variable, which, parameters):
     project_variable.writer.add_figure(tag='confusion/%s' % which, figure=fig, global_step=project_variable.current_epoch)
 
 
-def add_xai(project_variable, my_model):
+def add_xai(project_variable, my_model, device, epoch):
     # visualize the filters
-
+    layer_vis.run(my_model, device, epoch)

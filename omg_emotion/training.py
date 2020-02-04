@@ -56,7 +56,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
     confusion_flatten = U.flatten_confusion(confusion_epoch)
 
-    TM.add_kernels(project_variable, my_model)
+    # TM.add_kernels(project_variable, my_model)
 
     if project_variable.model_number in [1, 2, 3, 71, 72, 73, 74, 75, 76, 77, 8]:
         TM.add_histograms(project_variable, my_model)
@@ -78,6 +78,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # add things to writer
     TM.add_standard_info(project_variable, 'train', (loss, accuracy, confusion_epoch))
+    TM.add_xai(project_variable, my_model, device, project_variable.current_epoch)
     # TM.add_temporal_visualizations(project_variable, my_model)
 
 
