@@ -2128,7 +2128,7 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         kt, kh, kw = project_variable.k_shape
         
         self.return_ind = False
-        if project_variable.return_indices_maxpool:
+        if project_variable.return_ind:
             self.return_ind = True
         
         super(LeNet5_TTN3d_xD, self).__init__()
@@ -2351,16 +2351,18 @@ class deconv_3DTTN(torch.nn.Module):
             self.deconv2 = torch.nn.ConvTranspose3d(in_channels=16,
                                                     out_channels=6,
                                                     kernel_size=5,
-                                                    padding=0)
+                                                    padding=0,
+                                                    bias=False)
 
         # relu
         # unpool 1
         self.unpool1 = torch.nn.MaxUnpool3d(kernel_size=2)
         # deconv 1
         self.deconv1 = torch.nn.ConvTranspose3d(in_channels=6,
-                                                out_channels=3,
+                                                out_channels=1,
                                                 kernel_size=5,
-                                                padding=2)
+                                                padding=2,
+                                                bias=False)
 
         self.which_conv = which_conv
 

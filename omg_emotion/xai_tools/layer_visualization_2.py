@@ -38,17 +38,21 @@ def run_erhan2009(my_model, device, epoch):
 def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
-    assert(project_variable.model_number == 11)
+    # assert(project_variable.model_number == 11)
 
     def get_deconv_model():
         model = deconv_3DTTN(which_conv)
+        model.cuda(device)
+
         # copy the weights from trained model
-        model.deconv1.weight = my_model.conv1.weight.data
-        model.deconv1.bias = my_model.conv1.bias.data
-        
+        w1 = my_model.conv1.weight
+        # w1 = torch.nn.Parameter(w1.permute(0, 1, 4, 3, 2))
+        model.deconv1.weight = w1
+
         if which_conv == 'conv2':
-            model.deconv2.weight = my_model.conv2.weight.data
-            model.deconv2.bias = my_model.conv2.bias.data
+            w2 = my_model.conv2.weight
+            # w2 = torch.nn.Parameter(w2.permute(0, 1, 4, 3, 2))
+            model.deconv2.weight = w2
 
         return model
 
@@ -74,9 +78,9 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv)
 
     # pass the activations as input to the deconv_model
     if which_conv == 'conv1':
-        reconstruction = deconv_model(x3, switches[0])
+        reconstruction = deconv_model(x3, switches)
     elif which_conv == 'conv2':
-        reconstruction = deconv_model(x6, switches[1])
+        reconstruction = deconv_model(x6, switches)
     else:
         reconstruction = None
 
@@ -94,15 +98,29 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv)
     else:
         number = 0
 
-    folder = '%s_epoch_%d_n%d' % (which_conv, epoch, number)
+    folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
     save_path = os.path.join(save_location, folder)
 
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
-    for f in range(reconstruction.shape[0]):
+    for f in range(reconstruction.shape[2]):
         name = 'frame_%d.png' % f
         ultimate_path = os.path.join(save_path, name)
 
-        im = Image.fromarray(reconstruction[f], mode='L')
+        im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
+
+        im = Image.fromarray(im_as_arr, mode='L')
         im.save(ultimate_path)
+
+    path_input = os.path.join(save_path, 'og_image')
+    if not os.path.exists(path_input):
+        os.mkdir(path_input)
+
+    for f in range(input.shape[2]):
+        name = 'frame_%d.png' % f
+        path = os.path.join(path_input, name)
+        input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
+        input_img = Image.fromarray(input_as_arr, mode='L')
+
+        input_img.save(path)

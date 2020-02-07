@@ -29,7 +29,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
         if ts == 0:
-            data_for_vis = data[0]
+            data_for_vis = data[0].unsqueeze(0)
+
 
         my_optimizer.zero_grad()
 
