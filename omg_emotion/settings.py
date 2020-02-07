@@ -29,6 +29,8 @@ class ProjectVariable(object):
         self._inference_only_mode = False
         # [batch mode: True or False, end_run, expnum, modelnum]
         self._inference_in_batches = [False, None, None, None]
+        # for zeiler2014 in xai_tools
+        self._return_ind = False
 
         # which google sheet to write to
         self._sheet_number = None
@@ -253,6 +255,15 @@ class ProjectVariable(object):
     def inference_in_batches(self, value):
         self._inference_in_batches = value
 
+    @property
+    def return_ind(self):
+        return self._return_ind
+
+    @return_ind.setter
+    def return_ind(self, value):
+        self._return_ind = value
+    
+    
     @property
     def sheet_number(self):
         return self._sheet_number

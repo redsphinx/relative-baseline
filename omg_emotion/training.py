@@ -14,7 +14,6 @@ from .settings import ProjectVariable
 def run(project_variable, all_data, my_model, my_optimizer, device):
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
-
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
@@ -24,8 +23,13 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                                                           max_lr=project_variable.learning_rate*10,
                                                           step_size_up= steps/2)
 
+    data_for_vis = None
+
     for ts in tqdm(range(steps)):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
+
+        if ts == 0:
+            data_for_vis = data[0]
 
         my_optimizer.zero_grad()
 
@@ -33,6 +37,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             predictions = my_model(data, device)
         else:
             predictions = my_model(data)
+
         loss = U.calculate_loss(project_variable, predictions, labels)
         # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
         loss.backward()
@@ -78,7 +83,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # add things to writer
     TM.add_standard_info(project_variable, 'train', (loss, accuracy, confusion_epoch))
-    TM.add_xai(project_variable, my_model, device, project_variable.current_epoch)
+
+    TM.add_xai(project_variable, my_model, device, project_variable.current_epoch, data_point=data_for_vis, which_method='zeiler2014')
     # TM.add_temporal_visualizations(project_variable, my_model)
 
 

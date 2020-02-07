@@ -9,7 +9,6 @@ def add_kernels(project_variable, my_model):
     model_number = project_variable.model_number
 
     if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8, 11]:
-        # FIX this, wrong weight matrix
         kernel = my_model.conv1.weight.data
         kernel = kernel.transpose(1, 2)
 
@@ -235,7 +234,16 @@ def add_standard_info(project_variable, which, parameters):
     project_variable.writer.add_figure(tag='confusion/%s' % which, figure=fig, global_step=project_variable.current_epoch)
 
 
-def add_xai(project_variable, my_model, device, epoch):
-    # visualize the filters
-    layer_vis.run_erhan2009(my_model, device, epoch)
+def add_xai(project_variable, my_model, device, epoch, which_method, data_point=None):
+    assert(project_variable.model_number in [11])
+    assert(which_method in ['erhan2009', 'zeiler2014'])
+
+    if which_method == 'erhan2009':
+        layer_vis.run_erhan2009(my_model, device, epoch)
+    elif which_method == 'zeiler2014':
+        assert(data_point is not None)
+        assert(project_variable.return_ind == True)
+
+        which_conv = 'conv1'
+        layer_vis.run_zeiler2014(project_variable, data_point, my_model, device, epoch, which_conv)
 

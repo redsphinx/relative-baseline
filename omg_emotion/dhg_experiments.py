@@ -1018,6 +1018,8 @@ def e_test_3D_dhg():
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [6, 16]
 
+    project_variable.return_ind = True
+
     main_file.run(project_variable)
 
 # --------------------------------------

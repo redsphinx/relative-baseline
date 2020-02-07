@@ -2126,7 +2126,11 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
     def __init__(self, input_shape, project_variable):
         t, h, w = input_shape
         kt, kh, kw = project_variable.k_shape
-
+        
+        self.return_ind = False
+        if project_variable.return_indices_maxpool:
+            self.return_ind = True
+        
         super(LeNet5_TTN3d_xD, self).__init__()
         self.conv1 = ConvTTN3d(in_channels=project_variable.num_in_channels, out_channels=project_variable.num_out_channels[0], kernel_size=5,
                                padding=2,
@@ -2137,7 +2141,7 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
 
         t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
 
-        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
 
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
@@ -2150,8 +2154,8 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
                                transformations_per_filter=project_variable.transformations_per_filter)
 
         t, h, w = auto_in_features((t, h, w), 'conv', (kt, kh, kw, 0))
-
-        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+        
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
 
         t, h, w = auto_in_features((t, h, w), 'pool', (2, 2, 2))
 
@@ -2184,10 +2188,20 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
     def forward(self, x, device):
         x = self.conv1(x, device)
         x = torch.nn.functional.relu(x)
-        x = self.max_pool_1(x)
+        
+        if self.return_ind:
+            x, ind1 = self.max_pool_1(x)
+        else:
+            x = self.max_pool_1(x)
+            
         x = self.conv2(x, device)
         x = torch.nn.functional.relu(x)
-        x = self.max_pool_2(x)
+        
+        if self.return_ind:
+            x, ind2 = self.max_pool_2(x)
+        else:
+            x = self.max_pool_2(x)
+            
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         # _shape = x.shape
@@ -2197,11 +2211,14 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         x = self.fc2(x)
         x = torch.nn.functional.relu(x)
         x = self.fc3(x)
+
         return x
+
 
 def isnan(x, name):
     if True in np.ravel(np.array(torch.isnan(x).cpu())) or True in np.ravel(np.array(torch.isinf(x).cpu())):
         print('NaN or Inf in %s' % name)
+
 
 class LeNet5_3d_xD(torch.nn.Module):
 
@@ -2316,5 +2333,45 @@ class LeNet5_2d_xD(torch.nn.Module):
         x = torch.nn.functional.relu(self.fc2(x))
         # FC-3
         x = self.fc3(x)
+
+        return x
+
+
+class deconv_3DTTN(torch.nn.Module):
+    # TODO: ASSUME WE DON'T NEED TO TRANSPOSE THE WEIGHTS WHEN COPYING FROM 3DCONV
+
+    def __init__(self, which_conv):
+        super(deconv_3DTTN, self).__init__()
+
+        if which_conv == 'conv2':
+            # relu
+            # unpool 2
+            self.unpool2 = torch.nn.MaxUnpool3d(kernel_size=2)
+            # deconv 2
+            self.deconv2 = torch.nn.ConvTranspose3d(in_channels=16,
+                                                    out_channels=6,
+                                                    kernel_size=5,
+                                                    padding=0)
+
+        # relu
+        # unpool 1
+        self.unpool1 = torch.nn.MaxUnpool3d(kernel_size=2)
+        # deconv 1
+        self.deconv1 = torch.nn.ConvTranspose3d(in_channels=6,
+                                                out_channels=3,
+                                                kernel_size=5,
+                                                padding=2)
+
+        self.which_conv = which_conv
+
+    def forward(self, x, pool_switches):
+        if self.which_conv == 'conv2':
+            x = torch.nn.functional.relu(x)
+            x = self.unpool2(x, pool_switches[1])
+            x = self.deconv2(x)
+
+        x = torch.nn.functional.relu(x)
+        x = self.unpool1(x, pool_switches[0])
+        x = self.deconv1(x)
 
         return x
