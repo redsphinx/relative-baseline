@@ -148,8 +148,6 @@ def normalize_image(img):
 def save_clip(clip, save_location, epoch):
     clip = np.array(clip.data.cpu(), dtype=int)
 
-    # TODO normalize image
-
     folder = os.path.join(save_location, 'epoch_%d' % epoch)
     if not os.path.exists(folder):
         os.mkdir(folder)

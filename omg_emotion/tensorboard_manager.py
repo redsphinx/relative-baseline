@@ -237,4 +237,5 @@ def add_standard_info(project_variable, which, parameters):
 
 def add_xai(project_variable, my_model, device, epoch):
     # visualize the filters
-    layer_vis.run(my_model, device, epoch)
+    layer_vis.run_erhan2009(my_model, device, epoch)
+
