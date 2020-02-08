@@ -1002,7 +1002,7 @@ def e66_3D_dhg():
 
 def e_test_3D_dhg():
     set_init_3()
-    project_variable.end_epoch = 100
+    project_variable.end_epoch = 50
     project_variable.repeat_experiments = 1
 
     project_variable.experiment_number = 5800

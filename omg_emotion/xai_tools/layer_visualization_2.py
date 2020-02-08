@@ -35,7 +35,7 @@ def run_erhan2009(my_model, device, epoch):
             save_clip(conv_output, save_location, epoch)
 
 
-def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv):
+def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv, which_channel):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
     # assert(project_variable.model_number == 11)
@@ -46,12 +46,12 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv)
 
         # copy the weights from trained model
         w1 = my_model.conv1.weight
-        # w1 = torch.nn.Parameter(w1.permute(0, 1, 4, 3, 2))
+        w1 = torch.nn.Parameter(w1.permute(1, 0, 4, 3, 2))
         model.deconv1.weight = w1
 
         if which_conv == 'conv2':
             w2 = my_model.conv2.weight
-            # w2 = torch.nn.Parameter(w2.permute(0, 1, 4, 3, 2))
+            w2 = torch.nn.Parameter(w2.permute(1, 0, 4, 3, 2))
             model.deconv2.weight = w2
 
         return model
@@ -84,43 +84,47 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv)
     else:
         reconstruction = None
 
-    # save reconstruction
-    save_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2014'
-    if not os.path.exists(save_location):
-        os.mkdir(save_location)
+    save_indices = [0, 19, 39, 49]
 
-    # automatic number assignment
-    existing = os.listdir(save_location)
-    if len(existing) != 0:
-        existing = [int(i.split('_')[-1]) for i in existing]
-        existing.sort()
-        number = max(existing) + 1
-    else:
-        number = 0
+    if epoch in save_indices:
+        # save reconstruction
+        save_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2014'
+        if not os.path.exists(save_location):
+            os.mkdir(save_location)
 
-    folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
-    save_path = os.path.join(save_location, folder)
+        # automatic number assignment
+        existing = os.listdir(save_location)
+        if len(existing) != 0:
+            existing = [int(i.split('_')[-1]) for i in existing]
+            existing.sort()
+            number = max(existing) + 1
+        else:
+            number = 0
 
-    if not os.path.exists(save_path):
-        os.mkdir(save_path)
+        folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
+        save_path = os.path.join(save_location, folder)
 
-    for f in range(reconstruction.shape[2]):
-        name = 'frame_%d.png' % f
-        ultimate_path = os.path.join(save_path, name)
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
 
-        im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
+        for f in range(reconstruction.shape[2]):
+            name = 'frame_%d.png' % f
+            ultimate_path = os.path.join(save_path, name)
 
-        im = Image.fromarray(im_as_arr, mode='L')
-        im.save(ultimate_path)
+            im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
 
-    path_input = os.path.join(save_path, 'og_image')
-    if not os.path.exists(path_input):
-        os.mkdir(path_input)
+            im = Image.fromarray(im_as_arr, mode='L')
+            im.save(ultimate_path)
 
-    for f in range(input.shape[2]):
-        name = 'frame_%d.png' % f
-        path = os.path.join(path_input, name)
-        input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
-        input_img = Image.fromarray(input_as_arr, mode='L')
+        path_input = os.path.join(save_path, 'og_image')
+        if not os.path.exists(path_input):
+            os.mkdir(path_input)
 
-        input_img.save(path)
+        for f in range(input.shape[2]):
+            name = 'frame_%d.png' % f
+            path = os.path.join(path_input, name)
+            input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
+            input_img = Image.fromarray(input_as_arr, mode='L')
+
+            input_img.save(path)
+

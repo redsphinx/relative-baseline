@@ -245,5 +245,6 @@ def add_xai(project_variable, my_model, device, epoch, which_method, data_point=
         assert(project_variable.return_ind == True)
 
         which_conv = 'conv1'
-        layer_vis.run_zeiler2014(project_variable, data_point, my_model, device, epoch, which_conv)
+        which_channel = [0, 1, 2, 3, 4, 5]
+        layer_vis.run_zeiler2014(project_variable, data_point, my_model, device, epoch, which_conv, which_channel)
 
