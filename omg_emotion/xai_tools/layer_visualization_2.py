@@ -38,7 +38,7 @@ def run_erhan2009(my_model, device, epoch):
 def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv, which_channel):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
-    # assert(project_variable.model_number == 11)
+    # which_channels contain the numbers of the channels that need to be visualized
 
     def get_deconv_model():
         model = deconv_3DTTN(which_conv)
@@ -46,12 +46,12 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv,
 
         # copy the weights from trained model
         w1 = my_model.conv1.weight
-        w1 = torch.nn.Parameter(w1.permute(1, 0, 4, 3, 2))
+        # w1 = torch.nn.Parameter(w1.permute(1, 0, 4, 3, 2))
         model.deconv1.weight = w1
 
         if which_conv == 'conv2':
             w2 = my_model.conv2.weight
-            w2 = torch.nn.Parameter(w2.permute(1, 0, 4, 3, 2))
+            # w2 = torch.nn.Parameter(w2.permute(1, 0, 4, 3, 2))
             model.deconv2.weight = w2
 
         return model
@@ -74,7 +74,17 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv,
         x6 = torch.nn.functional.relu(x5)
 
     # set the irrelevant activations to zero
-    # assume that it means: ignore the higher up layers
+    if which_conv == 'conv1':
+        assert(0 < len(which_channel) < project_variable.num_out_channels[0]+1)
+        for i in range(x3.shape[1]):
+            if i not in which_channel:
+                x3[0, i] = torch.nn.Parameter(torch.zeros(x3[0, i].shape))
+
+    elif which_conv == 'conv2':
+        assert (0 < len(which_channel) < project_variable.num_out_channels[1]+1)
+        for i in range(x6.shape[1]):
+            if i not in which_channel:
+                x6[0, i] = torch.nn.Parameter(torch.zeros(x6[0, i].shape))
 
     # pass the activations as input to the deconv_model
     if which_conv == 'conv1':
@@ -84,7 +94,7 @@ def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv,
     else:
         reconstruction = None
 
-    save_indices = [0, 19, 39, 49]
+    save_indices = [0, 9, 19, 29, 39, 49]
 
     if epoch in save_indices:
         # save reconstruction
