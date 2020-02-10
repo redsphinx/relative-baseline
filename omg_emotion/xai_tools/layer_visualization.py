@@ -42,7 +42,11 @@ def run_erhan2009(project_variable, my_model, device):
     all_outputs = []
 
     for l in range(len(project_variable.which_layers)):
+        output_1 = []
+
         for c in range(len(project_variable.which_channels[l])):
+            output_2 = []
+
             which_layer = project_variable.which_layers[l]
             which_channel = project_variable.which_channels[l][c]
 

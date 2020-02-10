@@ -763,7 +763,7 @@ class ProjectVariable(object):
         return self._which_methods
 
     @which_methods.setter
-    def which_method(self, value):
+    def which_methods(self, value):
         self._which_methods = value
 
     @property

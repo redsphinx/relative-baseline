@@ -240,6 +240,22 @@ def add_xai(project_variable, my_model, device, data_point=None):
     if 'erhan2009' in project_variable.which_methods:
         all_outputs = layer_vis.run_erhan2009(project_variable, my_model, device)
 
+        for i in range(len(project_variable.which_methods)):
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j])):
+                    which_methods = project_variable.which_methods[i]
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
+
+                    output = all_outputs[i, ] # TODO
+
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers, which_channels),
+                                                      vid_tensor=all_outputs,
+                                                      global_step=project_variable.current_epoch, fps=2)
+
+
+
+# xai/erhan2009/layer1/channel
 
 
 
@@ -250,4 +266,25 @@ def add_xai(project_variable, my_model, device, data_point=None):
         project_variable.return_ind = True
         layer_vis.run_zeiler2014(project_variable, data_point, my_model, device)
         project_variable.return_ind = False
+
+
+def add_ksfsdfernels(project_variable, my_model):
+    model_number = project_variable.model_number
+
+    if model_number in [2, 3, 71, 72, 73, 74, 75, 76, 77, 8, 11]:
+        kernel = my_model.conv1.weight.data
+        kernel = kernel.transpose(1, 2)
+
+        for k in range(kernel.shape[0]):
+            new_k = kernel[k].unsqueeze(0)
+
+            project_variable.writer.add_video(tag='kernels/%d' % k, vid_tensor=new_k,
+                                              global_step=project_variable.current_epoch, fps=2)
+    elif model_number == 1:
+        kernel = my_model.conv1.weight.data
+
+        for k in range(kernel.shape[0]):
+            new_k = kernel[k]
+            project_variable.writer.add_image(tag='kernels/%d' % k, img_tensor=new_k,
+                                              global_step=project_variable.current_epoch)
 
