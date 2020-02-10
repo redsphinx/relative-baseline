@@ -1,146 +1,196 @@
-"""
-Created on Sat Nov 18 23:12:08 2017
-
-@author: Utku Ozbulak - github.com/utkuozbulak
-"""
 import os
 import numpy as np
+from PIL import Image
 
 import torch
 from torch.optim import Adam
-from torchvision import models
+from torch.autograd import Variable
 
-from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_image
-
-
-class CNNLayerVisualization():
-    """
-        Produces an image that minimizes the loss of a convolution
-        operation for a specific layer and filter
-    """
-    def __init__(self, model, selected_layer, selected_filter):
-        self.model = model
-        self.model.eval()
-        self.selected_layer = selected_layer
-        self.selected_filter = selected_filter
-        self.conv_output = 0
-        # Create the folder to export images if not exists
-        if not os.path.exists('../generated'):
-            os.makedirs('../generated')
-
-    def hook_layer(self):
-        def hook_function(module, grad_in, grad_out):
-            # Gets the conv output of the selected filter (from selected layer)
-            self.conv_output = grad_out[0, self.selected_filter]
-        # Hook the selected layer
-        self.model[self.selected_layer].register_forward_hook(hook_function)
-
-    def visualise_layer_with_hooks(self):
-
-        # images = np.zeros((6, 224, 224, 3))
-
-        # Hook the selected layer
-        self.hook_layer()
-        # Generate a random image
-        random_image = np.uint8(np.random.uniform(150, 180, (224, 224, 3)))
-        # Process image and return variable
-        processed_image = preprocess_image(random_image, False)
-        # Define optimizer for the image
-        optimizer = Adam([processed_image], lr=0.1, weight_decay=1e-6)
-        for i in range(1, 31):
-            optimizer.zero_grad()
-            # Assign create image to a variable to move forward in the model
-            x = processed_image
-            for index, layer in enumerate(self.model):
-                # Forward pass layer by layer
-                # x is not used after this point because it is only needed to trigger
-                # the forward hook function
-                x = layer(x)
-                # Only need to forward until the selected layer is reached
-                if index == self.selected_layer:
-                    # (forward hook function triggered)
-                    break
-            # Loss function is the mean of the output of the selected layer/filter
-            # We try to minimize the mean of the output of that specific filter
-            loss = -torch.mean(self.conv_output)
-            print('Iteration:', str(i), 'Loss:', "{0:.2f}".format(loss.data.numpy()))
-            # Backward
-            loss.backward()
-            # Update image
-            optimizer.step()
-            # Recreate image
-            self.created_image = recreate_image(processed_image)
-            # Save image
-            if i % 5 == 0:
-                im_path = '../generated/layer_vis_l' + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.jpg'
-                save_image(self.created_image, im_path)
-
-                # images[i] = self.created_image
-
-        # return images
-
-    def visualise_layer_without_hooks(self):
-        # Process image and return variable
-        # Generate a random image
-        random_image = np.uint8(np.random.uniform(150, 180, (224, 224, 3)))
-        # Process image and return variable
-        processed_image = preprocess_image(random_image, False)
-        # Define optimizer for the image
-        optimizer = Adam([processed_image], lr=0.1, weight_decay=1e-6)
-        for i in range(1, 31):
-            optimizer.zero_grad()
-            # Assign create image to a variable to move forward in the model
-            x = processed_image
-            for index, layer in enumerate(self.model.named_parameters()):
-                # Forward pass layer by layer
-                x = layer(x)
-                if index == self.selected_layer:  # self.model.conv1(x)
-                    # Only need to forward until the selected layer is reached
-                    # Now, x is the output of the selected layer
-                    break
-            # Here, we get the specific filter from the output of the convolution operation
-            # x is a tensor of shape 1x512x28x28.(For layer 17)
-            # So there are 512 unique filter outputs
-            # Following line selects a filter from 512 filters so self.conv_output will become
-            # a tensor of shape 28x28
-            self.conv_output = x[0, self.selected_filter]
-            # Loss function is the mean of the output of the selected layer/filter
-            # We try to minimize the mean of the output of that specific filter
-            loss = -torch.mean(self.conv_output)
-            print('Iteration:', str(i), 'Loss:', "{0:.2f}".format(loss.data.numpy()))
-            # Backward
-            loss.backward()
-            # Update image
-            optimizer.step()
-            # Recreate image
-            self.created_image = recreate_image(processed_image)
-            # Save image
-            if i % 5 == 0:
-                im_path = '../generated/layer_vis_l' + str(self.selected_layer) + \
-                    '_f' + str(self.selected_filter) + '_iter' + str(i) + '.jpg'
-                save_image(self.created_image, im_path)
+from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
+from relative_baseline.omg_emotion.models import deconv_3DTTN
+import relative_baseline.omg_emotion.project_paths as PP
 
 
-# if __name__ == '__main__':
-#     cnn_layer = 17
-#     filter_pos = 5
-#     # Fully connected layer is not needed
-#     pretrained_model = models.vgg16(pretrained=True).features
-#     layer_vis = CNNLayerVisualization(pretrained_model, cnn_layer, filter_pos)
-#
-#     # Layer visualization with pytorch hooks
-#     layer_vis.visualise_layer_with_hooks()
-#
-#     # Layer visualization without pytorch hooks
-#     # layer_vis.visualise_layer_without_hooks()
+def save_image(image, location, epoch_number):
 
-def run(cnn_layer, filter_pos, my_model, use_hooks=False):
-    layer_vis = CNNLayerVisualization(my_model, cnn_layer, filter_pos)
+    assert(isinstance(image, torch.Tensor)), "Image type not torch.Tensor: '%s' " % str(type(image))
 
-    if use_hooks:
-        # Layer visualization with pytorch hooks
-        layer_vis.visualise_layer_with_hooks()
+    image = np.array(image.data.cpu(), dtype=np.uint8)
+    assert(image.shape[1] == 1), "Image contains more than 1 channel: '%s'" % str()
+
+    if image.shape[0] > 1:
+        folder = os.path.join(location, 'epoch_%d' % epoch_number)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+        for i in range(image.shape[0]):
+            im = Image.fromarray(image[i], mode='L')
+            name = 'frame_%d.png' % i
+
+            save_path = os.path.join(folder, name)
+            im.save(save_path)
+
     else:
-        # Layer visualization without pytorch hooks
-        layer_vis.visualise_layer_without_hooks()
+        im = Image.fromarray(image[0, 0], mode='L')
+        name = 'image_epoch_%d.png' % epoch_number
+        save_path = os.path.join(location, name)
+        im.save(save_path)
+
+
+def run_erhan2009(project_variable, my_model, device):
+    # based on "Visualizing Higher-Layer Features of a Deep Network" by Erhan et al. 2009
+    all_outputs = []
+
+    for l in range(len(project_variable.which_layers)):
+        for c in range(len(project_variable.which_channels[l])):
+            which_layer = project_variable.which_layers[l]
+            which_channel = project_variable.which_channels[l][c]
+
+            random_image = torch.rand((1, 1, 50, 28, 28), requires_grad=True, device=device)
+            # TODO: scale values accordingly
+            # TODO: subtract mean and divide by std of avg image in training set
+
+            optimizer = Adam([random_image], lr=0.01, weight_decay=0)
+            mini_epochs = 50
+            conv_output = None
+
+            for i in range(1, mini_epochs+1):
+                optimizer.zero_grad()
+                x = random_image
+                my_model.eval() # prevent gradients being computed for my_model
+
+                if which_layer == 'conv1':
+                    x = my_model.conv1(x, device)
+                elif which_layer == 'conv2':
+                    x = my_model.conv1(x, device)
+                    x = my_model.max_pool_1(x)
+                    x = torch.nn.functional.relu(x)
+                    x = my_model.conv2(x, device)
+
+                my_model.train()
+
+                conv_output = x[0, which_channel]
+                loss = -torch.mean(conv_output)
+                loss.backward()
+                optimizer.step()
+
+                print('erhan2009 loss mini-epoch %d: %f' % (i, loss.data.cpu()))
+
+            conv_output = np.array(conv_output.data.cpu(), dtype=np.uint8)
+            all_outputs.append(conv_output)
+
+                ## use this for debugging
+                # if i == mini_epochs:
+                #     save_location = PP.erhan2009
+                #     save_clip(conv_output, save_location, epoch)
+
+    # return for tensorboard plotting
+    return all_outputs
+
+
+
+
+
+def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv, which_channel):
+    # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
+
+    # which_channels contain the numbers of the channels that need to be visualized
+
+    def get_deconv_model():
+        model = deconv_3DTTN(which_conv)
+        model.cuda(device)
+
+        # copy the weights from trained model
+        w1 = my_model.conv1.weight
+        # w1 = torch.nn.Parameter(w1.permute(1, 0, 4, 3, 2))
+        model.deconv1.weight = w1
+
+        if which_conv == 'conv2':
+            w2 = my_model.conv2.weight
+            # w2 = torch.nn.Parameter(w2.permute(1, 0, 4, 3, 2))
+            model.deconv2.weight = w2
+
+        return model
+
+    deconv_model = get_deconv_model()
+    
+    # for the unpooling switches
+    switches = []
+
+    # pass input through my_model until the point of interest
+    x1 = my_model.conv1(input, device)
+    x2, _s = my_model.max_pool_1(x1)
+    switches.append(_s)
+    x3 = torch.nn.functional.relu(x2)
+
+    if which_conv == 'conv2':
+        x4 = my_model.conv2(x3, device)
+        x5, _s = my_model.max_pool_2(x4)
+        switches.append(_s)
+        x6 = torch.nn.functional.relu(x5)
+
+    # set the irrelevant activations to zero
+    if which_conv == 'conv1':
+        assert(0 < len(which_channel) < project_variable.num_out_channels[0]+1)
+        for i in range(x3.shape[1]):
+            if i not in which_channel:
+                x3[0, i] = torch.nn.Parameter(torch.zeros(x3[0, i].shape))
+
+    elif which_conv == 'conv2':
+        assert (0 < len(which_channel) < project_variable.num_out_channels[1]+1)
+        for i in range(x6.shape[1]):
+            if i not in which_channel:
+                x6[0, i] = torch.nn.Parameter(torch.zeros(x6[0, i].shape))
+
+    # pass the activations as input to the deconv_model
+    if which_conv == 'conv1':
+        reconstruction = deconv_model(x3, switches)
+    elif which_conv == 'conv2':
+        reconstruction = deconv_model(x6, switches)
+    else:
+        reconstruction = None
+
+    save_indices = [0, 9, 19, 29, 39, 49]
+
+    if epoch in save_indices:
+        # save reconstruction
+        save_location = PP.zeiler2014
+        if not os.path.exists(save_location):
+            os.mkdir(save_location)
+
+        # automatic number assignment
+        existing = os.listdir(save_location)
+        if len(existing) != 0:
+            existing = [int(i.split('_')[-1]) for i in existing]
+            existing.sort()
+            number = max(existing) + 1
+        else:
+            number = 0
+
+        folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
+        save_path = os.path.join(save_location, folder)
+
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+
+        for f in range(reconstruction.shape[2]):
+            name = 'frame_%d.png' % f
+            ultimate_path = os.path.join(save_path, name)
+
+            im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
+
+            im = Image.fromarray(im_as_arr, mode='L')
+            im.save(ultimate_path)
+
+        path_input = os.path.join(save_path, 'og_image')
+        if not os.path.exists(path_input):
+            os.mkdir(path_input)
+
+        for f in range(input.shape[2]):
+            name = 'frame_%d.png' % f
+            path = os.path.join(path_input, name)
+            input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
+            input_img = Image.fromarray(input_as_arr, mode='L')
+
+            input_img.save(path)
+

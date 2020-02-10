@@ -64,6 +64,10 @@ def run(project_variable, all_data, my_model, device):
 
     TM.add_standard_info(project_variable, 'val', (loss, accuracy, confusion_epoch))
 
+    if project_variable.do_xai:
+        TM.add_xai(project_variable, my_model, device, data_point=data[0].unsqueeze(0))
+
+
     # project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
     # project_variable.writer.add_scalar('accuracy/val', accuracy, project_variable.current_epoch)
     # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)

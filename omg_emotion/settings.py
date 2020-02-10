@@ -1,4 +1,6 @@
+import numpy as np
 from relative_baseline.omg_emotion import project_paths as PP
+
 
 class ProjectVariable(object):
     def __init__(self, debug_mode=True):
@@ -186,6 +188,18 @@ class ProjectVariable(object):
         # self._max_learning_rate = 1e-2
         # self._mode = 'triangle'
 
+        # ----------------------------------------------------------------------------------------------------------
+        # XAI stuff for visualization
+        # ----------------------------------------------------------------------------------------------------------
+        self.do_xai = False
+        # options: 'erhan2009', 'zeiler2014'
+        self.which_methods = ['erhan2009']
+        # options: 'conv1', 'conv2'
+        self.which_layers = ['conv1']
+        # options: [np.arange(6), np.arange(16)]
+        # each index maps to the respective layer
+        self.which_channels = [np.array([0, 1])]
+        
 
     @property
     def writer(self):
@@ -735,3 +749,35 @@ class ProjectVariable(object):
     @bias_theta_learning_rate.setter
     def bias_theta_learning_rate(self, value):
         self._bias_theta_learning_rate = value
+        
+    @property
+    def do_xai(self):
+        return self._do_xai
+
+    @do_xai.setter
+    def do_xai(self, value):
+        self._do_xai = value
+
+    @property
+    def which_methods(self):
+        return self._which_methods
+
+    @which_methods.setter
+    def which_method(self, value):
+        self._which_methods = value
+
+    @property
+    def which_layers(self):
+        return self._which_layers
+
+    @which_layers.setter
+    def which_layers(self, value):
+        self._which_layers = value
+
+    @property
+    def which_channels(self):
+        return self._which_channels
+
+    @which_channels.setter
+    def which_channels(self, value):
+        self._which_channels = value

@@ -28,10 +28,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     for ts in tqdm(range(steps)):
         data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-        if ts == 0:
-            data_for_vis = data[0].unsqueeze(0)
-
-
         my_optimizer.zero_grad()
 
         if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11]:
@@ -85,7 +81,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # add things to writer
     TM.add_standard_info(project_variable, 'train', (loss, accuracy, confusion_epoch))
 
-    TM.add_xai(project_variable, my_model, device, project_variable.current_epoch, data_point=data_for_vis, which_method='zeiler2014')
+
     # TM.add_temporal_visualizations(project_variable, my_model)
 
 

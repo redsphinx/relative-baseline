@@ -1,5 +1,5 @@
 from relative_baseline.omg_emotion import visualization as VZ
-from relative_baseline.omg_emotion.xai_tools import layer_visualization_2 as layer_vis
+from relative_baseline.omg_emotion.xai_tools import layer_visualization as layer_vis
 
 import numpy as np
 import torch
@@ -234,17 +234,20 @@ def add_standard_info(project_variable, which, parameters):
     project_variable.writer.add_figure(tag='confusion/%s' % which, figure=fig, global_step=project_variable.current_epoch)
 
 
-def add_xai(project_variable, my_model, device, epoch, which_method, data_point=None):
+def add_xai(project_variable, my_model, device, data_point=None):
     assert(project_variable.model_number in [11])
-    assert(which_method in ['erhan2009', 'zeiler2014'])
 
-    if which_method == 'erhan2009':
-        layer_vis.run_erhan2009(my_model, device, epoch)
-    elif which_method == 'zeiler2014':
+    if 'erhan2009' in project_variable.which_methods:
+        all_outputs = layer_vis.run_erhan2009(project_variable, my_model, device)
+
+
+
+
+
+    if 'zeiler2014' in project_variable.which_methods:
         assert(data_point is not None)
-        assert(project_variable.return_ind == True)
 
-        which_conv = 'conv2'
-        which_channel = [0]
-        layer_vis.run_zeiler2014(project_variable, data_point, my_model, device, epoch, which_conv, which_channel)
+        project_variable.return_ind = True
+        layer_vis.run_zeiler2014(project_variable, data_point, my_model, device)
+        project_variable.return_ind = False
 

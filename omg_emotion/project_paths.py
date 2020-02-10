@@ -49,7 +49,11 @@ dhg_location = '/huge/gabras/DHG'
 dhg_hand_only_28_28 = '/huge/gabras/DHG_hand_only_28_28'
 dhg_hand_only_28_28_50_frames = '/huge/gabras/DHG_hand_only_28_28_50_frames'
 
+# visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
+erhan2009 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/erhan2009'
+zeiler2014 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2014'
+
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
 # todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py

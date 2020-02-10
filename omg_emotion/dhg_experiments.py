@@ -1,3 +1,4 @@
+import numpy as np
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 
@@ -1019,6 +1020,11 @@ def e_test_3D_dhg():
     project_variable.num_out_channels = [6, 16]
 
     project_variable.return_ind = True
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['erhan2009']
+    project_variable.which_layers = ['conv1']
+    project_variable.which_channels = [np.array([0, 1])]
 
     main_file.run(project_variable)
 
