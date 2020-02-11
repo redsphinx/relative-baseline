@@ -240,25 +240,23 @@ def add_xai(project_variable, my_model, device, data_point=None):
     if 'erhan2009' in project_variable.which_methods:
         all_outputs = layer_vis.run_erhan2009(project_variable, my_model, device)
 
-        for i in range(len(project_variable.which_methods)):
-            for j in range(len(project_variable.which_layers)):
-                for k in range(len(project_variable.which_channels[j])):
-                    which_methods = project_variable.which_methods[i]
-                    which_layers = project_variable.which_layers[j]
-                    which_channels = project_variable.which_channels[j][k]
+        which_methods = 'erhan2009'
 
-                    output = all_outputs[i, ] # TODO
+        for j in range(len(project_variable.which_layers)):
+            for k in range(len(project_variable.which_channels[j])):
+                which_layers = project_variable.which_layers[j]
+                which_channels = project_variable.which_channels[j][k]
 
-                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers, which_channels),
-                                                      vid_tensor=all_outputs,
-                                                      global_step=project_variable.current_epoch, fps=2)
+                output = all_outputs[j][k]
 
+                # output = np.expand_dims(np.expand_dims(output, axis=0), axis=0)
+                output = output.transpose(0, 2, 1, 3, 4)
 
-
-# xai/erhan2009/layer1/channel
-
-
-
+                # example: xai/erhan2009/layer1/channel
+                project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                which_channels),
+                                                  vid_tensor=output,
+                                                  global_step=project_variable.current_epoch, fps=5)
 
     if 'zeiler2014' in project_variable.which_methods:
         assert(data_point is not None)
@@ -266,6 +264,7 @@ def add_xai(project_variable, my_model, device, data_point=None):
         project_variable.return_ind = True
         layer_vis.run_zeiler2014(project_variable, data_point, my_model, device)
         project_variable.return_ind = False
+        # TODO
 
 
 def add_ksfsdfernels(project_variable, my_model):

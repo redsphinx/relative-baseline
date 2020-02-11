@@ -42,15 +42,19 @@ def run_erhan2009(project_variable, my_model, device):
     all_outputs = []
 
     for l in range(len(project_variable.which_layers)):
-        output_1 = []
+        channels = []
 
         for c in range(len(project_variable.which_channels[l])):
-            output_2 = []
-
             which_layer = project_variable.which_layers[l]
             which_channel = project_variable.which_channels[l][c]
 
-            random_image = torch.rand((1, 1, 50, 28, 28), requires_grad=True, device=device)
+            random_image_1 = torch.rand((1, 1, 50, 28, 28), requires_grad=True, device=device)
+            a = np.random.randint(low=0, high=255, size=(1, 1, 50, 28, 28))
+            a = a * 1.
+            b = torch.Tensor(a).cuda(device)
+            random_image = torch.nn.Parameter(b, requires_grad=True)
+
+
             # TODO: scale values accordingly
             # TODO: subtract mean and divide by std of avg image in training set
 
@@ -78,10 +82,14 @@ def run_erhan2009(project_variable, my_model, device):
                 loss.backward()
                 optimizer.step()
 
-                print('erhan2009 loss mini-epoch %d: %f' % (i, loss.data.cpu()))
+                # print('erhan2009 loss mini-epoch %d: %f' % (i, loss.data.cpu()))
 
-            conv_output = np.array(conv_output.data.cpu(), dtype=np.uint8)
-            all_outputs.append(conv_output)
+            # conv_output = np.array(conv_output.data.cpu(), dtype=np.uint8)
+            # channels.append(conv_output)
+            random_image = np.array(random_image.data.cpu(), dtype=np.uint8)
+            channels.append(random_image)
+
+        all_outputs.append(channels)
 
                 ## use this for debugging
                 # if i == mini_epochs:

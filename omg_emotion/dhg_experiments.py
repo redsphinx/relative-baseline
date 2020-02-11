@@ -1003,7 +1003,7 @@ def e66_3D_dhg():
 
 def e_test_3D_dhg():
     set_init_3()
-    project_variable.end_epoch = 50
+    project_variable.end_epoch = 20
     project_variable.repeat_experiments = 1
 
     project_variable.experiment_number = 5800
@@ -1011,7 +1011,7 @@ def e_test_3D_dhg():
     project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [140 * 14,  1 * 14, 1 * 14]
+    project_variable.data_points = [140 * 14,  20 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
@@ -1019,12 +1019,14 @@ def e_test_3D_dhg():
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [6, 16]
 
-    project_variable.return_ind = True
+    # project_variable.return_ind = True
 
     project_variable.do_xai = True
     project_variable.which_methods = ['erhan2009']
     project_variable.which_layers = ['conv1']
-    project_variable.which_channels = [np.array([0, 1])]
+    # project_variable.which_layers = ['conv2']
+    project_variable.which_channels = [np.array([0, 1, 2, 3, 4, 5])]
+    # project_variable.which_channels = [np.arange(16)]
 
     main_file.run(project_variable)
 
