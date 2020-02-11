@@ -100,9 +100,6 @@ def run_erhan2009(project_variable, my_model, device):
     return all_outputs
 
 
-
-
-
 def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv, which_channel):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
