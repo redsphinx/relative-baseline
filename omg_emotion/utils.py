@@ -242,3 +242,31 @@ def remove_all_files(experiment, model):
                 elif os.path.isfile(file_path):
                     os.remove(file_path)
 
+
+def flow_grid_from_theta(n, h, w, theta):
+    # auto range = at::linspace(-1, 1, num_steps, grid.options());
+
+    def linspace_from_neg_one(num_steps):
+        return np.linspace(-1, 1, num_steps)
+
+    def make_base_grid(n_, h_, w_):
+        grid = np.zeros((n_, h_, w_, 3))
+        grid[:, :, :, 0] = linspace_from_neg_one(w_)
+        grid[:, :, :, 1] = np.expand_dims(linspace_from_neg_one(h_), axis=-1)
+        grid[:, :, :, 2] = np.ones(shape=grid[:, :, :, 2].shape)
+        return grid
+
+    base_grid = make_base_grid(n, h, w)
+    final_grid = base_grid.reshape((n, h*w, 3))
+    final_grid = np.tensordot(final_grid, theta.transpose((0, 2, 1)), axes=([2],[1]))
+    final_grid = final_grid.reshape((n, h, w, 2))
+
+    print('final_grid.shape: ', final_grid.shape)
+    print(final_grid)
+
+    return final_grid
+
+## example
+# theta = np.array([[[2, 0, 0], [0, 2, 0]]])
+# flow_grid_from_theta(1, 3, 3, theta)
+
