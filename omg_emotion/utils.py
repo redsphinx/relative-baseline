@@ -246,8 +246,12 @@ def remove_all_files(experiment, model):
 def flow_grid_from_theta(n, h, w, theta):
     # auto range = at::linspace(-1, 1, num_steps, grid.options());
 
-    def linspace_from_neg_one(num_steps):
-        return np.linspace(-1, 1, num_steps)
+    def linspace_from_neg_one(num_steps, align_corners=False):
+        range_ = np.linspace(-1, 1, num_steps)
+        if not align_corners:
+            range_ = range_ * (num_steps - 1) / num_steps
+
+        return range_
 
     def make_base_grid(n_, h_, w_):
         grid = np.zeros((n_, h_, w_, 3))
@@ -275,18 +279,24 @@ def generate_next_k_slice(flow_grid, k0):
             total_xy = 0
             G_y = flow_grid[0, l, m, 0]
             G_x = flow_grid[0, l, m, 1]
-
+            a = np.zeros((flow_grid.shape[1], flow_grid.shape[2]))
             for i in range(flow_grid.shape[1]):
                 for j in range(flow_grid.shape[2]):
                     k0_ij = k0[i, j]
-                    delta_k0 = k0_ij * max(0, 1 - abs(G_x - i+1)) * max(0, 1 - abs(G_y - j+1))
-                    # print('k0_ij = ', k0_ij, ' i, j = ', i, j, ' G_x, G_y = ', G_x, G_y)
-                    # print('delta_k0 = %d * %d * %d = %d' % (int(k0_ij),
-                    #                                         int(max(0, 1 - abs(G_x - i+1))),
-                    #                                         int(max(0, 1 - abs(G_y - j+1))),
-                    #                                         int(delta_k0)))
-
+                    delta_k0 = k0_ij * max(0, 1-abs(G_x - (i))) * max(0,  1-abs(G_y - (j)))
+                    _tmp = total_xy
+                    a[i,j] = delta_k0
                     total_xy = total_xy + delta_k0
+
+                    # if delta_k0 > 0:
+                    #     print('before: ', _tmp, 'i, j: ', i, j)
+                    #     print('after: ', total_xy, 'i, j: ', i, j)
+                    #     print('k0_ij = ', k0_ij, ' i, j = ', i, j, ' G_x, G_y = ', G_x, G_y)
+                    #     print('delta_k0 = %f * %f * %f = %f' % (k0_ij,
+                    #                                             max(0, abs(G_x - (i+1))),
+                    #                                             max(0, abs(G_y - (j+1))),
+                    #                                             delta_k0))
+                    #     print(total_xy)
 
             k1[l, m] = total_xy
 
@@ -297,9 +307,9 @@ def generate_next_k_slice(flow_grid, k0):
 
 
 ## example
-h, w = 5, 5
-theta = np.array([[[1, 0, 0], [0, 1, 0]]])
-f_grid = flow_grid_from_theta(1, h, w, theta)
-
-k_zero = np.arange(h*w).reshape((h, w))
-k_one = generate_next_k_slice(f_grid, k_zero)
+# h, w = 3, 3
+# theta = np.array([[[1, 0, 0], [0, 1, 0]]])
+# f_grid = flow_grid_from_theta(1, h, w, theta)
+#
+# k_zero = np.arange(h*w).reshape((h, w))
+# k_one = generate_next_k_slice(f_grid, k_zero)

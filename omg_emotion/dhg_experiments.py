@@ -1008,10 +1008,10 @@ def e_test_3D_dhg():
 
     project_variable.experiment_number = 5800
     project_variable.sheet_number = 21
-    project_variable.device = 1
+    project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [10 * 14,  20 * 14, 1 * 14]
+    project_variable.data_points = [2 * 14,  2 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
