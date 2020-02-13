@@ -266,7 +266,40 @@ def flow_grid_from_theta(n, h, w, theta):
 
     return final_grid
 
-## example
-# theta = np.array([[[2, 0, 0], [0, 2, 0]]])
-# flow_grid_from_theta(1, 3, 3, theta)
 
+def generate_next_k_slice(flow_grid, k0):
+    k1 = np.zeros(shape=k0.shape)
+
+    for l in range(k0.shape[0]):
+        for m in range(k0.shape[1]):
+            total_xy = 0
+            G_y = flow_grid[0, l, m, 0]
+            G_x = flow_grid[0, l, m, 1]
+
+            for i in range(flow_grid.shape[1]):
+                for j in range(flow_grid.shape[2]):
+                    k0_ij = k0[i, j]
+                    delta_k0 = k0_ij * max(0, 1 - abs(G_x - i+1)) * max(0, 1 - abs(G_y - j+1))
+                    # print('k0_ij = ', k0_ij, ' i, j = ', i, j, ' G_x, G_y = ', G_x, G_y)
+                    # print('delta_k0 = %d * %d * %d = %d' % (int(k0_ij),
+                    #                                         int(max(0, 1 - abs(G_x - i+1))),
+                    #                                         int(max(0, 1 - abs(G_y - j+1))),
+                    #                                         int(delta_k0)))
+
+                    total_xy = total_xy + delta_k0
+
+            k1[l, m] = total_xy
+
+    print(k0)
+    print(k1)
+
+    return k1
+
+
+## example
+h, w = 5, 5
+theta = np.array([[[1, 0, 0], [0, 1, 0]]])
+f_grid = flow_grid_from_theta(1, h, w, theta)
+
+k_zero = np.arange(h*w).reshape((h, w))
+k_one = generate_next_k_slice(f_grid, k_zero)
