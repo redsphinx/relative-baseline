@@ -1057,7 +1057,7 @@ def e_test_3D_dhg():
         project_variable.return_ind = True
 
     project_variable.which_layers = ['conv1']
-    project_variable.which_channels = [np.array([0, 1, 2])]
+    project_variable.which_channels = [np.arange(6)]
     # project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
