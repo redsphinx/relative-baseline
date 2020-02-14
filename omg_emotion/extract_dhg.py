@@ -304,4 +304,3 @@ def create_fixed_sequence(frames=50):
 
 
 
-# create_fixed_sequence()

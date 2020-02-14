@@ -48,6 +48,7 @@ marcel_gestures_location = '/huge/gabras/marcel_gestures'
 dhg_location = '/huge/gabras/DHG'
 dhg_hand_only_28_28 = '/huge/gabras/DHG_hand_only_28_28'
 dhg_hand_only_28_28_50_frames = '/huge/gabras/DHG_hand_only_28_28_50_frames'
+dhg_mean_std = '/huge/gabras/DHG/mean_std.npy'
 
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'

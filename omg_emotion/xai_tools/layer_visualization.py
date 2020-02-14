@@ -9,6 +9,7 @@ from torch.autograd import Variable
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN
 import relative_baseline.omg_emotion.project_paths as PP
+import relative_baseline.omg_emotion.data_loading as DL
 
 
 def save_image(image, location, epoch_number):
@@ -41,6 +42,18 @@ def run_erhan2009(project_variable, my_model, device):
     # based on "Visualizing Higher-Layer Features of a Deep Network" by Erhan et al. 2009
     all_outputs = []
 
+    base_image = np.random.randint(low=250, high=255, size=(1, 1, 50, 28, 28))
+    base_image = base_image * 1.
+    # subtract mean and divide by std of avg image in training set
+    mean, std = DL.get_mean_std_train_dhg()
+    std[std == 0.] = 1.
+
+    base_image = base_image - mean
+    base_image = base_image / std
+
+    # set negative values to zero
+    base_image = base_image.clip(min=0)
+
     for l in range(len(project_variable.which_layers)):
         channels = []
 
@@ -48,17 +61,12 @@ def run_erhan2009(project_variable, my_model, device):
             which_layer = project_variable.which_layers[l]
             which_channel = project_variable.which_channels[l][c]
 
-            random_image_1 = torch.rand((1, 1, 50, 28, 28), requires_grad=True, device=device)
-            a = np.random.randint(low=0, high=255, size=(1, 1, 50, 28, 28))
-            a = a * 1.
-            b = torch.Tensor(a).cuda(device)
+            b = torch.Tensor(base_image).cuda(device)
             random_image = torch.nn.Parameter(b, requires_grad=True)
 
-
             # TODO: scale values accordingly
-            # TODO: subtract mean and divide by std of avg image in training set
 
-            optimizer = Adam([random_image], lr=0.01, weight_decay=0)
+            optimizer = Adam([random_image], lr=0.05, weight_decay=0)
             mini_epochs = 50
             conv_output = None
 
@@ -71,7 +79,7 @@ def run_erhan2009(project_variable, my_model, device):
                     x = my_model.conv1(x, device)
                 elif which_layer == 'conv2':
                     x = my_model.conv1(x, device)
-                    x = my_model.max_pool_1(x)
+                    x, _ = my_model.max_pool_1(x)
                     x = torch.nn.functional.relu(x)
                     x = my_model.conv2(x, device)
 
@@ -100,106 +108,132 @@ def run_erhan2009(project_variable, my_model, device):
     return all_outputs
 
 
-def run_zeiler2014(project_variable, input, my_model, device, epoch, which_conv, which_channel):
+def run_zeiler2014(project_variable, input, my_model, device):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
-    # which_channels contain the numbers of the channels that need to be visualized
+    # which_channels contain the numbers of the channels that need to be visualized individually
 
-    def get_deconv_model():
-        model = deconv_3DTTN(which_conv)
+    # TODO: input has to be clip that maximizes the ONLY nonzero value allowed
+
+    all_outputs = []
+    
+    def get_deconv_model(which_layer):
+        model = deconv_3DTTN(which_layer)
         model.cuda(device)
 
         # copy the weights from trained model
+        # TODO: try different permutations, maybe leave the temporal dimension untouched
         w1 = my_model.conv1.weight
-        # w1 = torch.nn.Parameter(w1.permute(1, 0, 4, 3, 2))
+        # w1 = torch.nn.Parameter(w1.permute(0, 1, 2, 4, 3))
+        w1 = torch.nn.Parameter(w1.permute(1, 0, 2, 4, 3))
         model.deconv1.weight = w1
 
-        if which_conv == 'conv2':
+        if which_layer == 'conv2':
             w2 = my_model.conv2.weight
-            # w2 = torch.nn.Parameter(w2.permute(1, 0, 4, 3, 2))
+            w2 = torch.nn.Parameter(w2.permute(1, 0, 2, 4, 3))
             model.deconv2.weight = w2
 
         return model
 
-    deconv_model = get_deconv_model()
-    
-    # for the unpooling switches
-    switches = []
+    for l in range(len(project_variable.which_layers)):
+        channels = []
+        channels.append(np.array(input.data.cpu(), dtype=np.uint8))
+        
+        for c in range(len(project_variable.which_channels[l])):
+            which_layer = project_variable.which_layers[l]
+            which_channel = project_variable.which_channels[l][c]
+            
+            deconv_model = get_deconv_model(which_layer)
+            # for the unpooling switches
+            switches = []
 
-    # pass input through my_model until the point of interest
-    x1 = my_model.conv1(input, device)
-    x2, _s = my_model.max_pool_1(x1)
-    switches.append(_s)
-    x3 = torch.nn.functional.relu(x2)
+            # pass input through my_model until the point of interest
+            my_model.eval()
+            x1 = my_model.conv1(input, device)
+            x2, _s = my_model.max_pool_1(x1)
+            switches.append(_s)
+            x3 = torch.nn.functional.relu(x2)
 
-    if which_conv == 'conv2':
-        x4 = my_model.conv2(x3, device)
-        x5, _s = my_model.max_pool_2(x4)
-        switches.append(_s)
-        x6 = torch.nn.functional.relu(x5)
+            if which_layer == 'conv2':
+                x4 = my_model.conv2(x3, device)
+                x5, _s = my_model.max_pool_2(x4)
+                switches.append(_s)
+                x6 = torch.nn.functional.relu(x5)
 
-    # set the irrelevant activations to zero
-    if which_conv == 'conv1':
-        assert(0 < len(which_channel) < project_variable.num_out_channels[0]+1)
-        for i in range(x3.shape[1]):
-            if i not in which_channel:
-                x3[0, i] = torch.nn.Parameter(torch.zeros(x3[0, i].shape))
+            my_model.train()
 
-    elif which_conv == 'conv2':
-        assert (0 < len(which_channel) < project_variable.num_out_channels[1]+1)
-        for i in range(x6.shape[1]):
-            if i not in which_channel:
-                x6[0, i] = torch.nn.Parameter(torch.zeros(x6[0, i].shape))
+            # set the irrelevant activations to zero
+            # TODO: all non max within feature map of channel of interest to zero as well!
+            # TODO: ONLY 1 nonzero value allowed
+            if which_layer == 'conv1':
 
-    # pass the activations as input to the deconv_model
-    if which_conv == 'conv1':
-        reconstruction = deconv_model(x3, switches)
-    elif which_conv == 'conv2':
-        reconstruction = deconv_model(x6, switches)
-    else:
-        reconstruction = None
+                for i in range(x3.shape[1]):
+                    if i != which_channel:
+                        x3[0, i] = torch.nn.Parameter(torch.zeros(x3[0, i].shape))
 
-    save_indices = [0, 9, 19, 29, 39, 49]
+            elif which_layer == 'conv2':
+                for i in range(x6.shape[1]):
+                    if i != which_channel:
+                        x6[0, i] = torch.nn.Parameter(torch.zeros(x6[0, i].shape))
+            
+            
+            # pass the activations as input to the deconv_model
+            if which_layer == 'conv1':
+                reconstruction = deconv_model(x3, switches)
+            elif which_layer == 'conv2':
+                reconstruction = deconv_model(x6, switches)
+            else:
+                reconstruction = None
 
-    if epoch in save_indices:
-        # save reconstruction
-        save_location = PP.zeiler2014
-        if not os.path.exists(save_location):
-            os.mkdir(save_location)
+            reconstruction = np.array(reconstruction.data.cpu(), dtype=np.uint8)
+            channels.append(reconstruction)
 
-        # automatic number assignment
-        existing = os.listdir(save_location)
-        if len(existing) != 0:
-            existing = [int(i.split('_')[-1]) for i in existing]
-            existing.sort()
-            number = max(existing) + 1
-        else:
-            number = 0
+        all_outputs.append(channels)
 
-        folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
-        save_path = os.path.join(save_location, folder)
+    # save_indices = [0, 9, 19, 29, 39, 49]
 
-        if not os.path.exists(save_path):
-            os.mkdir(save_path)
+    # return for tensorboard
 
-        for f in range(reconstruction.shape[2]):
-            name = 'frame_%d.png' % f
-            ultimate_path = os.path.join(save_path, name)
-
-            im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
-
-            im = Image.fromarray(im_as_arr, mode='L')
-            im.save(ultimate_path)
-
-        path_input = os.path.join(save_path, 'og_image')
-        if not os.path.exists(path_input):
-            os.mkdir(path_input)
-
-        for f in range(input.shape[2]):
-            name = 'frame_%d.png' % f
-            path = os.path.join(path_input, name)
-            input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
-            input_img = Image.fromarray(input_as_arr, mode='L')
-
-            input_img.save(path)
+    # if epoch in save_indices:
+    #     # save reconstruction
+    #     save_location = PP.zeiler2014
+    #     if not os.path.exists(save_location):
+    #         os.mkdir(save_location)
+    # 
+    #     # automatic number assignment
+    #     existing = os.listdir(save_location)
+    #     if len(existing) != 0:
+    #         existing = [int(i.split('_')[-1]) for i in existing]
+    #         existing.sort()
+    #         number = max(existing) + 1
+    #     else:
+    #         number = 0
+    # 
+    #     folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
+    #     save_path = os.path.join(save_location, folder)
+    # 
+    #     if not os.path.exists(save_path):
+    #         os.mkdir(save_path)
+    # 
+    #     for f in range(reconstruction.shape[2]):
+    #         name = 'frame_%d.png' % f
+    #         ultimate_path = os.path.join(save_path, name)
+    # 
+    #         im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
+    # 
+    #         im = Image.fromarray(im_as_arr, mode='L')
+    #         im.save(ultimate_path)
+    # 
+    #     path_input = os.path.join(save_path, 'og_image')
+    #     if not os.path.exists(path_input):
+    #         os.mkdir(path_input)
+    # 
+    #     for f in range(input.shape[2]):
+    #         name = 'frame_%d.png' % f
+    #         path = os.path.join(path_input, name)
+    #         input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
+    #         input_img = Image.fromarray(input_as_arr, mode='L')
+    # 
+    #         input_img.save(path)
+    return all_outputs
 

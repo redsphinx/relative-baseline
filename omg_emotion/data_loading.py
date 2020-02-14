@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from . import project_paths as PP
+import relative_baseline.omg_emotion.project_paths as PP
 from relative_baseline.omg_emotion import utils as U1
 import random
 from PIL import Image
@@ -10,7 +10,7 @@ import torch
 from multiprocessing import Pool, Queue
 from tqdm import tqdm
 # temporary for debugging
-from .settings import ProjectVariable
+# from .settings import ProjectVariable
 import time
 import torchvision.datasets as datasets
 import torchvision
@@ -802,6 +802,43 @@ def load_dhg(project_variable, seed):
         all_labels.append(some_labels)
 
     return splits, all_data, all_labels
+
+
+def get_mean_std_train_dhg():
+    if os.path.exists(PP.dhg_mean_std):
+        total = np.load(PP.dhg_mean_std)
+        mean = total[0]
+        std = total[1]
+    else:
+        all_train_files = np.zeros(shape=(140, 50, 28, 28))
+
+        label_path = os.path.join(PP.dhg_hand_only_28_28_50_frames, 'labels_train.txt')
+        labels = np.genfromtxt(label_path, delimiter=',', dtype=int)[:140]
+
+        for i in tqdm(range(140)):
+            for j in range(50):
+                img_path = os.path.join(PP.dhg_hand_only_28_28_50_frames,
+                                        'gesture_%d/finger_%d/subject_%s/essai_%d/depth_%d.png'
+                                        % (labels[i][0], labels[i][1], labels[i][2], labels[i][3], j + 1))
+                tmp = Image.open(img_path)
+                tmp = np.array(tmp.convert('L'))
+                all_train_files[i, j] = tmp
+
+        # get the mean as array.mean(axis=0)
+        mean = all_train_files.mean(axis=0)
+        # get the std as array.std(axis=0)
+        std = all_train_files.std(axis=0)
+
+    # save files for next time
+    total = np.array([mean, std])
+    np.save(PP.dhg_mean_std, total)
+
+    return mean, std
+
+    # save it somewhere in a text file
+
+# m, s = get_mean_std_train_dhg()
+
 
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':

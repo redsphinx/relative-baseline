@@ -998,20 +998,18 @@ def e66_3D_dhg():
     main_file.run(project_variable)
 
 
-# --------------------------------------
-#   for debugging purposes
 
-def e_test_3D_dhg():
+def e67_test_3D_dhg():
     set_init_3()
-    project_variable.end_epoch = 2
+    project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
 
-    project_variable.experiment_number = 5800
+    project_variable.experiment_number = 67
     project_variable.sheet_number = 21
     project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [2 * 14,  2 * 14, 1 * 14]
+    project_variable.data_points = [140 * 14,  20 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
@@ -1019,19 +1017,52 @@ def e_test_3D_dhg():
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [6, 16]
 
-    # project_variable.return_ind = True
 
-    project_variable.do_xai = False
-    project_variable.which_methods = ['erhan2009']
+    project_variable.do_xai = True
+    project_variable.which_methods = ['erhan2009', 'zeiler2014']
+    if 'zeiler2014' in project_variable.which_methods:
+        project_variable.return_ind = True
+
     project_variable.which_layers = ['conv1', 'conv2']
-    # project_variable.which_layers = ['conv2']
-    project_variable.which_channels = [np.array([0, 1, 2, 3, 4, 5]), np.arange(16)]
-    # project_variable.which_channels = [np.arange(16)]
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
+
+    main_file.run(project_variable)
+
+
+# --------------------------------------
+#   for debugging purposes
+
+def e_test_3D_dhg():
+    set_init_3()
+    project_variable.end_epoch = 20
+    project_variable.repeat_experiments = 1
+
+    project_variable.experiment_number = 923845
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.model_number = 11
+    project_variable.data_points = [50 * 14,  2 * 14, 1 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['erhan2009']
+    if 'zeiler2014' in project_variable.which_methods:
+        project_variable.return_ind = True
+
+    project_variable.which_layers = ['conv1']
+    project_variable.which_channels = [np.array([0, 1, 2])]
+    # project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
 
 # --------------------------------------
-
 
 project_variable = ProjectVariable(debug_mode=True)
 

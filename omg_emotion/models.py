@@ -2345,34 +2345,36 @@ class deconv_3DTTN(torch.nn.Module):
 
         if which_conv == 'conv2':
             # relu
-            # unpool 2
+            # unpool 2 5x5
             self.unpool2 = torch.nn.MaxUnpool3d(kernel_size=2)
             # deconv 2
-            self.deconv2 = torch.nn.ConvTranspose3d(in_channels=16,
-                                                    out_channels=6,
-                                                    kernel_size=5,
-                                                    padding=0,
-                                                    bias=False)
-            # self.deconv2 = torch.nn.Conv3d(in_channels=16,
-            #                                out_channels=6,
-            #                                kernel_size=5,
-            #                                padding=0,
-            #                                bias=False)
+            # self.deconv2 = torch.nn.ConvTranspose3d(in_channels=16,
+            #                                         out_channels=6,
+            #                                         kernel_size=5,
+            #                                         padding=0,
+            #                                         bias=False)
+            # 10x10
+            self.deconv2 = torch.nn.Conv3d(in_channels=16,
+                                           out_channels=6,
+                                           kernel_size=5, # flor k/2
+                                           padding=4,
+                                           bias=False)
 
         # relu
-        # unpool 1
+        # unpool 1 14x14
         self.unpool1 = torch.nn.MaxUnpool3d(kernel_size=2)
         # deconv 1
-        self.deconv1 = torch.nn.ConvTranspose3d(in_channels=6,
-                                                out_channels=1,
-                                                kernel_size=5,
-                                                padding=2,
-                                                bias=False)
-        # self.deconv1 = torch.nn.Conv3d(in_channels=6,
-        #                                out_channels=1,
-        #                                kernel_size=5,
-        #                                padding=2,
-        #                                bias=False)
+        # self.deconv1 = torch.nn.ConvTranspose3d(in_channels=6,
+        #                                         out_channels=1,
+        #                                         kernel_size=5,
+        #                                         padding=2,
+        #                                         bias=False)
+        #  28x28
+        self.deconv1 = torch.nn.Conv3d(in_channels=6,
+                                       out_channels=1,
+                                       kernel_size=5,
+                                       padding=2,
+                                       bias=False) #28x28 + 2
 
         self.which_conv = which_conv
 

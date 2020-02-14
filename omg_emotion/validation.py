@@ -64,7 +64,10 @@ def run(project_variable, all_data, my_model, device):
 
     TM.add_standard_info(project_variable, 'val', (loss, accuracy, confusion_epoch))
 
-    if project_variable.do_xai:
+    # save_epochs = [0, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
+    save_epochs = np.arange(20)
+
+    if project_variable.do_xai and project_variable.current_epoch in save_epochs:
         TM.add_xai(project_variable, my_model, device, data_point=data[0].unsqueeze(0))
 
 
