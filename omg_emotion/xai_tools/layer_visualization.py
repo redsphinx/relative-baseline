@@ -161,8 +161,6 @@ def run_zeiler2014(project_variable, input, my_model, device):
             my_model.train()
 
             # set the irrelevant activations to zero
-            # TODO: all non max within feature map of channel of interest to zero as well!
-            # TODO: ONLY 1 nonzero value allowed
             if which_layer == 'conv1':
 
                 # remove the bias
@@ -244,6 +242,7 @@ def run_zeiler2014(project_variable, input, my_model, device):
             else:
                 reconstruction = None
 
+            reconstruction = torch.clamp(input=reconstruction, min=0, max=255, out=None)
             reconstruction = np.array(reconstruction.data.cpu(), dtype=np.uint8)
             channels.append(reconstruction)
 

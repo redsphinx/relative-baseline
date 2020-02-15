@@ -1034,7 +1034,7 @@ def e67_test_3D_dhg():
 
 def e_test_3D_dhg():
     set_init_3()
-    project_variable.end_epoch = 20
+    project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
 
     project_variable.experiment_number = 923845
@@ -1042,7 +1042,7 @@ def e_test_3D_dhg():
     project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [100 * 14,  2 * 14, 1 * 14]
+    project_variable.data_points = [140 * 14,  2 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
@@ -1052,7 +1052,7 @@ def e_test_3D_dhg():
 
 
     project_variable.do_xai = True
-    project_variable.which_methods = ['zeiler2014']
+    project_variable.which_methods = ['erhan2009', 'zeiler2014']
     if 'zeiler2014' in project_variable.which_methods:
         project_variable.return_ind = True
 
