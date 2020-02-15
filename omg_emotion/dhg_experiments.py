@@ -1042,7 +1042,7 @@ def e_test_3D_dhg():
     project_variable.device = 2
 
     project_variable.model_number = 11
-    project_variable.data_points = [50 * 14,  2 * 14, 1 * 14]
+    project_variable.data_points = [100 * 14,  2 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
@@ -1052,13 +1052,13 @@ def e_test_3D_dhg():
 
 
     project_variable.do_xai = True
-    project_variable.which_methods = ['erhan2009']
+    project_variable.which_methods = ['zeiler2014']
     if 'zeiler2014' in project_variable.which_methods:
         project_variable.return_ind = True
 
-    project_variable.which_layers = ['conv1']
-    project_variable.which_channels = [np.arange(6)]
-    # project_variable.which_channels = [np.arange(6), np.arange(16)]
+    project_variable.which_layers = ['conv1', 'conv2']
+    # project_variable.which_channels = [np.arange(2), np.arange(2)]
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
 

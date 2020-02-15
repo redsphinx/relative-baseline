@@ -122,15 +122,13 @@ def run_zeiler2014(project_variable, input, my_model, device):
         model.cuda(device)
 
         # copy the weights from trained model
-        # TODO: try different permutations, maybe leave the temporal dimension untouched
         w1 = my_model.conv1.weight
-        # w1 = torch.nn.Parameter(w1.permute(0, 1, 2, 4, 3))
-        w1 = torch.nn.Parameter(w1.permute(1, 0, 2, 4, 3))
+        # w1 = torch.nn.Parameter(w1.permute(1, 0, 2, 4, 3))
         model.deconv1.weight = w1
 
         if which_layer == 'conv2':
             w2 = my_model.conv2.weight
-            w2 = torch.nn.Parameter(w2.permute(1, 0, 2, 4, 3))
+            # w2 = torch.nn.Parameter(w2.permute(1, 0, 2, 4, 3))
             model.deconv2.weight = w2
 
         return model
@@ -167,15 +165,76 @@ def run_zeiler2014(project_variable, input, my_model, device):
             # TODO: ONLY 1 nonzero value allowed
             if which_layer == 'conv1':
 
+                # remove the bias
+                bias = my_model.conv1.bias
+                n_ = bias.shape[0]
+                d_, h_, w_ = x3[0, 0].shape
+                bias = bias.repeat_interleave(d_ * h_ * w_, axis=0)
+                bias = bias.reshape((n_, d_, h_, w_))
+                x3 = x3 - bias
+
                 for i in range(x3.shape[1]):
                     if i != which_channel:
                         x3[0, i] = torch.nn.Parameter(torch.zeros(x3[0, i].shape))
 
+                # set all non-max activations to zero, per time dimension
+                for j in range(d_):
+                    # get index of highest value and the value
+                    highest_value = 0
+                    ind_1, ind_2 = 0, 0
+                    for m in range(h_):
+                        for n in range(w_):
+                            val = float(x3[0, which_channel, j, m, n].data.cpu())
+                            if val > highest_value:
+                                highest_value = val
+                                ind_1 = m
+                                ind_2 = n
+
+                    # set everything to zero
+                    x3[0, which_channel, j] = torch.nn.Parameter(torch.zeros(x3[0, which_channel, j].shape))
+
+                    # set index with highest value
+                    for m in range(h_):
+                        for n in range(w_):
+                            if ind_1 == m and ind_2 == n:
+                                x3[0, which_channel, j, ind_1, ind_2] = highest_value
+
             elif which_layer == 'conv2':
+
+                # remove the bias
+                bias = my_model.conv2.bias
+                n_ = bias.shape[0]
+                d_, h_, w_ = x6[0, 0].shape
+                bias = bias.repeat_interleave(d_ * h_ * w_, axis=0)
+                bias = bias.reshape((n_, d_, h_, w_))
+                x6 = x6 - bias
+
                 for i in range(x6.shape[1]):
                     if i != which_channel:
                         x6[0, i] = torch.nn.Parameter(torch.zeros(x6[0, i].shape))
-            
+
+                # set all non-max activations to zero, per time dimension
+                for j in range(x6[0, which_channel].shape[0]):
+                    # get index of highest value and the value
+                    highest_value = 0
+                    ind_1, ind_2 = 0, 0
+                    for m in range(h_):
+                        for n in range(w_):
+                            val = float(x6[0, which_channel, j, m, n].data.cpu())
+                            if val > highest_value:
+                                highest_value = val
+                                ind_1 = m
+                                ind_2 = n
+
+                    # set everything to zero
+                    x6[0, which_channel, j] = torch.nn.Parameter(torch.zeros(x6[0, which_channel, j].shape))
+
+                    # set index with highest value
+                    for m in range(h_):
+                        for n in range(w_):
+                            if ind_1 == m and ind_2 == n:
+                                x6[0, which_channel, j, ind_1, ind_2] = highest_value
+                                # break
             
             # pass the activations as input to the deconv_model
             if which_layer == 'conv1':
