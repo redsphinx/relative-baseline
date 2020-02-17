@@ -2224,13 +2224,17 @@ def isnan(x, name):
 class LeNet5_3d_xD(torch.nn.Module):
 
     def __init__(self, project_variable):
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
         super(LeNet5_3d_xD, self).__init__()
         self.conv1 = torch.nn.Conv3d(in_channels=project_variable.num_in_channels, out_channels=project_variable.num_out_channels[0],
                                      kernel_size=project_variable.k_shape, stride=1, padding=2, bias=True)
         if project_variable.k0_init == 'normal':
             self.conv1.weight = torch.nn.init.normal_(self.conv1.weight)
             self.conv1.bias = torch.nn.init.normal_(self.conv1.bias)
-        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
 
         self.conv2 = torch.nn.Conv3d(in_channels=project_variable.num_out_channels[0],
                                      out_channels=project_variable.num_out_channels[1],
@@ -2239,7 +2243,7 @@ class LeNet5_3d_xD(torch.nn.Module):
             self.conv2.weight = torch.nn.init.normal_(self.conv2.weight)
             self.conv2.bias = torch.nn.init.normal_(self.conv2.bias)
 
-        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
 
         in_features = None
 
@@ -2274,12 +2278,18 @@ class LeNet5_3d_xD(torch.nn.Module):
         # maybe shouldnt check here, too many input
 
         x = torch.nn.functional.relu(x)
-        x = self.max_pool_1(x)
+        if self.return_ind:
+            x, ind1 = self.max_pool_1(x)
+        else:
+            x = self.max_pool_1(x)
         isnan(x, 'max_pool_1')
 
         x = self.conv2(x)
         isnan(x, 'conv2')
-        x = self.max_pool_2(x)
+        if self.return_ind:
+            x, ind2 = self.max_pool_2(x)
+        else:
+            x = self.max_pool_2(x)
         isnan(x, 'max_pool_2')
 
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
@@ -2389,3 +2399,56 @@ class deconv_3DTTN(torch.nn.Module):
         x = self.deconv1(x)
 
         return x
+
+class deconv_3D(torch.nn.Module):
+
+    def __init__(self, which_conv):
+        super(deconv_3D, self).__init__()
+
+        if which_conv == 'conv2':
+            # relu
+            # unpool 2 5x5
+            self.unpool2 = torch.nn.MaxUnpool3d(kernel_size=2)
+            # deconv 2
+            self.deconv2 = torch.nn.ConvTranspose3d(in_channels=16,
+                                                    out_channels=6,
+                                                    kernel_size=5,
+                                                    padding=0,
+                                                    bias=False)
+            # 10x10
+            # self.deconv2 = torch.nn.Conv3d(in_channels=16,
+            #                                out_channels=6,
+            #                                kernel_size=5, # flor k/2
+            #                                padding=4,
+            #                                bias=False)
+
+        # relu
+        # unpool 1 14x14
+        self.unpool1 = torch.nn.MaxUnpool3d(kernel_size=2)
+        # deconv 1
+        self.deconv1 = torch.nn.ConvTranspose3d(in_channels=6,
+                                                out_channels=1,
+                                                kernel_size=5,
+                                                padding=2,
+                                                bias=False)
+        #  28x28
+        # self.deconv1 = torch.nn.Conv3d(in_channels=6,
+        #                                out_channels=1,
+        #                                kernel_size=5,
+        #                                padding=2,
+        #                                bias=False) #28x28 + 2
+
+        self.which_conv = which_conv
+
+    def forward(self, x, pool_switches):
+        if self.which_conv == 'conv2':
+            x = torch.nn.functional.relu(x)
+            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 21, 10, 10]))
+            x = self.deconv2(x)
+
+        x = torch.nn.functional.relu(x)
+        x = self.unpool1(x, pool_switches[0])
+        x = self.deconv1(x)
+
+        return x
+

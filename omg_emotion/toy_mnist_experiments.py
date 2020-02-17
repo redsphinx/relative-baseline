@@ -1,5 +1,6 @@
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
+import numpy as np
 
 
 def pilot():
@@ -9805,29 +9806,56 @@ def e1396_conv3dttn_mnist():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
 
-#10
-# e1379_conv3dttn_mnist()
-# e1380_conv3dttn_mnist()
-# e1381_conv3dttn_mnist()
-#20
-# e1382_conv3dttn_mnist()
-# e1383_conv3dttn_mnist()
-# e1384_conv3dttn_mnist()
-#30
-# e1385_conv3dttn_mnist()
-# e1386_conv3dttn_mnist()
-# e1387_conv3dttn_mnist()
-#40
-# e1388_conv3dttn_mnist()
-# e1389_conv3dttn_mnist()
-# e1390_conv3dttn_mnist()
-#50
-# e1391_conv3dttn_mnist()
-# e1392_conv3dttn_mnist()
-# e1393_conv3dttn_mnist()
-#100
-# e1394_conv3dttn_mnist()
-# e1395_conv3dttn_mnist()
-e1396_conv3dttn_mnist()
+# ---- testing the visualizations
+def e_test_3D_mnist():
+    project_variable.experiment_number = 923845
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.end_epoch = 10
+    project_variable.repeat_experiments = 1
+
+    project_variable.model_number = 2
+    project_variable.data_points = [50, 10, 0]
+    project_variable.batch_size = 2 * 10
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+
+    project_variable.dataset = 'mov_mnist'
+    project_variable.num_in_channels = 1
+    project_variable.label_size = 10
+    project_variable.load_num_frames = 30  # 50
+    project_variable.label_type = 'categories'
+
+    project_variable.save_only_best_run = True
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+
+    project_variable.experiment_state = 'new'
+    project_variable.eval_on = 'val'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['erhan2009', 'zeiler2014']
+    if 'zeiler2014' in project_variable.which_methods:
+        project_variable.return_ind = True
+
+    project_variable.which_layers = ['conv1', 'conv2']
+    project_variable.which_channels = [np.arange(2), np.arange(2)]
+    # project_variable.which_channels = [np.arange(6), np.arange(16)]
+
+    main_file.run(project_variable)
+# ----
+
+project_variable = ProjectVariable(debug_mode=True)
+
+e_test_3D_mnist()

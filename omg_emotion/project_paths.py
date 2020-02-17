@@ -34,6 +34,7 @@ mnist_location = '/home/gabras/deployed/mnist'
 dummy_location = '/scratch/users/gabras/data/convttn3d_project/dummy_data'
 moving_mnist_location = '/scratch/users/gabras/data/convttn3d_project/moving_mnist'
 moving_mnist_png = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/png'
+mov_mnist_mean_std = '/scratch/users/gabras/data/convttn3d_project/moving_mnist/mean_std.npy'
 
 # KTH
 kth_location = '/huge/gabras/kth_actions/avi'

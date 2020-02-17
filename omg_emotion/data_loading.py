@@ -835,9 +835,35 @@ def get_mean_std_train_dhg():
 
     return mean, std
 
-    # save it somewhere in a text file
 
-# m, s = get_mean_std_train_dhg()
+def get_mean_std_train_mov_mnist():
+    if os.path.exists(PP.mov_mnist_mean_std):
+        total = np.load(PP.mov_mnist_mean_std)
+        mean = total[0]
+        std = total[1]
+    else:
+        all_train_files = np.zeros(shape=(1000, 30, 28, 28))
+
+        train_data_path = os.path.join(PP.moving_mnist_location, 'png', 'train')
+
+        for i in tqdm(range(1000)):
+            for j in range(30):
+                img_path = os.path.join(train_data_path, str(i), '%s.png' % str(j))
+                tmp = Image.open(img_path)
+                tmp = np.array(tmp.convert('L'))
+                all_train_files[i, j] = tmp
+
+        # get the mean as array.mean(axis=0)
+        mean = all_train_files.mean(axis=0)
+        # get the std as array.std(axis=0)
+        std = all_train_files.std(axis=0)
+
+    # save files for next time
+    total = np.array([mean, std])
+    np.save(PP.dhg_mean_std, total)
+
+    return mean, std
+
 
 
 def load_data(project_variable, seed):

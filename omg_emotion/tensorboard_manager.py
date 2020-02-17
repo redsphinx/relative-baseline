@@ -235,7 +235,7 @@ def add_standard_info(project_variable, which, parameters):
 
 
 def add_xai(project_variable, my_model, device, data_point=None):
-    assert(project_variable.model_number in [11])
+    # assert(project_variable.model_number in [11, 12])
 
     if 'erhan2009' in project_variable.which_methods:
         all_outputs = layer_vis.run_erhan2009(project_variable, my_model, device)

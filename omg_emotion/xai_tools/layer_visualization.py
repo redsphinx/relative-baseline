@@ -42,10 +42,20 @@ def run_erhan2009(project_variable, my_model, device):
     # based on "Visualizing Higher-Layer Features of a Deep Network" by Erhan et al. 2009
     all_outputs = []
 
-    base_image = np.random.randint(low=250, high=255, size=(1, 1, 50, 28, 28))
+    if project_variable.dataset == 'dhg':
+        base_image = np.random.randint(low=250, high=255, size=(1, 1, 50, 28, 28))
+    elif project_variable.dataset == 'mov_mnist':
+        base_image = np.random.randint(low=250, high=255, size=(1, 1, 30, 28, 28))
+
     base_image = base_image * 1.
     # subtract mean and divide by std of avg image in training set
-    mean, std = DL.get_mean_std_train_dhg()
+    if project_variable.dataset == 'dhg':
+        mean, std = DL.get_mean_std_train_dhg()
+    elif project_variable.dataset == 'mov_mnist':
+        mean, std = DL.get_mean_std_train_mov_mnist()
+    else:
+        mean, std = None, None
+
     std[std == 0.] = 1.
 
     base_image = base_image - mean
@@ -64,8 +74,6 @@ def run_erhan2009(project_variable, my_model, device):
             b = torch.Tensor(base_image).cuda(device)
             random_image = torch.nn.Parameter(b, requires_grad=True)
 
-            # TODO: scale values accordingly
-
             optimizer = Adam([random_image], lr=0.05, weight_decay=0)
             mini_epochs = 50
             conv_output = None
@@ -74,14 +82,23 @@ def run_erhan2009(project_variable, my_model, device):
                 optimizer.zero_grad()
                 x = random_image
                 my_model.eval() # prevent gradients being computed for my_model
-
-                if which_layer == 'conv1':
-                    x = my_model.conv1(x, device)
-                elif which_layer == 'conv2':
-                    x = my_model.conv1(x, device)
-                    x, _ = my_model.max_pool_1(x)
-                    x = torch.nn.functional.relu(x)
-                    x = my_model.conv2(x, device)
+                
+                if project_variable.model_number == 11:
+                    if which_layer == 'conv1':
+                        x = my_model.conv1(x, device)
+                    elif which_layer == 'conv2':
+                        x = my_model.conv1(x, device)
+                        x, _ = my_model.max_pool_1(x)
+                        x = torch.nn.functional.relu(x)
+                        x = my_model.conv2(x, device)
+                else:
+                    if which_layer == 'conv1':
+                        x = my_model.conv1(x, )
+                    elif which_layer == 'conv2':
+                        x = my_model.conv1(x, )
+                        x, _ = my_model.max_pool_1(x)
+                        x = torch.nn.functional.relu(x)
+                        x = my_model.conv2(x, )
 
                 my_model.train()
 
@@ -147,16 +164,29 @@ def run_zeiler2014(project_variable, input, my_model, device):
 
             # pass input through my_model until the point of interest
             my_model.eval()
-            x1 = my_model.conv1(input, device)
-            x2, _s = my_model.max_pool_1(x1)
-            switches.append(_s)
-            x3 = torch.nn.functional.relu(x2)
-
-            if which_layer == 'conv2':
-                x4 = my_model.conv2(x3, device)
-                x5, _s = my_model.max_pool_2(x4)
+            
+            if project_variable.model_number == 11:
+                x1 = my_model.conv1(input, device)
+                x2, _s = my_model.max_pool_1(x1)
                 switches.append(_s)
-                x6 = torch.nn.functional.relu(x5)
+                x3 = torch.nn.functional.relu(x2)
+    
+                if which_layer == 'conv2':
+                    x4 = my_model.conv2(x3, device)
+                    x5, _s = my_model.max_pool_2(x4)
+                    switches.append(_s)
+                    x6 = torch.nn.functional.relu(x5)
+            else:
+                x1 = my_model.conv1(input, )
+                x2, _s = my_model.max_pool_1(x1)
+                switches.append(_s)
+                x3 = torch.nn.functional.relu(x2)
+
+                if which_layer == 'conv2':
+                    x4 = my_model.conv2(x3, )
+                    x5, _s = my_model.max_pool_2(x4)
+                    switches.append(_s)
+                    x6 = torch.nn.functional.relu(x5)
 
             my_model.train()
 
