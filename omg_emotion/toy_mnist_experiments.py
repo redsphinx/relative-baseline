@@ -9813,11 +9813,11 @@ def e_test_3D_mnist():
     project_variable.sheet_number = 21
     project_variable.device = 2
 
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 50
     project_variable.repeat_experiments = 1
 
     project_variable.model_number = 2
-    project_variable.data_points = [50, 10, 0]
+    project_variable.data_points = [1000, 10, 0]
     project_variable.batch_size = 2 * 10
 
     project_variable.theta_init = None
@@ -9850,8 +9850,8 @@ def e_test_3D_mnist():
         project_variable.return_ind = True
 
     project_variable.which_layers = ['conv1', 'conv2']
-    project_variable.which_channels = [np.arange(2), np.arange(2)]
-    # project_variable.which_channels = [np.arange(6), np.arange(16)]
+    # project_variable.which_channels = [ np.arange(2)]
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
 # ----
@@ -9859,3 +9859,16 @@ def e_test_3D_mnist():
 project_variable = ProjectVariable(debug_mode=True)
 
 e_test_3D_mnist()
+
+# x1.shape
+# torch.Size([1, 6, 30, 28, 28])
+# x2.shape
+# torch.Size([1, 6, 15, 14, 14])
+# x3.shape
+# torch.Size([1, 6, 15, 14, 14])
+# x4.shape
+# torch.Size([1, 16, 11, 10, 10])
+# x5.shape
+# torch.Size([1, 16, 5, 5, 5])
+# x6.shape
+# torch.Size([1, 16, 5, 5, 5])

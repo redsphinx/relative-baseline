@@ -1064,28 +1064,6 @@ def e_test_3DTTN_dhg():
 
 def e_test_3D_dhg():
     set_init_3()
-
-    project_variable.end_epoch = 100
-    project_variable.dataset = 'dhg'
-
-    project_variable.num_in_channels = 1
-    project_variable.label_size = 14
-    project_variable.load_num_frames = 50  # 50
-    project_variable.label_type = 'categories'
-
-    project_variable.repeat_experiments = 10
-    project_variable.save_only_best_run = True
-    project_variable.same_training_data = True
-    project_variable.randomize_training_data = True
-    project_variable.balance_training_data = True
-
-    project_variable.experiment_state = 'new'
-    project_variable.eval_on = 'val'
-
-    project_variable.theta_init = None
-    project_variable.srxy_init = 'eye'
-    project_variable.weight_transform = 'seq' ##
-
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
 
@@ -1093,8 +1071,8 @@ def e_test_3D_dhg():
     project_variable.sheet_number = 21
     project_variable.device = 2
 
-    project_variable.model_number = 12
-    project_variable.data_points = [140 * 14,  20 * 14, 1 * 14]
+    project_variable.model_number = 11
+    project_variable.data_points = [2 * 14,  2 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.optimizer = 'adam'
@@ -1104,7 +1082,7 @@ def e_test_3D_dhg():
 
 
     project_variable.do_xai = True
-    project_variable.which_methods = ['erhan2009', 'zeiler2014']
+    project_variable.which_methods = ['erhan2009']
     if 'zeiler2014' in project_variable.which_methods:
         project_variable.return_ind = True
 

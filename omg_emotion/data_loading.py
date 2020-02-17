@@ -860,10 +860,9 @@ def get_mean_std_train_mov_mnist():
 
     # save files for next time
     total = np.array([mean, std])
-    np.save(PP.dhg_mean_std, total)
+    np.save(PP.mov_mnist_mean_std, total)
 
     return mean, std
-
 
 
 def load_data(project_variable, seed):

@@ -306,6 +306,10 @@ class LeNet5_2d(torch.nn.Module):
 class LeNet5_3d(torch.nn.Module):
 
     def __init__(self, project_variable):
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
         super(LeNet5_3d, self).__init__()
         # Convolution (In LeNet-5, 32x32 images are given as input. Hence padding of 2 is done below)
         self.conv1 = torch.nn.Conv3d(in_channels=1, out_channels=project_variable.num_out_channels[0], kernel_size=project_variable.k_shape, stride=1, padding=2, bias=True)
@@ -317,7 +321,7 @@ class LeNet5_3d(torch.nn.Module):
             self.conv1.weight = torch.nn.init.constant_(self.conv1.weight, 1)
             self.conv1.bias = torch.nn.init.constant_(self.conv1.bias, 1)
         # Max-pooling
-        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
         if project_variable.do_batchnorm[0]:
             self.bn1 = torch.nn.BatchNorm3d(project_variable.num_out_channels[0])
         
@@ -330,7 +334,7 @@ class LeNet5_3d(torch.nn.Module):
             self.conv2.weight = torch.nn.init.constant_(self.conv2.weight, 1)
             self.conv2.bias = torch.nn.init.constant_(self.conv2.bias, 1)
         # Max-pooling
-        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2)
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
         
         if project_variable.do_batchnorm[1]:
             self.bn2 = torch.nn.BatchNorm3d(project_variable.num_out_channels[1])
@@ -367,7 +371,10 @@ class LeNet5_3d(torch.nn.Module):
             x = self.bn1(x)
         except AttributeError:
             pass
-        x = self.max_pool_1(x)
+        if self.return_ind:
+            x, ind1 = self.max_pool_1(x)
+        else:
+            x = self.max_pool_1(x)
 
 
         x = self.conv2(x)
@@ -376,7 +383,10 @@ class LeNet5_3d(torch.nn.Module):
             x = self.bn2(x)
         except AttributeError:
             pass
-        x = self.max_pool_2(x)
+        if self.return_ind:
+            x, ind2 = self.max_pool_2(x)
+        else:
+            x = self.max_pool_2(x)
 
 
         # first flatten 'max_pool_2_out' to contain 16*5*5 columns
@@ -2443,7 +2453,7 @@ class deconv_3D(torch.nn.Module):
     def forward(self, x, pool_switches):
         if self.which_conv == 'conv2':
             x = torch.nn.functional.relu(x)
-            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 21, 10, 10]))
+            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 11, 10, 10]))
             x = self.deconv2(x)
 
         x = torch.nn.functional.relu(x)

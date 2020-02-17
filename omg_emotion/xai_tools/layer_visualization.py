@@ -7,7 +7,7 @@ from torch.optim import Adam
 from torch.autograd import Variable
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
-from relative_baseline.omg_emotion.models import deconv_3DTTN
+from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
 import relative_baseline.omg_emotion.project_paths as PP
 import relative_baseline.omg_emotion.data_loading as DL
 
@@ -88,7 +88,10 @@ def run_erhan2009(project_variable, my_model, device):
                         x = my_model.conv1(x, device)
                     elif which_layer == 'conv2':
                         x = my_model.conv1(x, device)
-                        x, _ = my_model.max_pool_1(x)
+                        if 'zeiler2014' in project_variable.which_methods:
+                            x, _ = my_model.max_pool_1(x)
+                        else:
+                            x = my_model.max_pool_1(x)
                         x = torch.nn.functional.relu(x)
                         x = my_model.conv2(x, device)
                 else:
@@ -96,7 +99,10 @@ def run_erhan2009(project_variable, my_model, device):
                         x = my_model.conv1(x, )
                     elif which_layer == 'conv2':
                         x = my_model.conv1(x, )
-                        x, _ = my_model.max_pool_1(x)
+                        if 'zeiler2014' in project_variable.which_methods:
+                            x, _ = my_model.max_pool_1(x)
+                        else:
+                            x = my_model.max_pool_1(x)
                         x = torch.nn.functional.relu(x)
                         x = my_model.conv2(x, )
 
@@ -135,7 +141,10 @@ def run_zeiler2014(project_variable, input, my_model, device):
     all_outputs = []
     
     def get_deconv_model(which_layer):
-        model = deconv_3DTTN(which_layer)
+        if project_variable.model_number == 11:
+            model = deconv_3DTTN(which_layer)
+        else:
+            model = deconv_3D(which_layer)
         model.cuda(device)
 
         # copy the weights from trained model
@@ -324,4 +333,5 @@ def run_zeiler2014(project_variable, input, my_model, device):
     # 
     #         input_img.save(path)
     return all_outputs
+
 
