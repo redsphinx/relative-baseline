@@ -76,7 +76,6 @@ def run_erhan2009(project_variable, my_model, device):
 
             optimizer = Adam([random_image], lr=0.05, weight_decay=0)
             mini_epochs = 50
-            conv_output = None
 
             for i in range(1, mini_epochs+1):
                 optimizer.zero_grad()
@@ -122,21 +121,16 @@ def run_erhan2009(project_variable, my_model, device):
 
         all_outputs.append(channels)
 
-                ## use this for debugging
-                # if i == mini_epochs:
-                #     save_location = PP.erhan2009
-                #     save_clip(conv_output, save_location, epoch)
-
     # return for tensorboard plotting
     return all_outputs
 
 
-def run_zeiler2014(project_variable, input, my_model, device):
+def run_zeiler2014(project_variable, data_point, my_model, device):
     # based on "Visualizing and Understanding Convolutional Networks" by Zeiler et al. 2014
 
     # which_channels contain the numbers of the channels that need to be visualized individually
 
-    # TODO: input has to be clip that maximizes the ONLY nonzero value allowed
+    # TODO: data_point has to be clip that maximizes the ONLY nonzero value allowed
 
     all_outputs = []
     
@@ -161,7 +155,7 @@ def run_zeiler2014(project_variable, input, my_model, device):
 
     for l in range(len(project_variable.which_layers)):
         channels = []
-        channels.append(np.array(input.data.cpu(), dtype=np.uint8))
+        channels.append(np.array(data_point.data.cpu(), dtype=np.uint8))
         
         for c in range(len(project_variable.which_channels[l])):
             which_layer = project_variable.which_layers[l]
@@ -171,11 +165,11 @@ def run_zeiler2014(project_variable, input, my_model, device):
             # for the unpooling switches
             switches = []
 
-            # pass input through my_model until the point of interest
+            # pass data_point through my_model until the point of interest
             my_model.eval()
             
             if project_variable.model_number == 11:
-                x1 = my_model.conv1(input, device)
+                x1 = my_model.conv1(data_point, device)
                 x2, _s = my_model.max_pool_1(x1)
                 switches.append(_s)
                 x3 = torch.nn.functional.relu(x2)
@@ -186,7 +180,7 @@ def run_zeiler2014(project_variable, input, my_model, device):
                     switches.append(_s)
                     x6 = torch.nn.functional.relu(x5)
             else:
-                x1 = my_model.conv1(input, )
+                x1 = my_model.conv1(data_point, )
                 x2, _s = my_model.max_pool_1(x1)
                 switches.append(_s)
                 x3 = torch.nn.functional.relu(x2)
@@ -281,57 +275,51 @@ def run_zeiler2014(project_variable, input, my_model, device):
             else:
                 reconstruction = None
 
-            reconstruction = torch.clamp(input=reconstruction, min=0, max=255, out=None)
+            reconstruction = torch.clamp(data_point=reconstruction, min=0, max=255, out=None)
             reconstruction = np.array(reconstruction.data.cpu(), dtype=np.uint8)
             channels.append(reconstruction)
 
         all_outputs.append(channels)
-
-    # save_indices = [0, 9, 19, 29, 39, 49]
-
-    # return for tensorboard
-
-    # if epoch in save_indices:
-    #     # save reconstruction
-    #     save_location = PP.zeiler2014
-    #     if not os.path.exists(save_location):
-    #         os.mkdir(save_location)
-    # 
-    #     # automatic number assignment
-    #     existing = os.listdir(save_location)
-    #     if len(existing) != 0:
-    #         existing = [int(i.split('_')[-1]) for i in existing]
-    #         existing.sort()
-    #         number = max(existing) + 1
-    #     else:
-    #         number = 0
-    # 
-    #     folder = '%s_epoch_%d_n_%d' % (which_conv, epoch, number)
-    #     save_path = os.path.join(save_location, folder)
-    # 
-    #     if not os.path.exists(save_path):
-    #         os.mkdir(save_path)
-    # 
-    #     for f in range(reconstruction.shape[2]):
-    #         name = 'frame_%d.png' % f
-    #         ultimate_path = os.path.join(save_path, name)
-    # 
-    #         im_as_arr = np.array(reconstruction[0][0][f].cpu().data, dtype=np.uint8)
-    # 
-    #         im = Image.fromarray(im_as_arr, mode='L')
-    #         im.save(ultimate_path)
-    # 
-    #     path_input = os.path.join(save_path, 'og_image')
-    #     if not os.path.exists(path_input):
-    #         os.mkdir(path_input)
-    # 
-    #     for f in range(input.shape[2]):
-    #         name = 'frame_%d.png' % f
-    #         path = os.path.join(path_input, name)
-    #         input_as_arr = np.array(input[0][0][f].cpu().data, dtype=np.uint8)
-    #         input_img = Image.fromarray(input_as_arr, mode='L')
-    # 
-    #         input_img.save(path)
     return all_outputs
 
 
+def our_gradient_method(project_variable, data_point, my_model, device):
+    data, label = data_point
+
+    for l in range(len(project_variable.which_layers)):
+        channels = []
+
+        for c in range(len(project_variable.which_channels[l])):
+            which_layer = project_variable.which_layers[l]
+            which_channel = project_variable.which_channels[l][c]
+            
+            data = torch.nn.Parameter(data, requires_grad=True)
+            optimizer = Adam([data], lr=0.05, weight_decay=0)
+            #
+            optimizer.zero_grad()
+            #
+            # output = my_model(data_point, device)
+            #
+            # optimizer.step()
+
+            # TODO?? model.eval()
+            
+            if project_variable.model_number == 11:
+                if which_layer == 'conv1':
+                    x = my_model.conv1(data, device)
+                    x = my_model.max_pool_1(x)
+                    x = torch.nn.functional.relu(x)
+
+                    loss = x - x
+                    loss.backward()
+
+                    optimizer.step()
+
+
+            
+            
+                    print()
+                    
+            
+    
+    return None

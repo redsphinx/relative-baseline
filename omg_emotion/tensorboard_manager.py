@@ -280,4 +280,9 @@ def add_xai(project_variable, my_model, device, data_point=None):
                                                   vid_tensor=output,
                                                   global_step=project_variable.current_epoch, fps=5)
 
+    if 'gradient_method' in project_variable.which_methods:
+        assert (data_point is not None)
+        layer_vis.our_gradient_method(project_variable, data_point, my_model, device)
+
+
 

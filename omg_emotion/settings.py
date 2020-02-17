@@ -192,7 +192,7 @@ class ProjectVariable(object):
         # XAI stuff for visualization
         # ----------------------------------------------------------------------------------------------------------
         self.do_xai = False
-        # options: 'erhan2009', 'zeiler2014'
+        # options: 'erhan2009', 'zeiler2014', 'gradient_method'
         self.which_methods = ['erhan2009']
         # options: 'conv1', 'conv2'
         self.which_layers = ['conv1']
