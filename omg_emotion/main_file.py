@@ -255,6 +255,7 @@ def run(project_variable):
                     project_variable.loss_weights = w
 
                 data = data_val, labels_val
+
                 val_accuracy = validation.run(project_variable, data, my_model, device)
             # ------------------------------------------------------------------------------------------------
             # TESTING
@@ -326,6 +327,9 @@ def run(project_variable):
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
 
+#   ------------------------------------------------------/--------------------------------------------/---------------
+#  ------------------------------------------------------/--------------------------------------------/---------------
+# ------------------------------------------------------/--------------------------------------------/---------------
 
 def run_test_batch(project_variable):
     experiment_number_start = project_variable.experiment_number

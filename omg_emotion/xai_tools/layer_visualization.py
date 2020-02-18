@@ -10,6 +10,7 @@ from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_im
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
 import relative_baseline.omg_emotion.project_paths as PP
 import relative_baseline.omg_emotion.data_loading as DL
+from relative_baseline.omg_emotion import utils as U
 
 
 def save_image(image, location, epoch_number):
@@ -131,7 +132,8 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
     # which_channels contain the numbers of the channels that need to be visualized individually
 
     # TODO: data_point has to be clip that maximizes the ONLY nonzero value allowed
-
+    
+    the_data = data_point[0]
     all_outputs = []
     
     def get_deconv_model(which_layer):
@@ -155,7 +157,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
 
     for l in range(len(project_variable.which_layers)):
         channels = []
-        channels.append(np.array(data_point.data.cpu(), dtype=np.uint8))
+        channels.append(np.array(the_data.data.cpu(), dtype=np.uint8))
         
         for c in range(len(project_variable.which_channels[l])):
             which_layer = project_variable.which_layers[l]
@@ -165,11 +167,11 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
             # for the unpooling switches
             switches = []
 
-            # pass data_point through my_model until the point of interest
+            # pass the_data through my_model until the point of interest
             my_model.eval()
             
             if project_variable.model_number == 11:
-                x1 = my_model.conv1(data_point, device)
+                x1 = my_model.conv1(the_data, device)
                 x2, _s = my_model.max_pool_1(x1)
                 switches.append(_s)
                 x3 = torch.nn.functional.relu(x2)
@@ -180,7 +182,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
                     switches.append(_s)
                     x6 = torch.nn.functional.relu(x5)
             else:
-                x1 = my_model.conv1(data_point, )
+                x1 = my_model.conv1(the_data, )
                 x2, _s = my_model.max_pool_1(x1)
                 switches.append(_s)
                 x3 = torch.nn.functional.relu(x2)
@@ -275,7 +277,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
             else:
                 reconstruction = None
 
-            reconstruction = torch.clamp(data_point=reconstruction, min=0, max=255, out=None)
+            reconstruction = torch.clamp(input=reconstruction, min=0, max=255, out=None)
             reconstruction = np.array(reconstruction.data.cpu(), dtype=np.uint8)
             channels.append(reconstruction)
 
@@ -284,42 +286,26 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
 
 
 def our_gradient_method(project_variable, data_point, my_model, device):
+
     data, label = data_point
+    data = torch.nn.Parameter(data, requires_grad=True)
 
-    for l in range(len(project_variable.which_layers)):
-        channels = []
+    if project_variable.model_number in [11]:
+        predictions = my_model(data, device)
+    else:
+        predictions = my_model(data)
 
-        for c in range(len(project_variable.which_channels[l])):
-            which_layer = project_variable.which_layers[l]
-            which_channel = project_variable.which_channels[l][c]
-            
-            data = torch.nn.Parameter(data, requires_grad=True)
-            optimizer = Adam([data], lr=0.05, weight_decay=0)
-            #
-            optimizer.zero_grad()
-            #
-            # output = my_model(data_point, device)
-            #
-            # optimizer.step()
-
-            # TODO?? model.eval()
-            
-            if project_variable.model_number == 11:
-                if which_layer == 'conv1':
-                    x = my_model.conv1(data, device)
-                    x = my_model.max_pool_1(x)
-                    x = torch.nn.functional.relu(x)
-
-                    loss = x - x
-                    loss.backward()
-
-                    optimizer.step()
-
-
-            
-            
-                    print()
-                    
-            
+    loss = U.calculate_loss(project_variable, predictions, label)
+    loss.backward()
     
-    return None
+    image_grad = data.grad
+
+    final = image_grad[0, 0, 0] * data[0, 0, 0]
+
+    final = torch.clamp(input=final, min=0, max=255, out=None)
+    final = final.unsqueeze(0)
+    final = np.array(final.data.cpu(), dtype=np.uint8)
+
+    loss.detach()
+                    
+    return final
