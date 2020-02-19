@@ -39,6 +39,32 @@ def save_image(image, location, epoch_number):
         im.save(save_path)
 
 
+def binarize(data):
+
+    data = torch.clamp(input=data, min=0, max=255, out=None)
+
+    max = torch.ones(data.shape) * 255
+    min = torch.zeros(data.shape)
+
+    torch.where(data > 0, max, min)
+
+    return data
+
+def normalize(data):
+    z = 255
+    y = 0
+    a = float(data.max().cpu())
+    b = float(data.min().cpu())
+
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            c = data[i, j]
+            data[i, j] = (c - a) * (z - y) / (b - a) + y
+
+    return data
+
+
+
 def run_erhan2009(project_variable, my_model, device):
     # based on "Visualizing Higher-Layer Features of a Deep Network" by Erhan et al. 2009
     all_outputs = []
@@ -302,10 +328,18 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
     final = image_grad[0, 0, 0] * data[0, 0, 0]
 
-    final = torch.clamp(input=final, min=0, max=255, out=None)
+    final = normalize(final)
     final = final.unsqueeze(0)
     final = np.array(final.data.cpu(), dtype=np.uint8)
 
+    image_grad = normalize(image_grad[0,0,0])
+    image_grad = image_grad.unsqueeze(0)
+    image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
+    
+    data = data[0, 0, 0]
+    data = data.unsqueeze(0)
+    data = np.array(data.data.cpu(), dtype=np.uint8)
+    
     loss.detach()
                     
-    return final
+    return data, image_grad, final

@@ -239,7 +239,10 @@ def run(project_variable):
             # VALIDATION
             # ------------------------------------------------------------------------------------------------
             if project_variable.inference_only_mode:
-                project_variable.val = False
+                if project_variable.eval_on == 'val':
+                    project_variable.val = True
+                else:
+                    project_variable.val = False
             else:
                 project_variable.val = True
 

@@ -283,10 +283,17 @@ def add_xai(project_variable, my_model, device, data_point=None):
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
         which_methods = 'gradient_method'
-        output = layer_vis.our_gradient_method(project_variable, data_point, my_model, device)
+        dp, im_grad, output = layer_vis.our_gradient_method(project_variable, data_point, my_model, device)
 
+        project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
+                                          img_tensor=dp,
+                                          global_step=project_variable.current_epoch)
 
-        project_variable.writer.add_image(tag='xai/%s' % (which_methods),
+        project_variable.writer.add_image(tag='xai/%s/1_im_grad' % (which_methods),
+                                          img_tensor=im_grad,
+                                          global_step=project_variable.current_epoch)
+
+        project_variable.writer.add_image(tag='xai/%s/2_result' % (which_methods),
                                           img_tensor=output,
                                           global_step=project_variable.current_epoch)
 
