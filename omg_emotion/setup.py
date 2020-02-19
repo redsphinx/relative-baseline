@@ -81,8 +81,9 @@ def get_model(project_variable):
         model = M.LeNet5_TTN3d(project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
+        # mo is for transfer learning
         if project_variable.load_model is not None:
-            if mo == 1:
+            if mo == 1: # transfer weights from 2d conv
                 pretrained_dict = torch.load(path, map_location=torch.device('cpu'))
                 model.conv1.first_weight = torch.nn.Parameter(pretrained_dict['conv1.weight'].unsqueeze(2))
                 model.conv1.bias = torch.nn.Parameter(pretrained_dict['conv1.bias'])
@@ -95,7 +96,7 @@ def get_model(project_variable):
                 model.fc3.weight = torch.nn.Parameter(pretrained_dict['fc3.weight'])
                 model.fc3.bias = torch.nn.Parameter(pretrained_dict['fc3.bias'])
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
-            elif mo == 3:
+            elif mo == 3: # transfer weights from 3d ttn conv
                 model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
                 print('experiment_%d model_%d epoch_%d loaded' % (ex, mo, ep))
             else:
@@ -147,6 +148,10 @@ def get_model(project_variable):
         model = M.LeNet5_TTN3d_xD([project_variable.load_num_frames, 96, 96], project_variable)
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
+
+        if project_variable.load_model is not None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
     elif project_variable.model_number == 12:
         model = M.LeNet5_3d_xD(project_variable)
     else:

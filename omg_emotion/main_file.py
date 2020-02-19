@@ -57,7 +57,10 @@ def run(project_variable):
     start = project_variable.at_which_run
 
     if project_variable.inference_only_mode:
-        project_variable.val = False
+        if project_variable.eval_on == 'val':
+            project_variable.val = True
+        else:
+            project_variable.val = False
     else:
         project_variable.val = True
 
@@ -75,19 +78,17 @@ def run(project_variable):
             project_variable.train = False
 
     data = D.load_data(project_variable, seed=None)
-    
-    if project_variable.inference_only_mode or project_variable.eval_on == 'test':
+
+    if project_variable.train:
+        data_train = D.get_data('train', data)
+        labels_train = D.get_labels('train', data)
+    if project_variable.val:
+        data_val = D.get_data('val', data)
+        labels_val = D.get_labels('val', data)
+    if project_variable.test:
         data_test = D.get_data('test', data)
         labels_test = D.get_labels('test', data)
     
-    if not project_variable.inference_only_mode:
-        data_val = D.get_data('val', data)
-        labels_val = D.get_labels('val', data)
-        
-        if not project_variable.randomize_training_data:
-            data_train = D.get_data('train', data)
-            labels_train = D.get_labels('train', data) 
-            
 
     if project_variable.same_training_data:
         np.random.seed(project_variable.data_points)
@@ -102,9 +103,7 @@ def run(project_variable):
         else:
             seed = None
         # load the training data (which is now randomized)
-        if project_variable.inference_only_mode:
-            pass
-        else:
+        if not project_variable.inference_only_mode:
             if project_variable.randomize_training_data:
                 project_variable.test = False
                 project_variable.val = False

@@ -1085,7 +1085,7 @@ def e_test_3D_dhg():
 
 def e_test_3DTTN_dhg():
     set_init_3()
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 1
     project_variable.repeat_experiments = 1
 
     project_variable.experiment_number = 777656767
@@ -1093,8 +1093,11 @@ def e_test_3DTTN_dhg():
     project_variable.device = 0
 
     project_variable.model_number = 11
-    project_variable.data_points = [2 * 14,  2 * 14, 1 * 14]
+    project_variable.data_points = [0 * 14,  20 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
+
+    project_variable.inference_only_mode = True
+    project_variable.load_model = [68, 11, 199, 0]
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 1e-4
