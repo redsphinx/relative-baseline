@@ -311,7 +311,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
     return all_outputs
 
 
-def our_gradient_method(project_variable, data_point, my_model, device):
+def our_gradient_method(project_variable, data_point, my_model, device, basic_mode=True):
     all_outputs = []
     data = None
 
@@ -360,15 +360,38 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             image_grad = data.grad
 
             final = image_grad[0, 0, 0] * data[0, 0, 0]
-            final = normalize(final)
-            final = final.unsqueeze(0)
-            final = np.array(final.data.cpu(), dtype=np.uint8)
 
-            image_grad = normalize(image_grad[0, 0, 0])
-            image_grad = image_grad.unsqueeze(0)
-            image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
+            if basic_mode:
+                final = normalize(final)
+                final = final.unsqueeze(0)
+                final = np.array(final.data.cpu(), dtype=np.uint8)
 
-            channels.append([image_grad, final])
+                image_grad = normalize(image_grad[0, 0, 0])
+                image_grad = image_grad.unsqueeze(0)
+                image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
+                channels.append([image_grad, final])
+            else:
+                # TODO
+                # get transformations
+                trafo_per_filter = 4
+                if which_layer == 'conv1':
+                    for trafo in range(trafo_per_filter):
+                        s = my_model.conv1.scale[trafo, which_channel]
+                        r = my_model.conv1.rotate[trafo, which_channel]
+                        x = my_model.conv1.translate_x[trafo, which_channel]
+                        y = my_model.conv1.translate_y[trafo, which_channel]
+
+                        
+                        
+
+
+                # apply them on the final image
+                # generate the resulting 4 images
+                # store them in the array
+
+                pass
+
+
 
         all_outputs.append(channels)
 
@@ -377,3 +400,51 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     data = np.array(data.data.cpu(), dtype=np.uint8)
 
     return data, all_outputs
+
+
+def make_affine_matrix(sc, ro, tx, ty):
+    matrix = torch.zeros((sc.shape[0], 2, 3))
+    
+    matrix[:, 0, 0] = sc[:] * torch.cos(ro[:])
+    matrix[:, 0, 1] = -sc[:] * torch.sin(ro[:])
+    matrix[:, 0, 2] = tx[:] * sc[:] * torch.cos(ro[:]) - ty[:] * sc[:] * torch.sin(ro[:])
+    matrix[:, 1, 0] = sc[:] * torch.sin(ro[:])
+    matrix[:, 1, 1] = sc[:] * torch.cos(ro[:])
+    matrix[:, 1, 2] = tx[:] * sc[:] * torch.sin(ro[:]) + ty[:] * sc[:] * torch.cos(ro[:])
+
+    return matrix
+
+
+def create_next_frame(s, r, x, y, data):
+    affine_matrix = make_affine_matrix(s, r, x, y)
+
+
+
+    # ---
+    for i in range(self.kernel_size[0] - 1):
+        tmp = self.make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+        tmp = tmp.cuda(device)
+        theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
+    theta = theta[1:]
+
+    # deal with cudnn error
+    try:
+        _ = F.affine_grid(theta[0],
+                          [self.out_channels, self.kernel_size[0] - 1, self.kernel_size[1],
+                           self.kernel_size[2]])
+    except RuntimeError:
+        torch.backends.cudnn.deterministic = True
+        print('ok cudnn')
+    # ------
+
+    for i in range(self.kernel_size[0] - 1):
+        tmp = F.affine_grid(theta[i],
+                            [self.out_channels, self.kernel_size[0], self.kernel_size[1],
+                             self.kernel_size[2]])
+        grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
+
+    return grid
+
+    # ---
+
+    pass
