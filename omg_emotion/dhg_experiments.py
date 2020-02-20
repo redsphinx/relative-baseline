@@ -1111,9 +1111,9 @@ def e_test_3DTTN_dhg():
     # if 'zeiler2014' in project_variable.which_methods:
     #     project_variable.return_ind = True
 
-    # project_variable.which_layers = ['conv1']
+    project_variable.which_layers = ['conv1', 'conv2']
     # project_variable.which_channels = [np.arange(2)]
-    # project_variable.which_channels = [np.arange(6), np.arange(16)]
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
 # --------------------------------------

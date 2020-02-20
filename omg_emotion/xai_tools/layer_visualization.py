@@ -50,6 +50,7 @@ def binarize(data):
 
     return data
 
+
 def normalize(data):
     z = 255
     y = 0
@@ -62,7 +63,6 @@ def normalize(data):
             data[i, j] = (c - a) * (z - y) / (b - a) + y
 
     return data
-
 
 
 def run_erhan2009(project_variable, my_model, device):
@@ -159,7 +159,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
 
     # TODO: data_point has to be clip that maximizes the ONLY nonzero value allowed
     
-    the_data = data_point[0]
+    the_data = data_point
     all_outputs = []
     
     def get_deconv_model(which_layer):
@@ -312,34 +312,68 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
 
 
 def our_gradient_method(project_variable, data_point, my_model, device):
+    all_outputs = []
+    data = None
 
-    data, label = data_point
-    data = torch.nn.Parameter(data, requires_grad=True)
+    for l in range(len(project_variable.which_layers)):
+        channels = []
 
-    if project_variable.model_number in [11]:
-        predictions = my_model(data, device)
-    else:
-        predictions = my_model(data)
+        for c in range(len(project_variable.which_channels[l])):
+            which_layer = project_variable.which_layers[l]
+            which_channel = project_variable.which_channels[l][c]
 
-    loss = U.calculate_loss(project_variable, predictions, label)
-    loss.backward()
-    
-    image_grad = data.grad
+            data = data_point
+            data = torch.nn.Parameter(data, requires_grad=True)
 
-    final = image_grad[0, 0, 0] * data[0, 0, 0]
+            x1 = my_model.conv1(data, device)
+            x2 = my_model.max_pool_1(x1)
+            x3 = torch.nn.functional.relu(x2)
 
-    final = normalize(final)
-    final = final.unsqueeze(0)
-    final = np.array(final.data.cpu(), dtype=np.uint8)
+            if which_layer == 'conv2':
+                x4 = my_model.conv2(x3, device)
+                x5 = my_model.max_pool_2(x4)
+                x6 = torch.nn.functional.relu(x5)
 
-    image_grad = normalize(image_grad[0,0,0])
-    image_grad = image_grad.unsqueeze(0)
-    image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
-    
+            if which_layer == 'conv1':
+                _, ch, d, h, w = x3.shape
+            else:
+                _, ch, d, h, w = x6.shape
+
+            highest_value = 0
+            ind_1, ind_2 = 0, 0
+            for m in range(h):
+                for n in range(w):
+                    if which_layer == 'conv1':
+                        val = float(x3[0, which_channel, 0, m, n].data.cpu())
+                    else:
+                        val = float(x6[0, which_channel, 0, m, n].data.cpu())
+                    if val > highest_value:
+                        highest_value = val
+                        ind_1 = m
+                        ind_2 = n
+
+            if which_layer == 'conv1':
+                x3[0, which_channel, 0, ind_1, ind_2].backward()
+            else:
+                x6[0, which_channel, 0, ind_1, ind_2].backward()
+
+            image_grad = data.grad
+
+            final = image_grad[0, 0, 0] * data[0, 0, 0]
+            final = normalize(final)
+            final = final.unsqueeze(0)
+            final = np.array(final.data.cpu(), dtype=np.uint8)
+
+            image_grad = normalize(image_grad[0, 0, 0])
+            image_grad = image_grad.unsqueeze(0)
+            image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
+
+            channels.append([image_grad, final])
+
+        all_outputs.append(channels)
+
     data = data[0, 0, 0]
     data = data.unsqueeze(0)
     data = np.array(data.data.cpu(), dtype=np.uint8)
-    
-    loss.detach()
-                    
-    return data, image_grad, final
+
+    return data, all_outputs

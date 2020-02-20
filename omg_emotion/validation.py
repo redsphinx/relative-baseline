@@ -68,11 +68,11 @@ def run(project_variable, all_data, my_model, device):
     save_epochs = np.arange(project_variable.end_epoch)
 
     if project_variable.inference_only_mode:
-        TM.add_xai(project_variable, my_model, device, data_point=[data[0].unsqueeze(0), labels[-1].unsqueeze(0)])
+        TM.add_xai(project_variable, my_model, device, data_point=data[0].unsqueeze(0))
     else:
         if project_variable.do_xai and project_variable.current_epoch in save_epochs:
 
-            TM.add_xai(project_variable, my_model, device, data_point=[data[0].unsqueeze(0), labels[0].unsqueeze(0)])
+            TM.add_xai(project_variable, my_model, device, data_point=data[0].unsqueeze(0))
 
 
     # project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
