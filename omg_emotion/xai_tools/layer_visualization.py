@@ -5,6 +5,7 @@ from PIL import Image
 import torch
 from torch.optim import Adam
 from torch.autograd import Variable
+from torch.nn import functional as F
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
@@ -37,6 +38,63 @@ def save_image(image, location, epoch_number):
         name = 'image_epoch_%d.png' % epoch_number
         save_path = os.path.join(location, name)
         im.save(save_path)
+
+
+def make_affine_matrix(sc, ro, tx, ty):
+    matrix = torch.zeros((1, 2, 3))
+    # matrix = torch.zeros((sc.shape[0], 2, 3))
+
+    matrix[0, 0, 0] = sc * torch.cos(ro)
+    matrix[0, 0, 1] = -sc * torch.sin(ro)
+    matrix[0, 0, 2] = tx * sc * torch.cos(ro) - ty * sc * torch.sin(ro)
+    matrix[0, 1, 0] = sc * torch.sin(ro)
+    matrix[0, 1, 1] = sc * torch.cos(ro)
+    matrix[0, 1, 2] = tx * sc * torch.sin(ro) + ty * sc * torch.cos(ro)
+
+    return matrix
+
+
+def create_next_frame(s, r, x, y, data, device):
+    affine_matrix = make_affine_matrix(s, r, x, y)
+    # TODO: maybe unsqueeze
+
+    h_, w_ = data.shape
+
+    affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, 1, h_, w_])
+
+    affine_matrix = affine_matrix.cuda(device)
+
+    data = data.unsqueeze(0).unsqueeze(0)
+
+    affine_matrix = F.grid_sample(data, affine_matrix)
+
+    # ---
+    # for i in range(self.kernel_size[0] - 1):
+    #     tmp = self.make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
+    #     tmp = tmp.cuda(device)
+    #     theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
+    # theta = theta[1:]
+    #
+    # # deal with cudnn error
+    # try:
+    #     _ = F.affine_grid(theta[0],
+    #                       [self.out_channels, self.kernel_size[0] - 1, self.kernel_size[1],
+    #                        self.kernel_size[2]])
+    # except RuntimeError:
+    #     torch.backends.cudnn.deterministic = True
+    #     print('ok cudnn')
+    # # ------
+    #
+    # for i in range(self.kernel_size[0] - 1):
+    #     tmp = F.affine_grid(theta[i],
+    #                         [self.out_channels, self.kernel_size[0], self.kernel_size[1],
+    #                          self.kernel_size[2]])
+    #     grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
+    #
+    # return grid
+
+    # ---
+    return affine_matrix[0][0]
 
 
 def binarize(data):
@@ -312,8 +370,11 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
 
 
 def our_gradient_method(project_variable, data_point, my_model, device, basic_mode=True):
+    # if basic_mode is False, apply the temporal motion from the learned transformations
+    # TODO: take the first 5 frames!
     all_outputs = []
     data = None
+    trafo_per_filter = 4
 
     for l in range(len(project_variable.which_layers)):
         channels = []
@@ -372,79 +433,63 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                 channels.append([image_grad, final])
             else:
                 # TODO
+                all_finals = []
+                all_finals.append(final)
+                
                 # get transformations
-                trafo_per_filter = 4
+                
                 if which_layer == 'conv1':
                     for trafo in range(trafo_per_filter):
                         s = my_model.conv1.scale[trafo, which_channel]
                         r = my_model.conv1.rotate[trafo, which_channel]
                         x = my_model.conv1.translate_x[trafo, which_channel]
                         y = my_model.conv1.translate_y[trafo, which_channel]
+                        # apply them on the final image
+                        next_final = create_next_frame(s, r, x, y, final, device)
+                        all_finals.append(next_final)
+                    
+                else:
+                    for trafo in range(trafo_per_filter):
+                        s = my_model.conv2.scale[trafo, which_channel]
+                        r = my_model.conv2.rotate[trafo, which_channel]
+                        x = my_model.conv2.translate_x[trafo, which_channel]
+                        y = my_model.conv2.translate_y[trafo, which_channel]
+                        # apply them on the final image
+                        next_final = create_next_frame(s, r, x, y, final, device)
+                        all_finals.append(next_final)
 
-                        
-                        
-
-
-                # apply them on the final image
-                # generate the resulting 4 images
-                # store them in the array
-
-                pass
-
-
+                channels.append(all_finals)
 
         all_outputs.append(channels)
 
     data = data[0, 0, 0]
     data = data.unsqueeze(0)
     data = np.array(data.data.cpu(), dtype=np.uint8)
+    
+    if not basic_mode:
+        processed_outputs = []
+        
+        for l in range(len(project_variable.which_layers)):
+            channels = []
+
+            for c in range(len(project_variable.which_channels[l])):
+                all_finals = []
+                
+                for t in range(trafo_per_filter+1):
+                    
+                    processed_final = all_outputs[l][c][t]
+                    processed_final = normalize(processed_final)
+                    processed_final = processed_final.unsqueeze(0)
+                    processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+
+                    all_finals.append(processed_final)
+
+                channels.append(all_finals)
+
+            processed_outputs.append(channels)
+
+        all_outputs = processed_outputs
 
     return data, all_outputs
 
 
-def make_affine_matrix(sc, ro, tx, ty):
-    matrix = torch.zeros((sc.shape[0], 2, 3))
-    
-    matrix[:, 0, 0] = sc[:] * torch.cos(ro[:])
-    matrix[:, 0, 1] = -sc[:] * torch.sin(ro[:])
-    matrix[:, 0, 2] = tx[:] * sc[:] * torch.cos(ro[:]) - ty[:] * sc[:] * torch.sin(ro[:])
-    matrix[:, 1, 0] = sc[:] * torch.sin(ro[:])
-    matrix[:, 1, 1] = sc[:] * torch.cos(ro[:])
-    matrix[:, 1, 2] = tx[:] * sc[:] * torch.sin(ro[:]) + ty[:] * sc[:] * torch.cos(ro[:])
-
-    return matrix
-
-
-def create_next_frame(s, r, x, y, data):
-    affine_matrix = make_affine_matrix(s, r, x, y)
-
-
-
-    # ---
-    for i in range(self.kernel_size[0] - 1):
-        tmp = self.make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
-        tmp = tmp.cuda(device)
-        theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
-    theta = theta[1:]
-
-    # deal with cudnn error
-    try:
-        _ = F.affine_grid(theta[0],
-                          [self.out_channels, self.kernel_size[0] - 1, self.kernel_size[1],
-                           self.kernel_size[2]])
-    except RuntimeError:
-        torch.backends.cudnn.deterministic = True
-        print('ok cudnn')
-    # ------
-
-    for i in range(self.kernel_size[0] - 1):
-        tmp = F.affine_grid(theta[i],
-                            [self.out_channels, self.kernel_size[0], self.kernel_size[1],
-                             self.kernel_size[2]])
-        grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
-
-    return grid
-
-    # ---
-
-    pass

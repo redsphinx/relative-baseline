@@ -282,35 +282,64 @@ def add_xai(project_variable, my_model, device, data_point=None):
 
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
+        basic_mode = False
+
         which_methods = 'gradient_method'
-        dp, rest = layer_vis.our_gradient_method(project_variable, data_point, my_model, device)
+        dp, rest = layer_vis.our_gradient_method(project_variable, data_point, my_model, device, basic_mode)
+
+        if basic_mode:
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j]+1)):
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
+
+                    output = np.array([dp, rest[j][k][0], rest[j][k][1]])
+                    output = np.expand_dims(output, 0)
+
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                    which_channels),
+                                                      vid_tensor=output,
+                                                      global_step=project_variable.current_epoch, fps=1)
+        else:
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j]+1)):
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
+
+                    # WORKS
+                    # _0 = rest[j][k][0]  # [0] # shape = (1, 28, 28)
+                    # _1 = rest[j][k][1]  # [0] # shape = (1, 1, 1, 28, 28)
+                    # _2 = rest[j][k][2]  # [0]
+                    # _3 = rest[j][k][3]  # [0]
+                    # _4 = rest[j][k][4]  # [0]
+                    #
+                    # output = np.array([dp, _0, _1, _2, _3, _4])
+                    #
+                    # output = np.expand_dims(output, 0)
 
 
+                    temporal_dim = len(rest[0][0])
+                    _, h_, w_ = rest[0][0][0].shape
 
-        for j in range(len(project_variable.which_layers)):
-            for k in range(len(project_variable.which_channels[j]+1)):
-                which_layers = project_variable.which_layers[j]
-                which_channels = project_variable.which_channels[j][k]
+                    output = np.zeros(shape=(temporal_dim+1, 1, h_, w_), dtype=np.uint8)
+                    output[0] = dp
 
-                output = np.array([dp, rest[j][k][0], rest[j][k][1]])
-                output = np.expand_dims(output, 0)
+                    for t in range(temporal_dim):
+                        output[t+1] = rest[j][k][t]
+                        # output[t+1] = rest[j][k][t][0]
 
-                project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
-                                                                                which_channels),
-                                                  vid_tensor=output,
-                                                  global_step=project_variable.current_epoch, fps=1)
+                    output = np.expand_dims(output, 0)
 
+                    # output = output.transpose((0, 2, 1, 3, 4))
 
-            # project_variable.writer.add_image(tag='xai/%s/channel_%d/0_original' % (which_methods, i),
-            #                                   img_tensor=dp,
-            #                                   global_step=project_variable.current_epoch)
-            # project_variable.writer.add_image(tag='xai/%s/channel_%d/1_im_grad' % (which_methods, i),
-            #                                   img_tensor=rest[i][0],
-            #                                   global_step=project_variable.current_epoch)
-            #
-            # project_variable.writer.add_image(tag='xai/%s/channel_%d/2_result' % (which_methods, i),
-            #                                   img_tensor=rest[i][1],
-            #                                   global_step=project_variable.current_epoch)
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                    which_channels),
+                                                      vid_tensor=output,
+                                                      global_step=project_variable.current_epoch, fps=2)
+
+            project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
+                                              img_tensor=dp,
+                                              global_step=project_variable.current_epoch)
 
 
 
