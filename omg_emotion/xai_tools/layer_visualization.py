@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
+import cv2 as cv
 
 import torch
 from torch.optim import Adam
@@ -12,6 +13,7 @@ from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
 import relative_baseline.omg_emotion.project_paths as PP
 import relative_baseline.omg_emotion.data_loading as DL
 from relative_baseline.omg_emotion import utils as U
+from relative_baseline.omg_emotion import visualization as VZ
 
 
 def save_image(image, location, epoch_number):
@@ -40,61 +42,54 @@ def save_image(image, location, epoch_number):
         im.save(save_path)
 
 
-def make_affine_matrix(sc, ro, tx, ty):
-    matrix = torch.zeros((1, 2, 3))
-    # matrix = torch.zeros((sc.shape[0], 2, 3))
+def make_affine_matrix(sc, ro, tx, ty, use_opencv=False):
+    if use_opencv:
+        matrix = np.zeros((2, 3))
 
-    matrix[0, 0, 0] = sc * torch.cos(ro)
-    matrix[0, 0, 1] = -sc * torch.sin(ro)
-    matrix[0, 0, 2] = tx * sc * torch.cos(ro) - ty * sc * torch.sin(ro)
-    matrix[0, 1, 0] = sc * torch.sin(ro)
-    matrix[0, 1, 1] = sc * torch.cos(ro)
-    matrix[0, 1, 2] = tx * sc * torch.sin(ro) + ty * sc * torch.cos(ro)
+        sc = float(sc.data.cpu())
+        ro = float(ro.data.cpu())
+        tx = float(tx.data.cpu())
+        ty = float(ty.data.cpu())
+
+        matrix[0, 0] = sc * np.cos(ro)
+        matrix[0, 1] = -sc * np.sin(ro)
+        matrix[0, 2] = tx * sc * np.cos(ro) - ty * sc * np.sin(ro)
+        matrix[1, 0] = sc * np.sin(ro)
+        matrix[1, 1] = sc * np.cos(ro)
+        matrix[1, 2] = tx * sc * np.sin(ro) + ty * sc * np.cos(ro)
+
+    else:
+    
+        matrix = torch.zeros((1, 2, 3))
+
+        matrix[0, 0, 0] = sc * torch.cos(ro)
+        matrix[0, 0, 1] = -sc * torch.sin(ro)
+        matrix[0, 0, 2] = tx * sc * torch.cos(ro) - ty * sc * torch.sin(ro)
+        matrix[0, 1, 0] = sc * torch.sin(ro)
+        matrix[0, 1, 1] = sc * torch.cos(ro)
+        matrix[0, 1, 2] = tx * sc * torch.sin(ro) + ty * sc * torch.cos(ro)
 
     return matrix
 
 
-def create_next_frame(s, r, x, y, data, device):
-    affine_matrix = make_affine_matrix(s, r, x, y)
-    # TODO: maybe unsqueeze
+def create_next_frame(s, r, x, y, data, device, use_opencv=False):
 
-    h_, w_ = data.shape
+    affine_matrix = make_affine_matrix(s, r, x, y, use_opencv)
 
-    affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, 1, h_, w_])
+    if use_opencv:
+        # data = np.array(data.data.cpu(), dtype=np.uint8)
+        # data = cv.cvtColor(data, cv.COLOR_RGB2GRAY)
+        affine_matrix = VZ.make_pacman_frame(data, affine_matrix)
+        return affine_matrix
 
-    affine_matrix = affine_matrix.cuda(device)
+    else:
 
-    data = data.unsqueeze(0).unsqueeze(0)
-
-    affine_matrix = F.grid_sample(data, affine_matrix)
-
-    # ---
-    # for i in range(self.kernel_size[0] - 1):
-    #     tmp = self.make_affine_matrix(self.scale[i], self.rotate[i], self.translate_x[i], self.translate_y[i])
-    #     tmp = tmp.cuda(device)
-    #     theta = torch.cat((theta, tmp.unsqueeze(0)), 0)
-    # theta = theta[1:]
-    #
-    # # deal with cudnn error
-    # try:
-    #     _ = F.affine_grid(theta[0],
-    #                       [self.out_channels, self.kernel_size[0] - 1, self.kernel_size[1],
-    #                        self.kernel_size[2]])
-    # except RuntimeError:
-    #     torch.backends.cudnn.deterministic = True
-    #     print('ok cudnn')
-    # # ------
-    #
-    # for i in range(self.kernel_size[0] - 1):
-    #     tmp = F.affine_grid(theta[i],
-    #                         [self.out_channels, self.kernel_size[0], self.kernel_size[1],
-    #                          self.kernel_size[2]])
-    #     grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
-    #
-    # return grid
-
-    # ---
-    return affine_matrix[0][0]
+        h_, w_ = data.shape
+        affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, 1, h_, w_])
+        affine_matrix = affine_matrix.cuda(device)
+        data = data.unsqueeze(0).unsqueeze(0)
+        affine_matrix = F.grid_sample(data, affine_matrix)
+        return affine_matrix[0][0]
 
 
 def binarize(data):
@@ -369,9 +364,8 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
     return all_outputs
 
 
-def our_gradient_method(project_variable, data_point, my_model, device, basic_mode=True):
+def our_gradient_method(project_variable, data_point, my_model, device, basic_mode=True, use_opencv=False):
     # if basic_mode is False, apply the temporal motion from the learned transformations
-    # TODO: take the first 5 frames!
     all_outputs = []
     data = None
     trafo_per_filter = 4
@@ -406,8 +400,10 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                 for n in range(w):
                     if which_layer == 'conv1':
                         val = float(x3[0, which_channel, 0, m, n].data.cpu())
+                        # val = float(x1[0, which_channel, 0, m, n].data.cpu())
                     else:
                         val = float(x6[0, which_channel, 0, m, n].data.cpu())
+                        # val = float(x4[0, which_channel, 0, m, n].data.cpu())
                     if val > highest_value:
                         highest_value = val
                         ind_1 = m
@@ -415,8 +411,10 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
 
             if which_layer == 'conv1':
                 x3[0, which_channel, 0, ind_1, ind_2].backward()
+                # x1[0, which_channel, 0, ind_1, ind_2].backward()
             else:
                 x6[0, which_channel, 0, ind_1, ind_2].backward()
+                # x4[0, which_channel, 0, ind_1, ind_2].backward()
 
             image_grad = data.grad
 
@@ -432,20 +430,21 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                 image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
                 channels.append([image_grad, final])
             else:
-                # TODO
+                
                 all_finals = []
                 all_finals.append(final)
                 
                 # get transformations
                 
                 if which_layer == 'conv1':
+                    final = np.array(final.data.cpu(), dtype=np.uint8)
                     for trafo in range(trafo_per_filter):
                         s = my_model.conv1.scale[trafo, which_channel]
                         r = my_model.conv1.rotate[trafo, which_channel]
                         x = my_model.conv1.translate_x[trafo, which_channel]
                         y = my_model.conv1.translate_y[trafo, which_channel]
                         # apply them on the final image
-                        next_final = create_next_frame(s, r, x, y, final, device)
+                        next_final = create_next_frame(s, r, x, y, all_finals[trafo], device, use_opencv)
                         all_finals.append(next_final)
                     
                 else:
@@ -455,7 +454,7 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                         x = my_model.conv2.translate_x[trafo, which_channel]
                         y = my_model.conv2.translate_y[trafo, which_channel]
                         # apply them on the final image
-                        next_final = create_next_frame(s, r, x, y, final, device)
+                        next_final = create_next_frame(s, r, x, y, all_finals[trafo], device, use_opencv)
                         all_finals.append(next_final)
 
                 channels.append(all_finals)
@@ -476,11 +475,16 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                 all_finals = []
                 
                 for t in range(trafo_per_filter+1):
-                    
-                    processed_final = all_outputs[l][c][t]
-                    processed_final = normalize(processed_final)
-                    processed_final = processed_final.unsqueeze(0)
-                    processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+                    if use_opencv:
+                        processed_final = all_outputs[l][c][t]
+                        processed_final = normalize(processed_final)
+                        processed_final = processed_final.unsqueeze(0)
+                        processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+                    else:
+                        processed_final = all_outputs[l][c][t]
+                        processed_final = normalize(processed_final)
+                        processed_final = processed_final.unsqueeze(0)
+                        processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 
                     all_finals.append(processed_final)
 

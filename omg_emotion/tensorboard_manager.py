@@ -283,9 +283,10 @@ def add_xai(project_variable, my_model, device, data_point=None):
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
         basic_mode = False
+        use_opencv = False
 
         which_methods = 'gradient_method'
-        dp, rest = layer_vis.our_gradient_method(project_variable, data_point, my_model, device, basic_mode)
+        dp, rest = layer_vis.our_gradient_method(project_variable, data_point, my_model, device, basic_mode, use_opencv)
 
         if basic_mode:
             for j in range(len(project_variable.which_layers)):
@@ -301,22 +302,11 @@ def add_xai(project_variable, my_model, device, data_point=None):
                                                       vid_tensor=output,
                                                       global_step=project_variable.current_epoch, fps=1)
         else:
+
             for j in range(len(project_variable.which_layers)):
                 for k in range(len(project_variable.which_channels[j]+1)):
                     which_layers = project_variable.which_layers[j]
                     which_channels = project_variable.which_channels[j][k]
-
-                    # WORKS
-                    # _0 = rest[j][k][0]  # [0] # shape = (1, 28, 28)
-                    # _1 = rest[j][k][1]  # [0] # shape = (1, 1, 1, 28, 28)
-                    # _2 = rest[j][k][2]  # [0]
-                    # _3 = rest[j][k][3]  # [0]
-                    # _4 = rest[j][k][4]  # [0]
-                    #
-                    # output = np.array([dp, _0, _1, _2, _3, _4])
-                    #
-                    # output = np.expand_dims(output, 0)
-
 
                     temporal_dim = len(rest[0][0])
                     _, h_, w_ = rest[0][0][0].shape
@@ -326,11 +316,8 @@ def add_xai(project_variable, my_model, device, data_point=None):
 
                     for t in range(temporal_dim):
                         output[t+1] = rest[j][k][t]
-                        # output[t+1] = rest[j][k][t][0]
 
                     output = np.expand_dims(output, 0)
-
-                    # output = output.transpose((0, 2, 1, 3, 4))
 
                     project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
                                                                                     which_channels),
