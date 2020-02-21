@@ -104,11 +104,15 @@ def binarize(data):
     return data
 
 
-def normalize(data):
+def normalize(data, use_opencv=False):
     z = 255
     y = 0
-    a = float(data.max().cpu())
-    b = float(data.min().cpu())
+    if use_opencv:
+        a = float(data.max())
+        b = float(data.min())
+    else:
+        a = float(data.max().cpu())
+        b = float(data.min().cpu())
 
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
@@ -432,12 +436,15 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
             else:
                 
                 all_finals = []
+                if use_opencv:
+                    final = np.array(final.data.cpu(), dtype=np.uint8)
+
                 all_finals.append(final)
                 
                 # get transformations
                 
                 if which_layer == 'conv1':
-                    final = np.array(final.data.cpu(), dtype=np.uint8)
+
                     for trafo in range(trafo_per_filter):
                         s = my_model.conv1.scale[trafo, which_channel]
                         r = my_model.conv1.rotate[trafo, which_channel]
@@ -448,6 +455,7 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                         all_finals.append(next_final)
                     
                 else:
+                    # all_finals.append(final)
                     for trafo in range(trafo_per_filter):
                         s = my_model.conv2.scale[trafo, which_channel]
                         r = my_model.conv2.rotate[trafo, which_channel]
@@ -477,9 +485,9 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
                 for t in range(trafo_per_filter+1):
                     if use_opencv:
                         processed_final = all_outputs[l][c][t]
-                        processed_final = normalize(processed_final)
-                        processed_final = processed_final.unsqueeze(0)
-                        processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+                        processed_final = normalize(processed_final, use_opencv)
+                        processed_final = np.expand_dims(processed_final, 0)
+                        processed_final = np.array(processed_final, dtype=np.uint8)
                     else:
                         processed_final = all_outputs[l][c][t]
                         processed_final = normalize(processed_final)
