@@ -505,7 +505,7 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
     return data, all_outputs
 
 
-def our_gradient_method_regular_3d(project_variable, data_point, my_model, device):
+def our_gradient_method_regular_3d(project_variable, data_point, my_model):
     all_outputs = []
     the_data = []
     data = None
@@ -529,8 +529,7 @@ def our_gradient_method_regular_3d(project_variable, data_point, my_model, devic
                     d_ = d_.unsqueeze(0)
                     d_ = np.array(d_.data.cpu(), dtype=np.uint8)
                     the_data.append(d_)
-                    
-    
+
                 x1 = my_model.conv1(data)
                 x2 = my_model.max_pool_1(x1)
                 x3 = torch.nn.functional.relu(x2)
@@ -579,7 +578,14 @@ def our_gradient_method_regular_3d(project_variable, data_point, my_model, devic
             channels.append(kernel)
         
         all_outputs.append(channels)
-        
-        
-    
+
     return the_data, all_outputs
+
+
+def gradient_method(project_variable, data_point, my_model, device, basic_mode=True, use_opencv=False):
+
+    if project_variable.model_number == 11:
+        return our_gradient_method(project_variable, data_point, my_model, device, basic_mode, use_opencv)
+    else:
+        return our_gradient_method_regular_3d(project_variable, data_point, my_model)
+
