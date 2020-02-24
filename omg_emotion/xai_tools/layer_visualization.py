@@ -505,3 +505,81 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
     return data, all_outputs
 
 
+def our_gradient_method_regular_3d(project_variable, data_point, my_model, device):
+    all_outputs = []
+    the_data = []
+    data = None
+
+    for l in range(len(project_variable.which_layers)):
+        channels = []
+
+        for c in range(len(project_variable.which_channels[l])):
+            which_layer = project_variable.which_layers[l]
+            which_channel = project_variable.which_channels[l][c]
+
+            kernel = []
+
+            for k in range(project_variable.k_shape[0]):
+            
+                data = data_point
+                data = torch.nn.Parameter(data, requires_grad=True)
+                
+                if l == 0 and c == 0:
+                    d_ = data[0, 0, k]
+                    d_ = d_.unsqueeze(0)
+                    d_ = np.array(d_.data.cpu(), dtype=np.uint8)
+                    the_data.append(d_)
+                    
+    
+                x1 = my_model.conv1(data)
+                x2 = my_model.max_pool_1(x1)
+                x3 = torch.nn.functional.relu(x2)
+    
+                if which_layer == 'conv2':
+                    x4 = my_model.conv2(x3)
+                    x5 = my_model.max_pool_2(x4)
+                    x6 = torch.nn.functional.relu(x5)
+    
+                if which_layer == 'conv1':
+                    _, ch, d, h, w = x3.shape
+                else:
+                    _, ch, d, h, w = x6.shape
+    
+                highest_value = 0
+                ind_1, ind_2 = 0, 0
+                for m in range(h):
+                    for n in range(w):
+                        if which_layer == 'conv1':
+                            val = float(x3[0, which_channel, k, m, n].data.cpu())
+                            # val = float(x1[0, which_channel, 0, m, n].data.cpu())
+                        else:
+                            val = float(x6[0, which_channel, k, m, n].data.cpu())
+                            # val = float(x4[0, which_channel, 0, m, n].data.cpu())
+                        if val > highest_value:
+                            highest_value = val
+                            ind_1 = m
+                            ind_2 = n
+    
+                if which_layer == 'conv1':
+                    x3[0, which_channel, k, ind_1, ind_2].backward()
+                    # x1[0, which_channel, 0, ind_1, ind_2].backward()
+                else:
+                    x6[0, which_channel, k, ind_1, ind_2].backward()
+                    # x4[0, which_channel, 0, ind_1, ind_2].backward()
+    
+                image_grad = data.grad
+    
+                final = image_grad[0, 0, k] * data[0, 0, k]
+                final = normalize(final)
+                final = final.unsqueeze(0)
+                final = np.array(final.data.cpu(), dtype=np.uint8)
+                
+                kernel.append(final)
+            
+            channels.append(kernel)
+        
+        all_outputs.append(channels)
+        
+        
+    
+    return the_data, all_outputs
