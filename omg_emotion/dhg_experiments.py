@@ -1062,7 +1062,7 @@ def e_test_3D_dhg():
     project_variable.device = 1
 
     project_variable.model_number = 12
-    project_variable.data_points = [2 * 14,  2 * 14, 1 * 14]
+    project_variable.data_points = [0 * 14,  20 * 14, 0 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.inference_only_mode = True
