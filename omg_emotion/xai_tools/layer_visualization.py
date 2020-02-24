@@ -580,6 +580,7 @@ def our_gradient_method_regular_3d(project_variable, data_point, my_model):
         all_outputs.append(channels)
 
     return the_data, all_outputs
+# TODO: image gradient is zero sometimes; fix this!
 
 
 def gradient_method(project_variable, data_point, my_model, device, basic_mode=True, use_opencv=False):
