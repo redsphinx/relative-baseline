@@ -282,50 +282,36 @@ def add_xai(project_variable, my_model, device, data_point=None):
 
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
-        basic_mode = False
-        use_opencv = False
+        mode = 'slices'
+        # mode = 'srxy' # only for 3DTTN
 
         which_methods = 'gradient_method'
-        dp, rest = layer_vis.gradient_method(project_variable, data_point, my_model, device, basic_mode, use_opencv)
+        dp, rest = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
 
-        if project_variable.model_number == 11:
-            if basic_mode:
-                for j in range(len(project_variable.which_layers)):
-                    for k in range(len(project_variable.which_channels[j]+1)):
-                        which_layers = project_variable.which_layers[j]
-                        which_channels = project_variable.which_channels[j][k]
+        if mode == 'srxy':
+            assert (project_variable.model_number == 11)
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j] + 1)):
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
 
-                        output = np.array([dp, rest[j][k][0], rest[j][k][1]])
-                        output = np.expand_dims(output, 0)
+                    temporal_dim = len(rest[0][0])
+                    _, h_, w_ = rest[0][0][0].shape
 
-                        project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
-                                                                                        which_channels),
-                                                          vid_tensor=output,
-                                                          global_step=project_variable.current_epoch, fps=1)
-            else:
+                    output = np.zeros(shape=(temporal_dim + 1, 1, h_, w_), dtype=np.uint8)
+                    output[0] = dp
 
-                for j in range(len(project_variable.which_layers)):
-                    for k in range(len(project_variable.which_channels[j]+1)):
-                        which_layers = project_variable.which_layers[j]
-                        which_channels = project_variable.which_channels[j][k]
+                    for t in range(temporal_dim):
+                        output[t + 1] = rest[j][k][t]
 
-                        temporal_dim = len(rest[0][0])
-                        _, h_, w_ = rest[0][0][0].shape
+                    output = np.expand_dims(output, 0)
 
-                        output = np.zeros(shape=(temporal_dim+1, 1, h_, w_), dtype=np.uint8)
-                        output[0] = dp
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                    which_channels),
+                                                      vid_tensor=output,
+                                                      global_step=project_variable.current_epoch, fps=2)
 
-                        for t in range(temporal_dim):
-                            output[t+1] = rest[j][k][t]
-
-                        output = np.expand_dims(output, 0)
-
-                        project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
-                                                                                        which_channels),
-                                                          vid_tensor=output,
-                                                          global_step=project_variable.current_epoch, fps=2)
-
-                project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
+            project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
                                               img_tensor=dp,
                                               global_step=project_variable.current_epoch)
 

@@ -368,7 +368,7 @@ def run_zeiler2014(project_variable, data_point, my_model, device):
     return all_outputs
 
 
-def our_gradient_method(project_variable, data_point, my_model, device, basic_mode=True, use_opencv=False):
+def our_gradient_method(project_variable, data_point, my_model, device):
     # if basic_mode is False, apply the temporal motion from the learned transformations
     all_outputs = []
     data = None
@@ -424,48 +424,35 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
 
             final = image_grad[0, 0, 0] * data[0, 0, 0]
 
-            if basic_mode:
-                final = normalize(final)
-                final = final.unsqueeze(0)
-                final = np.array(final.data.cpu(), dtype=np.uint8)
+            all_finals = []
 
-                image_grad = normalize(image_grad[0, 0, 0])
-                image_grad = image_grad.unsqueeze(0)
-                image_grad = np.array(image_grad.data.cpu(), dtype=np.uint8)
-                channels.append([image_grad, final])
+            all_finals.append(final)
+
+            # get transformations
+
+            if which_layer == 'conv1':
+
+                for trafo in range(trafo_per_filter):
+                    s = my_model.conv1.scale[trafo, which_channel]
+                    r = my_model.conv1.rotate[trafo, which_channel]
+                    x = my_model.conv1.translate_x[trafo, which_channel]
+                    y = my_model.conv1.translate_y[trafo, which_channel]
+                    # apply them on the final image
+                    next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
+                    all_finals.append(next_final)
+
             else:
-                
-                all_finals = []
-                if use_opencv:
-                    final = np.array(final.data.cpu(), dtype=np.uint8)
+                # all_finals.append(final)
+                for trafo in range(trafo_per_filter):
+                    s = my_model.conv2.scale[trafo, which_channel]
+                    r = my_model.conv2.rotate[trafo, which_channel]
+                    x = my_model.conv2.translate_x[trafo, which_channel]
+                    y = my_model.conv2.translate_y[trafo, which_channel]
+                    # apply them on the final image
+                    next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
+                    all_finals.append(next_final)
 
-                all_finals.append(final)
-                
-                # get transformations
-                
-                if which_layer == 'conv1':
-
-                    for trafo in range(trafo_per_filter):
-                        s = my_model.conv1.scale[trafo, which_channel]
-                        r = my_model.conv1.rotate[trafo, which_channel]
-                        x = my_model.conv1.translate_x[trafo, which_channel]
-                        y = my_model.conv1.translate_y[trafo, which_channel]
-                        # apply them on the final image
-                        next_final = create_next_frame(s, r, x, y, all_finals[trafo], device, use_opencv)
-                        all_finals.append(next_final)
-                    
-                else:
-                    # all_finals.append(final)
-                    for trafo in range(trafo_per_filter):
-                        s = my_model.conv2.scale[trafo, which_channel]
-                        r = my_model.conv2.rotate[trafo, which_channel]
-                        x = my_model.conv2.translate_x[trafo, which_channel]
-                        y = my_model.conv2.translate_y[trafo, which_channel]
-                        # apply them on the final image
-                        next_final = create_next_frame(s, r, x, y, all_finals[trafo], device, use_opencv)
-                        all_finals.append(next_final)
-
-                channels.append(all_finals)
+            channels.append(all_finals)
 
         all_outputs.append(channels)
 
@@ -473,42 +460,34 @@ def our_gradient_method(project_variable, data_point, my_model, device, basic_mo
     data = data.unsqueeze(0)
     data = np.array(data.data.cpu(), dtype=np.uint8)
     
-    if not basic_mode:
-        processed_outputs = []
-        
-        for l in range(len(project_variable.which_layers)):
-            channels = []
+    processed_outputs = []
 
-            for c in range(len(project_variable.which_channels[l])):
-                all_finals = []
-                
-                for t in range(trafo_per_filter+1):
-                    if use_opencv:
-                        processed_final = all_outputs[l][c][t]
-                        processed_final = normalize(processed_final, use_opencv)
-                        processed_final = np.expand_dims(processed_final, 0)
-                        processed_final = np.array(processed_final, dtype=np.uint8)
-                    else:
-                        processed_final = all_outputs[l][c][t]
-                        processed_final = normalize(processed_final)
-                        processed_final = processed_final.unsqueeze(0)
-                        processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+    for l in range(len(project_variable.which_layers)):
+        channels = []
 
-                    all_finals.append(processed_final)
+        for c in range(len(project_variable.which_channels[l])):
+            all_finals = []
 
-                channels.append(all_finals)
+            for t in range(trafo_per_filter+1):
+                processed_final = all_outputs[l][c][t]
+                processed_final = normalize(processed_final)
+                processed_final = processed_final.unsqueeze(0)
+                processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 
-            processed_outputs.append(channels)
+                all_finals.append(processed_final)
 
-        all_outputs = processed_outputs
+            channels.append(all_finals)
+
+        processed_outputs.append(channels)
+
+    all_outputs = processed_outputs
 
     return data, all_outputs
 
 
-def our_gradient_method_regular_3d(project_variable, data_point, my_model):
+def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
     all_outputs = []
     the_data = []
-    data = None
 
     for l in range(len(project_variable.which_layers)):
         channels = []
@@ -519,60 +498,64 @@ def our_gradient_method_regular_3d(project_variable, data_point, my_model):
 
             kernel = []
 
+            data = data_point
+            data = torch.nn.Parameter(data, requires_grad=True)
+
+
+
+            if project_variable.model_number == 11:
+                x1 = my_model.conv1(data, device)
+            else:
+                x1 = my_model.conv1(data)
+            x2 = my_model.max_pool_1(x1)
+            x3 = torch.nn.functional.relu(x2)
+
+            if which_layer == 'conv2':
+                if project_variable.model_number == 11:
+                    x4 = my_model.conv2(x3, device)
+                else:
+                    x4 = my_model.conv2(x3)
+                x5 = my_model.max_pool_2(x4)
+                x6 = torch.nn.functional.relu(x5)
+
+            if which_layer == 'conv1':
+                _, ch, d, h, w = x3.shape
+            else:
+                _, ch, d, h, w = x6.shape
+
+            # fix: set k to 0
+            highest_value = 0
+            ind_1, ind_2 = 0, 0
+            for m in range(h):
+                for n in range(w):
+                    if which_layer == 'conv1':
+                        val = float(x3[0, which_channel, 0, m, n].data.cpu())
+                    else:
+                        val = float(x6[0, which_channel, 0, m, n].data.cpu())
+                    if val > highest_value:
+                        highest_value = val
+                        ind_1 = m
+                        ind_2 = n
+
+            if which_layer == 'conv1':
+                x3[0, which_channel, 0, ind_1, ind_2].backward()
+            else:
+                x6[0, which_channel, 0, ind_1, ind_2].backward()
+
+            image_grad = data.grad
+
             for k in range(project_variable.k_shape[0]):
-            
-                data = data_point
-                data = torch.nn.Parameter(data, requires_grad=True)
-                
                 if l == 0 and c == 0:
                     d_ = data[0, 0, k]
                     d_ = d_.unsqueeze(0)
                     d_ = np.array(d_.data.cpu(), dtype=np.uint8)
                     the_data.append(d_)
 
-                x1 = my_model.conv1(data)
-                x2 = my_model.max_pool_1(x1)
-                x3 = torch.nn.functional.relu(x2)
-    
-                if which_layer == 'conv2':
-                    x4 = my_model.conv2(x3)
-                    x5 = my_model.max_pool_2(x4)
-                    x6 = torch.nn.functional.relu(x5)
-    
-                if which_layer == 'conv1':
-                    _, ch, d, h, w = x3.shape
-                else:
-                    _, ch, d, h, w = x6.shape
-    
-                highest_value = 0
-                ind_1, ind_2 = 0, 0
-                for m in range(h):
-                    for n in range(w):
-                        if which_layer == 'conv1':
-                            val = float(x3[0, which_channel, k, m, n].data.cpu())
-                            # val = float(x1[0, which_channel, 0, m, n].data.cpu())
-                        else:
-                            val = float(x6[0, which_channel, k, m, n].data.cpu())
-                            # val = float(x4[0, which_channel, 0, m, n].data.cpu())
-                        if val > highest_value:
-                            highest_value = val
-                            ind_1 = m
-                            ind_2 = n
-    
-                if which_layer == 'conv1':
-                    x3[0, which_channel, k, ind_1, ind_2].backward()
-                    # x1[0, which_channel, 0, ind_1, ind_2].backward()
-                else:
-                    x6[0, which_channel, k, ind_1, ind_2].backward()
-                    # x4[0, which_channel, 0, ind_1, ind_2].backward()
-    
-                image_grad = data.grad
-    
                 final = image_grad[0, 0, k] * data[0, 0, k]
                 final = normalize(final)
                 final = final.unsqueeze(0)
                 final = np.array(final.data.cpu(), dtype=np.uint8)
-                
+
                 kernel.append(final)
             
             channels.append(kernel)
@@ -580,13 +563,13 @@ def our_gradient_method_regular_3d(project_variable, data_point, my_model):
         all_outputs.append(channels)
 
     return the_data, all_outputs
-# TODO: image gradient is zero sometimes; fix this!
 
 
-def gradient_method(project_variable, data_point, my_model, device, basic_mode=True, use_opencv=False):
+def gradient_method(project_variable, data_point, my_model, device, mode):
 
-    if project_variable.model_number == 11:
-        return our_gradient_method(project_variable, data_point, my_model, device, basic_mode, use_opencv)
+    if mode == 'srxy':
+        return our_gradient_method(project_variable, data_point, my_model, device)
     else:
-        return our_gradient_method_regular_3d(project_variable, data_point, my_model)
+        return our_gradient_method_no_srxy(project_variable, data_point, my_model, device)
+
 

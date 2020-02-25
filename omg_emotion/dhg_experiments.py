@@ -1062,7 +1062,7 @@ def e_test_3D_dhg():
     project_variable.device = 1
 
     project_variable.model_number = 12
-    project_variable.data_points = [0 * 14,  20 * 14, 0 * 14]
+    project_variable.data_points = [0 * 14,  2 * 14, 0 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.inference_only_mode = True
@@ -1114,8 +1114,10 @@ def e_test_3DTTN_dhg():
     # if 'zeiler2014' in project_variable.which_methods:
     #     project_variable.return_ind = True
 
-    project_variable.which_layers = ['conv1', 'conv2']
+
+    # project_variable.which_layers = ['conv1']
     # project_variable.which_channels = [np.arange(2)]
+    project_variable.which_layers = ['conv1', 'conv2']
     project_variable.which_channels = [np.arange(6), np.arange(16)]
 
     main_file.run(project_variable)
