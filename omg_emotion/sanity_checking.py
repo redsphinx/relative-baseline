@@ -142,15 +142,15 @@ def matrix_transforms_test():
     img = torch.Tensor(img)
     # img = img.transpose(-1, 0)
 
-    # s = 0.9791
-    # r = -0.02759
-    # x = -0.01325
-    # y = 0.02823
+    s = 1.05
+    r = 0.02
+    x = 0.02
+    y = 0.02
 
-    s = 2
-    r = 90
-    x = 0.5
-    y = 0.5
+    # s = 2
+    # r = 90
+    # x = 0.5
+    # y = 0.5
 
     ss = torch.Tensor(np.array([s]))
     rr = torch.Tensor(np.array([np.deg2rad(r)]))

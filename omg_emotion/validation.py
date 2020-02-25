@@ -69,6 +69,8 @@ def run(project_variable, all_data, my_model, device):
 
     if project_variable.inference_only_mode:
         TM.add_xai(project_variable, my_model, device, data_point=data[0].unsqueeze(0))
+        TM.add_histograms_srxy(project_variable, my_model)
+        TM.add_text_srxy_per_channel(project_variable, my_model)
     else:
         if project_variable.do_xai and project_variable.current_epoch in save_epochs:
 

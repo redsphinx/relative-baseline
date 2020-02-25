@@ -282,8 +282,8 @@ def add_xai(project_variable, my_model, device, data_point=None):
 
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
-        mode = 'slices'
-        # mode = 'srxy' # only for 3DTTN
+        # mode = 'slices'
+        mode = 'srxy' # only for 3DTTN
 
         which_methods = 'gradient_method'
         dp, rest = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
@@ -341,3 +341,64 @@ def add_xai(project_variable, my_model, device, data_point=None):
             project_variable.writer.add_video(tag='xai/%s/0_original' % (which_methods),
                                               vid_tensor=dp,
                                               global_step=project_variable.current_epoch, fps=2)
+
+
+def add_histograms_srxy(project_variable, my_model):
+    assert project_variable.model_number == 11
+    
+    project_variable.writer.add_histogram('conv1.weight/scale', my_model.conv1.scale,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv1.weight/rotate', my_model.conv1.rotate,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv1.weight/translate_x', my_model.conv1.translate_x,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv1.weight/translate_y', my_model.conv1.translate_y,
+                                          project_variable.current_epoch)
+
+    project_variable.writer.add_histogram('conv2.weight/scale', my_model.conv2.scale,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv2.weight/rotate', my_model.conv2.rotate,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv2.weight/translate_x', my_model.conv2.translate_x,
+                                          project_variable.current_epoch)
+    project_variable.writer.add_histogram('conv2.weight/translate_y', my_model.conv2.translate_y,
+                                          project_variable.current_epoch)
+
+def add_text_srxy_per_channel(project_variable, my_model):
+
+    # conv1
+
+    conv1_scale = my_model.conv1.scale
+    conv1_rotate = my_model.conv1.rotate
+    conv1_translate_x = my_model.conv1.translate_x
+    conv1_translate_y = my_model.conv1.translate_y
+
+    conv1_string = ''
+
+    tr, ch = conv1_scale.shape
+
+    for i in range(ch):
+        for j in range(tr):
+            tmp_ = 'channel %d, trnsf %d, scale %0.2f, rotate %0.2f, trnsl x %0.2f, trnsl y %0.2f  \n' \
+                   % (i, j, conv1_scale[j, i], conv1_rotate[j, i], conv1_translate_x[j, i], conv1_translate_y[j, i])
+            conv1_string = conv1_string + tmp_
+
+    project_variable.writer.add_text('conv1/', conv1_string)
+    
+    # conv2
+    conv2_scale = my_model.conv2.scale
+    conv2_rotate = my_model.conv2.rotate
+    conv2_translate_x = my_model.conv2.translate_x
+    conv2_translate_y = my_model.conv2.translate_y
+
+    conv2_string = ''
+
+    tr, ch = conv2_scale.shape
+
+    for i in range(ch):
+        for j in range(tr):
+            tmp_ = 'channel %d, trnsf %d, scale %0.2f, rotate %0.2f, trnsl x %0.2f, trnsl y %0.2f  \n' \
+                   % (i, j, conv2_scale[j, i], conv2_rotate[j, i], conv2_translate_x[j, i], conv2_translate_y[j, i])
+            conv2_string = conv2_string + tmp_
+
+    project_variable.writer.add_text('conv2/', conv2_string)

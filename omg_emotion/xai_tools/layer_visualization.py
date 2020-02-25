@@ -2,6 +2,7 @@ import os
 import numpy as np
 from PIL import Image
 import cv2 as cv
+from scipy import stats
 
 import torch
 from torch.optim import Adam
@@ -118,6 +119,21 @@ def normalize(data, use_opencv=False):
         for j in range(data.shape[1]):
             c = data[i, j]
             data[i, j] = (c - a) * (z - y) / (b - a) + y
+
+    return data
+
+
+def whiten_bg(data):
+    data = np.array(data.data.cpu())
+    pixel_mode = stats.mode(data.flatten())
+
+    # data = data / float(pixel_mode[0]) * 255
+    data = data - float(pixel_mode[0]) + 255
+
+    # for i in range(data.shape[0]):
+    #     for j in range(data.shape[1]):
+    #         if data[i, j] > 255:
+    #             data[i, j] = data[i, j] / 2
 
     return data
 
@@ -482,6 +498,9 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
     all_outputs = processed_outputs
 
+    # processed_final = whiten_bg(processed_final)
+    # processed_final = np.expand_dims(processed_final, 0)
+
     return data, all_outputs
 
 
@@ -500,8 +519,6 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
 
             data = data_point
             data = torch.nn.Parameter(data, requires_grad=True)
-
-
 
             if project_variable.model_number == 11:
                 x1 = my_model.conv1(data, device)
@@ -571,5 +588,4 @@ def gradient_method(project_variable, data_point, my_model, device, mode):
         return our_gradient_method(project_variable, data_point, my_model, device)
     else:
         return our_gradient_method_no_srxy(project_variable, data_point, my_model, device)
-
 
