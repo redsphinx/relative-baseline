@@ -51,6 +51,10 @@ dhg_hand_only_28_28 = '/huge/gabras/DHG_hand_only_28_28'
 dhg_hand_only_28_28_50_frames = '/huge/gabras/DHG_hand_only_28_28_50_frames'
 dhg_mean_std = '/huge/gabras/DHG/mean_std.npy'
 
+# Jester
+jester_location = '/scratch/users/gabras/jester'
+jester_mean_std = '/scratch/users/gabras/jester/mean_std.npy'
+
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
 erhan2009 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/erhan2009'

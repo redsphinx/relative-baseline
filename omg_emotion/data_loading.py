@@ -804,6 +804,15 @@ def load_dhg(project_variable, seed):
     return splits, all_data, all_labels
 
 
+def load_jester(project_variables, seed):
+
+    pass
+
+
+def get_mean_std_train_jester():
+
+    pass
+
 def get_mean_std_train_dhg():
     if os.path.exists(PP.dhg_mean_std):
         total = np.load(PP.dhg_mean_std)
@@ -865,6 +874,7 @@ def get_mean_std_train_mov_mnist():
     return mean, std
 
 
+
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable, seed)
@@ -878,6 +888,8 @@ def load_data(project_variable, seed):
         return load_kthactions(project_variable, seed)
     elif project_variable.dataset == 'dhg':
         return load_dhg(project_variable, seed)
+    elif project_variable.dataset == 'jester':
+        return load_jester(project_variable, seed)
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
