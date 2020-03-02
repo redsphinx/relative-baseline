@@ -150,3 +150,118 @@ number of videos with exactly 30 frames: 948
 number of videos with greater than 30 frames: 144511
 '''
 
+def adjust_frame(image, h, w, c):
+    # resize to height of h
+    or_w, or_h = image.size
+    new_w = int(h * or_w / or_h)
+    image = image.resize((new_w, h)) # w, h
+
+    if new_w > w:
+        delta_w = (new_w - w) // 2
+        image = image.crop((delta_w, 0, new_w-delta_w-1, h)) # l, u, r, d
+    elif new_w < w:
+        delta_w = (w - new_w) // 2
+        image = np.array(image)
+        pixel_mean = np.mean(np.mean(image, axis=0), axis=0)
+        pixel_mean =np.array(pixel_mean, dtype=int)
+        canvas = np.ones(shape=(h, w, c), dtype=np.uint8)
+        canvas = canvas * pixel_mean
+        # paste it
+        canvas[:, delta_w:new_w+delta_w, :] = image
+        image = canvas
+
+    image = np.array(image, dtype=np.uint8)
+    assert image.shape == (h, w, c)
+
+    return image
+
+
+def standardize_clips(b, e):
+    print(b, e)
+    height = 50
+    width = 75
+    channels = 3
+    frames = 30
+
+    base_path = PP.jester_data
+    new_path = os.path.join(PP.jester_location, 'data_50_75')
+
+    if not os.path.exists(new_path):
+        os.mkdir(new_path)
+
+    all_videos = os.listdir(base_path)
+    all_videos.sort()
+
+    for vid in tqdm.tqdm(range(b, e)):
+        vid_path = os.path.join(base_path, all_videos[vid])
+        new_vid_path = os.path.join(new_path, all_videos[vid])
+        if not os.path.exists(new_vid_path):
+            os.mkdir(new_vid_path)
+
+        all_frames = os.listdir(vid_path)
+        # new_video = np.zeros(shape=(num_fames, channels, height, width), dtype=int)
+
+        num_frames = len(all_frames)
+        if num_frames < frames:
+            missing_frames = frames - num_frames
+            dupl_1 = [0 for n in range(missing_frames // 2)]
+            dupl_2 = [num_frames-1 for n in range(missing_frames - missing_frames // 2)]
+            dupl_mid = [n for n in range(num_frames)]
+            frames_to_copy = dupl_1 + dupl_mid + dupl_2
+            assert len(frames_to_copy) == frames
+
+        elif num_frames > frames:
+            frames_to_remove = [n for n in range(0, num_frames, num_frames // (num_frames - frames))]
+            leftover = num_frames - len(frames_to_remove)
+
+            if leftover < frames:
+                random_indices = random.sample(frames_to_remove, k=(frames - leftover))
+                for n in random_indices:
+                    frames_to_remove.remove(n)
+
+                assert num_frames - len(frames_to_remove) == frames
+
+            elif leftover > frames:
+                print('leftover > frames')
+
+            frames_to_copy = [n for n in range(num_frames)]
+            for n in frames_to_remove:
+                frames_to_copy.remove(n)
+
+            assert len(frames_to_copy) == frames
+
+        else:
+            frames_to_copy = [n for n in range(num_frames)]
+
+
+        for i in frames_to_copy:
+            frame_path = os.path.join(vid_path, all_frames[i])
+
+            frame = Image.open(frame_path)
+            frame = adjust_frame(frame, height, width, channels)
+
+            # TODO: adjust shape
+
+            # new_video[i] = frame
+
+            new_frame_path = os.path.join(new_vid_path, all_frames[i])
+            frame = Image.fromarray(frame, mode='RGB')
+            frame.save(new_frame_path)
+
+# 148092
+# DONE  standardize_clips(0, 3)
+# standardize_clips(3, 10000)
+# standardize_clips(10000, 20000)
+# standardize_clips(20000, 30000)
+# standardize_clips(30000, 40000)
+# standardize_clips(40000, 50000)
+# standardize_clips(50000, 60000)
+# standardize_clips(60000, 70000)
+# standardize_clips(70000, 80000)
+# standardize_clips(80000, 90000)
+# standardize_clips(90000, 100000)
+# standardize_clips(100000, 110000)
+# standardize_clips(110000, 120000)
+# standardize_clips(120000, 130000)
+# standardize_clips(130000, 140000)
+standardize_clips(140000, 148092)
