@@ -997,7 +997,6 @@ def get_mean_std_train_mov_mnist():
     return mean, std
 
 
-
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable, seed)

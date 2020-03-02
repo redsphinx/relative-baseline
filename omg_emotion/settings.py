@@ -73,6 +73,8 @@ class ProjectVariable(object):
         # omg_emotion categories: 7
         # affectnet categories: 11
         # mnist: 10
+        # dhg: 14
+        # jester: 27
         self._label_size = 10
 
         # float, learning rate

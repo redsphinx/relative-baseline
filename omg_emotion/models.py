@@ -2186,6 +2186,10 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
                 in_features = 4500
             elif project_variable.num_out_channels == [12, 22]:
                 in_features = 5500
+        elif project_variable.dataset == 'jester':
+            if project_variable.num_out_channels == [6, 16]:
+                # TODO
+                in_features = None
         else:
             _fc_in = [5, 5, 5]
 
@@ -2273,6 +2277,10 @@ class LeNet5_3d_xD(torch.nn.Module):
                 in_features = 4500
             elif project_variable.num_out_channels == [12, 22]:
                 in_features = 5500
+        elif project_variable.dataset == 'jester':
+            if project_variable.num_out_channels == [6, 16]:
+                # TODO
+                in_features = None
 
 
         self.fc1 = torch.nn.Linear(in_features,
