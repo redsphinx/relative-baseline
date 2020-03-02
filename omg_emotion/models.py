@@ -2280,7 +2280,7 @@ class LeNet5_3d_xD(torch.nn.Module):
         elif project_variable.dataset == 'jester':
             if project_variable.num_out_channels == [6, 16]:
                 # TODO
-                in_features = None
+                in_features = 420
 
 
         self.fc1 = torch.nn.Linear(in_features,
