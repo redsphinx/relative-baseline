@@ -116,21 +116,37 @@ def get_information():
     print('average number of frames:    %d\n'
           'max number of frames:        %d\n'
           'min number of frames:        %d\n'
-          % (int(avg_frames), frames.max(), frames.min()))
+          % (int(avg_frames), frames[:, 1].max(), frames[:, 1].min()))
 
-    # TODO: number of frames less than x
+    less_than = 30
 
-    # which = ['train', 'test', 'val']
-    # for i in which:
-    #     print('\n getting class balance %s...' % i)
-    #
-    #     labs = load_labels(i)[:, 1]
-    #     print('(perfect class balance at %d per class)' % (len(labs) // 27))
-    #
-    #     for j in range(27):
-    #         print('class %d:    %d' % (j, sum(labs == j)))
-    #     print('\n ------')
+    frames = frames[:, 1]
+    num_frames_less_than = sum(frames < less_than)
+    num_frames_exactly = sum(frames == less_than)
+    num_frames_gret_than = sum(frames > less_than)
 
+    print('number of videos with less than %i frames: %d' % (less_than, num_frames_less_than))
+    print('number of videos with exactly %i frames: %d' % (less_than, num_frames_exactly))
+    print('number of videos with greater than %i frames: %d' % (less_than, num_frames_gret_than))
 
-get_information()
+    which = ['train', 'test', 'val']
+    for i in which:
+        print('\n getting class balance %s...' % i)
+
+        labs = load_labels(i)[:, 1]
+        print('(perfect class balance at %d per class)' % (len(labs) // 27))
+
+        for j in range(27):
+            print('class %d:    %d' % (j, sum(labs == j)))
+        print('\n ------')
+
+'''
+average number of frames:    35
+max number of frames:        70
+min number of frames:        12
+
+number of videos with less than 30 frames: 2633
+number of videos with exactly 30 frames: 948
+number of videos with greater than 30 frames: 144511
+'''
 
