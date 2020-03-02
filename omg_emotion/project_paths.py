@@ -54,7 +54,7 @@ dhg_mean_std = '/huge/gabras/DHG/mean_std.npy'
 # Jester
 jester_location = '/scratch/users/gabras/jester'
 jester_data = '/scratch/users/gabras/jester/data'
-jester_mean_std = '/scratch/users/gabras/jester/mean_std.npy'
+jester_data_50_75 = '/scratch/users/gabras/jester/data_50_75'
 jester_frames = '/scratch/users/gabras/jester/frames.txt'
 jester_zero = '/scratch/users/gabras/jester/zero.txt'
 

@@ -804,14 +804,137 @@ def load_dhg(project_variable, seed):
     return splits, all_data, all_labels
 
 
-def load_jester(project_variables, seed):
+def load_jester(project_variable, seed):
+    tp = np.float32
+    splits = []
+    all_labels = []
+    all_data = []
+    FRAMES = project_variable.load_num_frames  # 30
 
-    pass
+    def load(which, dp):
+        label_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
+        labels = np.load(label_path)[:dp]
 
+        data = np.zeros(shape=(dp, 3, FRAMES, 50, 75), dtype=tp)  # dp, c, d, h, w
 
-def get_mean_std_train_jester():
+        for i in tqdm(range(dp)):
+            frames_path = os.path.join(PP.jester_data_50_75, labels[i][0])
+            frames_in_folder = os.listdir(frames_path)
+            frames_in_folder.sort()
 
-    pass
+            for j in range(FRAMES):
+                img_path = os.path.join(PP.jester_data_50_75,
+                                        str(labels[i][0]),
+                                        frames_in_folder[j]
+                                        )
+
+                tmp = Image.open(img_path)
+                # TODO: possible color conversion
+                # TODO: possible transpose of shape
+                tmp = np.array(tmp)
+                # tmp = np.array(tmp.convert('L'))
+                data[i, :, j] = tmp
+
+        labels = labels[:, 1]
+
+        return data, labels
+
+    def load_random(which, dp, balanced, seed):
+        num_categories = 27
+        total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
+        if dp != total_dp[which]:
+            assert (dp % num_categories == 0)
+
+        label_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
+        full_labels = np.load(label_path)
+        names = full_labels[:, 0]
+        labels = full_labels[:, 1]
+
+        if balanced:
+            if seed is not None:
+                random.seed(seed)
+
+            chosen = []
+            for i in range(num_categories):
+                indices = np.arange(total_dp[which])[labels == i]
+
+                # if seed is not None:
+                #     random.seed(seed)
+
+                num_samples_per_category = dp // num_categories
+
+                if num_samples_per_category > len(indices):
+                    chosen.extend(indices)
+
+                    diff = num_samples_per_category - len(indices)
+                    assert (len(indices) + diff == num_samples_per_category)
+                    choose_indices = random.choices(list(np.arange(len(indices))), k=diff)
+                else:
+                    choose_indices = random.sample(list(np.arange(len(indices))), num_samples_per_category)
+
+                chosen.extend(indices[choose_indices])
+        else:
+            chosen = np.arange(total_dp[which])
+
+            if seed is not None:
+                random.seed(seed)
+
+            random.shuffle(chosen)
+            chosen = chosen[:dp]
+
+        chosen.sort()
+        labels = labels[chosen]
+        names = names[chosen]
+        full_labels = full_labels[chosen]
+
+        num_points = len(labels)
+
+        data = np.zeros(shape=(dp, 3, FRAMES, 50, 75), dtype=tp)  # dp, c, d, h, w
+
+        for i in tqdm(range(num_points)):
+            frames_path = os.path.join(PP.jester_data_50_75, labels[i][0])
+            frames_in_folder = os.listdir(frames_path)
+            frames_in_folder.sort()
+
+            for j in range(FRAMES):
+                img_path = os.path.join(PP.jester_data_50_75,
+                                        str(names[i]),
+                                        frames_in_folder[j]
+                                        )
+
+                tmp = Image.open(img_path)
+                # TODO: possible color conversion
+                # TODO: possible transpose of shape
+                tmp = np.array(tmp)
+                # tmp = np.array(tmp.convert('L'))
+                data[i, :, j] = tmp
+
+        return data, labels
+
+    if project_variable.train:
+        if project_variable.randomize_training_data:
+            data, some_labels = load_random('train', project_variable.data_points[0],
+                                            project_variable.balance_training_data, seed)
+        else:
+            data, some_labels = load('train', project_variable.data_points[0])
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.val:
+        data, some_labels = load('val', project_variable.data_points[1])
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.test:
+        data, some_labels = load('test', project_variable.data_points[2])
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    return splits, all_data, all_labels
+
 
 def get_mean_std_train_dhg():
     if os.path.exists(PP.dhg_mean_std):
