@@ -52,10 +52,56 @@ def wc_l(path):
     output = int(output.decode('utf-8'))
     return output
 
-    # return subprocess.check_output(['ls', path, '|', 'wc', '-l']).decode('utf-8')
-    #
-    # command = "ls %s | wc -l" % path
-    # subprocess.call(command, shell=True)
+
+def get_num_frames():
+    total_videos = 148092
+    frames = np.zeros(shape=(total_videos, 2), dtype=int)
+    continue_from = 0
+    base_path = PP.jester_data
+    vid_folders = os.listdir(base_path)
+    vid_folders.sort()
+
+    if os.path.exists(PP.jester_frames):
+        tmp = np.genfromtxt(PP.jester_frames, delimiter=',', dtype=int)
+        if tmp.shape[0] == total_videos:
+            return tmp
+        else:
+            frames[:tmp.shape[0]] = tmp
+            continue_from = vid_folders.index(str(tmp[-1][0])) + 1
+
+    if os.path.exists(PP.jester_zero):
+        zeros = list(np.genfromtxt(PP.jester_zero, delimiter='\n', dtype=int))
+    else:
+        zeros = []
+
+    print('getting number of frames, this may take a while...')
+    for vid in tqdm.tqdm(range(continue_from, len(vid_folders))):
+        vid_path = os.path.join(base_path, vid_folders[vid])
+        imgs = wc_l(vid_path)
+        frames[vid] = [vid_folders[vid], imgs]
+
+        line = '%s,%i\n' % (vid_folders[vid], imgs)
+        with open(PP.jester_frames, 'a') as my_file:
+            my_file.write(line)
+
+        if imgs == 0:
+            print('video %s has zero frames\n' % vid_folders[vid])
+            zeros.append(vid_folders[vid])
+
+            line = '%s\n' % vid_folders[vid]
+            with open(PP.jester_zero, 'a') as a_file:
+                a_file.write(line)
+
+        if vid > 0 and vid % 1000 == 0:
+            tmp = np.genfromtxt(PP.jester_frames, delimiter=',', dtype=int)
+            avg_frames = np.mean(tmp[:, 1])
+            print('based on %d videos:'
+                  'average number of frames:    %d\n'
+                  'max number of frames:        %d\n'
+                  'min number of frames:        %d\n\n'
+                  % (len(tmp), int(avg_frames), tmp[:, 1].max(), tmp[:, 1].min()))
+
+    return frames
 
 
 def get_information():
@@ -63,18 +109,10 @@ def get_information():
     vid_folders = os.listdir(base_path)
     vid_folders.sort()
 
-    print('getting number of frames...')
-    frames = []
-    for vid in tqdm.tqdm(range(len(vid_folders))):
+    print('getting number of frames, this will take a while...')
+    frames = get_num_frames()
 
-        vid_path = os.path.join(base_path, vid_folders[vid])
-        imgs = wc_l(vid_path)
-        frames.append(imgs)
-
-        frames.append(len(imgs))
-
-    frames = np.array(frames)
-    avg_frames = np.mean(frames)
+    avg_frames = np.mean(frames[:, 1])
     print('average number of frames:    %d\n'
           'max number of frames:        %d\n'
           'min number of frames:        %d\n'

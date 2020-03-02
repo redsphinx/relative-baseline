@@ -53,7 +53,11 @@ dhg_mean_std = '/huge/gabras/DHG/mean_std.npy'
 
 # Jester
 jester_location = '/scratch/users/gabras/jester'
+jester_data = '/scratch/users/gabras/jester/data'
 jester_mean_std = '/scratch/users/gabras/jester/mean_std.npy'
+jester_frames = '/scratch/users/gabras/jester/frames.txt'
+jester_zero = '/scratch/users/gabras/jester/zero.txt'
+
 
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
