@@ -2180,7 +2180,7 @@ class LeNet5_TTN3d_xD(torch.nn.Module):
         elif project_variable.dataset == 'mov_mnist':
             if project_variable.num_out_channels == [6, 16]:
                 # TODO
-                in_features = 6
+                in_features = 2000
         elif project_variable.dataset == 'dhg':
             if project_variable.num_out_channels == [6, 16]:
                 in_features = 4000

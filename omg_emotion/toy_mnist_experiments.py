@@ -9823,8 +9823,8 @@ def e1397_conv3d_mnist():
     project_variable.experiment_number = 1397
     project_variable.device = 2
 
-    # project_variable.data_points = [500, 1000, 0]
-    project_variable.data_points = [20, 20, 0]
+    project_variable.data_points = [500, 1000, 0]
+    # project_variable.data_points = [20, 20, 0]
     project_variable.learning_rate = 5e-8
     project_variable.adapt_eval_on = 'val'
     project_variable.decrease_after_num_epochs = 10
@@ -9844,10 +9844,10 @@ def e1398_conv3dttn_mnist():
     project_variable.num_in_channels = 1
 
     project_variable.experiment_number = 1398
-    project_variable.device = 1
+    project_variable.device = 2
 
-    # project_variable.data_points = [500, 1000, 0]
-    project_variable.data_points = [20, 20, 0]
+    project_variable.data_points = [500, 1000, 0]
+    # project_variable.data_points = [20, 20, 0]
     project_variable.learning_rate = 5e-8
     project_variable.adapt_eval_on = 'val'
     project_variable.decrease_after_num_epochs = 10
@@ -9912,7 +9912,7 @@ def e_test_3D_mnist():
     main_file.run(project_variable)
 # ----
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
 # e_test_3D_mnist()
 # e1397_conv3d_mnist()
