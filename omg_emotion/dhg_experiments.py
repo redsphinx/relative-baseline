@@ -1050,6 +1050,60 @@ def e68_3DTTN_dhg():
 
     main_file.run(project_variable)
 
+# ----------------------------------------------------------------------------||
+# ----------------------------------------------------------------------------||
+# saving 69, 70 for marcel
+
+def e69_test_3D_dhg():
+    set_init_3()
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 5
+
+    project_variable.experiment_number = 69
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.model_number = 12  # lenet5 3dconv xD
+    project_variable.data_points = [140 * 14,  20 * 14, 0 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-3
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    project_variable.do_xai = False
+    project_variable.return_ind = True
+
+    main_file.run(project_variable)
+
+
+def e70_3DTTN_dhg():
+    set_init_3()
+    project_variable.end_epoch = 150
+    project_variable.repeat_experiments = 5
+
+    project_variable.experiment_number = 70
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.model_number = 11  # 3dconvTTN xD
+    project_variable.data_points = [140 * 14,  20 * 14, 0 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    project_variable.do_xai = False
+    project_variable.return_ind = True
+
+    main_file.run(project_variable)
+
+# ----------------------------------------------------------------------------||
+# ----------------------------------------------------------------------------||
+
 # --------------------------------------
 #   for debugging purposes
 def e_test_3D_dhg():
@@ -1124,7 +1178,10 @@ def e_test_3DTTN_dhg():
 # --------------------------------------
 
 
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
 
-e_test_3DTTN_dhg()
+# e69_test_3D_dhg()
+# e70_3DTTN_dhg()
+
+# e_test_3DTTN_dhg()
 # e_test_3D_dhg()

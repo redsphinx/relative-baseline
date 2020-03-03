@@ -9807,6 +9807,62 @@ def e1396_conv3dttn_mnist():
     main_file.run(project_variable)
 
 
+# ------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
+# MARCEL
+
+
+def e1397_conv3d_mnist():
+    set_init_17()
+    project_variable.repeat_experiments = 5
+    project_variable.sheet_number = 18
+    project_variable.do_xai = False
+    project_variable.return_ind = True
+    project_variable.num_in_channels = 1
+
+    project_variable.experiment_number = 1397
+    project_variable.device = 2
+
+    # project_variable.data_points = [500, 1000, 0]
+    project_variable.data_points = [20, 20, 0]
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [6, 16]
+    project_variable.model_number = 12  # lenet 3dconv xD
+    main_file.run(project_variable)
+
+
+def e1398_conv3dttn_mnist():
+    set_init_18()
+    project_variable.repeat_experiments = 5
+    project_variable.sheet_number = 18
+    project_variable.do_xai = False
+    project_variable.return_ind = True
+    project_variable.num_in_channels = 1
+
+    project_variable.experiment_number = 1398
+    project_variable.device = 1
+
+    # project_variable.data_points = [500, 1000, 0]
+    project_variable.data_points = [20, 20, 0]
+    project_variable.learning_rate = 5e-8
+    project_variable.adapt_eval_on = 'val'
+    project_variable.decrease_after_num_epochs = 10
+    project_variable.reduction_factor = 2
+
+    project_variable.num_out_channels = [6, 16]
+    project_variable.model_number = 11  # lenet 3dconvTTN xD
+    main_file.run(project_variable)
+
+
+# MARCEL
+# ------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------------------------------------
+
+
 # ---- testing the visualizations
 def e_test_3D_mnist():
     project_variable.experiment_number = 923845
@@ -9858,17 +9914,6 @@ def e_test_3D_mnist():
 
 project_variable = ProjectVariable(debug_mode=True)
 
-e_test_3D_mnist()
-
-# x1.shape
-# torch.Size([1, 6, 30, 28, 28])
-# x2.shape
-# torch.Size([1, 6, 15, 14, 14])
-# x3.shape
-# torch.Size([1, 6, 15, 14, 14])
-# x4.shape
-# torch.Size([1, 16, 11, 10, 10])
-# x5.shape
-# torch.Size([1, 16, 5, 5, 5])
-# x6.shape
-# torch.Size([1, 16, 5, 5, 5])
+# e_test_3D_mnist()
+# e1397_conv3d_mnist()
+e1398_conv3dttn_mnist()
