@@ -1054,7 +1054,7 @@ def e68_3DTTN_dhg():
 # ----------------------------------------------------------------------------||
 # saving 69, 70 for marcel
 
-def e69_test_3D_dhg():
+def e69_3D_dhg():
     set_init_3()
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 5
@@ -1100,6 +1100,70 @@ def e70_3DTTN_dhg():
     project_variable.return_ind = True
 
     main_file.run(project_variable)
+
+
+# inference only and visualization
+
+def e71_3D_dhg():
+    set_init_3()
+    project_variable.end_epoch = 1
+    project_variable.repeat_experiments = 1
+
+    project_variable.experiment_number = 71
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.model_number = 12
+    project_variable.data_points = [0 * 14,  2 * 14, 0 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.inference_only_mode = True
+    project_variable.load_model = [69, 12, 99, 3]
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [6, 16]
+
+    project_variable.do_xai = True
+    # project_variable.which_methods = ['gradient_method']
+    project_variable.which_methods = ['erhan2009', 'zeiler2014','gradient_method']
+    project_variable.return_ind = True
+    project_variable.which_layers = ['conv1', 'conv2']
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
+
+    main_file.run(project_variable)
+
+
+def e72_3DTTN_dhg():
+    set_init_3()
+    project_variable.end_epoch = 1
+    project_variable.repeat_experiments = 1
+
+    project_variable.experiment_number = 72
+    project_variable.sheet_number = 21
+    project_variable.device = 2
+
+    project_variable.model_number = 11
+    project_variable.data_points = [0 * 14,  2 * 14, 0 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.inference_only_mode = True
+    project_variable.load_model = [70, 11, 149, 4]
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['erhan2009', 'zeiler2014', 'gradient_method']
+    project_variable.return_ind = True
+    project_variable.which_layers = ['conv1', 'conv2']
+    project_variable.which_channels = [np.arange(6), np.arange(16)]
+
+    main_file.run(project_variable)
+
 
 # ----------------------------------------------------------------------------||
 # ----------------------------------------------------------------------------||
@@ -1180,8 +1244,5 @@ def e_test_3DTTN_dhg():
 
 project_variable = ProjectVariable(debug_mode=False)
 
-# e69_test_3D_dhg()
-# e70_3DTTN_dhg()
-
-# e_test_3DTTN_dhg()
-# e_test_3D_dhg()
+# e71_3D_dhg()
+e72_3DTTN_dhg()

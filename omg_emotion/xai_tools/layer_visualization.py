@@ -187,7 +187,7 @@ def run_erhan2009(project_variable, my_model, device):
                         x = my_model.conv1(x, device)
                     elif which_layer == 'conv2':
                         x = my_model.conv1(x, device)
-                        if 'zeiler2014' in project_variable.which_methods:
+                        if project_variable.return_ind:
                             x, _ = my_model.max_pool_1(x)
                         else:
                             x = my_model.max_pool_1(x)
@@ -198,7 +198,7 @@ def run_erhan2009(project_variable, my_model, device):
                         x = my_model.conv1(x, )
                     elif which_layer == 'conv2':
                         x = my_model.conv1(x, )
-                        if 'zeiler2014' in project_variable.which_methods:
+                        if project_variable.return_ind:
                             x, _ = my_model.max_pool_1(x)
                         else:
                             x = my_model.max_pool_1(x)
@@ -401,12 +401,18 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             data = torch.nn.Parameter(data, requires_grad=True)
 
             x1 = my_model.conv1(data, device)
-            x2 = my_model.max_pool_1(x1)
+            if project_variable.return_ind:
+                x2, _ = my_model.max_pool_1(x1)
+            else:
+                x2 = my_model.max_pool_1(x1)
             x3 = torch.nn.functional.relu(x2)
 
             if which_layer == 'conv2':
                 x4 = my_model.conv2(x3, device)
-                x5 = my_model.max_pool_2(x4)
+                if project_variable.return_ind:
+                    x5, _ = my_model.max_pool_2(x4)
+                else:
+                    x5 = my_model.max_pool_2(x4)
                 x6 = torch.nn.functional.relu(x5)
 
             if which_layer == 'conv1':
@@ -524,7 +530,10 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
                 x1 = my_model.conv1(data, device)
             else:
                 x1 = my_model.conv1(data)
-            x2 = my_model.max_pool_1(x1)
+            if project_variable.return_ind:
+                x2, _ = my_model.max_pool_1(x1)
+            else:
+                x2 = my_model.max_pool_1(x1)
             x3 = torch.nn.functional.relu(x2)
 
             if which_layer == 'conv2':
@@ -532,7 +541,10 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
                     x4 = my_model.conv2(x3, device)
                 else:
                     x4 = my_model.conv2(x3)
-                x5 = my_model.max_pool_2(x4)
+                if project_variable.return_ind:
+                    x5, _ = my_model.max_pool_2(x4)
+                else:
+                    x5 = my_model.max_pool_2(x4)
                 x6 = torch.nn.functional.relu(x5)
 
             if which_layer == 'conv1':

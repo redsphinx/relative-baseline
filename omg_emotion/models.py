@@ -2415,7 +2415,8 @@ class deconv_3DTTN(torch.nn.Module):
     def forward(self, x, pool_switches):
         if self.which_conv == 'conv2':
             x = torch.nn.functional.relu(x)
-            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 21, 10, 10]))
+            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 11, 10, 10]))  # video mnist
+            # x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 21, 10, 10])) # dhg
             x = self.deconv2(x)
 
         x = torch.nn.functional.relu(x)
@@ -2467,7 +2468,8 @@ class deconv_3D(torch.nn.Module):
     def forward(self, x, pool_switches):
         if self.which_conv == 'conv2':
             x = torch.nn.functional.relu(x)
-            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 11, 10, 10]))
+            x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 11, 10, 10])) # video mnist
+            # x = self.unpool2(x, pool_switches[1], torch.Size([1, 16, 21, 10, 10])) # dhg
             x = self.deconv2(x)
 
         x = torch.nn.functional.relu(x)
