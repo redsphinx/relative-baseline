@@ -833,7 +833,9 @@ def load_jester(project_variable, seed):
                 # TODO: possible transpose of shape
                 tmp = np.array(tmp)
                 # tmp = np.array(tmp.convert('L'))
+                tmp = tmp.transpose((2, 0, 1))
                 data[i, :, j] = tmp
+
 
         labels = labels[:, 1]
 

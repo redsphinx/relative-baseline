@@ -4,7 +4,6 @@ from relative_baseline.omg_emotion import main_file
 
 
 def set_init_1():
-    project_variable.model_number = 12
     project_variable.end_epoch = 100
     project_variable.dataset = 'jester'
 
@@ -28,6 +27,8 @@ def set_init_1():
 
 def e0_3D_jester():
     set_init_1()
+    project_variable.model_number = 12
+    # project_variable.model_number = 11
     project_variable.experiment_number = 918274591283
     project_variable.sheet_number = 21
     project_variable.device = 2
