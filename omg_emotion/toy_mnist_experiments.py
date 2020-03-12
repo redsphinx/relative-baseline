@@ -9983,12 +9983,12 @@ def e_test_3D_mnist():
     main_file.run(project_variable)
 # ----
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 
 # e1399_3D_mnist()
-e1400_3DTTN_mnist()
+# e1400_3DTTN_mnist()
 
-# e_test_3D_mnist()
+e_test_3D_mnist()
 # e1397_conv3d_mnist()
 # e1398_conv3dttn_mnist()
