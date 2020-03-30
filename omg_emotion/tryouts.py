@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 # from matplotlib import cm
 # from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
+import skvideo.io
 
 
 def plot_results():
@@ -316,3 +317,4 @@ t =  6.7833472994078745  p =  7.242109800359888e-08
 result is significant
 t =  6.141700191847464  p =  5.725557998814051e-07
 '''
+
