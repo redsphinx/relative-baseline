@@ -823,19 +823,21 @@ def load_jester(project_variable, seed):
             frames_in_folder.sort()
 
             for j in range(FRAMES):
-                img_path = os.path.join(PP.jester_data_50_75,
-                                        str(labels[i][0]),
-                                        frames_in_folder[j]
-                                        )
+                try:
+                    img_path = os.path.join(PP.jester_data_50_75,
+                                            str(labels[i][0]),
+                                            frames_in_folder[j])
+                except IndexError:
+                    print('index error happens at i = %d and j = %d' % (i, j))
+                    # img_path = os.path.join(PP.jester_data_50_75,
+                    #                         str(labels[i][0]),
+                    #                         frames_in_folder[j])
 
                 tmp = Image.open(img_path)
-                # TODO: possible color conversion
-                # TODO: possible transpose of shape
                 tmp = np.array(tmp)
                 # tmp = np.array(tmp.convert('L'))
                 tmp = tmp.transpose((2, 0, 1))
                 data[i, :, j] = tmp
-
 
         labels = labels[:, 1]
 

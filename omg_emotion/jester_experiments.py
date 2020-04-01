@@ -31,7 +31,7 @@ def e0_3D_jester():
     # project_variable.model_number = 11
     project_variable.experiment_number = 918274591283
     project_variable.sheet_number = 21
-    project_variable.device = 2
+    project_variable.device = 1
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 1e-3

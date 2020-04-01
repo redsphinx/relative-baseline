@@ -233,20 +233,19 @@ def standardize_clips(b, e):
         else:
             frames_to_copy = [n for n in range(num_frames)]
 
-
+        cntr = 0
         for i in frames_to_copy:
             frame_path = os.path.join(vid_path, all_frames[i])
 
             frame = Image.open(frame_path)
             frame = adjust_frame(frame, height, width, channels)
 
-            # TODO: adjust shape
+            frame_name = '%05d.jpg' % cntr
 
-            # new_video[i] = frame
-
-            new_frame_path = os.path.join(new_vid_path, all_frames[i])
+            new_frame_path = os.path.join(new_vid_path, frame_name)
             frame = Image.fromarray(frame, mode='RGB')
             frame.save(new_frame_path)
+            cntr = cntr + 1
 
 # 148092
 # DONE  standardize_clips(0, 3)
@@ -265,3 +264,46 @@ def standardize_clips(b, e):
 # standardize_clips(120000, 130000)
 # standardize_clips(130000, 140000)
 # standardize_clips(140000, 148092)
+
+
+def triple_check_num_frames_in_folders():
+    path = PP.jester_data_50_75
+    save_path = os.path.join(PP.jester_location, 'missing_frames.txt')
+
+    all_folders = os.listdir(path)
+    all_folders.sort()
+    for i in tqdm.tqdm(range(len(all_folders))):
+        p1 = os.path.join(path, all_folders[i])
+        num_frames = wc_l(p1)
+        if num_frames < 30:
+            print(all_folders[i], num_frames)
+            with open(save_path, 'a') as my_file:
+                my_file.write('%s,%d\n' % (all_folders[i], num_frames))
+
+
+def redo_folders_with_few_frames():
+    folders_missing_frames = os.path.join(PP.jester_data, 'missing_frames.txt')
+    folder_names = np.genfromtxt(folders_missing_frames, str, delimiter=',')[:0]
+
+    base_path = PP.jester_data
+    all_videos = os.listdir(base_path)
+    all_videos.sort()
+
+    for fn in folder_names:
+        fn_index = all_videos.index(fn)
+
+        folder_path = os.path.join(PP.jester_data_50_75, fn)
+        # confirm that folder has less than 30 frames
+        assert(wc_l(folder_path) < 30)
+
+        # remove existing folder
+        os.remove(folder_path)
+
+        # create the folder again
+        standardize_clips(fn_index, fn_index+1)
+
+        # check that the folder has the correct number of frames
+        assert(wc_l(folder_path) == 30)
+
+
+
