@@ -829,9 +829,6 @@ def load_jester(project_variable, seed):
                                             frames_in_folder[j])
                 except IndexError:
                     print('index error happens at i = %d and j = %d' % (i, j))
-                    # img_path = os.path.join(PP.jester_data_50_75,
-                    #                         str(labels[i][0]),
-                    #                         frames_in_folder[j])
 
                 tmp = Image.open(img_path)
                 tmp = np.array(tmp)
@@ -840,6 +837,9 @@ def load_jester(project_variable, seed):
                 data[i, :, j] = tmp
 
         labels = labels[:, 1]
+        labels = [int(i) for i in labels]
+
+        labels = np.array(labels)
 
         return data, labels
 
@@ -860,7 +860,7 @@ def load_jester(project_variable, seed):
 
             chosen = []
             for i in range(num_categories):
-                indices = np.arange(total_dp[which])[labels == i]
+                indices = np.arange(total_dp[which])[labels == str(i)]
 
                 # if seed is not None:
                 #     random.seed(seed)
@@ -871,7 +871,7 @@ def load_jester(project_variable, seed):
                     chosen.extend(indices)
 
                     diff = num_samples_per_category - len(indices)
-                    assert (len(indices) + diff == num_samples_per_category)
+                    assert(len(indices) + diff == num_samples_per_category)
                     choose_indices = random.choices(list(np.arange(len(indices))), k=diff)
                 else:
                     choose_indices = random.sample(list(np.arange(len(indices))), num_samples_per_category)
@@ -888,15 +888,18 @@ def load_jester(project_variable, seed):
 
         chosen.sort()
         labels = labels[chosen]
+        labels = [int(i) for i in labels]
+        labels = np.array(labels)
+
         names = names[chosen]
-        full_labels = full_labels[chosen]
+        # full_labels = full_labels[chosen]
 
         num_points = len(labels)
 
         data = np.zeros(shape=(dp, 3, FRAMES, 50, 75), dtype=tp)  # dp, c, d, h, w
 
         for i in tqdm(range(num_points)):
-            frames_path = os.path.join(PP.jester_data_50_75, labels[i][0])
+            frames_path = os.path.join(PP.jester_data_50_75, names[i])
             frames_in_folder = os.listdir(frames_path)
             frames_in_folder.sort()
 
@@ -907,9 +910,8 @@ def load_jester(project_variable, seed):
                                         )
 
                 tmp = Image.open(img_path)
-                # TODO: possible color conversion
-                # TODO: possible transpose of shape
                 tmp = np.array(tmp)
+                tmp = tmp.transpose((2, 0, 1))
                 # tmp = np.array(tmp.convert('L'))
                 data[i, :, j] = tmp
 
