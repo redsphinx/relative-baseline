@@ -116,8 +116,7 @@ def random_sampling():
 
 def matrix_transforms_test():
     # goes through all the matrix transforms, applies them on an image and saves it
-    # radians: https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/45_degree_rotations_expressed_in_radian_measure.svg/400px-45_degree_rotations_expressed_in_radian_measure.svg.png
-    # radians = counterclockwise
+    # rotations in degrees = counterclockwise
     # scale: the bigger the number, the smaller the resulting image. so size is divided by s. fractions make it scale up
     # translate_x: if 1, move half img horizontal left. if -1, move half img horizontal right
     # translate_y: if 1, move half img vertical up. if -1, move half img vertical down
@@ -142,15 +141,15 @@ def matrix_transforms_test():
     img = torch.Tensor(img)
     # img = img.transpose(-1, 0)
 
-    s = 1.05
-    r = 0.02
-    x = 0.02
-    y = 0.02
+    # s = 1.05
+    # r = 0.02
+    # x = 0.02
+    # y = 0.02
 
-    # s = 2
-    # r = 90
-    # x = 0.5
-    # y = 0.5
+    s = 1
+    r = 0
+    x = -1
+    y = 0
 
     ss = torch.Tensor(np.array([s]))
     rr = torch.Tensor(np.array([np.deg2rad(r)]))

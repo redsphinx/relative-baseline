@@ -60,6 +60,41 @@ def plot_confusion_matrix(confusion_matrix, dataset):
     return fig
 
 
+def plot_srxy(optional_srxy, which_layer, which_channel):
+    datapoints = optional_srxy[which_layer]
+    datapoints = datapoints[which_channel]  # should be 2D now
+
+    x = np.arange(1, 5)
+
+    fig, axs = plt.subplots(4, 1, constrained_layout=True)
+    axs[0].plot(x, datapoints[:, 0])
+    axs[0].set_ylabel('ratio')
+    axs[0].set_title('scale')
+    axs[0].grid(True)
+
+    axs[1].plot(x, datapoints[:, 1])
+    axs[1].set_ylabel('degrees')
+    axs[1].set_title('rotation')
+    axs[1].grid(True)
+
+    axs[2].plot(x, datapoints[:, 2])
+    axs[2].set_ylabel('image portion')
+    axs[2].set_title('move x')
+    axs[2].grid(True)
+
+    axs[3].plot(x, datapoints[:, 3])
+    axs[3].set_ylabel('image portion')
+    axs[3].set_title('move y')
+    axs[3].grid(True)
+    axs[0].set_xlabel('time')
+
+    # fig.tight_layout()
+    fig.suptitle('layer %d channel %d' % (which_layer + 1, which_channel + 1))
+    # plt.savefig('this_is_test.jpg')
+
+    return fig
+
+
 def visualize_network(model, file_name, save_location):
     x = torch.zeros(1, 3, 224, 224, dtype=torch.float, requires_grad=False)
     out = model(x)

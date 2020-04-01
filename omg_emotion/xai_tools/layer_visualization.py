@@ -389,9 +389,11 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     all_outputs = []
     data = None
     trafo_per_filter = 4
+    all_srxy_params = []
 
     for l in range(len(project_variable.which_layers)):
         channels = []
+        srxy_params = []
 
         for c in range(len(project_variable.which_channels[l])):
             which_layer = project_variable.which_layers[l]
@@ -463,6 +465,13 @@ def our_gradient_method(project_variable, data_point, my_model, device):
                     next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
                     all_finals.append(next_final)
 
+                    # translate parameters to interpretable things
+                    # scale -> 1/s
+                    # rotation -> degrees counterclockwise
+                    # x, y -> half of size image
+
+                    srxy_params.append([1 / float(s), -1 * float(r), -0.5 * float(x), 0.5 * float(y)])
+
             else:
                 # all_finals.append(final)
                 for trafo in range(trafo_per_filter):
@@ -474,7 +483,11 @@ def our_gradient_method(project_variable, data_point, my_model, device):
                     next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
                     all_finals.append(next_final)
 
+                    srxy_params.append([1/float(s), -1 * float(r), -0.5 * float(x), 0.5 * float(y)])
+
             channels.append(all_finals)
+        srxy_params = np.reshape(srxy_params, (len(project_variable.which_channels[l]), trafo_per_filter, 4))
+        all_srxy_params.append(srxy_params)
 
         all_outputs.append(channels)
 
@@ -507,7 +520,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     # processed_final = whiten_bg(processed_final)
     # processed_final = np.expand_dims(processed_final, 0)
 
-    return data, all_outputs
+    return data, all_outputs, all_srxy_params
 
 
 def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
@@ -591,7 +604,7 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
         
         all_outputs.append(channels)
 
-    return the_data, all_outputs
+    return the_data, all_outputs, None
 
 
 def gradient_method(project_variable, data_point, my_model, device, mode):
@@ -600,4 +613,7 @@ def gradient_method(project_variable, data_point, my_model, device, mode):
         return our_gradient_method(project_variable, data_point, my_model, device)
     else:
         return our_gradient_method_no_srxy(project_variable, data_point, my_model, device)
+
+
+
 

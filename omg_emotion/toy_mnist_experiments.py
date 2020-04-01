@@ -9983,12 +9983,37 @@ def e_test_3D_mnist():
     main_file.run(project_variable)
 # ----
 
+
+# debugging the mnist visualizations (why it dont move)
+def debug_3DTTN_mnist():
+    set_init_26()
+    project_variable.experiment_number = 816321872361827
+    project_variable.sheet_number = 18
+    project_variable.device = 1
+
+    project_variable.model_number = 11
+    project_variable.inference_only_mode = True
+    project_variable.load_model = [1398, 11, 99, 2]
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['gradient_method']
+    project_variable.return_ind = True
+    # project_variable.which_layers = ['conv1', 'conv2']
+    # project_variable.which_channels = [np.arange(6), np.arange(16)]
+    project_variable.which_layers = ['conv1']
+    project_variable.which_channels = [np.arange(6)]
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=True)
 
 
-# e1399_3D_mnist()
-# e1400_3DTTN_mnist()
+debug_3DTTN_mnist()
 
-e_test_3D_mnist()
+# e1399_3D_mnist()
+# e1399_3DTTN_mnist()
+
+# e_test_3D_mnist()
 # e1397_conv3d_mnist()
 # e1398_conv3dttn_mnist()

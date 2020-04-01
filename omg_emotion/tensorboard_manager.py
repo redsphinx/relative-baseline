@@ -289,10 +289,12 @@ def add_xai(project_variable, my_model, device, data_point=None):
             mode = None
 
         which_methods = 'gradient_method'
-        dp, rest = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
+        dp, rest, optional_srxy = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
 
         if mode == 'srxy':
-            assert (project_variable.model_number == 11)
+            assert project_variable.model_number == 11
+            assert optional_srxy is not None
+
             for j in range(len(project_variable.which_layers)):
                 for k in range(len(project_variable.which_channels[j] + 1)):
                     which_layers = project_variable.which_layers[j]
@@ -314,9 +316,16 @@ def add_xai(project_variable, my_model, device, data_point=None):
                                                       vid_tensor=output,
                                                       global_step=project_variable.current_epoch, fps=2)
 
+                    fig = VZ.plot_srxy(optional_srxy, j, k)
+                    project_variable.writer.add_figure(tag='srxy_params/layer_%d/channel_%d'
+                                                           % (j+1, k+1), figure=fig,
+                                                       global_step=project_variable.current_epoch)
+
             project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
                                               img_tensor=dp,
                                               global_step=project_variable.current_epoch)
+
+
 
         else:
             for j in range(len(project_variable.which_layers)):
