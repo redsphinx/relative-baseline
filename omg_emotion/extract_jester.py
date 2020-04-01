@@ -233,7 +233,8 @@ def standardize_clips(b, e):
         else:
             frames_to_copy = [n for n in range(num_frames)]
 
-        cntr = 0
+        all_frames.sort()
+        cntr = 1
         for i in frames_to_copy:
             frame_path = os.path.join(vid_path, all_frames[i])
 
@@ -282,22 +283,27 @@ def triple_check_num_frames_in_folders():
 
 
 def redo_folders_with_few_frames():
-    folders_missing_frames = os.path.join(PP.jester_data, 'missing_frames.txt')
-    folder_names = np.genfromtxt(folders_missing_frames, str, delimiter=',')[:0]
+    folders_missing_frames = os.path.join(PP.jester_location, 'missing_frames.txt')
+    folder_names = np.genfromtxt(folders_missing_frames, dtype=int, delimiter=',')[:, 0]
 
     base_path = PP.jester_data
     all_videos = os.listdir(base_path)
     all_videos.sort()
 
-    for fn in folder_names:
-        fn_index = all_videos.index(fn)
+    tot_folders = len(folder_names)
+    cntr = 1
 
-        folder_path = os.path.join(PP.jester_data_50_75, fn)
+    for fn in folder_names:
+        fn_index = all_videos.index(str(fn))
+
+        folder_path = os.path.join(PP.jester_data_50_75, str(fn))
         # confirm that folder has less than 30 frames
-        assert(wc_l(folder_path) < 30)
+        if os.path.exists(folder_path):
+            assert(wc_l(folder_path) < 30)
 
         # remove existing folder
-        os.remove(folder_path)
+        if os.path.exists(folder_path):
+            shutil.rmtree(folder_path)
 
         # create the folder again
         standardize_clips(fn_index, fn_index+1)
@@ -305,5 +311,7 @@ def redo_folders_with_few_frames():
         # check that the folder has the correct number of frames
         assert(wc_l(folder_path) == 30)
 
+        print('%d/%d DONEEE' % (cntr, tot_folders))
+        cntr = cntr + 1
 
 
