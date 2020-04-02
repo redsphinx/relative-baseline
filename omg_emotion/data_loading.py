@@ -823,12 +823,9 @@ def load_jester(project_variable, seed):
             frames_in_folder.sort()
 
             for j in range(FRAMES):
-                try:
-                    img_path = os.path.join(PP.jester_data_50_75,
-                                            str(labels[i][0]),
-                                            frames_in_folder[j])
-                except IndexError:
-                    print('index error happens at i = %d and j = %d' % (i, j))
+                img_path = os.path.join(PP.jester_data_50_75,
+                                        str(labels[i][0]),
+                                        frames_in_folder[j])
 
                 tmp = Image.open(img_path)
                 tmp = np.array(tmp)

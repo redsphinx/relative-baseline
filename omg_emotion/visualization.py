@@ -12,6 +12,17 @@ from torchviz import make_dot
 import cv2 as cv
 
 
+
+
+
+["Swiping Left", "Swiping Right", "Swiping Down", "Swiping Up", "Pushing Hand Away",
+ "Pulling Hand In", "Sliding Two Fingers Left", "Sliding Two Fingers Right", "Sliding Two Fingers Down",
+"Sliding Two Fingers Up", "Pushing Two Fingers Away", "Pulling Two Fingers In", "Rolling Hand Forward",
+"Rolling Hand Backward", "Turning Hand Clockwise", "Turning Hand Counterclockwise", "Zooming In With Full Hand",
+"Zooming Out With Full Hand", "Zooming In With Two Fingers", "Zooming Out With Two Fingers",
+"Thumb Up", "Thumb Down", "Shaking Hand", "Stop Sign", "Drumming Fingers", "No gesture", "Doing other things"]
+
+
 # def plot_confusion_matrix(correct_labels, predict_labels, labels, title='Confusion matrix', tensor_name = 'MyFigure/image', normalize=False):
 def plot_confusion_matrix(confusion_matrix, dataset):
 
@@ -24,6 +35,15 @@ def plot_confusion_matrix(confusion_matrix, dataset):
     elif dataset == 'dhg':
         labels = ['grab', 'tap', 'expand', 'pinch', 'rotation CW', 'rotation CCW', 'swipe R', 'swipe L',
                   'swipe U', 'swipe D', 'swipe X', 'swipe Y', 'swipe +', 'shake']
+    elif dataset == 'jester':
+        labels = ["Swiping Left", "Swiping Right", "Swiping Down", "Swiping Up", "Pushing Hand Away",
+                  "Pulling Hand In", "Sliding Two Fingers Left", "Sliding Two Fingers Right",
+                  "Sliding Two Fingers Down", "Sliding Two Fingers Up", "Pushing Two Fingers Away",
+                  "Pulling Two Fingers In", "Rolling Hand Forward", "Rolling Hand Backward", "Turning Hand Clockwise",
+                  "Turning Hand Counterclockwise", "Zooming In With Full Hand", "Zooming Out With Full Hand",
+                  "Zooming In With Two Fingers", "Zooming Out With Two Fingers", "Thumb Up", "Thumb Down",
+                  "Shaking Hand", "Stop Sign", "Drumming Fingers", "No gesture", "Doing other things"]
+        # labels = [str(i) for i in range(27)]
     else:
         labels = []
 
@@ -43,13 +63,13 @@ def plot_confusion_matrix(confusion_matrix, dataset):
 
     ax.set_xlabel('Predicted', fontsize=12)
     ax.set_xticks(tick_marks)
-    c = ax.set_xticklabels(classes, fontsize=16, rotation=-90,  ha='center')
+    c = ax.set_xticklabels(classes, fontsize=10, rotation=-90,  ha='center')
     ax.xaxis.set_label_position('bottom')
     ax.xaxis.tick_bottom()
 
     ax.set_ylabel('True Label', fontsize=12)
     ax.set_yticks(tick_marks)
-    ax.set_yticklabels(classes, fontsize=16, va ='center')
+    ax.set_yticklabels(classes, fontsize=10, va ='center')
     ax.yaxis.set_label_position('left')
     ax.yaxis.tick_left()
 

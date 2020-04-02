@@ -140,6 +140,9 @@ def get_information():
             print('class %d:    %d' % (j, sum(labs == j)))
         print('\n ------')
 
+
+# get_information()
+
 '''
 average number of frames:    35
 max number of frames:        70
@@ -313,5 +316,4 @@ def redo_folders_with_few_frames():
 
         print('%d/%d DONEEE' % (cntr, tot_folders))
         cntr = cntr + 1
-
 

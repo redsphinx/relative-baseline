@@ -52,6 +52,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 10
     elif sheet_number in [8, 16]:
         start = 15
+
     else:
         print('ERROR: Sheet number %d not supported' % sheet_number)
         return None

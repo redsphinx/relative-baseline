@@ -7,6 +7,7 @@ def set_init_1():
     project_variable.end_epoch = 100
     project_variable.dataset = 'jester'
 
+    # if you want all the data: train: 150, val: 10, test: 10
     # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
     project_variable.num_in_channels = 3
     project_variable.data_points = [2 * 27,  1 * 27, 0 * 27]
@@ -21,17 +22,22 @@ def set_init_1():
     project_variable.randomize_training_data = True
     project_variable.balance_training_data = True
 
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
     project_variable.experiment_state = 'new'
     project_variable.eval_on = 'val'
 
 
-def e0_3D_jester():
+def e1_3D_jester():
     set_init_1()
     project_variable.model_number = 12
-    # project_variable.model_number = 11
-    project_variable.experiment_number = 918274591283
-    project_variable.sheet_number = 21
-    project_variable.device = 1
+    project_variable.experiment_number = 1
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+
+    project_variable.data_points = [50 * 27, 5 * 27, 0 * 27]
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 1e-3
@@ -41,7 +47,26 @@ def e0_3D_jester():
     main_file.run(project_variable)
 
 
+def e_test_3D_jester():
+    set_init_1()
+    project_variable.model_number = 11
+    project_variable.experiment_number = 1792792989823
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+
+    project_variable.data_points = [50 * 27, 5 * 27, 0 * 27]
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    # project_variable.num_out_channels = [6, 16]
+    project_variable.num_out_channels = [12, 22]
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=True)
 
 
-e0_3D_jester()
+# e1_3D_jester()
+e_test_3D_jester()
