@@ -2483,3 +2483,83 @@ class deconv_3D(torch.nn.Module):
 
         return x
 
+
+# TODO: create method that give you the input shape depending on the dataset
+def get_input_shape():
+    pass
+
+
+# model_number = 14
+class Experimental_TTN3d_xD(torch.nn.Module):
+    def __init__(self, project_variable):
+
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
+        super(Experimental_TTN3d_xD, self).__init__()
+        self.conv1 = ConvTTN3d(in_channels=project_variable.num_in_channels,
+                               out_channels=project_variable.num_out_channels[0], kernel_size=5,
+                               padding=2,
+                               project_variable=project_variable,
+                               transformation_groups=project_variable.transformation_groups[0],
+                               k0_groups=project_variable.k0_groups[0],
+                               transformations_per_filter=project_variable.transformations_per_filter)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
+
+        self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0],
+                               out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
+                               project_variable=project_variable,
+                               transformation_groups=project_variable.transformation_groups[1],
+                               k0_groups=project_variable.k0_groups[1],
+                               transformations_per_filter=project_variable.transformations_per_filter)
+
+        self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
+
+        # TODO: automate this
+        # determine number of features for fc layer
+        in_features = 420.69
+
+        if project_variable.dataset == 'mov_mnist':
+            if project_variable.num_out_channels == [6, 16, 16]:
+                in_features = 666  # TODO
+        elif project_variable.dataset == 'dhg':
+            if project_variable.num_out_channels == [6, 16, 16]:
+                in_features = 666  # TODO
+        elif project_variable.dataset == 'jester':
+            if project_variable.num_out_channels == [6, 16, 16]:
+                in_features = 666  # TODO
+
+        self.fc1 = torch.nn.Linear(in_features, 120)
+        self.fc2 = torch.nn.Linear(120, 84)
+        self.fc3 = torch.nn.Linear(84, project_variable.label_size)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = torch.nn.functional.relu(x)
+
+        if self.return_ind:
+            x, ind1 = self.max_pool_1(x)
+        else:
+            x = self.max_pool_1(x)
+
+        x = self.conv2(x, device)
+        x = torch.nn.functional.relu(x)
+
+        if self.return_ind:
+            x, ind2 = self.max_pool_2(x)
+        else:
+            x = self.max_pool_2(x)
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        # _shape = x.shape
+        # x = x.view(-1, _shape[1] * 5 * 5 * 5)
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc2(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc3(x)
+
+        return x

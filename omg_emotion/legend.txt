@@ -19,3 +19,4 @@ project_variable.model_number
 11  lenet5 3dconvTTN xD
 12  lenet5 3dconv xD
 13  lenet5 2dconv xD
+14  experimental model 3dconvTTN xD
