@@ -2543,7 +2543,7 @@ class Experimental_TTN3d_xD(torch.nn.Module):
             if project_variable.num_out_channels == [6, 16, 16]:
                 in_features = 12800
             elif project_variable.num_out_channels == [16, 32, 32]:
-                in_features = 25600
+                in_features = 2560
 
         self.fc1 = torch.nn.Linear(in_features, 120)
         self.fc2 = torch.nn.Linear(120, 84)
@@ -2565,6 +2565,14 @@ class Experimental_TTN3d_xD(torch.nn.Module):
             x, ind2 = self.max_pool_2(x)
         else:
             x = self.max_pool_2(x)
+
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        
+        if self.return_ind:
+            x, ind3 = self.max_pool_3(x)
+        else:
+            x = self.max_pool_3(x)
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])

@@ -67,8 +67,8 @@ def e_test_3D_jester():
     project_variable.which_methods = ['gradient_method']
     # project_variable.which_layers = ['conv1', 'conv2', 'conv3']
     # project_variable.which_channels = [np.arange(16), np.arange(32), np.arange(32)]
-    project_variable.which_layers = ['conv1', 'conv2']
-    project_variable.which_channels = [np.arange(16), np.arange(32)]
+    project_variable.which_layers = ['conv3']
+    project_variable.which_channels = [np.arange(10)]
 
     main_file.run(project_variable)
 

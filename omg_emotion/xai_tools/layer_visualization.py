@@ -539,11 +539,14 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             data = data_point
             data = torch.nn.Parameter(data, requires_grad=True)
 
-            cntr = 0
+            # cntr = 0
             x_end = None
 
-            # TODO: make it dependant on which layer is chosen to be visualized
-            while cntr < (l + 1):
+            layer_number = int(which_layer[-1])
+
+            # FIX: make it dependant on which layer is chosen to be visualized
+            for cntr in range(layer_number):
+                print('cntr: ', cntr)
                 if cntr == 0:
                     the_input = data
 
@@ -558,7 +561,6 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
                 x_end = torch.nn.functional.relu(x_max_pool)
                 the_input = x_end
-                cntr = cntr + 1
 
             _, ch, d, h, w = x_end.shape
 
