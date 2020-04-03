@@ -54,14 +54,21 @@ def e_test_3D_jester():
     project_variable.sheet_number = 22
     project_variable.device = 0
 
-    project_variable.data_points = [50 * 27, 5 * 27, 0 * 27]
+    # project_variable.data_points = [50 * 27, 5 * 27, 0 * 27]
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 10
+    project_variable.learning_rate = 1e-4
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [16, 32, 32]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['gradient_method']
+    # project_variable.which_layers = ['conv1', 'conv2', 'conv3']
+    # project_variable.which_channels = [np.arange(16), np.arange(32), np.arange(32)]
+    project_variable.which_layers = ['conv1', 'conv2']
+    project_variable.which_channels = [np.arange(16), np.arange(32)]
 
     main_file.run(project_variable)
 

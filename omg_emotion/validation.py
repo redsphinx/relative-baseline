@@ -67,8 +67,8 @@ def run(project_variable, all_data, my_model, device):
     # save_epochs = [0, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
     save_epochs = np.arange(project_variable.end_epoch)
 
-    # which_datapoint = 0
-    which_datapoint = 1
+    which_datapoint = 0
+    # which_datapoint = 1
 
     if project_variable.inference_only_mode:
         TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))

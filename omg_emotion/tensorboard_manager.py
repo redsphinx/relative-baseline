@@ -292,7 +292,6 @@ def add_xai(project_variable, my_model, device, data_point=None):
         dp, rest, optional_srxy = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
 
         if mode == 'srxy':
-            assert project_variable.model_number == 11
             assert optional_srxy is not None
 
             for j in range(len(project_variable.which_layers)):

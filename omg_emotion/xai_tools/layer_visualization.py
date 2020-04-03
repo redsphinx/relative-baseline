@@ -542,6 +542,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             cntr = 0
             x_end = None
 
+            # TODO: make it dependant on which layer is chosen to be visualized
             while cntr < (l + 1):
                 if cntr == 0:
                     the_input = data
