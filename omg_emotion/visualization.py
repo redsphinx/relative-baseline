@@ -12,17 +12,6 @@ from torchviz import make_dot
 import cv2 as cv
 
 
-
-
-
-["Swiping Left", "Swiping Right", "Swiping Down", "Swiping Up", "Pushing Hand Away",
- "Pulling Hand In", "Sliding Two Fingers Left", "Sliding Two Fingers Right", "Sliding Two Fingers Down",
-"Sliding Two Fingers Up", "Pushing Two Fingers Away", "Pulling Two Fingers In", "Rolling Hand Forward",
-"Rolling Hand Backward", "Turning Hand Clockwise", "Turning Hand Counterclockwise", "Zooming In With Full Hand",
-"Zooming Out With Full Hand", "Zooming In With Two Fingers", "Zooming Out With Two Fingers",
-"Thumb Up", "Thumb Down", "Shaking Hand", "Stop Sign", "Drumming Fingers", "No gesture", "Doing other things"]
-
-
 # def plot_confusion_matrix(correct_labels, predict_labels, labels, title='Confusion matrix', tensor_name = 'MyFigure/image', normalize=False):
 def plot_confusion_matrix(confusion_matrix, dataset):
 
@@ -36,14 +25,14 @@ def plot_confusion_matrix(confusion_matrix, dataset):
         labels = ['grab', 'tap', 'expand', 'pinch', 'rotation CW', 'rotation CCW', 'swipe R', 'swipe L',
                   'swipe U', 'swipe D', 'swipe X', 'swipe Y', 'swipe +', 'shake']
     elif dataset == 'jester':
-        labels = ["Swiping Left", "Swiping Right", "Swiping Down", "Swiping Up", "Pushing Hand Away",
-                  "Pulling Hand In", "Sliding Two Fingers Left", "Sliding Two Fingers Right",
-                  "Sliding Two Fingers Down", "Sliding Two Fingers Up", "Pushing Two Fingers Away",
-                  "Pulling Two Fingers In", "Rolling Hand Forward", "Rolling Hand Backward", "Turning Hand Clockwise",
-                  "Turning Hand Counterclockwise", "Zooming In With Full Hand", "Zooming Out With Full Hand",
-                  "Zooming In With Two Fingers", "Zooming Out With Two Fingers", "Thumb Up", "Thumb Down",
-                  "Shaking Hand", "Stop Sign", "Drumming Fingers", "No gesture", "Doing other things"]
-        # labels = [str(i) for i in range(27)]
+        # labels = ["Swiping Left", "Swiping Right", "Swiping Down", "Swiping Up", "Pushing Hand Away",
+        #           "Pulling Hand In", "Sliding Two Fingers Left", "Sliding Two Fingers Right",
+        #           "Sliding Two Fingers Down", "Sliding Two Fingers Up", "Pushing Two Fingers Away",
+        #           "Pulling Two Fingers In", "Rolling Hand Forward", "Rolling Hand Backward", "Turning Hand Clockwise",
+        #           "Turning Hand Counterclockwise", "Zooming In With Full Hand", "Zooming Out With Full Hand",
+        #           "Zooming In With Two Fingers", "Zooming Out With Two Fingers", "Thumb Up", "Thumb Down",
+        #           "Shaking Hand", "Stop Sign", "Drumming Fingers", "No gesture", "Doing other things"]
+        labels = [str(i) for i in range(27)]
     else:
         labels = []
 
@@ -79,7 +68,7 @@ def plot_confusion_matrix(confusion_matrix, dataset):
     # summary = tfplot.figure.to_summary(fig, tag=tensor_name)
     return fig
 
-
+# HERE
 def plot_srxy(optional_srxy, which_layer, which_channel):
     datapoints = optional_srxy[which_layer]
     datapoints = datapoints[which_channel]  # should be 2D now

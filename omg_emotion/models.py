@@ -2489,6 +2489,29 @@ def get_input_shape():
     pass
 
 
+def make_ConvTTN3d_layer(which_layer, k, p, project_variable):
+    # start counting at 1
+    assert which_layer > 0
+
+    if which_layer == 1:
+        the_in_channels = project_variable.num_in_channels
+    else:
+        the_in_channels = project_variable.num_out_channels[which_layer - 2]
+
+    the_out_channels = project_variable.num_out_channels[which_layer - 1]
+    the_transformation_groups = project_variable.transformation_groups[which_layer - 1]
+    the_k0_groups = project_variable.k0_groups[0]
+
+    return ConvTTN3d(in_channels=the_in_channels,
+                     out_channels=the_out_channels,
+                     kernel_size=k,
+                     padding=p,
+                     project_variable=project_variable,
+                     transformation_groups=the_transformation_groups,
+                     k0_groups=the_k0_groups,
+                     transformations_per_filter=project_variable.transformations_per_filter)
+
+
 # model_number = 14
 class Experimental_TTN3d_xD(torch.nn.Module):
     def __init__(self, project_variable):
@@ -2498,28 +2521,17 @@ class Experimental_TTN3d_xD(torch.nn.Module):
             self.return_ind = True
 
         super(Experimental_TTN3d_xD, self).__init__()
-        self.conv1 = ConvTTN3d(in_channels=project_variable.num_in_channels,
-                               out_channels=project_variable.num_out_channels[0], kernel_size=5,
-                               padding=2,
-                               project_variable=project_variable,
-                               transformation_groups=project_variable.transformation_groups[0],
-                               k0_groups=project_variable.k0_groups[0],
-                               transformations_per_filter=project_variable.transformations_per_filter)
 
+        self.conv1 = make_ConvTTN3d_layer(1, 5, 2, project_variable)
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
-
-        self.conv2 = ConvTTN3d(in_channels=project_variable.num_out_channels[0],
-                               out_channels=project_variable.num_out_channels[1], kernel_size=5, padding=0,
-                               project_variable=project_variable,
-                               transformation_groups=project_variable.transformation_groups[1],
-                               k0_groups=project_variable.k0_groups[1],
-                               transformations_per_filter=project_variable.transformations_per_filter)
-
+        self.conv2 = make_ConvTTN3d_layer(2, 5, 0, project_variable)
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
+        self.conv3 = make_ConvTTN3d_layer(3, 5, 0, project_variable)
+        self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
 
         # TODO: automate this
         # determine number of features for fc layer
-        in_features = 420.69
+        in_features = 42069
 
         if project_variable.dataset == 'mov_mnist':
             if project_variable.num_out_channels == [6, 16, 16]:
@@ -2529,7 +2541,9 @@ class Experimental_TTN3d_xD(torch.nn.Module):
                 in_features = 666  # TODO
         elif project_variable.dataset == 'jester':
             if project_variable.num_out_channels == [6, 16, 16]:
-                in_features = 666  # TODO
+                in_features = 12800
+            elif project_variable.num_out_channels == [16, 32, 32]:
+                in_features = 25600
 
         self.fc1 = torch.nn.Linear(in_features, 120)
         self.fc2 = torch.nn.Linear(120, 84)

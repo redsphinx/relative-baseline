@@ -1,0 +1,12 @@
+creating new model
+
+models.py	implement new model
+		determine in_features for datasets
+
+setup.py	add new model 
+
+training.py	in def run, add model_number
+validation.py	in def run, add model_number
+testing.py	in def run, add model_number
+
+tensorboard_manager	in def add_xai, add model_number

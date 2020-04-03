@@ -1214,7 +1214,7 @@ def e_test_3DTTN_dhg():
     project_variable.device = 0
 
     project_variable.model_number = 11
-    project_variable.data_points = [0 * 14,  20 * 14, 1 * 14]
+    project_variable.data_points = [0 * 14,  2 * 14, 1 * 14]
     project_variable.batch_size = 2 * 14
 
     project_variable.inference_only_mode = True
@@ -1242,7 +1242,9 @@ def e_test_3DTTN_dhg():
 # --------------------------------------
 
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 # e71_3D_dhg()
-e72_3DTTN_dhg()
+# e72_3DTTN_dhg()
+
+e_test_3DTTN_dhg()
