@@ -2489,7 +2489,7 @@ def get_input_shape():
     pass
 
 
-def make_ConvTTN3d_layer(which_layer, k, p, project_variable):
+def make_ConvTTN3d_layer(project_variable, which_layer, k, p):
     # start counting at 1
     assert which_layer > 0
 
@@ -2512,9 +2512,30 @@ def make_ConvTTN3d_layer(which_layer, k, p, project_variable):
                      transformations_per_filter=project_variable.transformations_per_filter)
 
 
+def auto_in_features_2(t, h, w, layer_type, k, p, s, div):
+    assert layer_type in ['conv', 'pool']
+
+    if layer_type == 'conv':
+        t = (t - k + 2 * p) / s + 1
+        h = (h - k + 2 * p) / s + 1
+        w = (w - k + 2 * p) / s + 1
+    elif layer_type == 'pool':
+        t = int(np.floor(t / div))
+        h = int(np.floor(h / div))
+        w = int(np.floor(w / div))
+
+    # print("after %s: t=%d, h=%d, w=%d" % (layer_type, t, h, w))
+
+    return t, h, w
+
+
 # model_number = 14
 class Experimental_TTN3d_xD(torch.nn.Module):
     def __init__(self, project_variable):
+        if project_variable.dataset == 'jester':
+            t, h, w = 30, 50, 75
+        else:
+            t, h, w = None, None, None
 
         self.return_ind = False
         if project_variable.return_ind:
@@ -2522,62 +2543,65 @@ class Experimental_TTN3d_xD(torch.nn.Module):
 
         super(Experimental_TTN3d_xD, self).__init__()
 
-        self.conv1 = make_ConvTTN3d_layer(1, 5, 2, project_variable)
+        self.conv1 = make_ConvTTN3d_layer(project_variable, which_layer=1, k=5, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+
         self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
-        self.conv2 = make_ConvTTN3d_layer(2, 5, 0, project_variable)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        self.conv2 = make_ConvTTN3d_layer(project_variable, which_layer=2, k=5, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+
         self.max_pool_2 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
-        self.conv3 = make_ConvTTN3d_layer(3, 5, 0, project_variable)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        self.conv3 = make_ConvTTN3d_layer(project_variable, which_layer=3, k=5, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+
         self.max_pool_3 = torch.nn.MaxPool3d(kernel_size=2, return_indices=self.return_ind)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
 
-        # TODO: automate this
-        # determine number of features for fc layer
-        in_features = 42069
-
-        if project_variable.dataset == 'mov_mnist':
-            if project_variable.num_out_channels == [6, 16, 16]:
-                in_features = 666  # TODO
-        elif project_variable.dataset == 'dhg':
-            if project_variable.num_out_channels == [6, 16, 16]:
-                in_features = 666  # TODO
-        elif project_variable.dataset == 'jester':
-            if project_variable.num_out_channels == [6, 16, 16]:
-                in_features = 12800
-            elif project_variable.num_out_channels == [16, 32, 32]:
-                in_features = 2560
-
+        # out_channels of last conv layer - 1
+        in_features = t * h * w * project_variable.num_out_channels[3 - 1]
         self.fc1 = torch.nn.Linear(in_features, 120)
         self.fc2 = torch.nn.Linear(120, 84)
         self.fc3 = torch.nn.Linear(84, project_variable.label_size)
 
     def forward(self, x, device):
+        # print('input shape: ', x.shape)
         x = self.conv1(x, device)
+        # print('conv1: ', x.shape)
+
         x = torch.nn.functional.relu(x)
 
         if self.return_ind:
             x, ind1 = self.max_pool_1(x)
         else:
             x = self.max_pool_1(x)
+        # print('mp1: ', x.shape)
 
         x = self.conv2(x, device)
+        # print('conv2: ', x.shape)
         x = torch.nn.functional.relu(x)
 
         if self.return_ind:
             x, ind2 = self.max_pool_2(x)
         else:
             x = self.max_pool_2(x)
+        # print('mp2: ', x.shape)
 
         x = self.conv3(x, device)
+        # print('conv3: ', x.shape)
         x = torch.nn.functional.relu(x)
         
         if self.return_ind:
             x, ind3 = self.max_pool_3(x)
         else:
             x = self.max_pool_3(x)
+        # print('mp3: ', x.shape)
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        # _shape = x.shape
-        # x = x.view(-1, _shape[1] * 5 * 5 * 5)
         x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         x = self.fc2(x)

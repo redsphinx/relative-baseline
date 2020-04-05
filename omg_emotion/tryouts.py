@@ -318,3 +318,31 @@ result is significant
 t =  6.141700191847464  p =  5.725557998814051e-07
 '''
 
+
+def calc_architecture_viability(t, h, w, layer_type, k, p, s, div):
+    assert layer_type in ['conv', 'pool']
+    
+    if layer_type == 'conv':
+        t = (t - k + 2 * p) / s + 1
+        h = (h - k + 2 * p) / s + 1
+        w = (w - k + 2 * p) / s + 1
+    elif layer_type == 'pool':
+        t = int(np.floor(t / div))
+        h = int(np.floor(h / div))
+        w = int(np.floor(w / div))
+
+    print("after %s: t=%d, h=%d, w=%d" % (layer_type, t, h, w))
+
+    return t, h, w
+
+
+def run_calc_av():
+    t, h, w = 30, 50, 75
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+# run_calc_av()
