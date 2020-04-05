@@ -121,8 +121,15 @@ def normalize(data, use_opencv=False):
         a = float(data.max())
         b = float(data.min())
     else:
-        a = float(data.max().cpu())
-        b = float(data.min().cpu())
+        if len(data.shape) == 2:
+            a = float(data.max().cpu())
+            b = float(data.min().cpu())
+        else:
+            a_s = []
+            b_s = []
+            for c in range(data.shape[0]):
+                a_s.append(float(data[c].max().cpu()))
+                b_s.append(float(data[c].min().cpu()))
 
     if len(data.shape) == 2:
         for i in range(data.shape[0]):
@@ -134,7 +141,7 @@ def normalize(data, use_opencv=False):
             for j in range(data.shape[1]):
                 for k in range(data.shape[2]):
                     c = data[i, j, k]
-                    data[i, j] = (c - a) * (z - y) / (b - a) + y
+                    data[i, j] = (c - a_s[i]) * (z - y) / (b_s[i] - a_s[i]) + y
 
     return data
 
@@ -646,8 +653,14 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             for t in range(trafo_per_filter + 1):
 
                 processed_final = all_outputs[l][c][t]
-                # HERE
-                processed_final = normalize(processed_final)
+                # TODO: debug the coloring, right now it's only displaying
+                # save as jpg
+                # transpose channels
+                # no normalization
+                # normalization per channel
+
+                # TODO: turn on normalization again once the network starts training better
+                # processed_final = normalize(processed_final)
                 processed_final = processed_final.unsqueeze(0)
                 processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 

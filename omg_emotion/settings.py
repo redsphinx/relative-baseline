@@ -144,7 +144,7 @@ class ProjectVariable(object):
         # k_0 initialization: 'normal', 'ones', 'ones_var'=mean=1,std=0.5, 'uniform'
         self._k0_init = 'normal'
         # share transformation parameters across all filters in a layer.
-        # here we set how many sets of transformations are learned.
+        # her_e we set how many sets of transformations are learned.
         # note that 1 <= transformation_groups <= num_out_channels
         self._transformation_groups = self.num_out_channels # across filters
         # filters share k0
