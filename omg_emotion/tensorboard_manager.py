@@ -300,13 +300,17 @@ def add_xai(project_variable, my_model, device, data_point=None):
                     which_channels = project_variable.which_channels[j][k]
 
                     temporal_dim = len(rest[0][0])
-                    _, h_, w_ = rest[0][0][0].shape
+                    if project_variable.dataset == 'jester':
+                        _, c_, h_, w_ = rest[0][0][0].shape
+                    else:
+                        _, h_, w_ = rest[0][0][0].shape
+                        c_ = 1
 
-                    output = np.zeros(shape=(temporal_dim + 1, 1, h_, w_), dtype=np.uint8)
+                    output = np.zeros(shape=(temporal_dim + 1, c_, h_, w_), dtype=np.uint8)
                     output[0] = dp
 
                     for t in range(temporal_dim):
-                        output[t + 1] = rest[j][k][t]
+                        output[t + 1] = rest[j][:][k][t]
 
                     output = np.expand_dims(output, 0)
 
@@ -323,8 +327,6 @@ def add_xai(project_variable, my_model, device, data_point=None):
             project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
                                               img_tensor=dp,
                                               global_step=project_variable.current_epoch)
-
-
 
         else:
             for j in range(len(project_variable.which_layers)):

@@ -84,13 +84,22 @@ def create_next_frame(s, r, x, y, data, device, use_opencv=False):
         return affine_matrix
 
     else:
+        if len(data.shape) == 2:
+            h_, w_ = data.shape
+            c_ = 1
+        else:
+            c_, h_, w_ = data.shape
 
-        h_, w_ = data.shape
-        affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, 1, h_, w_])
+        affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, c_, h_, w_])
         affine_matrix = affine_matrix.cuda(device)
-        data = data.unsqueeze(0).unsqueeze(0)
-        affine_matrix = F.grid_sample(data, affine_matrix)
-        return affine_matrix[0][0]
+        if len(data.shape) == 2:
+            data = data.unsqueeze(0).unsqueeze(0)
+            affine_matrix = F.grid_sample(data, affine_matrix)
+            return affine_matrix[0][0]
+        else:
+            data = data.unsqueeze(0)
+            affine_matrix = F.grid_sample(data, affine_matrix)
+            return affine_matrix[0]
 
 
 def binarize(data):
@@ -115,10 +124,17 @@ def normalize(data, use_opencv=False):
         a = float(data.max().cpu())
         b = float(data.min().cpu())
 
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            c = data[i, j]
-            data[i, j] = (c - a) * (z - y) / (b - a) + y
+    if len(data.shape) == 2:
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                c = data[i, j]
+                data[i, j] = (c - a) * (z - y) / (b - a) + y
+    else:
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                for k in range(data.shape[2]):
+                    c = data[i, j, k]
+                    data[i, j] = (c - a) * (z - y) / (b - a) + y
 
     return data
 
@@ -544,9 +560,8 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
             layer_number = int(which_layer[-1])
 
-            # FIX: make it dependant on which layer is chosen to be visualized
             for cntr in range(layer_number):
-                print('cntr: ', cntr)
+                # print('cntr: ', cntr)
                 if cntr == 0:
                     the_input = data
 
@@ -578,10 +593,13 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
             image_grad = data.grad
 
-            final = image_grad[0, 0, 0] * data[0, 0, 0]
+            # FIX color
+            if project_variable.dataset == 'jester':
+                final = image_grad[0, :, 0] * data[0, :, 0]
+            else:
+                final = image_grad[0, 0, 0] * data[0, 0, 0]
 
             all_finals = []
-
             all_finals.append(final)
 
             # get transformations
@@ -609,8 +627,12 @@ def our_gradient_method(project_variable, data_point, my_model, device):
 
         all_outputs.append(channels)
 
-    data = data[0, 0, 0]
-    data = data.unsqueeze(0)
+    if project_variable.dataset == 'jester':
+        data = data[0, :, 0]
+    else:
+        data = data[0, 0, 0]
+        data = data.unsqueeze(0)
+
     data = np.array(data.data.cpu(), dtype=np.uint8)
 
     processed_outputs = []
@@ -622,7 +644,9 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             all_finals = []
 
             for t in range(trafo_per_filter + 1):
+
                 processed_final = all_outputs[l][c][t]
+                # HERE
                 processed_final = normalize(processed_final)
                 processed_final = processed_final.unsqueeze(0)
                 processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
@@ -639,7 +663,6 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     # processed_final = np.expand_dims(processed_final, 0)
 
     return data, all_outputs, all_srxy_params
-
 
 
 def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
