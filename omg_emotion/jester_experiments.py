@@ -53,10 +53,10 @@ def e_test_3D_jester():
     project_variable.experiment_number = 1792792989823
     project_variable.sheet_number = 22
     project_variable.device = 0
-    project_variable.end_epoch = 3
+    project_variable.end_epoch = 30
     project_variable.repeat_experiments = 1
 
-    project_variable.data_points = [20 * 27, 5 * 27, 0 * 27]
+    project_variable.data_points = [30 * 27, 5 * 27, 0 * 27]
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 1e-4

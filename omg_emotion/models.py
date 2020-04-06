@@ -2588,18 +2588,21 @@ def make_ConvTTN3d_layer(project_variable, which_layer, k, p):
     else:
         the_in_channels = project_variable.num_out_channels[which_layer - 2]
 
+    # TODO: get rid of the transformation_groups, k0_groups
     the_out_channels = project_variable.num_out_channels[which_layer - 1]
-    the_transformation_groups = project_variable.transformation_groups[which_layer - 1]
-    the_k0_groups = project_variable.k0_groups[0]
+    # the_transformation_groups = project_variable.transformation_groups[which_layer - 1]
+    print('check the k0_groups')
+    # the_k0_groups = project_variable.k0_groups[which_layer - 1]  # <- correct
 
     return ConvTTN3d(in_channels=the_in_channels,
                      out_channels=the_out_channels,
                      kernel_size=k,
                      padding=p,
-                     project_variable=project_variable,
-                     transformation_groups=the_transformation_groups,
-                     k0_groups=the_k0_groups,
-                     transformations_per_filter=project_variable.transformations_per_filter)
+                     project_variable=project_variable
+                     # transformation_groups=the_transformation_groups,
+                     # k0_groups=the_k0_groups,
+                     # transformations_per_filter=project_variable.transformations_per_filter
+                     )
 
 
 def auto_in_features_2(t, h, w, layer_type, k, p, s, div):
@@ -2622,6 +2625,9 @@ def auto_in_features_2(t, h, w, layer_type, k, p, s, div):
 # model_number = 14
 class Experimental_TTN3d_xD(torch.nn.Module):
     def __init__(self, project_variable):
+
+        print('check the transformation_groups, k0_groups and transformations_per_filter')
+
         if project_variable.dataset == 'jester':
             t, h, w = 30, 50, 75
         else:
