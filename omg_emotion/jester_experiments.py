@@ -59,9 +59,9 @@ def e_test_3D_jester():
     project_variable.data_points = [30 * 27, 5 * 27, 0 * 27]
 
     project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 1e-4
+    project_variable.learning_rate = 5e-4
     project_variable.use_adaptive_lr = True
-    project_variable.num_out_channels = [6, 16, 16]
+    project_variable.num_out_channels = [6, 16, 32]
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
 
