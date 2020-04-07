@@ -104,6 +104,30 @@ def flatten_confusion(matrix):
     return s
 
 
+def has_collapsed(matrix):
+    threshold = 0.5
+    summed = matrix.sum(axis=0)
+    total_dp = summed.sum()
+
+    collapsed = []
+
+    for i in range(summed.shape[0]):
+        if summed[i] / total_dp >= threshold:
+            collapsed.append(1)
+        else:
+            collapsed.append(0)
+
+    collapsed = np.array(collapsed)
+
+    if collapsed.sum() > 0:
+        matrix_collaps = True
+    else:
+        matrix_collaps = False
+
+    return matrix_collaps, collapsed
+
+
+
 # https://discuss.pytorch.org/t/how-do-i-check-the-number-of-parameters-of-a-model/4325/7
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)

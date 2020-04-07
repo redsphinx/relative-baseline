@@ -30,23 +30,6 @@ def set_init_1():
     project_variable.eval_on = 'val'
 
 
-def e1_3D_jester():
-    set_init_1()
-    project_variable.model_number = 12
-    project_variable.experiment_number = 1
-    project_variable.sheet_number = 22
-    project_variable.device = 0
-
-    project_variable.data_points = [50 * 27, 5 * 27, 0 * 27]
-
-    project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 1e-3
-    project_variable.use_adaptive_lr = False
-    project_variable.num_out_channels = [6, 16]
-
-    main_file.run(project_variable)
-
-
 def e_test_3D_jester():
     set_init_1()
     project_variable.model_number = 14
@@ -74,6 +57,32 @@ def e_test_3D_jester():
 
 
 project_variable = ProjectVariable(debug_mode=True)
+
+
+def auto_search(lr_range, epochs, repeat_run, ):
+
+
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # e1_3D_jester()
