@@ -235,7 +235,10 @@ def run(project_variable):
                 # labels is list because can be more than one type of labels
                 data = data_train, labels_train
                 my_model.train()
-                train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
+                if project_variable.nas:
+                    train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
+                else:
+                    train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
             # ------------------------------------------------------------------------------------------------
             # VALIDATION
             # ------------------------------------------------------------------------------------------------
@@ -315,6 +318,12 @@ def run(project_variable):
 
                                 project_variable.theta_learning_rate /= project_variable.reduction_factor
 
+        if project_variable.nas:
+            print('matrix has collapsed: %s' % str(has_collapsed))
+            if has_collapsed:
+                ind = np.where(collapsed_matrix == 1)[0]
+                print('-->> collapse to idx %s' % (str(ind)))
+
         # at the end of a run
         project_variable.at_which_run += 1
         project_variable.writer.close()
@@ -329,6 +338,9 @@ def run(project_variable):
         S.write_results(acc, std, best_run, ROW, project_variable.sheet_number)
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
+
+    if project_variable.nas:
+        return train_accuracy, val_accuracy, has_collapsed, collapsed_matrix
 
 #   ------------------------------------------------------/--------------------------------------------/---------------
 #  ------------------------------------------------------/--------------------------------------------/---------------

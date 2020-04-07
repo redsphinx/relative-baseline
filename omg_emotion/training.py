@@ -89,5 +89,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # project_variable.writer.add_scalar('accuracy/train', accuracy, project_variable.current_epoch)
     # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     # project_variable.writer.add_figure(tag='confusion/train', figure=fig, global_step=project_variable.current_epoch)
-
-    return accuracy
+    if project_variable.nas:
+        return accuracy, U.has_collapsed(confusion_epoch)
+    else:
+        return accuracy

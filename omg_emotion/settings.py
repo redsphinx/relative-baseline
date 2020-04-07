@@ -201,7 +201,12 @@ class ProjectVariable(object):
         # options: [np.arange(6), np.arange(16)]
         # each index maps to the respective layer
         self.which_channels = [np.array([0, 1])]
-        
+
+        # ----------------------------------------------------------------------------------------------------------
+        # NAS stuff
+        # ----------------------------------------------------------------------------------------------------------
+        # turn on or off semi-automated architecture search
+        self.nas = False
 
     @property
     def writer(self):
@@ -783,3 +788,11 @@ class ProjectVariable(object):
     @which_channels.setter
     def which_channels(self, value):
         self._which_channels = value
+
+    @property
+    def nas(self):
+        return self._nas
+
+    @nas.setter
+    def nas(self, value):
+        self._nas = value

@@ -58,12 +58,13 @@ jester_data_50_75 = '/scratch/users/gabras/jester/data_50_75'
 jester_frames = '/scratch/users/gabras/jester/frames.txt'
 jester_zero = '/scratch/users/gabras/jester/zero.txt'
 
-
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
 erhan2009 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/erhan2009'
 zeiler2014 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2014'
 
+# NAS saving location
+nas_location = '/huge/gabras/omg_emotion/saving_data/nas'
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
 # todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py
