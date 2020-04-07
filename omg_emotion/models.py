@@ -2391,44 +2391,23 @@ class Experimental15_TTN3d_xD(torch.nn.Module):
         self.fc2 = torch.nn.Linear(500, project_variable.label_size)
 
     def forward(self, x, device):
-        # print('input shape: ', x.shape)
         x = self.conv1(x, device)
-        # print('conv1: ', x.shape)
-
         x = torch.nn.functional.relu(x)
-
-        if self.return_ind:
-            x, ind1 = self.max_pool_1(x)
-        else:
-            x = self.max_pool_1(x)
-        # print('mp1: ', x.shape)
+        x = self.max_pool_1(x)
 
         x = self.conv2(x, device)
-        # print('conv2: ', x.shape)
         x = torch.nn.functional.relu(x)
-
-        if self.return_ind:
-            x, ind2 = self.max_pool_2(x)
-        else:
-            x = self.max_pool_2(x)
-        # print('mp2: ', x.shape)
-
         x = self.conv3(x, device)
-        # print('conv3: ', x.shape)
+        x = torch.nn.functional.relu(x)
+        x = self.conv4(x, device)
         x = torch.nn.functional.relu(x)
 
-        if self.return_ind:
-            x, ind3 = self.max_pool_3(x)
-        else:
-            x = self.max_pool_3(x)
-        # print('mp3: ', x.shape)
+        x = self.max_pool_2(x)
 
         _shape = x.shape
         x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         x = self.fc1(x)
         x = torch.nn.functional.relu(x)
         x = self.fc2(x)
-        x = torch.nn.functional.relu(x)
-        x = self.fc3(x)
 
         return x
