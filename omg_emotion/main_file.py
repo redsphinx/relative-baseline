@@ -130,13 +130,14 @@ def run(project_variable):
         else:
             path = os.path.join(PP.writer_path, 'debugging')
 
-        if not os.path.exists(path):
-            os.makedirs(path)
-        else:
-            # clear directory before writing new events
-            shutil.rmtree(path)
-            time.sleep(2)
-            os.mkdir(path)
+        if not project_variable.nas:
+            if not os.path.exists(path):
+                os.makedirs(path)
+            else:
+                # clear directory before writing new events
+                shutil.rmtree(path)
+                time.sleep(2)
+                os.mkdir(path)
 
         project_variable.writer = SummaryWriter(path)
         print('tensorboardX writer path: %s' % path)

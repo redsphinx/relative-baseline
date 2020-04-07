@@ -54,7 +54,7 @@ def run_single_experiment(project_variable, lr, epochs, out_channels, device, mo
     return main_file.run(project_variable)
 
 
-def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, device):
+def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, device, b=1, e=10, s=2):
     file_name = date.today().strftime('%d%m') + '_' + datetime.now().strftime('%H%M%S') + '.txt'
     save_path = os.path.join(PP.nas_location, file_name)
 
@@ -65,7 +65,7 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
     for cfg in range(len(conv_layer_channels)):
         out_channels = conv_layer_channels[cfg]
 
-        for lr_incr in range(1, 10, 2):
+        for lr_incr in range(b, e, s):
             lr = lr_incr / lr_size
 
             for run in range(repeat_run):
@@ -99,5 +99,24 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 # conv_channels = [[8, 16, 32], [10, 20, 30], [32, 64, 128]]
 # auto_search(10000, 30, 3, 14, conv_channels, 1)
 
-conv_channels = [[32, 48, 64], [16, 64, 128], [32, 16, 16]]
-auto_search(10000, 30, 3, 14, conv_channels, 2)
+# conv_channels = [[16, 64, 128], [32, 16, 16]]
+# auto_search(10000, 30, 3, 14, conv_channels, 2)
+
+# conv_channels = [[16, 32, 64], [32, 32, 64]]
+# auto_search(10000, 30, 3, 14, conv_channels, 0)
+
+# conv_channels = [[32, 48, 64]]
+# auto_search(10000, 30, 3, 14, conv_channels, 0, b=9, e=10, s=2)
+
+# conv_channels = [[16, 16, 32]]
+# auto_search(10000, 30, 3, 14, conv_channels, 1, b=3, e=10, s=2)
+
+# conv_channels = [[32, 64, 128]]
+# auto_search(10000, 30, 3, 14, conv_channels, 2, b=3, e=10, s=2)
+
+# TODO: when others finish
+# conv_channels = [[16, 16, 32, 64], [16, 32, 64, 128]]
+# auto_search(10000, 30, 3, 15, conv_channels, 1)
+
+# conv_channels = [[32, 32, 64, 64], [32, 32, 64, 128]]
+# auto_search(10000, 30, 3, 15, conv_channels, 2)

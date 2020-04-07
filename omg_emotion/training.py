@@ -30,7 +30,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         my_optimizer.zero_grad()
 
-        if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14]:
+        if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15]:
             predictions = my_model(data, device)
         else:
             predictions = my_model(data)

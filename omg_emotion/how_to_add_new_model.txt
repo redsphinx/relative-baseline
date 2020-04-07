@@ -1,7 +1,6 @@
 creating new model
 
 models.py	implement new model
-		determine in_features for datasets
 
 setup.py	add new model 
 

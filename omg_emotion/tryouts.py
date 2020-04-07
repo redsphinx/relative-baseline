@@ -345,4 +345,17 @@ def run_calc_av():
     t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=1, s=1, div=None)
     t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
 
-# run_calc_av()
+
+def run_calc_av_1():
+    t, h, w = 30, 50, 75
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+    t, h, w = calc_architecture_viability(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+
+    t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+
+run_calc_av_1()

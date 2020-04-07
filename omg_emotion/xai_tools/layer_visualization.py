@@ -653,7 +653,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             for t in range(trafo_per_filter + 1):
 
                 processed_final = all_outputs[l][c][t]
-                # TODO: debug the coloring, right now it's only displaying
+                # TODO: finis debugging the coloring
                 # save as jpg
                 # transpose channels
                 # no normalization
