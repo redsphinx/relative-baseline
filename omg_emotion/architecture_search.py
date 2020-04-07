@@ -75,7 +75,7 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 
                 chnls = chnls[:-1] + ']'
 
-                settings = '%f,%d,%d,%s' % (lr, epochs, model_number, chnls)
+                settings = '%f,%d,%d,%s,' % (lr, epochs, model_number, chnls)
                 with open(save_path, 'a') as my_file:
                     my_file.write(settings)
 
@@ -93,30 +93,11 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
                     my_file.write(results)
 
 
-# conv_channels = [[6, 16, 32], [16, 16, 32], [16, 32, 64], [32, 32, 64]]
-# auto_search(10000, 30, 3, 14, conv_channels, 0)
-
-# conv_channels = [[8, 16, 32], [10, 20, 30], [32, 64, 128]]
-# auto_search(10000, 30, 3, 14, conv_channels, 1)
-
-# conv_channels = [[16, 64, 128], [32, 16, 16]]
-# auto_search(10000, 30, 3, 14, conv_channels, 2)
-
-# conv_channels = [[16, 32, 64], [32, 32, 64]]
-# auto_search(10000, 30, 3, 14, conv_channels, 0)
-
-# conv_channels = [[32, 48, 64]]
-# auto_search(10000, 30, 3, 14, conv_channels, 0, b=9, e=10, s=2)
-
-# conv_channels = [[16, 16, 32]]
-# auto_search(10000, 30, 3, 14, conv_channels, 1, b=3, e=10, s=2)
-
-# conv_channels = [[32, 64, 128]]
-# auto_search(10000, 30, 3, 14, conv_channels, 2, b=3, e=10, s=2)
-
-# TODO: when others finish
 # conv_channels = [[16, 16, 32, 64], [16, 32, 64, 128]]
 # auto_search(10000, 30, 3, 15, conv_channels, 1)
 
 # conv_channels = [[32, 32, 64, 64], [32, 32, 64, 128]]
 # auto_search(10000, 30, 3, 15, conv_channels, 2)
+
+# conv_channels = [[32, 64, 128, 256]]
+# auto_search(10000, 30, 3, 15, conv_channels, 0)
