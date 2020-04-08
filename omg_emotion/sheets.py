@@ -42,11 +42,11 @@ def get_specific_row(experiment_number, sheet_number):
         start = 16
     elif sheet_number in [2, 17]:
         start = 11
-    elif sheet_number in [0, 10, 15, 18]:
+    elif sheet_number in [0, 10, 15, 18, 22]:
         start = 13
     elif sheet_number in [4, 6, 12]:
         start = 17
-    elif sheet_number in [7, 11, 14, 20, 21, 22]:
+    elif sheet_number in [7, 11, 14, 20, 21]:
         start = 14
     elif sheet_number == 666:
         start = 10
@@ -375,10 +375,11 @@ def write_settings(project_variable):
             project_variable.model_number,
             str(project_variable.data_points),
             project_variable.repeat_experiments,
-            project_variable.end_epoch
+            project_variable.end_epoch,
+            project_variable.batch_size
 
         ]]
-        end_letter = 'P'
+        end_letter = 'Q'
     else:
         print('Error: sheet_number not supported')
         return None

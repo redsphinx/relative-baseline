@@ -141,7 +141,7 @@ def get_information():
         print('\n ------')
 
 
-# get_information()
+get_information()
 
 '''
 average number of frames:    35
