@@ -101,3 +101,12 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 
 # conv_channels = [[32, 64, 128, 256]]
 # auto_search(10000, 30, 3, 15, conv_channels, 0)
+
+# conv_channels = [[16, 32, 64, 128, 256]]
+# auto_search(10000, 30, 3, 16, conv_channels, 1)
+
+# conv_channels = [[16, 32, 32, 64, 64]]
+# auto_search(10000, 30, 3, 16, conv_channels, 2)
+#
+conv_channels = [[32, 32, 64, 64, 128]]
+auto_search(10000, 30, 3, 16, conv_channels, 2)

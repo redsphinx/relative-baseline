@@ -167,6 +167,11 @@ def get_model(project_variable):
         if project_variable.load_model is not None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
+    elif project_variable.model_number == 16:
+        model = M.Experimental16_TTN3d_xD(project_variable)
+        if project_variable.load_model is not None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None
