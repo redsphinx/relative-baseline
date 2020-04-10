@@ -104,10 +104,34 @@ def e3_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
+def e4_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 16
+    project_variable.experiment_number = 4
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 20
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 2 * 27
+
+    # if you want all the data: train: 4200, val: 250, test: 250
+    # project_variable.data_points = [300 * 27, 50 * 27, 0 * 27]
+    project_variable.data_points = [30 * 27, 5 * 27, 0 * 27]
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.0003
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [16, 32, 64, 128, 256]
+    project_variable.transformation_groups = project_variable.num_out_channels
+    project_variable.k0_groups = project_variable.num_out_channels
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 
 
-# e1_3D_jester()
-# e_test_3D_jester()
-
-e3_conv3DTTN_jester()
+e4_conv3DTTN_jester()

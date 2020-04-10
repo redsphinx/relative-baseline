@@ -229,10 +229,10 @@ def delete_runs(project_variable, except_run):
 
         # delete models except the model with the correct epoch
         for i in range(len(models_best_run)):
-            if models_best_run[i].split('_')[-1] != best_epoch_index:
+            if models_best_run[i].split('_')[-1] != str(best_epoch_index):
                 to_be_del = os.path.join(models_best_run_path, models_best_run[i])
                 if os.path.exists(to_be_del):
-                    shutil.rmtree(to_be_del)
+                    os.remove(to_be_del)
 
 
 # ================================================================
@@ -286,6 +286,9 @@ def remove_all_files(experiment, model):
                     shutil.rmtree(file_path)
                 elif os.path.isfile(file_path):
                     os.remove(file_path)
+
+
+# remove_all_files(4, 16)
 
 
 def flow_grid_from_theta(n, h, w, theta):

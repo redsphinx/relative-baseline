@@ -15,6 +15,7 @@ import numpy as np
 import torch
 from tensorboardX import SummaryWriter
 import shutil
+import math
 
 # temporary for debugging
 # from .settings import ProjectVariable
@@ -200,7 +201,7 @@ def run(project_variable):
         checking_at_epochs = [9 + (i * check_every_num_epoch) for i in range(project_variable.end_epoch // check_every_num_epoch)]
         checking_at_epochs = [0] + checking_at_epochs
         val_acc_tracker = 0
-        val_loss_tracker = 0
+        val_loss_tracker = math.inf
 
         # variable depending on settings 'stop_at_collapse=True' and/or 'early_stopping=True'
         stop_experiment = False
@@ -401,7 +402,7 @@ def run(project_variable):
         if project_variable.stop_at_collapse or project_variable.early_stopping:
             best_run_stopped = which_epoch_stopped[best_run]
             num_runs_collapsed = sum(runs_collapsed)
-            S.extra_write_results(best_run_stopped, num_runs_collapsed, ROW, project_variable.sheet_number)
+            S.extra_write_results(int(best_run_stopped), int(num_runs_collapsed), ROW, project_variable.sheet_number)
 
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
