@@ -543,7 +543,6 @@ def load_movmnist(project_variable, seed):
 
         return data, labels
 
-
     if project_variable.train:
         if project_variable.randomize_training_data:
             data, labels = load_random('train', project_variable.data_points[0], project_variable.balance_training_data,
@@ -811,6 +810,9 @@ def load_jester(project_variable, seed):
     all_data = []
     FRAMES = project_variable.load_num_frames  # 30
 
+
+    # def simple_parallel_load():
+
     def load(which, dp):
         label_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
         labels = np.load(label_path)[:dp]
@@ -1018,5 +1020,4 @@ def load_data(project_variable, seed):
     else:
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
-
 
