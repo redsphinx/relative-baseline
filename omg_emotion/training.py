@@ -21,7 +21,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         clr_scheduler = torch.optim.lr_scheduler.CyclicLR(my_optimizer,
                                                           base_lr=project_variable.learning_rate/10,
                                                           max_lr=project_variable.learning_rate*10,
-                                                          step_size_up= steps/2)
+                                                          step_size_up=steps/2)
 
     data_for_vis = None
 
@@ -75,8 +75,15 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # save model
     if project_variable.save_model:
-        if project_variable.current_epoch == project_variable.end_epoch - 1:
+        if project_variable.stop_at_collapse or project_variable.early_stopping:
+            # if model collapses, we don't want to save it. collapse usually happens pretty early in the training.
+            # if we're stopping early we want to be able to choose the best model, so we need all the models
+            # the best model will be kept at the end of the experiment, the other models will be deleted
             saving.save_model(project_variable, my_model)
+
+        else:
+            if project_variable.current_epoch == project_variable.end_epoch - 1:
+                saving.save_model(project_variable, my_model)
 
     # add things to writer
     TM.add_standard_info(project_variable, 'train', (loss, accuracy, confusion_epoch))

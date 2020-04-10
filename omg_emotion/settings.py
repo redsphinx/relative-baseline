@@ -203,10 +203,16 @@ class ProjectVariable(object):
         self.which_channels = [np.array([0, 1])]
 
         # ----------------------------------------------------------------------------------------------------------
-        # NAS stuff
+        # NAS stuff, optimized training
         # ----------------------------------------------------------------------------------------------------------
         # turn on or off semi-automated architecture search
         self.nas = False
+        # stop when confusion matrix has collapsed
+        self.stop_at_collapse = False
+        # stop when validation accuracy is going down + validation loss is going up
+        self.early_stopping = False
+
+        
 
     @property
     def writer(self):
@@ -796,3 +802,20 @@ class ProjectVariable(object):
     @nas.setter
     def nas(self, value):
         self._nas = value
+
+    @property
+    def stop_at_collapse(self):
+        return self._stop_at_collapse
+
+    @stop_at_collapse.setter
+    def stop_at_collapse(self, value):
+        self._stop_at_collapse = value
+
+    @property
+    def early_stopping(self):
+        return self._early_stopping
+
+    @early_stopping.setter
+    def early_stopping(self, value):
+        self._early_stopping = value
+        

@@ -213,6 +213,27 @@ def delete_runs(project_variable, except_run):
             if os.path.exists(to_be_del):
                 shutil.rmtree(to_be_del)
 
+    # keep only the best epoch from the best run if stop_at_collapse or early_stopping
+    # if not using these settings, only the end epoch will be saved, there will be nothing else to delete
+    if project_variable.stop_at_collapse or project_variable.early_stopping:
+        # get the best epoch from the logs
+        val_log_path = os.path.join(PP.saving_data, 'val', 'experiment_%d_model_%d_run_%d.txt' %
+                                    (project_variable.experiment_number, project_variable.model_number, except_run))
+        val_accuracies = np.genfromtxt(val_log_path, float, delimiter=',')
+        best_epoch_index = np.argmax(val_accuracies[:, 1])
+
+        # go to the foler where models are saved
+        models_best_run_path = os.path.join(PP.models, 'experiment_%d_model_%d_run_%d' %
+                                     (project_variable.experiment_number, project_variable.model_number, except_run))
+        models_best_run = os.listdir(models_best_run_path)
+
+        # delete models except the model with the correct epoch
+        for i in range(len(models_best_run)):
+            if models_best_run[i].split('_')[-1] != best_epoch_index:
+                to_be_del = os.path.join(models_best_run_path, models_best_run[i])
+                if os.path.exists(to_be_del):
+                    shutil.rmtree(to_be_del)
+
 
 # ================================================================
 # !! NOTE: be careful. this method DELETES stuff. use with care !!
@@ -265,8 +286,6 @@ def remove_all_files(experiment, model):
                     shutil.rmtree(file_path)
                 elif os.path.isfile(file_path):
                     os.remove(file_path)
-
-
 
 
 def flow_grid_from_theta(n, h, w, theta):

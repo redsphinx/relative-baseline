@@ -376,10 +376,14 @@ def write_settings(project_variable):
             str(project_variable.data_points),
             project_variable.repeat_experiments,
             project_variable.end_epoch,
-            project_variable.batch_size
+            project_variable.batch_size,
+            project_variable.stop_at_collapse,
+            project_variable.early_stopping,
+            '',  # best run stop epoch
+            ''  # number of collapses
 
         ]]
-        end_letter = 'Q'
+        end_letter = 'U'
     else:
         print('Error: sheet_number not supported')
         return None
@@ -439,6 +443,28 @@ def write_results(accuracy, std, best_run, row, sheet_number):
         best_run,  # best run                                           #H
     ]]
     range_name = 'Sheet%d!F%d:H%d' % (sheet_number, row, row)
+    data = [
+        {
+            'range': range_name,
+            'values': values
+        }  # ,
+    ]
+    body = {
+        'valueInputOption': VALUE_INPUT_OPTION,
+        'data': data
+    }
+    result = SERVICE.spreadsheets().values().batchUpdate(
+        spreadsheetId=SPREADSHEET_ID, body=body).execute()
+
+
+def extra_write_results(best_run_stop, num_runs_collapsed, row, sheet_number):
+    initialize()
+
+    values = [[
+        best_run_stop,  # mean accuracy                                      #T
+        num_runs_collapsed  # std                                            #U
+    ]]
+    range_name = 'Sheet%d!T%d:U%d' % (sheet_number, row, row)
     data = [
         {
             'range': range_name,

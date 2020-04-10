@@ -73,18 +73,21 @@ def e_test_3D_jester():
     main_file.run(project_variable)
 
 
-def e1_conv3DTTN_jester():
+def e3_conv3DTTN_jester():
     set_init_1()
     project_variable.model_number = 16
-    project_variable.experiment_number = 1
+    project_variable.experiment_number = 3
     project_variable.sheet_number = 22
     project_variable.device = 0
     project_variable.end_epoch = 200
     project_variable.repeat_experiments = 5
-    project_variable.batch_size = 10 * 27
+    project_variable.batch_size = 5 * 27  # 9021MiB on lovelace
 
     # if you want all the data: train: 4200, val: 250, test: 250
     project_variable.data_points = [300 * 27, 50 * 27, 0 * 27]
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.0003
@@ -93,7 +96,7 @@ def e1_conv3DTTN_jester():
     project_variable.transformation_groups = project_variable.num_out_channels
     project_variable.k0_groups = project_variable.num_out_channels
 
-    project_variable.do_xai = True
+    project_variable.do_xai = False
     project_variable.which_methods = ['gradient_method']
     project_variable.which_layers = ['conv1', 'conv2', 'conv3', 'conv4', 'conv5']
     project_variable.which_channels = [np.arange(10), np.arange(10), np.arange(10), np.arange(10), np.arange(10)]
@@ -107,4 +110,4 @@ project_variable = ProjectVariable(debug_mode=False)
 # e1_3D_jester()
 # e_test_3D_jester()
 
-e1_conv3DTTN_jester()
+e3_conv3DTTN_jester()

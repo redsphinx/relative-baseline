@@ -81,10 +81,12 @@ def run(project_variable, all_data, my_model, device):
 
             TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))
 
-
     # project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
     # project_variable.writer.add_scalar('accuracy/val', accuracy, project_variable.current_epoch)
     # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     # project_variable.writer.add_figure(tag='confusion/val', figure=fig, global_step=project_variable.current_epoch)
-    return accuracy
+    if project_variable.early_stopping:
+        return accuracy, loss
+    else:
+        return accuracy
 
