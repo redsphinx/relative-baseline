@@ -41,17 +41,14 @@ def create_dali_iters(batch_size, file_names, num_workers):
 
 
 def tryout():
-
-    jester_data_path = PP.jester_data_50_75
+    b, e = 0, 100
     jester_labels_val_path = os.path.join(PP.jester_location, 'labels_val.npy')
 
-    labels_val = np.load(jester_labels_val_path)
-    video_folders = os.listdir(jester_data_path)
+    labels_val = np.load(jester_labels_val_path)[b:e]
 
     num_epochs = 10
 
-    # TODO: get filenames
-    file_names = []
+    file_names = [os.path.join(PP.jester_data_50_75_avi, '%s.avi' % i) for i in labels_val[:, 0]]
 
     val_iter = create_dali_iters(batch_size=2*27, file_names=file_names, num_workers=4)
 
@@ -63,5 +60,7 @@ def tryout():
             if i >= num_steps:
                 break
 
-            print(type(data), data.shape)
+            print('well here we are')
 
+
+tryout()
