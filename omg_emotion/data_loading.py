@@ -941,6 +941,51 @@ def load_jester(project_variable, seed):
     return splits, all_data, all_labels
 
 
+def template_load(project_variable, seed):
+    tp = np.float32
+    splits = []
+    all_labels = []
+    all_data = []
+    FRAMES = project_variable.load_num_frames
+
+
+    def load(which, dp):
+        data = np.zeros(shape=(dp, 3, FRAMES, 50, 75), dtype=tp)
+        labels = np.array([])
+        # TODO: implement simple data loading
+        return data, labels
+
+    def load_random(which, dp, balanced, seed):
+        data = np.zeros(shape=(dp, 3, FRAMES, 50, 75), dtype=tp)
+        labels = np.array([])
+        # TODO: implement randomized dataloading
+        return data, labels
+
+    if project_variable.train:
+        if project_variable.randomize_training_data:
+            data, some_labels = load_random('train', project_variable.data_points[0],
+                                            project_variable.balance_training_data, seed)
+        else:
+            data, some_labels = load('train', project_variable.data_points[0])
+        splits.append('train')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.val:
+        data, some_labels = load('val', project_variable.data_points[1])
+        splits.append('val')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    if project_variable.test:
+        data, some_labels = load('test', project_variable.data_points[2])
+        splits.append('test')
+        all_data.append(data)
+        all_labels.append(some_labels)
+
+    return splits, all_data, all_labels
+
+
 def get_mean_std_train_dhg():
     if os.path.exists(PP.dhg_mean_std):
         total = np.load(PP.dhg_mean_std)

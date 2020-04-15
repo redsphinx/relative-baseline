@@ -317,3 +317,45 @@ def redo_folders_with_few_frames():
         print('%d/%d DONEEE' % (cntr, tot_folders))
         cntr = cntr + 1
 
+
+def fix_file_names_in_folder(folder_path):
+
+    list_files = os.listdir(folder_path)
+    list_files.sort()
+
+    for i in range(1, len(list_files) + 1):
+        name = int(list_files[i-1].split('.')[0])
+        if name != i:
+            name = '%05d.jpg' % i
+
+            src = os.path.join(folder_path, list_files[i-1])
+            dest = os.path.join(folder_path, name)
+            # shutil.move(src, dest)
+
+
+def jpg_to_avi(jpg_folder, avi_dest):
+    command = "ffmpeg -f image2 -i %s/%05d.jpg %s" % (jpg_folder, avi_dest)
+    subprocess.call(command, shell=True)
+
+
+def to_mp4(which, b, e):
+    assert which in ['test', 'val', 'train']
+
+    if not os.path.exists(PP.jester_data_50_75_avi):
+        os.mkdir(PP.jester_data_50_75_avi)
+
+    labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
+    labels = np.load(labels_path)[b:e]
+
+    list_files_to_convert = [os.path.join(PP.jester_data_50_75, i) for i in labels[:, 0]]
+
+    for file_path in list_files_to_convert:
+
+        fix_file_names_in_folder(file_path)
+
+        dest = os.path.join(PP.jester_data_50_75_avi, '%s.avi' % (file_path.split('/')[-1]))
+
+        jpg_to_avi(file_path, dest)
+
+
+to_mp4('val', 0, 3)
