@@ -79,25 +79,33 @@ def run(project_variable):
         else:
             project_variable.train = False
 
-    data = D.load_data(project_variable, seed=None)
+    # HERE: data loading for 'val' and 'test'
+    if project_variable.use_dali:
+        # data will be loaded later during epochs
+        pass
+    else:
+        data = D.load_data(project_variable, seed=None)
 
-    if project_variable.train:
-        data_train = D.get_data('train', data)
-        labels_train = D.get_labels('train', data)
-    if project_variable.val:
-        data_val = D.get_data('val', data)
-        labels_val = D.get_labels('val', data)
-    if project_variable.test:
-        data_test = D.get_data('test', data)
-        labels_test = D.get_labels('test', data)
-    
+        if project_variable.train:
+            data_train = D.get_data('train', data)
+            labels_train = D.get_labels('train', data)
+        if project_variable.val:
+            data_val = D.get_data('val', data)
+            labels_val = D.get_labels('val', data)
+        if project_variable.test:
+            data_test = D.get_data('test', data)
+            labels_test = D.get_labels('test', data)
+
+    # to ensure the same data will be chosen between various models
+    # useful when experimenting with low number of datapoints
     if project_variable.same_training_data:
         np.random.seed(project_variable.data_points)
+        # each run has a unique seed based on the initial datapoints configuration
         training_seed_runs = np.random.randint(10000, size=project_variable.repeat_experiments)
 
     # keep track of how many runs have collapsed and at which epoch it stops training
-    runs_collapsed = np.zeros(shape=(project_variable.repeat_experiments), dtype=int)
-    which_epoch_stopped = np.ones(shape=(project_variable.repeat_experiments), dtype=int) * -1
+    runs_collapsed = np.zeros(shape=project_variable.repeat_experiments, dtype=int)
+    which_epoch_stopped = np.ones(shape=project_variable.repeat_experiments, dtype=int) * -1
 
     # ====================================================================================================
     # start with runs
@@ -107,16 +115,22 @@ def run(project_variable):
             seed = training_seed_runs[num_runs]
         else:
             seed = None
-        # load the training data (which is now randomized)
-        if not project_variable.inference_only_mode:
-            if project_variable.randomize_training_data:
-                project_variable.test = False
-                project_variable.val = False
-                project_variable.train = True
-                data = D.load_data(project_variable, seed)
-                if project_variable.train:
-                    data_train = D.get_data('train', data)
-                    labels_train = D.get_labels('train', data)
+
+        # HERE data loading for 'train'
+        if project_variable.use_dali:
+            # load the data later
+            pass
+        else:
+            # load the training data (which is now randomized)
+            if not project_variable.inference_only_mode:
+                if project_variable.randomize_training_data:
+                    project_variable.test = False
+                    project_variable.val = False
+                    project_variable.train = True
+                    data = D.load_data(project_variable, seed)
+                    if project_variable.train:
+                        data_train = D.get_data('train', data)
+                        labels_train = D.get_labels('train', data)
                     
         print('-------------------------------------------------------\n\n'
               'RUN: %d / %d\n\n'
@@ -258,12 +272,16 @@ def run(project_variable):
                     # labels_train = data[2][0]
 
                     # labels is list because can be more than one type of labels
-                    data = data_train, labels_train
-                    my_model.train()
-                    if project_variable.nas or project_variable.stop_at_collapse:
-                        train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
+                    # HERE data
+                    if project_variable.use_dali:
+                        pass
                     else:
-                        train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
+                        data = data_train, labels_train
+                        my_model.train()
+                        if project_variable.nas or project_variable.stop_at_collapse:
+                            train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
+                        else:
+                            train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
                 # ------------------------------------------------------------------------------------------------
                 # VALIDATION
                 # ------------------------------------------------------------------------------------------------
@@ -285,12 +303,15 @@ def run(project_variable):
                         w = torch.from_numpy(w).cuda(device)
                         project_variable.loss_weights = w
 
-                    data = data_val, labels_val
-
-                    if project_variable.early_stopping:
-                        val_accuracy, val_loss = validation.run(project_variable, data, my_model, device)
+                    # HERE data
+                    if project_variable.use_dali:
+                        pass
                     else:
-                        val_accuracy = validation.run(project_variable, data, my_model, device)
+                        data = data_val, labels_val
+                        if project_variable.early_stopping:
+                            val_accuracy, val_loss = validation.run(project_variable, data, my_model, device)
+                        else:
+                            val_accuracy = validation.run(project_variable, data, my_model, device)
                 # ------------------------------------------------------------------------------------------------
                 # TESTING
                 # ------------------------------------------------------------------------------------------------
@@ -310,8 +331,12 @@ def run(project_variable):
                             w = torch.from_numpy(w).cuda(device)
                             project_variable.loss_weights = w
 
-                        data = data_test, labels_test
-                        testing.run(project_variable, data, my_model, device)
+                        # HERE data
+                        if project_variable.use_dali:
+                            pass
+                        else:
+                            data = data_test, labels_test
+                            testing.run(project_variable, data, my_model, device)
 
                 # ------------------------------------------------------------------------------------------------
                 # ------------------------------------------------------------------------------------------------
@@ -378,12 +403,6 @@ def run(project_variable):
                             which_epoch_stopped[num_runs] = e
                         val_acc_tracker = val_accuracy
                         val_loss_tracker = val_loss
-
-        # if project_variable.nas:
-        #     print('matrix has collapsed: %s' % str(has_collapsed))
-        #     if has_collapsed:
-        #         ind = np.where(collapsed_matrix == 1)[0]
-        #         print('-->> collapse to idx %s' % (str(ind)))
 
         # at the end of a run
         project_variable.at_which_run += 1

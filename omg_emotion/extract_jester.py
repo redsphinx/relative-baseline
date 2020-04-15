@@ -341,14 +341,16 @@ def jpg_to_avi(jpg_folder, avi_dest):
     subprocess.call(command, shell=True)
 
 
-def to_mp4(which, b, e):
+def to_avi(which, b, e):
+    print('start and finish: ', b, e)
     assert which in ['test', 'val', 'train']
 
     if not os.path.exists(PP.jester_data_50_75_avi):
         os.mkdir(PP.jester_data_50_75_avi)
 
     labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
-    labels = np.load(labels_path)[b:e]
+    labels = np.load(labels_path)
+    labels = labels[b:e]
 
     list_files_to_convert = [os.path.join(PP.jester_data_50_75, i) for i in labels[:, 0]]
 
@@ -361,4 +363,43 @@ def to_mp4(which, b, e):
         jpg_to_avi(file_path, dest)
 
 
-# to_mp4('val', 0, 100)
+# to_avi('val', 0, 100)
+# to_avi('val', 100, 10000)  # 7393
+
+# to_avi('train', 0, 10000)
+# to_avi('train', 10000, 20000)
+# to_avi('train', 20000, 30000)
+# to_avi('train', 30000, 40000)
+# to_avi('train', 40000, 50000)
+# to_avi('train', 50000, 60000)
+# to_avi('train', 60000, 70000)
+# to_avi('train', 70000, 80000)
+# to_avi('train', 80000, 90000)
+# to_avi('train', 90000, 100000)
+# to_avi('train', 100000, 110000)
+# to_avi('train', 110000, 120000)
+
+# to_avi('test', 0, 10000)
+
+
+def create_file_list(which):
+    assert which in ['test', 'val', 'train']
+
+    dest_path = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+
+    labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
+    labels = np.load(labels_path)
+
+    with open(dest_path, 'a') as my_file:
+        for i in range(len(labels)):
+            fname = os.path.join(os.path.join(PP.jester_data_50_75_avi, '%s.avi' % labels[i, 0]))
+            the_label = int(labels[i, 1]) + 1
+
+            # NOTE: there *HAS* to be a space between the image path and the label
+
+            line = '%s %d\n' % (fname, the_label)
+            # print(line)
+            my_file.write(line)
+
+
+# create_file_list('train')

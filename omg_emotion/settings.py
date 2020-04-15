@@ -52,16 +52,16 @@ class ProjectVariable(object):
         # UNUSED? ================================================================================
 
         # instead of having 3 dataset splits, have just 1 dataset parameter
-        # implemented datasets: omg_emotion, mnist, dummy, mov_mnist, kth_actions.  status affectnet??
+        # implemented datasets: omg_emotion, mnist, dummy, mov_mnist, kth_actions, dhg, jester  status affectnet??
         self._dataset = 'mnist'
         self._randomize_training_data = False
         self._balance_training_data = False
         self._same_training_data = False
         self._data_points = [100, 100, 100]  # [train, val, test]
+        self._use_dali = False
 
         # bool, which procedures to perform
         self._train = None
-        self._val = None
         self._test = None
 
         # list of str, which labels to use.
@@ -378,6 +378,14 @@ class ProjectVariable(object):
     @data_points.setter
     def data_points(self, value):
         self._data_points = value
+
+    @property
+    def use_dali(self):
+        return self._use_dali
+
+    @use_dali.setter
+    def use_dali(self, value):
+        self._use_dali = value
 
     @property
     def train(self):
