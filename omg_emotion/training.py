@@ -40,9 +40,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         # similar to what is already there, but without the loading data part
 
         # create list with filenames
-
+        # save it as a .txt file
         # create the dali iterator
 
+        # at the end of the epoch delete the file
 
 
         pass
