@@ -141,7 +141,7 @@ def get_information():
         print('\n ------')
 
 
-get_information()
+# get_information()
 
 '''
 average number of frames:    35
@@ -323,18 +323,21 @@ def fix_file_names_in_folder(folder_path):
     list_files = os.listdir(folder_path)
     list_files.sort()
 
-    for i in range(1, len(list_files) + 1):
-        name = int(list_files[i-1].split('.')[0])
-        if name != i:
-            name = '%05d.jpg' % i
+    good_list = ['%05d.jpg' % i for i in range(1, 31)]
 
-            src = os.path.join(folder_path, list_files[i-1])
-            dest = os.path.join(folder_path, name)
-            # shutil.move(src, dest)
+    if list_files != good_list:
+        for i in range(1, len(list_files) + 1):
+            name = int(list_files[i-1].split('.')[0])
+            if name != i:
+                name = '%05d.jpg' % i
+
+                src = os.path.join(folder_path, list_files[i-1])
+                dest = os.path.join(folder_path, name)
+                shutil.move(src, dest)
 
 
 def jpg_to_avi(jpg_folder, avi_dest):
-    command = "ffmpeg -f image2 -i %s/%05d.jpg %s" % (jpg_folder, avi_dest)
+    command = "ffmpeg -loglevel fatal -f image2 -i %s/%s.jpg %s" % (jpg_folder, '%05d', avi_dest)
     subprocess.call(command, shell=True)
 
 
@@ -349,7 +352,7 @@ def to_mp4(which, b, e):
 
     list_files_to_convert = [os.path.join(PP.jester_data_50_75, i) for i in labels[:, 0]]
 
-    for file_path in list_files_to_convert:
+    for file_path in tqdm.tqdm(list_files_to_convert):
 
         fix_file_names_in_folder(file_path)
 
@@ -358,4 +361,4 @@ def to_mp4(which, b, e):
         jpg_to_avi(file_path, dest)
 
 
-to_mp4('val', 0, 3)
+to_mp4('val', 0, 100)
