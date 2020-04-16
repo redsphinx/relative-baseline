@@ -11,7 +11,8 @@ from relative_baseline.omg_emotion import project_paths as PP
 class VideoPipe(Pipeline):
     def __init__(self, batch_size, num_threads=6, device_id=0, file_list="", shuffle=False, sequence_length=30, step=-1,
                  stride=1, initial_fill=1024, seed=0):
-        super(VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
+        # super(VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
+        super(VideoPipe, self).__init__()
 
         # filenames assumes the selection of which files to load has already been made
         # TODO: does it load in order specified?

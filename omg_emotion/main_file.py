@@ -81,8 +81,17 @@ def run(project_variable):
 
     # HERE: data loading for 'val' and 'test'
     if project_variable.use_dali:
-        # data will be loaded later during epochs
-        pass
+        train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
+        val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
+        test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
+
+        if project_variable.val:
+            val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0)
+        if project_variable.test:
+            test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0)
+        # if not project_variable.inference_only_mode:
+        #     train_iter = D.create_dali_iterator(5 * 27, train_file_list, 4, True, 0)
+
     else:
         data = D.load_data(project_variable, seed=None)
 

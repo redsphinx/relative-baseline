@@ -15,6 +15,10 @@ import time
 import torchvision.datasets as datasets
 import torchvision
 
+from nvidia.dali.pipeline import Pipeline
+import nvidia.dali.ops as ops
+from nvidia.dali.plugin.pytorch import DALIGenericIterator
+
 # arousal,valence
 # Training: {0: 262, 1: 96, 2: 54, 3: 503, 4: 682, 5: 339, 6: 19}
 # Validation: {0: 51, 1: 34, 2: 17, 3: 156, 4: 141, 5: 75, 6: 7}
@@ -1066,3 +1070,48 @@ def load_data(project_variable, seed):
         print('Error: dataset %s not supported' % project_variable.dataset)
         return None
 
+
+class VideoPipe(Pipeline):
+    def __init__(self, batch_size,
+                 num_threads=6,
+                 device_id=0,
+                 file_list='',
+                 shuffle=False,
+                 sequence_length=30,
+                 step=-1,
+                 stride=1,
+                 initial_fill=1024,
+                 seed=0):
+
+        super(VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
+
+        self.input = ops.VideoReader(device='gpu',
+                                     file_list=file_list,
+                                     sequence_length=sequence_length,
+                                     step=step,
+                                     stride=stride,
+                                     shard_id=0,
+                                     num_shards=1,
+                                     random_shuffle=shuffle,
+                                     initial_fill=initial_fill)
+
+        def define_graph(self):
+            output, labels = self.input(name="Reader")
+            return output, labels
+
+
+def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed):
+
+    pipe = VideoPipe(batch_size=batch_size,
+                     file_list=file_list,
+                     shuffle=do_shuffle,
+                     initial_fill=batch_size,
+                     num_threads=num_workers,
+                     seed=the_seed
+                     )
+    pipe.build()
+
+    dali_iter = DALIGenericIterator([pipe], ['data', 'labels'], pipe.epoch_size("Reader"), auto_reset=True,
+                                    fill_last_batch=True, last_batch_padded=False)
+
+    return dali_iter

@@ -28,22 +28,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     # ------------------ DALI stuff ------------------
 
     if project_variable.use_dali:
-        # there are 2 scenarios: either we use all the data or we use a subset of the data
-        # deal with randomization -> seed
-        # deal with balancing classes
-        # deal with same data selection
 
-        # IF we use all the data:
-        # get the labels
-
-        # we can make something in data_loading.py that deals with randomization, balancing and same data selection
-        # similar to what is already there, but without the loading data part
-
-        # create list with filenames
-        # save it as a .txt file
-        # create the dali iterator
-
-        # at the end of the epoch delete the file
 
 
         pass
