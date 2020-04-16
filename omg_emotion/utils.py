@@ -47,7 +47,8 @@ def calculate_loss(project_variable, input, target):
         else:
             loss_function = None
     else:
-        loss_function = CrossEntropyLoss()
+
+        loss_function = CrossEntropyLoss(weight=project_variable.loss_weights)
 
     loss = loss_function(input, target)
     return loss

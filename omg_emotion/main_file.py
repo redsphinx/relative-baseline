@@ -188,6 +188,22 @@ def run(project_variable):
                   )
         project_variable.writer.add_text('project settings', text)
 
+        # load the weights for weighted loss
+        w = None
+        if project_variable.model_number == 0:
+            w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+        elif project_variable.dataset == 'jester':
+            w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
+                          0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
+                          0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
+                          0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
+                          0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
+                          0.036873, 0.01644524])
+        if w is not None:
+            w = w.astype(dtype=np.float32)
+            w = torch.from_numpy(w).cuda(device)
+            project_variable.loss_weights = w
+
         # ====================================================================================================
         # start with epochs
         # ====================================================================================================
@@ -261,11 +277,11 @@ def run(project_variable):
                 project_variable.test = False
 
                 if project_variable.train:
-                    if project_variable.model_number == 0:
-                        w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-                        w = w.astype(dtype=np.float32)
-                        w = torch.from_numpy(w).cuda(device)
-                        project_variable.loss_weights = w
+                    # if project_variable.model_number == 0:
+                    #     w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+                    #     w = w.astype(dtype=np.float32)
+                    #     w = torch.from_numpy(w).cuda(device)
+                    #     project_variable.loss_weights = w
 
                     # data = D.load_data(project_variable)
                     # data_train = data[1][0]

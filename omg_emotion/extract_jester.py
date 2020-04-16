@@ -403,3 +403,29 @@ def create_file_list(which):
 
 
 # create_file_list('train')
+
+def calculate_weights_for_loss(which='train'):
+    assert which in ['test', 'val', 'train']
+
+    weights = np.zeros(shape=27)
+    # get the number of datapoints for each class
+
+    labs = load_labels(which)[:, 1]
+
+    for j in range(27):
+        weights[j] = sum(labs == j)
+
+    total = sum(weights)
+
+    weights = weights / total
+
+    weights = 1 / weights
+
+    total = sum(weights)
+
+    weights = weights / total
+
+    print(weights)
+
+
+calculate_weights_for_loss()
