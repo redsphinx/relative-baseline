@@ -137,12 +137,12 @@ def etes_conv3DTTN_jester():
     project_variable.experiment_number = 12234232323232
     project_variable.sheet_number = 22
     project_variable.device = 0
-    project_variable.end_epoch = 10
+    project_variable.end_epoch = 5
     project_variable.repeat_experiments = 1
-    project_variable.batch_size = 10 * 27
+    project_variable.batch_size = 2*27 # 10 * 27
 
-    project_variable.stop_at_collapse = True
-    project_variable.early_stopping = True
+    # project_variable.stop_at_collapse = True
+    # project_variable.early_stopping = True
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.0003
@@ -150,11 +150,11 @@ def etes_conv3DTTN_jester():
     project_variable.num_out_channels = [6, 16]
     # project_variable.num_out_channels = [16, 32, 64, 128, 256]
 
-    # project_variable.use_dali = True
+    project_variable.use_dali = True
 
     main_file.run(project_variable)
 
 
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 etes_conv3DTTN_jester()

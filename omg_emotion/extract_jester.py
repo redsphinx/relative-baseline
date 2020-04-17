@@ -428,4 +428,46 @@ def calculate_weights_for_loss(which='train'):
     print(weights)
 
 
-calculate_weights_for_loss(which='test')
+def ffmpeg_clean(src, dest):
+    command = "ffmpeg -loglevel fatal -i %s -map 0 -map -0:a -c copy -y %s" % (src, dest)
+    subprocess.call(command, shell=True)
+
+
+def clean_files(b, e, which):
+    assert which in ['test', 'val', 'train']
+    print('b: %d    e: %d' % (b, e))
+
+    if not os.path.exists(PP.jester_data_50_75_avi_clean):
+        os.mkdir(PP.jester_data_50_75_avi_clean)
+
+    which_path = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+    all_paths = np.genfromtxt(which_path, dtype=str, delimiter=' ')[b:e, 0]
+
+    for i in tqdm.tqdm(range(len(all_paths))):
+        dest = os.path.join(PP.jester_data_50_75_avi_clean, all_paths[i].split('/')[-1])
+        # print(dest)
+
+        ffmpeg_clean(all_paths[i], dest)
+
+
+# clean_files(0, 500, 'val')
+
+def short_filelist():
+    src = os.path.join(PP.jester_location, 'filelist_val.txt')
+    dest = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
+
+
+    lines = np.genfromtxt(src, dtype=str, delimiter=' ')
+
+    for i in range(500):
+        line = lines[i][0]
+        name = line.split('/')[-1]
+        path = os.path.join(PP.jester_data_50_75_avi_clean, name)
+        mod_line = '%s %s\n' % (path, lines[i][1])
+
+        with open(dest, 'a') as my_file:
+            my_file.write(mod_line)
+
+# short_filelist()
+
+

@@ -23,9 +23,17 @@ def run(project_variable, all_data, my_model, device):
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
+        steps = 0
+
         for i, data_and_labels in enumerate(all_data):
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
+
+            # transpose data
+            data = data.permute(0, 4, 1, 2, 3)
+            # convert to floattensor
+            data = data.type(torch.float32)
+            labels = labels.type(torch.float32)
 
             my_model.eval()
             with torch.no_grad():
@@ -41,6 +49,7 @@ def run(project_variable, all_data, my_model, device):
                 loss = loss.detach()
                 # loss.backward()
             my_model.train()
+            steps = steps + 1
 
             accuracy = U.calculate_accuracy(predictions, labels)
             confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
@@ -79,7 +88,11 @@ def run(project_variable, all_data, my_model, device):
     # save data
     # print('loss epoch: ', loss_epoch)
     loss = float(np.mean(loss_epoch))
-    accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
+    if project_variable.use_dali:
+        accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size)
+    else:
+        accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
+
     confusion_flatten = U.flatten_confusion(confusion_epoch)
 
     if project_variable.save_data:

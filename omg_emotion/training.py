@@ -27,12 +27,20 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     data_for_vis = None
 
+
     if project_variable.use_dali:
+        steps = 0
         for i, data_and_labels in enumerate(all_data):
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
-            
-            # TODO: check how big batch_size is
+
+            # transpose data
+            data = data.permute(0, 4, 1, 2, 3)
+            # convert to floattensor
+            data = data.type(torch.float32)
+            labels = labels.type(torch.long)
+            labels = labels.flatten()
+            labels = labels - 1
 
             my_optimizer.zero_grad()
 
@@ -58,6 +66,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
             loss_epoch.append(float(loss))
             accuracy_epoch.append(float(accuracy))
+
+            steps = steps + 1
 
     else:
         assert steps is not None
@@ -91,7 +101,13 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     # save data
     loss = float(np.mean(loss_epoch))
-    accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
+
+
+    if project_variable.use_dali:
+        accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size)
+    else:
+        accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)
+
     confusion_flatten = U.flatten_confusion(confusion_epoch)
 
     # TM.add_kernels(project_variable, my_model)

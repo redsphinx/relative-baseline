@@ -1095,9 +1095,9 @@ class VideoPipe(Pipeline):
                                      random_shuffle=shuffle,
                                      initial_fill=initial_fill)
 
-        def define_graph(self):
-            output, labels = self.input(name="Reader")
-            return output, labels
+    def define_graph(self):
+        output, labels = self.input(name="Reader")
+        return output, labels
 
 
 def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed):
