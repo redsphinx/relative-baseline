@@ -29,7 +29,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
 
     if project_variable.use_dali:
-        end_at = 100
+        end_at = project_variable.data_points[0]
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):

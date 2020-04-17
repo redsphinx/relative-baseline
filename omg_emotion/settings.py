@@ -57,6 +57,7 @@ class ProjectVariable(object):
         self._randomize_training_data = False
         self._balance_training_data = False
         self._same_training_data = False
+        # if use_dali, these represent are the number of steps
         self._data_points = [100, 100, 100]  # [train, val, test]
         self._use_dali = False
         self._dali_workers = 4

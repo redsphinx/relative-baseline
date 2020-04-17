@@ -19,13 +19,21 @@ def run(project_variable, all_data, my_model, device):
     # all_data = [data, labels] shape = (n, 2)
     # device is string
 
+    if project_variable.use_dali:
+        # reset so that we evaluate on the same data
+        all_data.reset()
+
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
+        end_at = project_variable.data_points[1]
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):
+            if steps >= end_at:
+                break
+
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
 
@@ -51,13 +59,14 @@ def run(project_variable, all_data, my_model, device):
                 loss = loss.detach()
                 # loss.backward()
             my_model.train()
-            steps = steps + 1
 
             accuracy = U.calculate_accuracy(predictions, labels)
             confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
             loss_epoch.append(float(loss))
             accuracy_epoch.append(float(accuracy))
+
+            steps = steps + 1
 
     else:
 

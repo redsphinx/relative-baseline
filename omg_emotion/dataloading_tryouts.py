@@ -60,6 +60,8 @@ def tryout():
 
     val_iter = create_dali_iters(batch_size=2*27, file_list=the_filelist_val, num_workers=4)
 
+    val_iter.re
+
     for epoch in range(num_epochs):
 
         num_steps = 5
