@@ -82,11 +82,11 @@ def run(project_variable):
 
     # HERE: data loading for 'val' and 'test'
     if project_variable.use_dali:
-        # train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
-        train_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
+        train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
+        # train_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
 
-        # val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
-        val_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
+        val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
+        # val_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
 
         test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
 
@@ -99,8 +99,8 @@ def run(project_variable):
         if not project_variable.inference_only_mode:
             print('Loading training iterator...')
             train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
-                                                project_variable.dali_workers, project_variable.randomize_training_data,
-                                                6)
+                                                project_variable.dali_workers,
+                                                project_variable.randomize_training_data, 6)
 
     else:
         data = D.load_data(project_variable, seed=None)

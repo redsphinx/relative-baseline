@@ -12,7 +12,7 @@ def set_init_1():
     project_variable.num_in_channels = 3
     project_variable.data_points = [2 * 27,  1 * 27, 0 * 27]
     project_variable.label_size = 27
-    project_variable.batch_size = 2 * 27
+    project_variable.batch_size = 5 * 27
     project_variable.load_num_frames = 30
     project_variable.label_type = 'categories'
 
@@ -137,12 +137,13 @@ def etes_conv3DTTN_jester():
     project_variable.experiment_number = 12234232323232
     project_variable.sheet_number = 22
     project_variable.device = 0
-    project_variable.end_epoch = 5
+    project_variable.end_epoch = 3
     project_variable.repeat_experiments = 1
-    project_variable.batch_size = 2*27 # 10 * 27
+    project_variable.batch_size = 5*27 # 10 * 27
 
     # project_variable.stop_at_collapse = True
     # project_variable.early_stopping = True
+    project_variable.dali_workers = 8
 
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.0003

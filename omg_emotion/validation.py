@@ -33,7 +33,9 @@ def run(project_variable, all_data, my_model, device):
             data = data.permute(0, 4, 1, 2, 3)
             # convert to floattensor
             data = data.type(torch.float32)
-            labels = labels.type(torch.float32)
+            labels = labels.type(torch.long)
+            labels = labels.flatten()
+            labels = labels - 1
 
             my_model.eval()
             with torch.no_grad():
