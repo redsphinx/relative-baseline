@@ -79,6 +79,7 @@ def run(project_variable):
         else:
             project_variable.train = False
 
+
     # HERE: data loading for 'val' and 'test'
     if project_variable.use_dali:
         train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
@@ -89,8 +90,10 @@ def run(project_variable):
             val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0)
         if project_variable.test:
             test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0)
-        # if not project_variable.inference_only_mode:
-        #     train_iter = D.create_dali_iterator(5 * 27, train_file_list, 4, True, 0)
+        if not project_variable.inference_only_mode:
+            train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
+                                                project_variable.dali_workers, project_variable.randomize_training_data,
+                                                6)
 
     else:
         data = D.load_data(project_variable, seed=None)
@@ -105,12 +108,12 @@ def run(project_variable):
             data_test = D.get_data('test', data)
             labels_test = D.get_labels('test', data)
 
-    # to ensure the same data will be chosen between various models
-    # useful when experimenting with low number of datapoints
-    if project_variable.same_training_data:
-        np.random.seed(project_variable.data_points)
-        # each run has a unique seed based on the initial datapoints configuration
-        training_seed_runs = np.random.randint(10000, size=project_variable.repeat_experiments)
+        # to ensure the same data will be chosen between various models
+        # useful when experimenting with low number of datapoints
+        if project_variable.same_training_data:
+            np.random.seed(project_variable.data_points)
+            # each run has a unique seed based on the initial datapoints configuration
+            training_seed_runs = np.random.randint(10000, size=project_variable.repeat_experiments)
 
     # keep track of how many runs have collapsed and at which epoch it stops training
     runs_collapsed = np.zeros(shape=project_variable.repeat_experiments, dtype=int)
@@ -126,10 +129,7 @@ def run(project_variable):
             seed = None
 
         # HERE data loading for 'train'
-        if project_variable.use_dali:
-            # load the data later
-            pass
-        else:
+        if not project_variable.use_dali:
             # load the training data (which is now randomized)
             if not project_variable.inference_only_mode:
                 if project_variable.randomize_training_data:
@@ -197,21 +197,21 @@ def run(project_variable):
                   )
         project_variable.writer.add_text('project settings', text)
 
-        # load the weights for weighted loss
-        w = None
-        if project_variable.model_number == 0:
-            w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-        elif project_variable.dataset == 'jester':
-            w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
-                          0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
-                          0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
-                          0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
-                          0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
-                          0.036873, 0.01644524])
-        if w is not None:
-            w = w.astype(dtype=np.float32)
-            w = torch.from_numpy(w).cuda(device)
-            project_variable.loss_weights = w
+        # # load the weights for weighted loss
+        # w = None
+        # if project_variable.model_number == 0:
+        #     w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+        # elif project_variable.dataset == 'jester' and project_variable.use_dali:
+        #     w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
+        #                   0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
+        #                   0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
+        #                   0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
+        #                   0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
+        #                   0.036873, 0.01644524])
+        # if w is not None:
+        #     w = w.astype(dtype=np.float32)
+        #     w = torch.from_numpy(w).cuda(device)
+        #     project_variable.loss_weights = w
 
         # ====================================================================================================
         # start with epochs
@@ -286,6 +286,21 @@ def run(project_variable):
                 project_variable.test = False
 
                 if project_variable.train:
+                    w = None
+                    if project_variable.model_number == 0:
+                        w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
+                    elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                        w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
+                                      0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
+                                      0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
+                                      0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
+                                      0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
+                                      0.036873, 0.01644524])
+                    if w is not None:
+                        w = w.astype(dtype=np.float32)
+                        w = torch.from_numpy(w).cuda(device)
+                        project_variable.loss_weights = w
+
                     # if project_variable.model_number == 0:
                     #     w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
                     #     w = w.astype(dtype=np.float32)
@@ -299,14 +314,16 @@ def run(project_variable):
                     # labels is list because can be more than one type of labels
                     # HERE data
                     if project_variable.use_dali:
-                        pass
+                        data = train_iter
+                        my_model.train()
                     else:
                         data = data_train, labels_train
                         my_model.train()
-                        if project_variable.nas or project_variable.stop_at_collapse:
-                            train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
-                        else:
-                            train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
+
+                    if project_variable.nas or project_variable.stop_at_collapse:
+                        train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
+                    else:
+                        train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
                 # ------------------------------------------------------------------------------------------------
                 # VALIDATION
                 # ------------------------------------------------------------------------------------------------
@@ -322,21 +339,31 @@ def run(project_variable):
                 project_variable.test = False
 
                 if project_variable.val:
+                    w = None
                     if project_variable.model_number == 0:
                         w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
+                    elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                        w = np.array([0.03913151, 0.03897372, 0.03606524, 0.03929058, 0.03464331, 0.0377558,
+                                      0.03945095, 0.03913151, 0.03593117, 0.03593117, 0.03835509, 0.04044135,
+                                      0.03731847, 0.0370325, 0.04931369, 0.04646867, 0.0354047, 0.03760889,
+                                      0.03620031, 0.0377558, 0.03675089, 0.03593117, 0.03620031, 0.03451958,
+                                      0.03464331, 0.03647352, 0.01327676])
+                    if w is not None:
                         w = w.astype(dtype=np.float32)
                         w = torch.from_numpy(w).cuda(device)
                         project_variable.loss_weights = w
 
+
                     # HERE data
                     if project_variable.use_dali:
-                        pass
+                        data = val_iter
                     else:
                         data = data_val, labels_val
-                        if project_variable.early_stopping:
-                            val_accuracy, val_loss = validation.run(project_variable, data, my_model, device)
-                        else:
-                            val_accuracy = validation.run(project_variable, data, my_model, device)
+
+                    if project_variable.early_stopping:
+                        val_accuracy, val_loss = validation.run(project_variable, data, my_model, device)
+                    else:
+                        val_accuracy = validation.run(project_variable, data, my_model, device)
                 # ------------------------------------------------------------------------------------------------
                 # TESTING
                 # ------------------------------------------------------------------------------------------------
@@ -350,18 +377,27 @@ def run(project_variable):
                         project_variable.test = False
 
                     if project_variable.test:
+                        w = None
                         if project_variable.model_number == 0:
                             w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+                        elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                            w = np.array([0.03897281, 0.04044657, 0.03819954, 0.03674154, 0.03716712, 0.0356529,
+                                          0.03513242, 0.03578544, 0.03674154, 0.03804855, 0.03450281, 0.03437958,
+                                          0.03674154, 0.0414926, 0.05093271, 0.05039939, 0.03804855, 0.03578544,
+                                          0.03775013, 0.03513242, 0.03487784, 0.03605349, 0.03688231, 0.03760267,
+                                          0.03760267, 0.03591897, 0.01300849])
+                        if w is not None:
                             w = w.astype(dtype=np.float32)
                             w = torch.from_numpy(w).cuda(device)
                             project_variable.loss_weights = w
 
                         # HERE data
                         if project_variable.use_dali:
-                            pass
+                            data = test_iter
                         else:
                             data = data_test, labels_test
-                            testing.run(project_variable, data, my_model, device)
+
+                        testing.run(project_variable, data, my_model, device)
 
                 # ------------------------------------------------------------------------------------------------
                 # ------------------------------------------------------------------------------------------------

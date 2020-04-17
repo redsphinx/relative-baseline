@@ -14,16 +14,23 @@ def initialize(project_variable, all_data):
     loss_epoch = []
     accuracy_epoch = []
     confusion_epoch = np.zeros(shape=(project_variable.label_size, project_variable.label_size), dtype=int)
-    nice_div = len(all_data[0]) % project_variable.batch_size
-    if nice_div == 0:
-        steps = len(all_data[0]) // project_variable.batch_size
-    else:
-        steps = len(all_data[0]) // project_variable.batch_size + 1
 
-    full_data, full_labels = all_data
+    nice_div = None
+    steps = None
+    full_labels = None
+    full_data = None
 
-    if len(full_labels) == 1:
-        full_labels = full_labels[0]
+    if not project_variable.use_dali:
+        nice_div = len(all_data[0]) % project_variable.batch_size
+        if nice_div == 0:
+            steps = len(all_data[0]) // project_variable.batch_size
+        else:
+            steps = len(all_data[0]) // project_variable.batch_size + 1
+
+        full_data, full_labels = all_data
+
+        if len(full_labels) == 1:
+            full_labels = full_labels[0]
 
     return loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data
 

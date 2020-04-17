@@ -15,32 +15,52 @@ def run(project_variable, all_data, my_model, device):
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
-    # for ts in range(project_variable.train_steps):
-    for ts in tqdm(range(steps)):
+    if project_variable.use_dali:
+        for i, data_and_labels in enumerate(all_data):
+            data = data_and_labels[0]['data']
+            labels = data_and_labels[0]['labels']
 
-        # get part of data
-        data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
+            my_model.eval()
+            with torch.no_grad():
+                # my_optimizer.zero_grad()
+                # predictions = my_model.forward(data)
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                    predictions = my_model(data, device)
+                else:
+                    predictions = my_model(data)
+                # print(predictions)
+                loss = U.calculate_loss(project_variable, predictions, labels)
+                # print('loss raw: %s' % str(loss))
+                loss = loss.detach()
+                # loss.backward()
+            my_model.train()
+            
+    else:
+        for ts in tqdm(range(steps)):
 
-        my_model.eval()
-        with torch.no_grad():
-            # my_optimizer.zero_grad()
-            # predictions = my_model.forward(data)
-            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
-                predictions = my_model(data, device)
-            else:
-                predictions = my_model(data)
-            # print(predictions)
-            loss = U.calculate_loss(project_variable, predictions, labels)
-            # print('loss raw: %s' % str(loss))
-            loss = loss.detach()
-            # loss.backward()
-        my_model.train()
+            # get part of data
+            data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-        accuracy = U.calculate_accuracy(predictions, labels)
-        confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
+            my_model.eval()
+            with torch.no_grad():
+                # my_optimizer.zero_grad()
+                # predictions = my_model.forward(data)
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                    predictions = my_model(data, device)
+                else:
+                    predictions = my_model(data)
+                # print(predictions)
+                loss = U.calculate_loss(project_variable, predictions, labels)
+                # print('loss raw: %s' % str(loss))
+                loss = loss.detach()
+                # loss.backward()
+            my_model.train()
 
-        loss_epoch.append(float(loss))
-        accuracy_epoch.append(float(accuracy))
+            accuracy = U.calculate_accuracy(predictions, labels)
+            confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
+
+            loss_epoch.append(float(loss))
+            accuracy_epoch.append(float(accuracy))
 
     # save data
     # print('loss epoch: ', loss_epoch)

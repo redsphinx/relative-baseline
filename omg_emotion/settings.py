@@ -59,6 +59,7 @@ class ProjectVariable(object):
         self._same_training_data = False
         self._data_points = [100, 100, 100]  # [train, val, test]
         self._use_dali = False
+        self._dali_workers = 4
 
         # bool, which procedures to perform
         self._train = None
@@ -386,6 +387,14 @@ class ProjectVariable(object):
     @use_dali.setter
     def use_dali(self, value):
         self._use_dali = value
+
+    @property
+    def dali_workers(self):
+        return self._dali_workers
+
+    @dali_workers.setter
+    def dali_workers(self, value):
+        self._dali_workers = value
 
     @property
     def train(self):

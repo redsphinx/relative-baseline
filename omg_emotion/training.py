@@ -12,8 +12,10 @@ from .settings import ProjectVariable
 
 
 def run(project_variable, all_data, my_model, my_optimizer, device):
+    # if project_variable.use_dali, all_data = train iterator
     # all_data = np.array with the train datasplit depending
     # all_data = [data, labels] shape = (n, 2)
+
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
@@ -25,51 +27,68 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
     data_for_vis = None
 
-    # ------------------ DALI stuff ------------------
-
     if project_variable.use_dali:
+        for i, data_and_labels in enumerate(all_data):
+            data = data_and_labels[0]['data']
+            labels = data_and_labels[0]['labels']
+            
+            # TODO: check how big batch_size is
 
+            my_optimizer.zero_grad()
 
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                predictions = my_model(data, device)
+            else:
+                predictions = my_model(data)
 
-        pass
+            loss = U.calculate_loss(project_variable, predictions, labels)
+            # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
+            loss.backward()
 
+            my_optimizer.step()
 
+            if project_variable.use_clr:
+                clr_scheduler.step()
+                # print('CLR LR: ', clr_scheduler.get_lr())
 
+            # my_optimizer.step()
 
+            accuracy = U.calculate_accuracy(predictions, labels)
+            confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
-    # ------------------ DALI stuff ------------------
+            loss_epoch.append(float(loss))
+            accuracy_epoch.append(float(accuracy))
 
+    else:
+        assert steps is not None
+        for ts in tqdm(range(steps)):
+            data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
+            my_optimizer.zero_grad()
 
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                predictions = my_model(data, device)
+            else:
+                predictions = my_model(data)
 
-    for ts in tqdm(range(steps)):
-        data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
+            loss = U.calculate_loss(project_variable, predictions, labels)
+            # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
+            loss.backward()
 
-        my_optimizer.zero_grad()
+            my_optimizer.step()
 
-        if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
-            predictions = my_model(data, device)
-        else:
-            predictions = my_model(data)
+            if project_variable.use_clr:
+                clr_scheduler.step()
+                # print('CLR LR: ', clr_scheduler.get_lr())
 
-        loss = U.calculate_loss(project_variable, predictions, labels)
-        # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
-        loss.backward()
+            # my_optimizer.step()
 
-        my_optimizer.step()
+            accuracy = U.calculate_accuracy(predictions, labels)
+            confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
-        if project_variable.use_clr:
-            clr_scheduler.step()
-            # print('CLR LR: ', clr_scheduler.get_lr())
+            loss_epoch.append(float(loss))
+            accuracy_epoch.append(float(accuracy))
 
-        # my_optimizer.step()
-
-        accuracy = U.calculate_accuracy(predictions, labels)
-        confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
-
-        loss_epoch.append(float(loss))
-        accuracy_epoch.append(float(accuracy))
-        
     # save data
     loss = float(np.mean(loss_epoch))
     accuracy = sum(accuracy_epoch) / (steps * project_variable.batch_size + nice_div)

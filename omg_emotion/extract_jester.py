@@ -428,4 +428,4 @@ def calculate_weights_for_loss(which='train'):
     print(weights)
 
 
-calculate_weights_for_loss()
+calculate_weights_for_loss(which='test')
