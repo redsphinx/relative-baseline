@@ -124,6 +124,7 @@ def run(project_variable, all_data, my_model, device):
     # which_datapoint = 1
 
     if project_variable.inference_only_mode:
+        # TODO: check if datapoint works
         TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))
         TM.add_histograms_srxy(project_variable, my_model)
         TM.add_text_srxy_per_channel(project_variable, my_model)
