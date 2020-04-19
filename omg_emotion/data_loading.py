@@ -1100,14 +1100,15 @@ class VideoPipe(Pipeline):
         return output, labels
 
 
-def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed, iterator_size, reset):
+def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed, iterator_size, reset, device):
 
     pipe = VideoPipe(batch_size=batch_size,
                      file_list=file_list,
                      shuffle=do_shuffle,
                      initial_fill=batch_size,
                      num_threads=num_workers,
-                     seed=the_seed
+                     seed=the_seed,
+                     device_id=device
                      )
     pipe.build()
 

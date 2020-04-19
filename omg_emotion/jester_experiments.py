@@ -1,4 +1,6 @@
 import numpy as np
+from multiprocessing import Pool
+
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 
@@ -157,7 +159,80 @@ def etes_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
-
 project_variable = ProjectVariable(debug_mode=True)
 
-etes_conv3DTTN_jester()
+
+def same_settings(pv):
+    pv.nas = True
+
+    pv.end_epoch = 1
+    pv.dataset = 'jester'
+
+    # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
+    pv.num_in_channels = 3
+    pv.label_size = 27
+    pv.batch_size = 5 * 27
+    pv.load_num_frames = 30
+    pv.label_type = 'categories'
+
+    pv.repeat_experiments = 1
+    pv.save_only_best_run = True
+    pv.same_training_data = True
+    pv.randomize_training_data = True
+    pv.balance_training_data = True
+
+    pv.theta_init = None
+    pv.srxy_init = 'eye'
+    pv.weight_transform = 'seq'
+
+    pv.experiment_state = 'new'
+    pv.eval_on = 'val'
+
+    pv.model_number = 11
+    pv.sheet_number = 22
+
+    pv.use_dali = True
+    pv.dali_workers = 8
+    # for now, use 'all' for val, since idk how to reset the iterator
+    pv.dali_iterator_size = [5 * 27, 10 * 27, 0]
+
+    # pv.stop_at_collapse = True
+    # pv.early_stopping = True
+
+    pv.optimizer = 'adam'
+    pv.learning_rate = 0.0003
+    pv.use_adaptive_lr = True
+    # pv.num_out_channels = [6, 16]
+
+    return pv
+
+def parallel_experiment():
+    pv1 = ProjectVariable(debug_mode=True)
+    p1 = same_settings(pv1)
+    pv1.experiment_number = 111111111111111111
+    pv1.num_out_channels = [6, 16]
+    pv1.device = 0
+
+    pv2 = ProjectVariable(debug_mode=True)
+    p2 = same_settings(pv2)
+    pv2.experiment_number = 222222222222222
+    pv2.num_out_channels = [12, 22]
+    pv2.device = 1
+
+    pv3 = ProjectVariable(debug_mode=True)
+    p3 = same_settings(pv3)
+    pv3.experiment_number = 333333333333333
+    pv3.num_out_channels = [8, 18]
+    pv3.device = 2
+
+    pool = Pool(processes=3)
+    # pool.apply_async(main_file.run)
+    results = pool.map(main_file.run, [p1, p2, p3])
+
+    pool.join()
+    pool.close()
+
+    # write the results to some file
+
+
+parallel_experiment()

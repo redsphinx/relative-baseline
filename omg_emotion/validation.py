@@ -38,7 +38,6 @@ def run(project_variable, all_data, my_model, device):
             labels = labels.flatten()
             labels = labels - 1
 
-            # TODO: to check how iterator reset works. Check the values of labels
             my_model.eval()
             with torch.no_grad():
                 # my_optimizer.zero_grad()
@@ -127,9 +126,9 @@ def run(project_variable, all_data, my_model, device):
 
             TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))
 
-    if project_variable.use_dali:
-            # reset so that we evaluate on the same data
-            all_data.reset()
+    # if project_variable.use_dali:
+    #         # reset so that we evaluate on the same data
+    #         all_data.reset()
 
     # project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
     # project_variable.writer.add_scalar('accuracy/val', accuracy, project_variable.current_epoch)

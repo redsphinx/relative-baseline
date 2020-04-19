@@ -21,6 +21,8 @@ import math
 # from .settings import ProjectVariable
 
 
+
+
 def run(project_variable):
     # only one of these can be True at a time
     # assert(project_variable.use_adaptive_lr and project_variable.use_clr is False)
@@ -80,7 +82,7 @@ def run(project_variable):
             project_variable.train = False
 
 
-    # HERE: create the dali iterators
+    # create the dali iterators
     if project_variable.use_dali:
         train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
         # train_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
@@ -93,17 +95,17 @@ def run(project_variable):
         if project_variable.val:
             print('Loading validation iterator...')
             val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0,
-                                              project_variable.dali_iterator_size[1], False)
+                                              project_variable.dali_iterator_size[1], True, project_variable.device)
         if project_variable.test:
             print('Loading test iterator...')
             test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0,
-                                               project_variable.dali_iterator_size[2], False)
+                                               project_variable.dali_iterator_size[2], True, project_variable.device)
         if not project_variable.inference_only_mode:
             print('Loading training iterator...')
             train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
                                                 project_variable.dali_workers,
                                                 project_variable.randomize_training_data, 6,
-                                                project_variable.dali_iterator_size[0], True)
+                                                project_variable.dali_iterator_size[0], True, project_variable.device)
 
     else:
         data = D.load_data(project_variable, seed=None)
@@ -139,7 +141,6 @@ def run(project_variable):
             else:
                 seed = None
 
-        # HERE data loading for 'train'
         if not project_variable.use_dali:
             # load the training data (which is now randomized)
             if not project_variable.inference_only_mode:
@@ -207,22 +208,6 @@ def run(project_variable):
                   U.count_parameters(my_model)
                   )
         project_variable.writer.add_text('project settings', text)
-
-        # # load the weights for weighted loss
-        # w = None
-        # if project_variable.model_number == 0:
-        #     w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-        # elif project_variable.dataset == 'jester' and project_variable.use_dali:
-        #     w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
-        #                   0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
-        #                   0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
-        #                   0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
-        #                   0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
-        #                   0.036873, 0.01644524])
-        # if w is not None:
-        #     w = w.astype(dtype=np.float32)
-        #     w = torch.from_numpy(w).cuda(device)
-        #     project_variable.loss_weights = w
 
         # ====================================================================================================
         # start with epochs
@@ -323,7 +308,6 @@ def run(project_variable):
                     # labels_train = data[2][0]
 
                     # labels is list because can be more than one type of labels
-                    # HERE data
                     if project_variable.use_dali:
                         data = train_iter
                         my_model.train()
@@ -365,7 +349,6 @@ def run(project_variable):
                         project_variable.loss_weights = w
 
 
-                    # HERE data
                     if project_variable.use_dali:
                         data = val_iter
                     else:
@@ -402,7 +385,6 @@ def run(project_variable):
                             w = torch.from_numpy(w).cuda(device)
                             project_variable.loss_weights = w
 
-                        # HERE data
                         if project_variable.use_dali:
                             data = test_iter
                         else:
@@ -497,6 +479,12 @@ def run(project_variable):
 
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
+
+
+    print('\n\n\n END OF EXPERIMENT %d \n\n\n' % (project_variable.experiment_number))
+
+    return (project_variable.experiment_number, train_accuracy, val_accuracy)
+
 
     # if project_variable.stop_at_collapse and project_variable.early_stopping:
     #     return train_accuracy, val_accuracy, has_collapsed, collapsed_matrix, val_loss

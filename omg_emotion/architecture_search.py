@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from datetime import date, datetime
+from multiprocessing import Pool
 
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
@@ -24,9 +25,16 @@ def run_single_experiment(project_variable, lr, epochs, out_channels, device, mo
     # if you want all the data: train: 150, val: 10, test: 10
     # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
     project_variable.num_in_channels = 3
-    project_variable.data_points = [2 * 27,  1 * 27, 0 * 27]
-    project_variable.label_size = 27
+    # project_variable.data_points = [2 * 27,  1 * 27, 0 * 27]
     project_variable.batch_size = 2 * 27
+    project_variable.use_dali = True
+    project_variable.dali_workers = 8
+    # for now, use 'all' for val, since idk how to reset the iterator
+    project_variable.dali_iterator_size = [5 * 27, 'all', 0]
+
+
+    project_variable.label_size = 27
+
     project_variable.load_num_frames = 30
     project_variable.label_type = 'categories'
     project_variable.use_adaptive_lr = True
@@ -108,5 +116,73 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 # conv_channels = [[16, 32, 32, 64, 64]]
 # auto_search(10000, 30, 3, 16, conv_channels, 2)
 #
-conv_channels = [[32, 32, 64, 64, 128]]
-auto_search(10000, 30, 3, 16, conv_channels, 2)
+# conv_channels = [[32, 32, 64, 64, 128]]
+# auto_search(10000, 30, 3, 16, conv_channels, 2)
+
+
+def evolutionary_search(debug_mode=True):
+    population_limit = 3
+    generations = 100
+    results = None
+
+    for gen in range(generations):
+        if gen == 0:
+            # manually seed
+            genome_1 = {'lr': 0.0003,
+                        'num_conv_layers': 2,
+                        'num_channels': [6, 16],
+                        'kernel_size_per_layer': [5, 5],
+                        'layer_type': ['conv3dttn', 'conv3dttn'],
+                        'pooling_after_conv': 'max',
+                        'pooling_final': 'avg',
+                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
+            genome_2 = {'lr': 0.0003,
+                        'num_conv_layers': 2,
+                        'num_channels': [6, 16],
+                        'kernel_size_per_layer': [3, 5],
+                        'layer_type': ['conv3dttn', 'conv3dttn'],
+                        'pooling_after_conv': 'max',
+                        'pooling_final': 'avg',
+                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
+            genome_3 = {'lr': 0.0003,
+                        'num_conv_layers': 3,
+                        'num_channels': [6, 16, 32],
+                        'kernel_size_per_layer': [3, 5, 5],
+                        'layer_type': ['conv3d', 'conv3dttn', 'conv3dttn'],
+                        'pooling_after_conv': 'max',
+                        'pooling_final': 'avg',
+                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
+            
+        else:
+            assert results is not None
+            # use results to generate new genome
+            # asses viability, if fails, generate new one
+            pass
+
+        # TODO: construct models
+        
+        # run models
+        pv1 = ProjectVariable(debug_mode)
+        pv1 = apply_same_settings(pv1)
+        pv1 = apply_unique_settings(pv1)
+
+        pv2 = ProjectVariable(debug_mode)
+        pv2 = apply_same_settings(pv2)
+        pv2 = apply_unique_settings(pv2)
+
+        pv3 = ProjectVariable(debug_mode)
+        pv3 = apply_same_settings(pv3)
+        pv3 = apply_unique_settings(pv3)
+
+        pool = Pool(processes=3)
+        results = pool.map(main_file.run, [pv1, pv2, pv3])
+
+        pool.join()
+        pool.close()
+
+        # TODO: write the results to some file
+        
+
+        pass
+        
+

@@ -65,6 +65,8 @@ class ProjectVariable(object):
         # default is to use all of the data
         # this controls the number of steps: steps = dali_iterator_size / batch_size
         self._dali_iterator_size = ['all', 'all', 'all']
+        # for training in parallel
+        # self._run_in_parallel = False
 
         # bool, which procedures to perform
         self._train = None
@@ -408,6 +410,14 @@ class ProjectVariable(object):
     @dali_iterator_size.setter
     def dali_iterator_size(self, value):
         self._dali_iterator_size = value
+
+    # @property
+    # def run_in_parallel(self):
+    #     return self._run_in_parallel
+    #
+    # @run_in_parallel.setter
+    # def run_in_parallel(self, value):
+    #     self._run_in_parallel = value
 
     @property
     def train(self):
