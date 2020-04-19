@@ -2413,7 +2413,6 @@ class Experimental15_TTN3d_xD(torch.nn.Module):
         return x
 
 
-# model_number = 16
 class Experimental16_TTN3d_xD(torch.nn.Module):
     def __init__(self, project_variable):
 
@@ -2473,3 +2472,4 @@ class Experimental16_TTN3d_xD(torch.nn.Module):
         x = self.fc2(x)
 
         return x
+

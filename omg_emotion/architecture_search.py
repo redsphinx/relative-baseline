@@ -6,6 +6,7 @@ from multiprocessing import Pool
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
 from relative_baseline.omg_emotion import project_paths as PP
+from relative_baseline.omg_emotion.evolution import genetic_optimization as GO
 
 
 def run_single_experiment(project_variable, lr, epochs, out_channels, device, model_number):
@@ -120,59 +121,105 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 # auto_search(10000, 30, 3, 16, conv_channels, 2)
 
 
+def apply_same_settings(project_variable):
+    project_variable.nas = True
+    project_variable.eval_on = None
+
+    project_variable.model_number = 16
+    project_variable.sheet_number = 23
+
+    project_variable.end_epoch = 20
+    project_variable.dataset = 'jester'
+
+    # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
+    project_variable.num_in_channels = 3
+    project_variable.label_size = 27
+    project_variable.batch_size = 5 * 27
+    project_variable.load_num_frames = 30
+    project_variable.label_type = 'categories'
+
+    project_variable.repeat_experiments = 1
+    project_variable.save_only_best_run = True
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 8
+    project_variable.dali_iterator_size = [1000 * 27, 0, 0]
+
+    project_variable.stop_at_collapse = True
+    project_variable.experiment_state = 'new'
+    project_variable.optimizer = 'adam'
+
+    return project_variable
+
+
+def apply_unique_settings(project_variable, genome):
+    project_variable.learning_rate = genome['lr']
+    project_variable.num_out_channels = genome['num_channels']
+    return project_variable
+    
+
 def evolutionary_search(debug_mode=True):
-    population_limit = 3
     generations = 100
     results = None
 
     for gen in range(generations):
         if gen == 0:
-            # manually seed
-            genome_1 = {'lr': 0.0003,
-                        'num_conv_layers': 2,
-                        'num_channels': [6, 16],
-                        'kernel_size_per_layer': [5, 5],
-                        'layer_type': ['conv3dttn', 'conv3dttn'],
-                        'pooling_after_conv': 'max',
-                        'pooling_final': 'avg',
-                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
-            genome_2 = {'lr': 0.0003,
-                        'num_conv_layers': 2,
-                        'num_channels': [6, 16],
-                        'kernel_size_per_layer': [3, 5],
-                        'layer_type': ['conv3dttn', 'conv3dttn'],
-                        'pooling_after_conv': 'max',
-                        'pooling_final': 'avg',
-                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
-            genome_3 = {'lr': 0.0003,
-                        'num_conv_layers': 3,
-                        'num_channels': [6, 16, 32],
-                        'kernel_size_per_layer': [3, 5, 5],
-                        'layer_type': ['conv3d', 'conv3dttn', 'conv3dttn'],
-                        'pooling_after_conv': 'max',
-                        'pooling_final': 'avg',
-                        'architecture_order': ['conv', 'pool', 'conv', 'pool', 'conv', 'pool', 'fc', 'fc']}
+            # manually set first values
+            genome_1 = GO.write_genome((0.0003, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2]))
+            in_features_1 = None
+            
+            genome_2 = GO.write_genome((0.0003, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2]))
+            in_features_2 = None
+            
+            genome_3 = GO.write_genome((0.0003, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200,
+                                       [0, 1, 0, 1, 0, 1, 2, 2]))
+            in_features_3 = None
             
         else:
             assert results is not None
-            # use results to generate new genome
-            # asses viability, if fails, generate new one
+
+            # TODO: use results to generate new genome
+            genotype_1, in_feaures_1 = GO.generate_genotype(results)
+            genotype_2, in_feaures_2 = GO.generate_genotype(results)
+            genotype_3, in_feaures_3 = GO.generate_genotype(results)
+
+            genome_1 = GO.write_genome(genotype_1)
+            genome_2 = GO.write_genome(genotype_2)
+            genome_3 = GO.write_genome(genotype_3)
+
+            # TODO: make modular model architecture, almost done, in_features are missing
+
+            # TODO: make shorter version of training set -> make it balanced by default
+            # TODO: remove weighted loss adjustment
+            
+            
+            # TODO: make sure stop_at_collapse doesn't break things
+            # TODO: check eval_on=None
             pass
 
-        # TODO: construct models
         
         # run models
         pv1 = ProjectVariable(debug_mode)
         pv1 = apply_same_settings(pv1)
-        pv1 = apply_unique_settings(pv1)
+        pv1 = apply_unique_settings(pv1, genome_1)
+        pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
         pv2 = apply_same_settings(pv2)
-        pv2 = apply_unique_settings(pv2)
+        pv2 = apply_unique_settings(pv2, genome_2)
+        pv2.device = 1
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
-        pv3 = apply_unique_settings(pv3)
+        pv3 = apply_unique_settings(pv3, genome_3)
+        pv3.device = 2
 
         pool = Pool(processes=3)
         results = pool.map(main_file.run, [pv1, pv2, pv3])

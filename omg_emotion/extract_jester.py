@@ -470,5 +470,3 @@ def short_filelist():
             my_file.write(mod_line)
 
 # short_filelist()
-
-
