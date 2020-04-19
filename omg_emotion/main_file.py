@@ -80,7 +80,7 @@ def run(project_variable):
             project_variable.train = False
 
 
-    # HERE: data loading for 'val' and 'test'
+    # HERE: create the dali iterators
     if project_variable.use_dali:
         train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
         # train_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
@@ -92,15 +92,18 @@ def run(project_variable):
 
         if project_variable.val:
             print('Loading validation iterator...')
-            val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0)
+            val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0,
+                                              project_variable.dali_iterator_size[1], False)
         if project_variable.test:
             print('Loading test iterator...')
-            test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0)
+            test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0,
+                                               project_variable.dali_iterator_size[2], False)
         if not project_variable.inference_only_mode:
             print('Loading training iterator...')
             train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
                                                 project_variable.dali_workers,
-                                                project_variable.randomize_training_data, 6)
+                                                project_variable.randomize_training_data, 6,
+                                                project_variable.dali_iterator_size[0], True)
 
     else:
         data = D.load_data(project_variable, seed=None)

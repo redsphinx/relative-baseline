@@ -12,20 +12,13 @@ def run(project_variable, all_data, my_model, device):
     # all_data = [data, labels] shape = (n, 2)
     # device is string
 
-    if project_variable.use_dali:
-        # reset so that we evaluate on the same data
-        all_data.reset()
-
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
-        end_at = project_variable.data_points[2]
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):
-            if steps >= end_at:
-                break
 
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
@@ -103,6 +96,10 @@ def run(project_variable, all_data, my_model, device):
     # fig = VZ.plot_confusion_matrix(confusion_epoch, project_variable.dataset)
     # project_variable.writer.add_figure(tag='confusion/test', figure=fig, global_step=project_variable.current_epoch)
     TM.add_standard_info(project_variable, 'test', (loss, accuracy, confusion_epoch))
+
+    if project_variable.use_dali:
+            # reset so that we evaluate on the same data
+            all_data.reset()
 
     if project_variable.inference_in_batches[0]:
         return accuracy

@@ -142,9 +142,9 @@ def etes_conv3DTTN_jester():
     project_variable.batch_size = 5*27 # 10 * 27
 
     project_variable.use_dali = True
-    # if use_dali, these represent are the number of steps
-    project_variable.data_points = [5, 5, 5]
     project_variable.dali_workers = 8
+    # for now, use 'all' for val, since idk how to reset the iterator
+    project_variable.dali_iterator_size = [5*27, 'all', 0]
 
     # project_variable.stop_at_collapse = True
     # project_variable.early_stopping = True
@@ -154,8 +154,6 @@ def etes_conv3DTTN_jester():
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [6, 16]
     # project_variable.num_out_channels = [16, 32, 64, 128, 256]
-
-
 
     main_file.run(project_variable)
 

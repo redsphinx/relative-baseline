@@ -29,57 +29,55 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
 
     if project_variable.use_dali:
-        end_at = project_variable.data_points[0]
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):
-            if steps >= end_at:
-                break
+
+            print('\n'
+                  '\n'
+                  '\n'
+                  'STEP %d'
+                  '\n'
+                  '\n'
+                  '\n' % steps)
+            data = data_and_labels[0]['data']
+            labels = data_and_labels[0]['labels']
+
+            # transpose data
+            data = data.permute(0, 4, 1, 2, 3)
+            # convert to floattensor
+            data = data.type(torch.float32)
+            labels = labels.type(torch.long)
+            labels = labels.flatten()
+            labels = labels - 1
+
+            # TODO: check the label values
+            my_optimizer.zero_grad()
+
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                predictions = my_model(data, device)
             else:
-                print('\n'
-                      '\n'
-                      '\n'
-                      'STEP %d'
-                      '\n'
-                      '\n'
-                      '\n' % steps)
-                data = data_and_labels[0]['data']
-                labels = data_and_labels[0]['labels']
+                predictions = my_model(data)
 
-                # transpose data
-                data = data.permute(0, 4, 1, 2, 3)
-                # convert to floattensor
-                data = data.type(torch.float32)
-                labels = labels.type(torch.long)
-                labels = labels.flatten()
-                labels = labels - 1
+            loss = U.calculate_loss(project_variable, predictions, labels)
+            # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
+            loss.backward()
 
-                my_optimizer.zero_grad()
+            my_optimizer.step()
 
-                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
-                    predictions = my_model(data, device)
-                else:
-                    predictions = my_model(data)
+            if project_variable.use_clr:
+                clr_scheduler.step()
+                # print('CLR LR: ', clr_scheduler.get_lr())
 
-                loss = U.calculate_loss(project_variable, predictions, labels)
-                # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
-                loss.backward()
+            # my_optimizer.step()
 
-                my_optimizer.step()
+            accuracy = U.calculate_accuracy(predictions, labels)
+            confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
-                if project_variable.use_clr:
-                    clr_scheduler.step()
-                    # print('CLR LR: ', clr_scheduler.get_lr())
+            loss_epoch.append(float(loss))
+            accuracy_epoch.append(float(accuracy))
 
-                # my_optimizer.step()
-
-                accuracy = U.calculate_accuracy(predictions, labels)
-                confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
-
-                loss_epoch.append(float(loss))
-                accuracy_epoch.append(float(accuracy))
-
-                steps = steps + 1
+            steps = steps + 1
 
     else:
         assert steps is not None

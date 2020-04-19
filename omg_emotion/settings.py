@@ -57,10 +57,14 @@ class ProjectVariable(object):
         self._randomize_training_data = False
         self._balance_training_data = False
         self._same_training_data = False
-        # if use_dali, these represent are the number of steps
+        # if use_dali, these don't have any effect
+        # if use_dali, control the number of data using dali_iterator_size
         self._data_points = [100, 100, 100]  # [train, val, test]
         self._use_dali = False
         self._dali_workers = 4
+        # default is to use all of the data
+        # this controls the number of steps: steps = dali_iterator_size / batch_size
+        self._dali_iterator_size = ['all', 'all', 'all']
 
         # bool, which procedures to perform
         self._train = None
@@ -396,6 +400,14 @@ class ProjectVariable(object):
     @dali_workers.setter
     def dali_workers(self, value):
         self._dali_workers = value
+
+    @property
+    def dali_iterator_size(self):
+        return self._dali_iterator_size
+
+    @dali_iterator_size.setter
+    def dali_iterator_size(self, value):
+        self._dali_iterator_size = value
 
     @property
     def train(self):

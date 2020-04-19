@@ -1100,7 +1100,7 @@ class VideoPipe(Pipeline):
         return output, labels
 
 
-def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed):
+def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed, iterator_size, reset):
 
     pipe = VideoPipe(batch_size=batch_size,
                      file_list=file_list,
@@ -1111,7 +1111,12 @@ def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_see
                      )
     pipe.build()
 
-    dali_iter = DALIGenericIterator([pipe], ['data', 'labels'], pipe.epoch_size("Reader"), auto_reset=True,
+    if iterator_size == 'all':
+        it_size = pipe.epoch_size("Reader")
+    else:
+        it_size = iterator_size
+
+    dali_iter = DALIGenericIterator([pipe], ['data', 'labels'], size=it_size, auto_reset=reset,
                                     fill_last_batch=True, last_batch_padded=False)
 
     return dali_iter

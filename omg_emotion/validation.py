@@ -19,20 +19,13 @@ def run(project_variable, all_data, my_model, device):
     # all_data = [data, labels] shape = (n, 2)
     # device is string
 
-    if project_variable.use_dali:
-        # reset so that we evaluate on the same data
-        all_data.reset()
-
     loss_epoch, accuracy_epoch, confusion_epoch, nice_div, steps, full_labels, full_data = \
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
-        end_at = project_variable.data_points[1]
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):
-            if steps >= end_at:
-                break
 
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
@@ -45,6 +38,7 @@ def run(project_variable, all_data, my_model, device):
             labels = labels.flatten()
             labels = labels - 1
 
+            # TODO: to check how iterator reset works. Check the values of labels
             my_model.eval()
             with torch.no_grad():
                 # my_optimizer.zero_grad()
@@ -124,7 +118,7 @@ def run(project_variable, all_data, my_model, device):
     # which_datapoint = 1
 
     if project_variable.inference_only_mode:
-        # TODO: check if datapoint works
+
         TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))
         TM.add_histograms_srxy(project_variable, my_model)
         TM.add_text_srxy_per_channel(project_variable, my_model)
@@ -132,6 +126,10 @@ def run(project_variable, all_data, my_model, device):
         if project_variable.do_xai and project_variable.current_epoch in save_epochs:
 
             TM.add_xai(project_variable, my_model, device, data_point=data[which_datapoint].unsqueeze(0))
+
+    if project_variable.use_dali:
+            # reset so that we evaluate on the same data
+            all_data.reset()
 
     # project_variable.writer.add_scalar('loss/val', loss, project_variable.current_epoch)
     # project_variable.writer.add_scalar('accuracy/val', accuracy, project_variable.current_epoch)
