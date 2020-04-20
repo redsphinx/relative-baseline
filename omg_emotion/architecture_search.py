@@ -169,6 +169,15 @@ def apply_unique_settings(project_variable, genome):
 
 def evolutionary_search(debug_mode=True):
     generations = 100
+    genetic_search_path = os.path.join(PP.jester_location, 'genetic_search_log.txt')
+    if not os.path.exists(genetic_search_path):
+        # delimiter = ';'
+        with open(genetic_search_path, 'a') as my_file:
+            header = 'generation;exp_num;collapsed;val_acc;train_acc;' \
+                     'lr;num_conv_layers;num_channels;kernels;padding;conv_type;pooling_a_conv;' \
+                     'pooling_final;fc_layer;arch_order;in_features\n'
+            my_file.write(header)
+
     results = None
 
     genotype_1, genotype_2, genotype_3 = None, None, None
@@ -176,18 +185,18 @@ def evolutionary_search(debug_mode=True):
     for gen in range(generations):
         if gen == 0:
             # manually set first values
-            #               0   1   2       3       4       5       6  7  8    9
-            genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2])
             in_features_1 = None
-            genome_1 = GO.write_genome(genotype_1, in_features_1)
+            #               0   1   2       3       4       5       6  7  8    9
+            genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2], in_features_1)
+            genome_1 = GO.write_genome(genotype_1)
 
-            genotype_2 = (3e-4, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2])
             in_features_2 = None
-            genome_2 = GO.write_genome(genotype_2, in_features_2)
+            genotype_2 = (3e-4, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2], in_features_2)
+            genome_2 = GO.write_genome(genotype_2)
 
-            genotype_3 = (3e-4, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200, [0, 1, 0, 1, 0, 1, 2, 2])
             in_features_3 = None
-            genome_3 = GO.write_genome(genotype_3, in_features_3)
+            genotype_3 = (3e-4, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200, [0, 1, 0, 1, 0, 1, 2, 2], in_features_3)
+            genome_3 = GO.write_genome(genotype_3)
 
             
         else:
@@ -195,14 +204,14 @@ def evolutionary_search(debug_mode=True):
             # Note: padding and in_features and architecture are used to make the network dimensions work,
             # they get calculated after the generation of the new genotype
 
-            # TODO: use results to generate new genome
-            new_genotype_1, in_features_1 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
-            new_genotype_2, in_features_2 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
-            new_genotype_3, in_features_3 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            # FIX: that keys need to be 1 2 3
+            new_genotypes= GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
-            genome_1 = GO.write_genome(new_genotype_1, in_features_1)
-            genome_2 = GO.write_genome(new_genotype_2, in_features_2)
-            genome_3 = GO.write_genome(new_genotype_3, in_features_3)
+            new_genotype_1, new_genotype_2, new_genotype_3 = new_genotypes
+
+            genome_1 = GO.write_genome(new_genotype_1)
+            genome_2 = GO.write_genome(new_genotype_2)
+            genome_3 = GO.write_genome(new_genotype_3)
 
             # TODO: make sure stop_at_collapse doesn't break things
             # TODO: check eval_on='val'
@@ -214,17 +223,19 @@ def evolutionary_search(debug_mode=True):
         pv1 = ProjectVariable(debug_mode)
         pv1 = apply_same_settings(pv1)
         pv1 = apply_unique_settings(pv1, genome_1)
-        pv1.experiment_number =
+        pv1.experiment_number = # TODO
         pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
         pv2 = apply_same_settings(pv2)
         pv2 = apply_unique_settings(pv2, genome_2)
+        pv2.experiment_number =  # TODO
         pv2.device = 1
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
         pv3 = apply_unique_settings(pv3, genome_3)
+        pv3.experiment_number =  # TODO
         pv3.device = 2
 
         pool = Pool(processes=3)
@@ -232,15 +243,28 @@ def evolutionary_search(debug_mode=True):
         col, val, train = results
         # col contains 1 and 0
 
-
         pool.join()
         pool.close()
 
         genotype_1 = new_genotype_1
 
-        # TODO: write the results to some file
-        
 
-        pass
+        for k in col.keys():
+            # keys are 1, 2, 3
+            if k == 1:
+                pv = pv1
+            elif k == 2:
+                pv = pv2
+            else:
+                pv = pv3
+
+            line = '%d;%d;%s;%f;%f;%f;%d;%s;%s;%s;%s;%d;%d;%d;%s;%d\n' % \
+                   (gen, pv.experiment_number, str(col[k]), val[k], train[k], pv.learning_rate, pv.genome['num_conv_layers'], 
+                    str(pv.num_out_channels), str(pv.genome['kernel_size_per_layer']), str(pv.genome['padding']), 
+                    str(pv.genome['conv_layer_type']), pv.genome['pooling_after_conv'], pv.genome['pooling_final'], 
+                    pv.genome['fc_layer'], str(pv.genome['architecture_order']), pv.genome['in_features'])
+            
+            with open(genetic_search_path, 'a') as my_file:
+                my_file.write(line)
         
 
