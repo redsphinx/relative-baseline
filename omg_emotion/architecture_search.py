@@ -176,6 +176,7 @@ def evolutionary_search(debug_mode=True):
     for gen in range(generations):
         if gen == 0:
             # manually set first values
+            #               0   1   2       3       4       5       6  7  8    9
             genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2])
             in_features_1 = None
             genome_1 = GO.write_genome(genotype_1, in_features_1)
@@ -191,17 +192,17 @@ def evolutionary_search(debug_mode=True):
             
         else:
             assert results is not None
-            # Note: padding and in_features are used to make the network dimensions work, they get calculated after the
-            # generation of the new genotype
+            # Note: padding and in_features and architecture are used to make the network dimensions work,
+            # they get calculated after the generation of the new genotype
 
             # TODO: use results to generate new genome
-            genotype_1, in_features_1 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
-            genotype_2, in_features_2 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
-            genotype_3, in_features_3 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            new_genotype_1, in_features_1 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            new_genotype_2, in_features_2 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            new_genotype_3, in_features_3 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
-            genome_1 = GO.write_genome(genotype_1, in_features_1)
-            genome_2 = GO.write_genome(genotype_2, in_features_2)
-            genome_3 = GO.write_genome(genotype_3, in_features_3)
+            genome_1 = GO.write_genome(new_genotype_1, in_features_1)
+            genome_2 = GO.write_genome(new_genotype_2, in_features_2)
+            genome_3 = GO.write_genome(new_genotype_3, in_features_3)
 
             # TODO: make sure stop_at_collapse doesn't break things
             # TODO: check eval_on='val'
@@ -229,9 +230,13 @@ def evolutionary_search(debug_mode=True):
         pool = Pool(processes=3)
         results = pool.map(main_file.run, [pv1, pv2, pv3])
         col, val, train = results
+        # col contains 1 and 0
+
 
         pool.join()
         pool.close()
+
+        genotype_1 = new_genotype_1
 
         # TODO: write the results to some file
         

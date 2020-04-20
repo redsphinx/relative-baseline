@@ -25,6 +25,7 @@ PROBABILITY_DICT_L2 = {'lr': 0,
                        'fc_layer': 0.1,
                        'architecture_order': 0
                        }
+EXCEPTION_IND = [4, 8, 9]
 
 # example:
 # lr=0.0003, num_conv=2, num_chan=[6, 16], kernels=[5, 5], layer_type=[0, 0], pooling_conv=0, pooling_final=1,
@@ -67,7 +68,7 @@ def fitness_function(results_collapsed, results_val, results_train):
 
     for i in results_collapsed.keys():
         score = 0
-        if not results_collapsed[i]:
+        if int(results_collapsed[i]) == 0:
             score = score + 100
 
         if results_val[i] > 1/27:
@@ -93,12 +94,49 @@ def fitness_function(results_collapsed, results_val, results_train):
     return score_dict
 
 
-def crossover(results, fitness, prev_genotypes):
+def crossover(results_collapsed, fitness, prev_genotypes):
     # if there are 2 or more individuals in the population who did not collapse, copy what they have in common
+    new_genotype = [None] * 11
+    crossover_ind = []
 
-    
-    return genotype
+    col_arr = np.array(list(results_collapsed.items()), dtype=int)
+    if sum(col_arr[:, 1]) <= 1:
+        # copy parts that are same, if any
+        genos = []
+        for i in results_collapsed.keys():
+            if results_collapsed[i] == '0':
+                # get the genotype
+                genos.append(prev_genotypes[i])
 
+        # of them did not collapse
+        if len(genos) == 2:
+            for i in range(len(genos[0])):
+                if i not in EXCEPTION_IND:
+                    if genos[0][i] == genos[1][i]:
+                        new_genotype[i] = genos[0][i]
+                        crossover_ind.append(i)
+
+        # all of them did not collapse
+        else:
+            for i in range(len(genos[0])):
+                if i not in EXCEPTION_IND:
+                    if genos[0][i] == genos[1][i] == genos[2][i]:
+                        new_genotype[i] = genos[0][i]
+                        crossover_ind.append(i)
+                    elif genos[0][i] == genos[1][i]:
+                        new_genotype[i] = genos[0][i]
+                        crossover_ind.append(i)
+                    elif genos[1][i] == genos[2][i]:
+                        new_genotype[i] = genos[1][i]
+                        crossover_ind.append(i)
+                    elif genos[0][i] == genos[2][i]:
+                        new_genotype[i] = genos[0][i]
+                        crossover_ind.append(i)
+
+    return new_genotype, crossover_ind
+
+
+def mutation(genotype, crossover_ind):
 
 
 
@@ -122,9 +160,9 @@ def generate_genotype(results, prev_genotypes):
     # fitness is a dictionary containing fitness score per model, sorted by best model first
     # it checks the has_collapsed, train_acc and val_acc variables
 
-    genotype = crossover(results, fitness, prev_genotypes)
+    genotype, crossover_ind = crossover(results[0], fitness, prev_genotypes)
 
-    genotype = mutation(genotype)
+    genotype = mutation(genotype, crossover_ind)
 
     while not viable:
         viable, in_features = assess_genotype_viability(genotype)
