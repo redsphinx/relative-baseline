@@ -55,12 +55,14 @@ def correct_names(list_of_names):
 
 class ModularConv(torch.nn.Module):
 
-    def __init__(self, settings, projecty_variable):
+    def __init__(self, project_variable):
         super(ModularConv, self).__init__()
+
+        settings = project_variable.genome
 
         self.conv_layers = {}
         for i in range(settings['num_conv_layers']):
-            conv = make_conv_layer(project_variable=projecty_variable,
+            conv = make_conv_layer(project_variable=project_variable,
                                    which_layer=i+1,
                                    k=settings['kernel_size_per_layer'][i],
                                    p=settings['padding'][i],
@@ -77,11 +79,10 @@ class ModularConv(torch.nn.Module):
             pool = make_pool_layer(last, settings['pooling_after_conv'], settings['pooling_final'])
             self.pool_layers['pool%d' % (i+1)] = pool
 
-        # TODO: calculate in features
-        in_features = None
+        in_features = settings['in_features']
 
         self.fc_layers = {'fc1': torch.nn.Linear(in_features, settings['fc_layer']),
-                          'fc2': torch.nn.Linear(settings['fc_layer'], projecty_variable.label_size)}
+                          'fc2': torch.nn.Linear(settings['fc_layer'], project_variable.label_size)}
 
 
     def forward(self, x, device, settings):

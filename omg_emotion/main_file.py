@@ -8,7 +8,6 @@ from relative_baseline.omg_emotion import utils as U
 # from relative_baseline.omg_emotion import visualization as V
 from relative_baseline.omg_emotion import sheets as S
 
-
 import os
 import time
 import numpy as np
@@ -17,10 +16,9 @@ from tensorboardX import SummaryWriter
 import shutil
 import math
 
+
 # temporary for debugging
 # from .settings import ProjectVariable
-
-
 
 
 def run(project_variable):
@@ -41,7 +39,7 @@ def run(project_variable):
             ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
         elif project_variable.experiment_state == 'extra':
             project_variable.at_which_run = 1 + U.experiment_exists(project_variable.experiment_number,
-                                                                project_variable.model_number)
+                                                                    project_variable.model_number)
             project_variable.repeat_experiments += project_variable.at_which_run
             ROW = S.get_specific_row(project_variable.experiment_number, project_variable.sheet_number)
 
@@ -81,16 +79,16 @@ def run(project_variable):
         else:
             project_variable.train = False
 
-
     # create the dali iterators
     if project_variable.use_dali:
-        train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
-        # train_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
-
-        val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
-        # val_file_list = os.path.join(PP.jester_location, 'filelist_val_TEST.txt')
-
-        test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
+        if project_variable.nas:
+            train_file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
+            val_file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
+            test_file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
+        else:
+            train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
+            val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
+            test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
 
         if project_variable.val:
             print('Loading validation iterator...')
@@ -152,7 +150,7 @@ def run(project_variable):
                     if project_variable.train:
                         data_train = D.get_data('train', data)
                         labels_train = D.get_labels('train', data)
-                    
+
         print('-------------------------------------------------------\n\n'
               'RUN: %d / %d\n\n'
               '-------------------------------------------------------'
@@ -193,7 +191,8 @@ def run(project_variable):
         else:
             my_optimizer = setup.get_optimizer(project_variable, my_model)
 
-        print('Loaded model number %d with %d trainable parameters' % (project_variable.model_number, U.count_parameters(my_model)))
+        print('Loaded model number %d with %d trainable parameters' % (
+        project_variable.model_number, U.count_parameters(my_model)))
 
         if not project_variable.debug_mode:
             if num_runs == 0:
@@ -233,7 +232,8 @@ def run(project_variable):
 
         # keeping track of validation accuracy for early stopping
         check_every_num_epoch = 10
-        checking_at_epochs = [9 + (i * check_every_num_epoch) for i in range(project_variable.end_epoch // check_every_num_epoch)]
+        checking_at_epochs = [9 + (i * check_every_num_epoch) for i in
+                              range(project_variable.end_epoch // check_every_num_epoch)]
         checking_at_epochs = [0] + checking_at_epochs
         val_acc_tracker = 0
         val_loss_tracker = math.inf
@@ -241,7 +241,7 @@ def run(project_variable):
         # variable depending on settings 'stop_at_collapse=True' and/or 'early_stopping=True'
         stop_experiment = False
 
-        for e in range(project_variable.start_epoch+1, project_variable.end_epoch):
+        for e in range(project_variable.start_epoch + 1, project_variable.end_epoch):
             if stop_experiment:
                 break
 
@@ -285,7 +285,7 @@ def run(project_variable):
                     w = None
                     if project_variable.model_number == 0:
                         w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-                    elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                    elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
                         w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
                                       0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
                                       0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
@@ -316,7 +316,8 @@ def run(project_variable):
                         my_model.train()
 
                     if project_variable.nas or project_variable.stop_at_collapse:
-                        train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data, my_model, my_optimizer, device)
+                        train_accuracy, (has_collapsed, collapsed_matrix) = training.run(project_variable, data,
+                                                                                         my_model, my_optimizer, device)
                     else:
                         train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
                 # ------------------------------------------------------------------------------------------------
@@ -336,8 +337,8 @@ def run(project_variable):
                 if project_variable.val:
                     w = None
                     if project_variable.model_number == 0:
-                        w = np.array([481]*7) / np.array([51, 34, 17, 156, 141, 75, 7])
-                    elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                        w = np.array([481] * 7) / np.array([51, 34, 17, 156, 141, 75, 7])
+                    elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
                         w = np.array([0.03913151, 0.03897372, 0.03606524, 0.03929058, 0.03464331, 0.0377558,
                                       0.03945095, 0.03913151, 0.03593117, 0.03593117, 0.03835509, 0.04044135,
                                       0.03731847, 0.0370325, 0.04931369, 0.04646867, 0.0354047, 0.03760889,
@@ -347,7 +348,6 @@ def run(project_variable):
                         w = w.astype(dtype=np.float32)
                         w = torch.from_numpy(w).cuda(device)
                         project_variable.loss_weights = w
-
 
                     if project_variable.use_dali:
                         data = val_iter
@@ -373,8 +373,8 @@ def run(project_variable):
                     if project_variable.test:
                         w = None
                         if project_variable.model_number == 0:
-                            w = np.array([ 1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-                        elif project_variable.dataset == 'jester' and project_variable.use_dali:
+                            w = np.array([1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
+                        elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
                             w = np.array([0.03897281, 0.04044657, 0.03819954, 0.03674154, 0.03716712, 0.0356529,
                                           0.03513242, 0.03578544, 0.03674154, 0.03804855, 0.03450281, 0.03437958,
                                           0.03674154, 0.0414926, 0.05093271, 0.05039939, 0.03804855, 0.03578544,
@@ -421,7 +421,8 @@ def run(project_variable):
                                           'THETA LEARNING RATE REDUCED: from %s to %s\n'
                                           '--------------------------------------------------------------------------'
                                           % (str(project_variable.theta_learning_rate),
-                                             str(project_variable.theta_learning_rate / project_variable.reduction_factor)))
+                                             str(
+                                                 project_variable.theta_learning_rate / project_variable.reduction_factor)))
 
                                     project_variable.theta_learning_rate /= project_variable.reduction_factor
 
@@ -463,7 +464,7 @@ def run(project_variable):
         project_variable.writer.close()
         project_variable.learning_rate = START_LR  # reset the learning rate
         if project_variable.theta_learning_rate is not None:
-            project_variable.theta_learning_rate = START_LR_THETA # reset theta learning rate
+            project_variable.theta_learning_rate = START_LR_THETA  # reset theta learning rate
 
     if not project_variable.debug_mode:
         # acc, std, best_run = U.experiment_runs_statistics(project_variable.experiment_number, project_variable.model_number)
@@ -480,11 +481,9 @@ def run(project_variable):
         if project_variable.save_only_best_run:
             U.delete_runs(project_variable, best_run)
 
-
     print('\n\n\n END OF EXPERIMENT %d \n\n\n' % (project_variable.experiment_number))
 
     return (project_variable.experiment_number, train_accuracy, val_accuracy)
-
 
     # if project_variable.stop_at_collapse and project_variable.early_stopping:
     #     return train_accuracy, val_accuracy, has_collapsed, collapsed_matrix, val_loss
@@ -505,8 +504,10 @@ def run_test_batch(project_variable):
     if not project_variable.debug_mode:
         if project_variable.experiment_state == 'new':
             project_variable.experiment_number = [experiment_number_start,
-                                                  experiment_number_start+project_variable.inference_in_batches[1]-1]
-            project_variable.load_model = [project_variable.inference_in_batches[2], project_variable.inference_in_batches[3]]
+                                                  experiment_number_start + project_variable.inference_in_batches[
+                                                      1] - 1]
+            project_variable.load_model = [project_variable.inference_in_batches[2],
+                                           project_variable.inference_in_batches[3]]
             ROW = S.write_settings(project_variable)
 
     project_variable.test = True
@@ -516,10 +517,9 @@ def run_test_batch(project_variable):
     project_variable.current_epoch = 0
 
     data = D.load_data(project_variable, seed=None)
-    data_test= D.get_data('test', data)
-    labels_test= D.get_labels('test', data)
+    data_test = D.get_data('test', data)
+    labels_test = D.get_labels('test', data)
     device = setup.get_device(project_variable)
-
 
     for _i in range(project_variable.inference_in_batches[1]):
         project_variable.experiment_number = experiment_number_start + _i

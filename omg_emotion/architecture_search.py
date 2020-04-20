@@ -123,7 +123,6 @@ def auto_search(lr_size, epochs, repeat_run, model_number, conv_layer_channels, 
 
 def apply_same_settings(project_variable):
     project_variable.nas = True
-    project_variable.eval_on = None
 
     project_variable.model_number = 16
     project_variable.sheet_number = 23
@@ -131,7 +130,6 @@ def apply_same_settings(project_variable):
     project_variable.end_epoch = 20
     project_variable.dataset = 'jester'
 
-    # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
     project_variable.num_in_channels = 3
     project_variable.label_size = 27
     project_variable.batch_size = 5 * 27
@@ -150,11 +148,14 @@ def apply_same_settings(project_variable):
 
     project_variable.use_dali = True
     project_variable.dali_workers = 8
-    project_variable.dali_iterator_size = [1000 * 27, 0, 0]
+    project_variable.dali_iterator_size = [np.inf, np.inf, 0]
 
     project_variable.stop_at_collapse = True
     project_variable.experiment_state = 'new'
     project_variable.optimizer = 'adam'
+    project_variable.use_adaptive_lr = True
+    project_variable.adapt_eval_on = 'val'
+    project_variable.eval_on = 'val'
 
     return project_variable
 
@@ -162,6 +163,7 @@ def apply_same_settings(project_variable):
 def apply_unique_settings(project_variable, genome):
     project_variable.learning_rate = genome['lr']
     project_variable.num_out_channels = genome['num_channels']
+    project_variable.genome = genome
     return project_variable
     
 
@@ -169,39 +171,41 @@ def evolutionary_search(debug_mode=True):
     generations = 100
     results = None
 
+    genotype_1, genotype_2, genotype_3 = None, None, None
+
     for gen in range(generations):
         if gen == 0:
             # manually set first values
-            genome_1 = GO.write_genome((0.0003, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2]))
+            genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2])
             in_features_1 = None
-            
-            genome_2 = GO.write_genome((0.0003, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2]))
+            genome_1 = GO.write_genome(genotype_1, in_features_1)
+
+            genotype_2 = (3e-4, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2])
             in_features_2 = None
-            
-            genome_3 = GO.write_genome((0.0003, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200,
-                                       [0, 1, 0, 1, 0, 1, 2, 2]))
+            genome_2 = GO.write_genome(genotype_2, in_features_2)
+
+            genotype_3 = (3e-4, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200, [0, 1, 0, 1, 0, 1, 2, 2])
             in_features_3 = None
+            genome_3 = GO.write_genome(genotype_3, in_features_3)
+
             
         else:
             assert results is not None
+            # Note: padding and in_features are used to make the network dimensions work, they get calculated after the
+            # generation of the new genotype
 
             # TODO: use results to generate new genome
-            genotype_1, in_feaures_1 = GO.generate_genotype(results)
-            genotype_2, in_feaures_2 = GO.generate_genotype(results)
-            genotype_3, in_feaures_3 = GO.generate_genotype(results)
+            genotype_1, in_features_1 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            genotype_2, in_features_2 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
+            genotype_3, in_features_3 = GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
-            genome_1 = GO.write_genome(genotype_1)
-            genome_2 = GO.write_genome(genotype_2)
-            genome_3 = GO.write_genome(genotype_3)
+            genome_1 = GO.write_genome(genotype_1, in_features_1)
+            genome_2 = GO.write_genome(genotype_2, in_features_2)
+            genome_3 = GO.write_genome(genotype_3, in_features_3)
 
-            # TODO: make modular model architecture, almost done, in_features are missing
-
-            # TODO: make shorter version of training set -> make it balanced by default
-            # TODO: remove weighted loss adjustment
-            
-            
             # TODO: make sure stop_at_collapse doesn't break things
-            # TODO: check eval_on=None
+            # TODO: check eval_on='val'
+            # TODO: figure out how to load a model
             pass
 
         
@@ -209,6 +213,7 @@ def evolutionary_search(debug_mode=True):
         pv1 = ProjectVariable(debug_mode)
         pv1 = apply_same_settings(pv1)
         pv1 = apply_unique_settings(pv1, genome_1)
+        pv1.experiment_number =
         pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
@@ -223,6 +228,7 @@ def evolutionary_search(debug_mode=True):
 
         pool = Pool(processes=3)
         results = pool.map(main_file.run, [pv1, pv2, pv3])
+        col, val, train = results
 
         pool.join()
         pool.close()

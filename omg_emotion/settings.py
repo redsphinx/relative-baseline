@@ -219,6 +219,8 @@ class ProjectVariable(object):
         self.stop_at_collapse = False
         # stop when validation accuracy is going down + validation loss is going up
         self.early_stopping = False
+        # for GA in NAS
+        self.genome = None
 
         
 
@@ -858,4 +860,12 @@ class ProjectVariable(object):
     @early_stopping.setter
     def early_stopping(self, value):
         self._early_stopping = value
+
+    @property
+    def genome(self):
+        return self._genome
+
+    @genome.setter
+    def genome(self, value):
+        self._genome = value
         
