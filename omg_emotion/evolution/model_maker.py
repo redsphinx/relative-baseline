@@ -70,6 +70,7 @@ class ModularConv(torch.nn.Module):
             self.conv_layers['conv%d' % (i+1)] = conv
 
         self.pool_layers = {}
+
         num_pooling_layers = settings['architecture_order'].count('pool')
         for i in range(num_pooling_layers):
             last = False

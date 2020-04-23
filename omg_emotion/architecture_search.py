@@ -186,7 +186,7 @@ def evolutionary_search(debug_mode=True):
         if gen == 0:
             # manually set first values
             in_features_1 = None
-            #               0   1   2       3       4       5       6  7  8    9
+            #               0   1   2       3       4       5       6  7  8    9                    10
             genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2], in_features_1)
             genome_1 = GO.write_genome(genotype_1)
 
@@ -215,27 +215,25 @@ def evolutionary_search(debug_mode=True):
 
             # TODO: make sure stop_at_collapse doesn't break things
             # TODO: check eval_on='val'
-            # TODO: figure out how to load a model
-            pass
 
         
         # run models
         pv1 = ProjectVariable(debug_mode)
         pv1 = apply_same_settings(pv1)
         pv1 = apply_unique_settings(pv1, genome_1)
-        pv1.experiment_number = # TODO
+        pv1.experiment_number = 10001# TODO
         pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
         pv2 = apply_same_settings(pv2)
         pv2 = apply_unique_settings(pv2, genome_2)
-        pv2.experiment_number =  # TODO
+        pv2.experiment_number = 10002 # TODO
         pv2.device = 1
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
         pv3 = apply_unique_settings(pv3, genome_3)
-        pv3.experiment_number =  # TODO
+        pv3.experiment_number = 10003 # TODO
         pv3.device = 2
 
         pool = Pool(processes=3)
@@ -247,6 +245,8 @@ def evolutionary_search(debug_mode=True):
         pool.close()
 
         genotype_1 = new_genotype_1
+        genotype_2 = new_genotype_2
+        genotype_3 = new_genotype_3
 
 
         for k in col.keys():
