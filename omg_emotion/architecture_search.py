@@ -127,12 +127,14 @@ def apply_same_settings(project_variable):
     project_variable.model_number = 16
     project_variable.sheet_number = 23
 
-    project_variable.end_epoch = 20
+    # project_variable.end_epoch = 20
+    project_variable.end_epoch = 3
     project_variable.dataset = 'jester'
 
     project_variable.num_in_channels = 3
     project_variable.label_size = 27
-    project_variable.batch_size = 5 * 27
+    # project_variable.batch_size = 5 * 27
+    project_variable.batch_size = 27
     project_variable.load_num_frames = 30
     project_variable.label_type = 'categories'
 
@@ -148,7 +150,7 @@ def apply_same_settings(project_variable):
 
     project_variable.use_dali = True
     project_variable.dali_workers = 8
-    project_variable.dali_iterator_size = [np.inf, np.inf, 0]
+    project_variable.dali_iterator_size = [27, 27, 0]
 
     project_variable.stop_at_collapse = True
     project_variable.experiment_state = 'new'
@@ -185,17 +187,17 @@ def evolutionary_search(debug_mode=True):
     for gen in range(generations):
         if gen == 0:
             # manually set first values
-            in_features_1 = None
-            #               0   1   2       3       4       5       6  7  8    9                    10
-            genotype_1 = (3e-4, 2, [6, 16], [5, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2], in_features_1)
+            in_features_1 = 540
+            #               0   1   2        3        4       5      6  7  8    9                    10
+            genotype_1 = (3e-4, 2, [12, 18], [5, 5], [0, 0], [0, 0], 0, 1, 600, [0, 1, 0, 1, 2, 2], in_features_1)
             genome_1 = GO.write_genome(genotype_1)
 
-            in_features_2 = None
-            genotype_2 = (3e-4, 2, [6, 16], [3, 5], [2, 0], [0, 0], 0, 1, 120, [0, 1, 0, 1, 2, 2], in_features_2)
+            in_features_2 = 336
+            genotype_2 = (3e-4, 3, [16, 32, 32], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 496, [0, 1, 0, 0, 1, 2, 2], in_features_2)
             genome_2 = GO.write_genome(genotype_2)
 
-            in_features_3 = None
-            genotype_3 = (3e-4, 3, [6, 16, 32], [3, 5, 5], [2, 0, 0], [0, 0, 0], 0, 1, 200, [0, 1, 0, 1, 0, 1, 2, 2], in_features_3)
+            in_features_3 = 182
+            genotype_3 = (3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
             genome_3 = GO.write_genome(genotype_3)
 
             
@@ -207,11 +209,11 @@ def evolutionary_search(debug_mode=True):
             # FIX: that keys need to be 1 2 3
             new_genotypes= GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
-            new_genotype_1, new_genotype_2, new_genotype_3 = new_genotypes
+            genotype_1, genotype_2, genotype_3 = new_genotypes
 
-            genome_1 = GO.write_genome(new_genotype_1)
-            genome_2 = GO.write_genome(new_genotype_2)
-            genome_3 = GO.write_genome(new_genotype_3)
+            genome_1 = GO.write_genome(genotype_1)
+            genome_2 = GO.write_genome(genotype_2)
+            genome_3 = GO.write_genome(genotype_3)
 
             # TODO: make sure stop_at_collapse doesn't break things
             # TODO: check eval_on='val'
@@ -228,7 +230,7 @@ def evolutionary_search(debug_mode=True):
         pv2 = apply_same_settings(pv2)
         pv2 = apply_unique_settings(pv2, genome_2)
         pv2.experiment_number = 10002 # TODO
-        pv2.device = 1
+        pv2.device = 2
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
@@ -238,16 +240,13 @@ def evolutionary_search(debug_mode=True):
 
         pool = Pool(processes=3)
         results = pool.map(main_file.run, [pv1, pv2, pv3])
+        # results =
+
         col, val, train = results
         # col contains 1 and 0
 
         pool.join()
         pool.close()
-
-        genotype_1 = new_genotype_1
-        genotype_2 = new_genotype_2
-        genotype_3 = new_genotype_3
-
 
         for k in col.keys():
             # keys are 1, 2, 3
@@ -268,3 +267,4 @@ def evolutionary_search(debug_mode=True):
                 my_file.write(line)
         
 
+evolutionary_search()

@@ -245,6 +245,9 @@ def mutate_by_unit(genotype, value_index, param, direction):
         value = genotype[value_index]
 
     elif param == 'conv_layer_type':
+        if len(genotype[value_index]) != genotype[1]:
+            genotype[value_index].append(genotype[value_index][-1])
+
         value = genotype[value_index]
     elif param == 'pooling_after_conv':
         value = abs(genotype[value_index] - 1)
