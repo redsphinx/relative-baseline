@@ -128,16 +128,14 @@ def crossover(results_collapsed, fitness, prev_genotypes):
     # if only 1 or less collapsed
     if sum(col_arr[:, 1]) <= 1:
         # copy parts that are same, if any
-        # TODO: debug this
         genos = []
         for i in results_collapsed.keys():
-            if results_collapsed[i] == '0':
+            if results_collapsed[i] == 0:
                 # get the genotype
-                genos.append(prev_genotypes[i])
+                genos.append(prev_genotypes[int(i)-1]) # -1 , keys start at 1
 
         # 2 of them did not collapse
         if len(genos) == 2:
-            # TODO: debug this
             for i in range(LEN_GENOTYPE):
                 if i not in EXCEPTION_IND:
                     if genos[0][i] == genos[1][i]:
@@ -146,7 +144,6 @@ def crossover(results_collapsed, fitness, prev_genotypes):
 
         # all of them did not collapse
         else:
-            # TODO: debug this
             for i in range(LEN_GENOTYPE):
                 if i not in EXCEPTION_IND:
                     if genos[0][i] == genos[1][i] == genos[2][i]:
@@ -163,10 +160,9 @@ def crossover(results_collapsed, fitness, prev_genotypes):
                         crossover_ind.append(i)
 
         # for the indices that are still None, copy the value of the best individual
-        # TODO: debug this
         for i in range(LEN_GENOTYPE):
             if i not in crossover_ind and i not in EXCEPTION_IND:
-                new_genotype[i] = prev_genotypes[int(most_fit)][i]
+                new_genotype[i] = prev_genotypes[int(most_fit)-1][i]
     # if all collapsed
     else:
         for i in range(LEN_GENOTYPE):
@@ -300,10 +296,8 @@ def mutate_by_unit(genotype, value_index, param, direction):
 
 
     elif param == 'pooling_after_conv':
-        # TODO: debug this
         value = abs(value - 1)
     elif param == 'pooling_final':
-        # TODO: debug this
         value = abs(value - 1)
     elif param == 'fc_layer':
         unit = 128
@@ -471,7 +465,6 @@ def calculate_in_features(genotype):
         if t <= 0:
             # start padding the beginning. add padding to the next layer if it is not sufficient.
             # if padding of 1 is reached in all layers, start again at the beginning.
-            # TODO: debug this
             padding[loc_start_pad] = padding[loc_start_pad] + 1
             # where_padding_added[loc_start_pad] = where_padding_added[loc_start_pad] + 1
             loc_start_pad = loc_start_pad + 1

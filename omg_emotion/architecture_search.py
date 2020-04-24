@@ -217,8 +217,6 @@ def evolutionary_search(debug_mode=True):
             
         else:
             assert results is not None
-            # Note: padding and in_features and architecture are used to make the network dimensions work,
-            # they get calculated after the generation of the new genotype
 
             new_genotypes= GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
@@ -245,7 +243,7 @@ def evolutionary_search(debug_mode=True):
         pv2 = apply_unique_settings(pv2, genome_2)
         pv2.experiment_number = 10002 # TODO
         pv2.individual_number = 2
-        pv2.device = 2
+        pv2.device = 1
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
@@ -254,15 +252,19 @@ def evolutionary_search(debug_mode=True):
         pv3.individual_number = 3
         pv3.device = 2
 
-        # pool = Pool(processes=3)
-        # results = pool.map(main_file.run, [pv1, pv2, pv3])
-        results = [(1, True, 0.0, 0.0), (2, True, 0.0, 0.037037037037037035), (3, True, 0.0, 0.07407407407407407)]
+        pool = Pool(processes=3)
+        results = pool.map(main_file.run, [pv1, pv2, pv3])
+
+        # results = [(1, False, 0.0, 0.0),
+        #            (2, False, 0.0, 0.037037037037037035),
+        #            (3, False, 0.0, 0.07407407407407407)]
+
         col, val, train = process_results(results)
         results = col, val, train
         # col contains 1 and 0, NO, it contains bools
 
-        # pool.join()
-        # pool.close()
+        pool.join()
+        pool.close()
 
         for k in col.keys():
             # keys are 1, 2, 3
