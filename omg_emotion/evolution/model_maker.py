@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch.nn.functional import conv3d
+from torch.nn import ModuleDict
 
 from relative_baseline.omg_emotion.convttn3d import ConvTTN3d
 
@@ -60,7 +61,7 @@ class ModularConv(torch.nn.Module):
 
         settings = project_variable.genome
 
-        self.conv_layers = {}
+        self.conv_layers = ModuleDict({})
         for i in range(settings['num_conv_layers']):
             conv = make_conv_layer(project_variable=project_variable,
                                    which_layer=i+1,
@@ -69,7 +70,7 @@ class ModularConv(torch.nn.Module):
                                    conv_type=settings['conv_layer_type'][i])
             self.conv_layers['conv%d' % (i+1)] = conv
 
-        self.pool_layers = {}
+        self.pool_layers = ModuleDict({})
 
         num_pooling_layers = settings['architecture_order'].count('pool')
         for i in range(num_pooling_layers):
@@ -80,10 +81,10 @@ class ModularConv(torch.nn.Module):
             pool = make_pool_layer(last, settings['pooling_after_conv'], settings['pooling_final'])
             self.pool_layers['pool%d' % (i+1)] = pool
 
-        in_features = settings['in_features']
+        in_features = settings['in_features'] * project_variable.num_out_channels[-1]
 
-        self.fc_layers = {'fc1': torch.nn.Linear(in_features, settings['fc_layer']),
-                          'fc2': torch.nn.Linear(settings['fc_layer'], project_variable.label_size)}
+        self.fc_layers = ModuleDict({'fc1': torch.nn.Linear(in_features, settings['fc_layer']),
+                                     'fc2': torch.nn.Linear(settings['fc_layer'], project_variable.label_size)})
 
 
     def forward(self, x, device, settings):
@@ -101,8 +102,12 @@ class ModularConv(torch.nn.Module):
                 x = self.pool_layers[names_architecture[i]](x)
 
             elif l == 'fc':
-                x = self.fc_layers[names_architecture[i]](x)
-                if [names_architecture[i]] == 'fc1':
+                if names_architecture[i] == 'fc1':
+                    _shape = x.shape
+                    x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+                    x = self.fc_layers[names_architecture[i]](x)
                     x = torch.nn.functional.relu(x)
+                else:
+                    x = self.fc_layers[names_architecture[i]](x)
 
         return x

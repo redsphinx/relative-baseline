@@ -221,6 +221,8 @@ class ProjectVariable(object):
         self.early_stopping = False
         # for GA in NAS
         self.genome = None
+        # to identify which individual it is in the population
+        self._individual_number = None
 
         
 
@@ -868,4 +870,11 @@ class ProjectVariable(object):
     @genome.setter
     def genome(self, value):
         self._genome = value
-        
+
+    @property
+    def individual_number(self):
+        return self._individual_number
+
+    @individual_number.setter
+    def individual_number(self, value):
+        self._individual_number = value

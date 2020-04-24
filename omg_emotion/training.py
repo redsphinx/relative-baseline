@@ -54,8 +54,10 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             # TODO: check the label values
             my_optimizer.zero_grad()
 
-            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15]:
                 predictions = my_model(data, device)
+            elif project_variable.model_number in [16]:
+                predictions = my_model(data, device, project_variable.genome)
             else:
                 predictions = my_model(data)
 

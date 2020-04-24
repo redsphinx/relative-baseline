@@ -150,6 +150,7 @@ def apply_same_settings(project_variable):
 
     project_variable.use_dali = True
     project_variable.dali_workers = 8
+    # project_variable.dali_iterator_size = ['all', 'all', 0]
     project_variable.dali_iterator_size = [27, 27, 0]
 
     project_variable.stop_at_collapse = True
@@ -167,7 +168,20 @@ def apply_unique_settings(project_variable, genome):
     project_variable.num_out_channels = genome['num_channels']
     project_variable.genome = genome
     return project_variable
-    
+
+
+def process_results(results):
+    # [(1, True, 0.0, 0.0), (2, True, 0.0, 0.037037037037037035), (3, True, 0.0, 0.07407407407407407)]
+    col = {}
+    val = {}
+    train = {}
+    for i in range(len(results)):
+        col[str(results[i][0])] = results[i][1]
+        val[str(results[i][0])] = results[i][2]
+        train[str(results[i][0])] = results[i][3]
+
+    return col, val, train
+
 
 def evolutionary_search(debug_mode=True):
     generations = 100
@@ -206,7 +220,6 @@ def evolutionary_search(debug_mode=True):
             # Note: padding and in_features and architecture are used to make the network dimensions work,
             # they get calculated after the generation of the new genotype
 
-            # FIX: that keys need to be 1 2 3
             new_genotypes= GO.generate_genotype(results, [genotype_1, genotype_2, genotype_3])
 
             genotype_1, genotype_2, genotype_3 = new_genotypes
@@ -238,21 +251,20 @@ def evolutionary_search(debug_mode=True):
         pv3.experiment_number = 10003 # TODO
         pv3.device = 2
 
-        pool = Pool(processes=3)
-        results = pool.map(main_file.run, [pv1, pv2, pv3])
-        # results =
-
-        col, val, train = results
+        # pool = Pool(processes=3)
+        # results = pool.map(main_file.run, [pv1, pv2, pv3])
+        results = [(1, True, 0.0, 0.0), (2, True, 0.0, 0.037037037037037035), (3, True, 0.0, 0.07407407407407407)]
+        col, val, train = process_results(results)
         # col contains 1 and 0
 
-        pool.join()
-        pool.close()
+        # pool.join()
+        # pool.close()
 
         for k in col.keys():
             # keys are 1, 2, 3
-            if k == 1:
+            if k == '1':
                 pv = pv1
-            elif k == 2:
+            elif k == '2':
                 pv = pv2
             else:
                 pv = pv3
@@ -267,4 +279,70 @@ def evolutionary_search(debug_mode=True):
                 my_file.write(line)
         
 
-evolutionary_search()
+# evolutionary_search()
+
+
+def debug_model_single(debug_mode=True):
+    # THIS WORKS
+
+    in_features_1 = 540
+    genotype_1 = (3e-4, 2, [12, 18], [5, 5], [0, 0], [0, 0], 0, 1, 600, [0, 1, 0, 1, 2, 2], in_features_1)
+    genome_1 = GO.write_genome(genotype_1)
+
+    pv1 = ProjectVariable(debug_mode)
+    pv1 = apply_same_settings(pv1)
+    pv1 = apply_unique_settings(pv1, genome_1)
+    pv1.experiment_number = 1000134978789
+    pv1.device = 1
+
+    results = main_file.run(pv1)
+
+    print('asdf')
+
+
+def debug_model_parallel(debug_mode=True):
+    in_features_1 = 540
+    #               0   1   2        3        4       5      6  7  8    9                    10
+    genotype_1 = (3e-4, 2, [12, 18], [5, 5], [0, 0], [0, 0], 0, 1, 600, [0, 1, 0, 1, 2, 2], in_features_1)
+    genome_1 = GO.write_genome(genotype_1)
+
+    in_features_2 = 336
+    genotype_2 = (
+    3e-4, 3, [16, 32, 32], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 496, [0, 1, 0, 0, 1, 2, 2], in_features_2)
+    genome_2 = GO.write_genome(genotype_2)
+
+    in_features_3 = 182
+    genotype_3 = (
+    3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
+    genome_3 = GO.write_genome(genotype_3)
+
+    pv1 = ProjectVariable(debug_mode)
+    pv1 = apply_same_settings(pv1)
+    pv1 = apply_unique_settings(pv1, genome_1)
+    pv1.experiment_number = 10001
+    pv1.individual_number = 1
+    pv1.device = 0
+
+    pv2 = ProjectVariable(debug_mode)
+    pv2 = apply_same_settings(pv2)
+    pv2 = apply_unique_settings(pv2, genome_2)
+    pv2.experiment_number = 10002
+    pv2.individual_number = 2
+    pv2.device = 1
+
+    pv3 = ProjectVariable(debug_mode)
+    pv3 = apply_same_settings(pv3)
+    pv3 = apply_unique_settings(pv3, genome_3)
+    pv3.experiment_number = 10003
+    pv3.individual_number = 3
+    pv3.device = 2
+
+    pool = Pool(processes=3)
+    results = pool.map(main_file.run, [pv1, pv2, pv3])
+
+    col, val, train = process_results(results)
+
+    print('asdf')
+
+
+# debug_model_parallel()

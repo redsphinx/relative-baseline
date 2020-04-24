@@ -483,7 +483,8 @@ def run(project_variable):
 
     print('\n\n\n END OF EXPERIMENT %d \n\n\n' % (project_variable.experiment_number))
 
-    return (project_variable.experiment_number, train_accuracy, val_accuracy)
+    if project_variable.nas:
+        return project_variable.individual_number, has_collapsed, val_accuracy, train_accuracy
 
     # if project_variable.stop_at_collapse and project_variable.early_stopping:
     #     return train_accuracy, val_accuracy, has_collapsed, collapsed_matrix, val_loss
