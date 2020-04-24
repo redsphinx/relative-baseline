@@ -1,3 +1,4 @@
+import time
 import os
 import numpy as np
 from datetime import date, datetime
@@ -127,14 +128,14 @@ def apply_same_settings(project_variable):
     project_variable.model_number = 16
     project_variable.sheet_number = 23
 
-    # project_variable.end_epoch = 20
-    project_variable.end_epoch = 3
+    project_variable.end_epoch = 10
+    # project_variable.end_epoch = 3
     project_variable.dataset = 'jester'
 
     project_variable.num_in_channels = 3
     project_variable.label_size = 27
-    # project_variable.batch_size = 5 * 27
-    project_variable.batch_size = 27
+    project_variable.batch_size = 5 * 27
+    # project_variable.batch_size = 27
     project_variable.load_num_frames = 30
     project_variable.label_type = 'categories'
 
@@ -150,8 +151,8 @@ def apply_same_settings(project_variable):
 
     project_variable.use_dali = True
     project_variable.dali_workers = 8
-    # project_variable.dali_iterator_size = ['all', 'all', 0]
-    project_variable.dali_iterator_size = [27, 27, 0]
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    # project_variable.dali_iterator_size = [5*27, 10*27, 0]
 
     project_variable.stop_at_collapse = True
     project_variable.experiment_state = 'new'
@@ -184,7 +185,8 @@ def process_results(results):
 
 
 def evolutionary_search(debug_mode=True):
-    generations = 100
+    # generations = 100
+    generations = 10
     genetic_search_path = os.path.join(PP.jester_location, 'genetic_search_log.txt')
     if not os.path.exists(genetic_search_path):
         # delimiter = ';'
@@ -226,29 +228,26 @@ def evolutionary_search(debug_mode=True):
             genome_2 = GO.write_genome(genotype_2)
             genome_3 = GO.write_genome(genotype_3)
 
-            # TODO: make sure stop_at_collapse doesn't break things
-            # TODO: check eval_on='val'
 
-        
         # run models
         pv1 = ProjectVariable(debug_mode)
         pv1 = apply_same_settings(pv1)
         pv1 = apply_unique_settings(pv1, genome_1)
-        pv1.experiment_number = 10001# TODO
+        pv1.experiment_number = 10001
         pv1.individual_number = 1
         pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
         pv2 = apply_same_settings(pv2)
         pv2 = apply_unique_settings(pv2, genome_2)
-        pv2.experiment_number = 10002 # TODO
+        pv2.experiment_number = 10002
         pv2.individual_number = 2
         pv2.device = 1
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
         pv3 = apply_unique_settings(pv3, genome_3)
-        pv3.experiment_number = 10003 # TODO
+        pv3.experiment_number = 10003
         pv3.individual_number = 3
         pv3.device = 2
 
@@ -263,8 +262,12 @@ def evolutionary_search(debug_mode=True):
         results = col, val, train
         # col contains 1 and 0, NO, it contains bools
 
-        pool.join()
+        # print(pool._pool[1].return_code)
+        # print(pool._pool[2].return_code)
+
         pool.close()
+        pool.join()
+
 
         for k in col.keys():
             # keys are 1, 2, 3
@@ -283,7 +286,9 @@ def evolutionary_search(debug_mode=True):
             
             with open(genetic_search_path, 'a') as my_file:
                 my_file.write(line)
-        
+
+        del pv1, pv2, pv3
+
 
 evolutionary_search()
 

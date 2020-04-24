@@ -252,11 +252,13 @@ def mutate_by_unit(genotype, value_index, param, direction):
                         eligible_chan_ind_SUB.append(i)
 
         if direction:
-            indx = eligible_chan_ind_ADD[randrange(len(eligible_chan_ind_ADD))]
-            value[indx] = value[indx] + unit
+            if len(eligible_chan_ind_ADD) > 0:
+                indx = eligible_chan_ind_ADD[randrange(len(eligible_chan_ind_ADD))]
+                value[indx] = value[indx] + unit
         else:
-            indx = eligible_chan_ind_SUB[randrange(len(eligible_chan_ind_SUB))]
-            value[indx] = value[indx] - unit
+            if len(eligible_chan_ind_SUB) > 0:
+                indx = eligible_chan_ind_SUB[randrange(len(eligible_chan_ind_SUB))]
+                value[indx] = value[indx] - unit
 
 
     elif param == 'kernel_size_per_layer':
@@ -278,7 +280,7 @@ def mutate_by_unit(genotype, value_index, param, direction):
         if direction:
             value[indx] = value[indx] + unit
         else:
-            if value[indx] - unit >= 0:
+            if value[indx] - unit >= 3:
                 value[indx] = value[indx] - unit
 
     elif param == 'conv_layer_type':
