@@ -7,31 +7,31 @@ import random
 CONV_LAYER_TYPES = ['conv3dttn', 'conv3d']
 POOL_LAYER_TYPES = ['max', 'avg']
 ARCHITECTURE_COMPONENTS = ['conv', 'pool', 'fc']
-PROBABILITY_DICT_L1 = {'lr': 0.3,
-                       'num_conv_layers': 0.4,
-                       'num_channels': 0.2,
+PROBABILITY_DICT_L1 = {'lr': 0.6,
+                       'num_conv_layers': 0.7,
+                       'num_channels': 0.6,
                        'kernel_size_per_layer': 0,
                        'padding': 0,
                        'conv_layer_type': 0,
                        'pooling_after_conv': 0,
                        'pooling_final': 0,
-                       'fc_layer': 0.1,
+                       'fc_layer': 0.5,
                        'architecture_order': 0,
                        'in_features': 0
                        }
 PROBABILITY_DICT_L2 = {'lr': 0,
-                       'num_conv_layers': 0.3,
-                       'num_channels': 0.45,
-                       'kernel_size_per_layer': 0.05,
+                       'num_conv_layers': 0.7,
+                       'num_channels': 0.7,
+                       'kernel_size_per_layer': 0.5,
                        'padding': 0,
                        'conv_layer_type': 0,
-                       'pooling_after_conv': 0.05,
-                       'pooling_final': 0.05,
-                       'fc_layer': 0.1,
+                       'pooling_after_conv': 0.3,
+                       'pooling_final': 0.3,
+                       'fc_layer': 0.6,
                        'architecture_order': 0,
                        'in_features': 0
                        }
-EXCEPTION_IND = [4, 8, 9]
+EXCEPTION_IND = [4, 9, 10]
 GENOTYPE_KEYS = list(PROBABILITY_DICT_L2.keys())
 LEN_GENOTYPE = len(GENOTYPE_KEYS)
 
@@ -128,6 +128,7 @@ def crossover(results_collapsed, fitness, prev_genotypes):
     # if only 1 or less collapsed
     if sum(col_arr[:, 1]) <= 1:
         # copy parts that are same, if any
+        # TODO: debug this
         genos = []
         for i in results_collapsed.keys():
             if results_collapsed[i] == '0':
@@ -136,6 +137,7 @@ def crossover(results_collapsed, fitness, prev_genotypes):
 
         # 2 of them did not collapse
         if len(genos) == 2:
+            # TODO: debug this
             for i in range(LEN_GENOTYPE):
                 if i not in EXCEPTION_IND:
                     if genos[0][i] == genos[1][i]:
@@ -144,6 +146,7 @@ def crossover(results_collapsed, fitness, prev_genotypes):
 
         # all of them did not collapse
         else:
+            # TODO: debug this
             for i in range(LEN_GENOTYPE):
                 if i not in EXCEPTION_IND:
                     if genos[0][i] == genos[1][i] == genos[2][i]:
@@ -160,6 +163,7 @@ def crossover(results_collapsed, fitness, prev_genotypes):
                         crossover_ind.append(i)
 
         # for the indices that are still None, copy the value of the best individual
+        # TODO: debug this
         for i in range(LEN_GENOTYPE):
             if i not in crossover_ind and i not in EXCEPTION_IND:
                 new_genotype[i] = prev_genotypes[int(most_fit)][i]
@@ -167,7 +171,26 @@ def crossover(results_collapsed, fitness, prev_genotypes):
     else:
         for i in range(LEN_GENOTYPE):
             if i not in crossover_ind and i not in EXCEPTION_IND:
-                new_genotype[i] = prev_genotypes[randrange(3)+1][i]
+                new_genotype[i] = prev_genotypes[randrange(3)][i] # prev_genotypes are in order
+
+    # make sure channel sizes and kernels are consistent with num_conv_layers
+    for i in [2, 3, 5]:
+        value = new_genotype[i]
+        if len(value) != new_genotype[1]:
+            diff = new_genotype[1] - len(value)
+            if diff < 0: # num_channels too long
+                value = value[:new_genotype[1]]
+            else:
+                for _d in range(diff):
+                    value.append(value[-1])
+        new_genotype[i] = value
+        assert len(new_genotype[i]) == new_genotype[1]
+
+
+    try:
+        assert len(new_genotype[2]) == len(new_genotype[3]) == len(new_genotype[5]) == new_genotype[1]
+    except AssertionError:
+        print('something went wrong')
 
     return new_genotype, crossover_ind
 
@@ -177,15 +200,20 @@ def decision(probability):
 
 
 def mutate_by_unit(genotype, value_index, param, direction):
-    value = genotype[value_index]
+    if type(genotype[value_index]) == list:
+        value = genotype[value_index].copy()
+    else:
+        value = genotype[value_index]
 
     if param == 'lr':
-        unit = 0.0001
+        unit = 0.00005
         if direction:
             value = value + unit
         else:
             value = value - unit
     elif param == 'num_conv_layers':
+
+
         unit = 1
         if direction:
             value = value + unit
@@ -199,7 +227,14 @@ def mutate_by_unit(genotype, value_index, param, direction):
         unit = 6
 
         if len(value) != genotype[1]:
-            value.append(value[-1])
+            diff = genotype[1] - len(value)
+            if diff < 0: # num_channels too long
+                value = value[:genotype[1]]
+            else:
+                for _d in range(diff):
+                    value.append(value[-1])
+
+        assert len(value) == genotype[1]
 
         # you can only add or subtract channels if the result is that the layer before it has less or
         # equal number of channels
@@ -207,61 +242,78 @@ def mutate_by_unit(genotype, value_index, param, direction):
         eligible_chan_ind_ADD = []
         eligible_chan_ind_SUB = []
         for i in range(len(value)):
-            if i != len(value) - 1:
-                if value[i+1] - value[i] >= unit:
+            if i != len(value) - 1: # if i is not the last
+                if value[i] + unit <= value[i+1]:
                     eligible_chan_ind_ADD.append(i)
+            else:
+                eligible_chan_ind_ADD.append(i)
 
-                if value[i] - unit >= unit:
-                    if i != 0:
-                        if value[i] - unit >= value[i-1]:
-                            eligible_chan_ind_SUB.append(i)
-                    else:
+            if value[i] - unit >= unit:
+                if i == 0:
+                    eligible_chan_ind_SUB.append(i)
+                else:
+                    if value[i] - unit >= value[i - 1]:
                         eligible_chan_ind_SUB.append(i)
 
         if direction:
             indx = eligible_chan_ind_ADD[randrange(len(eligible_chan_ind_ADD))]
-            genotype[value_index][indx] = genotype[value_index][indx] + unit
+            value[indx] = value[indx] + unit
         else:
             indx = eligible_chan_ind_SUB[randrange(len(eligible_chan_ind_SUB))]
-            genotype[value_index][indx] = genotype[value_index][indx] + unit
+            value[indx] = value[indx] - unit
 
-        value = genotype[value_index]
 
     elif param == 'kernel_size_per_layer':
         unit = 2
 
-        if len(genotype[value_index]) != genotype[1]:
-            genotype[value_index].append(genotype[value_index][-1])
+        if len(value) != genotype[1]:
+            diff = genotype[1] - len(value)
+            if diff < 0:  # num_channels too long
+                value = value[:genotype[1]]
+            else:
+                for _d in range(diff):
+                    value.append(value[-1])
+
+        assert len(value) == genotype[1]
 
         # choose one of the kernels
-        indx = randrange(len(genotype[value_index]))
+        indx = randrange(len(value))
 
         if direction:
-            genotype[value_index][indx] = genotype[value_index][indx] + unit
+            value[indx] = value[indx] + unit
         else:
-            if genotype[value_index][indx] - unit < 0:
-                genotype[value_index][indx] = genotype[value_index][indx] + unit
-
-        value = genotype[value_index]
+            if value[indx] - unit >= 0:
+                value[indx] = value[indx] - unit
 
     elif param == 'conv_layer_type':
-        if len(genotype[value_index]) != genotype[1]:
-            genotype[value_index].append(genotype[value_index][-1])
+        # only makes sure size is correct
+        # doesn't change values right now, might add functionality in the future
+        if len(value) != genotype[1]:
+            diff = genotype[1] - len(value)
+            if diff < 0:  # num_channels too long
+                value = value[:genotype[1]]
+            else:
+                for _d in range(diff):
+                    value.append(value[-1])
 
-        value = genotype[value_index]
+        assert len(value) == genotype[1]
+
+
     elif param == 'pooling_after_conv':
-        value = abs(genotype[value_index] - 1)
+        # TODO: debug this
+        value = abs(value - 1)
     elif param == 'pooling_final':
-        value = abs(genotype[value_index] - 1)
+        # TODO: debug this
+        value = abs(value - 1)
     elif param == 'fc_layer':
         unit = 128
         if direction:
-            value = genotype[value_index] + unit
+            value = value + unit
         else:
             if value - unit > 512:
-                value = genotype[value_index] - unit
+                value = value - unit
             else:
-                value = genotype[value_index] + unit//2
+                value = value + unit//2
 
     return value
 
@@ -271,6 +323,8 @@ def mutation(genotype, crossover_ind, collapsed):
     # determine if in L1 or L2
     # if none collapsed, L2 else L1
     collapsed = np.array(list(collapsed.items()), dtype=int)
+
+    print(genotype)
 
     if sum(collapsed[:, 1]) == 0:
         level = 2
@@ -287,21 +341,44 @@ def mutation(genotype, crossover_ind, collapsed):
     for i in crossover_ind:
         prob_tab[GENOTYPE_KEYS[i]] = prob_tab[GENOTYPE_KEYS[i]] / 2
 
+    og_num_chan = prob_tab['num_channels']
+    og_kernels = prob_tab['kernel_size_per_layer']
+    og_conv_type = prob_tab['conv_layer_type']
+
     # for item in table, decide if we're going to mutate depending on it's percentage
+    new_genos = []
 
-    g1 = genotype
-    g2 = genotype
-    g3 = genotype
-    new_genos = [g1, g2, g3]
+    for m in range(3):
+        template = genotype.copy()
+        # change back to default after change has been applied
+        prob_tab['num_channels'] = og_num_chan
+        prob_tab['kernel_size_per_layer'] = og_kernels
+        prob_tab['conv_layer_type'] = og_conv_type
 
-    for i, k in GENOTYPE_KEYS:
-        if i not in EXCEPTION_IND:
-            for m in range(3):
-                # get the prob
+        for i, k in enumerate(GENOTYPE_KEYS):
+            if i not in EXCEPTION_IND:
+                    # get the prob
                 if decision(prob_tab[k]):
+                    # if num_channels change, make sure channels and kernels are updated accordingly
+                    if k == 'num_conv_layers':
+                        print('num_conv_layers will change')
+                        prob_tab['num_channels'] = 1
+                        prob_tab['kernel_size_per_layer'] = 1
+                        prob_tab['conv_layer_type'] = 1
+
                     direction = randrange(2)
-                    # 0 = decrease, 1 = increase
-                    new_genos[m][i] = mutate_by_unit(new_genos[m], i, k, direction)
+                    template[i] = mutate_by_unit(template, i, k, direction)
+
+        try:
+            assert len(template[2]) == len(template[3]) == len(template[5]) == template[1]
+        except AssertionError:
+            print('something went wrong')
+
+        print(m, template)
+        new_genos.append(template.copy())
+        del(template)
+
+
 
     # TODO future
     # if genotype is novel, keep it
@@ -317,7 +394,7 @@ def create_architecture_order(genotypes):
     last = [1, 2, 2]
 
     for i in range(len(genotypes)):
-        middle = [0] * genotypes[i][1]
+        middle = [0] * (genotypes[i][1] - 1)
         arch = first + middle + last
         genotypes[i][9] = arch
 
@@ -365,19 +442,18 @@ def names_count(list_of_names):
 # 10 'in_features'
 def calculate_in_features(genotype):
     # genotype is a list
-    t = 30
-    h = 50
-    w = 75
-
     architecture_order = [ARCHITECTURE_COMPONENTS[i] for i in genotype[9]]
     names_ind = names_count(architecture_order)
     padding = [0] * genotype[1]
     viable = False
-    where_padding_added = [0] * len(padding)
+    # where_padding_added = [0] * len(padding)
     loc_start_pad = 0
 
     while not viable:
-        for j, layer in architecture_order:
+        t = 30
+        h = 50
+        w = 75
+        for j, layer in enumerate(architecture_order):
             if layer != 'fc':
                 if layer == 'conv':
                     k = genotype[3][names_ind[j]]
@@ -395,8 +471,9 @@ def calculate_in_features(genotype):
         if t <= 0:
             # start padding the beginning. add padding to the next layer if it is not sufficient.
             # if padding of 1 is reached in all layers, start again at the beginning.
-            padding[loc_start_pad] = 1
-            where_padding_added[loc_start_pad] = where_padding_added[loc_start_pad] + 1
+            # TODO: debug this
+            padding[loc_start_pad] = padding[loc_start_pad] + 1
+            # where_padding_added[loc_start_pad] = where_padding_added[loc_start_pad] + 1
             loc_start_pad = loc_start_pad + 1
             if loc_start_pad == len(padding) - 1:
                 loc_start_pad = 0
@@ -427,12 +504,23 @@ def generate_genotype(results, prev_genotypes):
     # it checks the has_collapsed, train_acc and val_acc variables
 
     new_geno, crossover_ind = crossover(results[0], fitness, prev_genotypes)
+
+    print('new geno ', new_geno)
+
     new_genotypes = mutation(new_geno, crossover_ind, results[0])
     new_genotypes = create_architecture_order(new_genotypes)
+
+    print('1 ', new_genotypes[0])
+    print('2 ', new_genotypes[1])
+    print('3 ', new_genotypes[2])
 
 
     for i in range(3):
         genotype = assess_genotype_viability(new_genotypes[i])
         new_genotypes[i] = genotype
+
+    print('1 ', new_genotypes[0])
+    print('2 ', new_genotypes[1])
+    print('3 ', new_genotypes[2])
 
     return new_genotypes

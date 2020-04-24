@@ -201,9 +201,9 @@ def evolutionary_search(debug_mode=True):
     for gen in range(generations):
         if gen == 0:
             # manually set first values
-            in_features_1 = 540
-            #               0   1   2        3        4       5      6  7  8    9                    10
-            genotype_1 = (3e-4, 2, [12, 18], [5, 5], [0, 0], [0, 0], 0, 1, 600, [0, 1, 0, 1, 2, 2], in_features_1)
+            in_features_1 = 1*6*12
+            #               0   1   2                  3                  4       5            6  7  8    9                          10
+            genotype_1 = (3e-4, 4, [12, 18, 24, 32], [3, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0], 0, 1, 600, [0, 1, 0, 0, 0, 1, 2, 2], in_features_1)
             genome_1 = GO.write_genome(genotype_1)
 
             in_features_2 = 336
@@ -237,25 +237,29 @@ def evolutionary_search(debug_mode=True):
         pv1 = apply_same_settings(pv1)
         pv1 = apply_unique_settings(pv1, genome_1)
         pv1.experiment_number = 10001# TODO
+        pv1.individual_number = 1
         pv1.device = 0
 
         pv2 = ProjectVariable(debug_mode)
         pv2 = apply_same_settings(pv2)
         pv2 = apply_unique_settings(pv2, genome_2)
         pv2.experiment_number = 10002 # TODO
+        pv2.individual_number = 2
         pv2.device = 2
 
         pv3 = ProjectVariable(debug_mode)
         pv3 = apply_same_settings(pv3)
         pv3 = apply_unique_settings(pv3, genome_3)
         pv3.experiment_number = 10003 # TODO
+        pv3.individual_number = 3
         pv3.device = 2
 
         # pool = Pool(processes=3)
         # results = pool.map(main_file.run, [pv1, pv2, pv3])
         results = [(1, True, 0.0, 0.0), (2, True, 0.0, 0.037037037037037035), (3, True, 0.0, 0.07407407407407407)]
         col, val, train = process_results(results)
-        # col contains 1 and 0
+        results = col, val, train
+        # col contains 1 and 0, NO, it contains bools
 
         # pool.join()
         # pool.close()
@@ -269,8 +273,8 @@ def evolutionary_search(debug_mode=True):
             else:
                 pv = pv3
 
-            line = '%d;%d;%s;%f;%f;%f;%d;%s;%s;%s;%s;%d;%d;%d;%s;%d\n' % \
-                   (gen, pv.experiment_number, str(col[k]), val[k], train[k], pv.learning_rate, pv.genome['num_conv_layers'], 
+            line = '%d;%d;%s;%f;%f;%f;%d;%s;%s;%s;%s;%s;%s;%d;%s;%d\n' % \
+                   (gen, pv.individual_number, str(col[k]), val[k], train[k], pv.learning_rate, pv.genome['num_conv_layers'],
                     str(pv.num_out_channels), str(pv.genome['kernel_size_per_layer']), str(pv.genome['padding']), 
                     str(pv.genome['conv_layer_type']), pv.genome['pooling_after_conv'], pv.genome['pooling_final'], 
                     pv.genome['fc_layer'], str(pv.genome['architecture_order']), pv.genome['in_features'])
@@ -279,7 +283,7 @@ def evolutionary_search(debug_mode=True):
                 my_file.write(line)
         
 
-# evolutionary_search()
+evolutionary_search()
 
 
 def debug_model_single(debug_mode=True):
