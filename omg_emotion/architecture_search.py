@@ -186,7 +186,7 @@ def process_results(results):
 
 def evolutionary_search(debug_mode=True):
     # generations = 100
-    generations = 10
+    generations = 15
     genetic_search_path = os.path.join(PP.jester_location, 'genetic_search_log.txt')
     if not os.path.exists(genetic_search_path):
         # delimiter = ';'
@@ -203,17 +203,25 @@ def evolutionary_search(debug_mode=True):
     for gen in range(generations):
         if gen == 0:
             # manually set first values
-            in_features_1 = 1*6*12
-            #               0   1   2                  3                  4       5            6  7  8    9                          10
-            genotype_1 = (3e-4, 4, [12, 18, 24, 32], [3, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0], 0, 1, 600, [0, 1, 0, 0, 0, 1, 2, 2], in_features_1)
+            # in_features_1 = 1*6*12
+            ##                0   1   2                  3                  4       5            6  7  8      9                          10
+            # genotype_1 = (3e-4, 4, [12, 18, 24, 32], [3, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0], 0, 1, 600, [0, 1, 0, 0, 0, 1, 2, 2], in_features_1)
+
+            genotype_1 = (3e-4, 5, [16, 32, 32, 48, 48], [5, 5, 5, 5, 5], [1, 1, 1, 0, 0], [0, 0, 0, 0, 0],
+                          0, 1, 1256, [0, 1, 0, 0, 0, 0, 1, 2, 2], 72)
+
             genome_1 = GO.write_genome(genotype_1)
 
-            in_features_2 = 336
-            genotype_2 = (3e-4, 3, [16, 32, 32], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 496, [0, 1, 0, 0, 1, 2, 2], in_features_2)
+            # in_features_2 = 336
+            # genotype_2 = (3e-4, 3, [16, 32, 32], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 496, [0, 1, 0, 0, 1, 2, 2], in_features_2)
+            genotype_2 = (2e-4, 6, [16, 38, 48, 48, 48, 60], [3, 5, 5, 3, 5, 5], [1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0],
+                          0, 1, 1024, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_2 = GO.write_genome(genotype_2)
 
-            in_features_3 = 182
-            genotype_3 = (3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
+            # in_features_3 = 182
+            # genotype_3 = (3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
+            genotype_3 = (2e-4, 6, [16, 32, 32, 32, 48, 60], [3, 3, 5, 5, 5, 5], [1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0],
+                          0, 1, 1024, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_3 = GO.write_genome(genotype_3)
 
             
@@ -258,15 +266,11 @@ def evolutionary_search(debug_mode=True):
         #            (2, False, 0.0, 0.037037037037037035),
         #            (3, False, 0.0, 0.07407407407407407)]
 
-        col, val, train = process_results(results)
-        results = col, val, train
-        # col contains 1 and 0, NO, it contains bools
-
-        # print(pool._pool[1].return_code)
-        # print(pool._pool[2].return_code)
-
         pool.close()
         pool.join()
+
+        col, val, train = process_results(results)
+        results = col, val, train
 
 
         for k in col.keys():
@@ -283,7 +287,7 @@ def evolutionary_search(debug_mode=True):
                     str(pv.num_out_channels), str(pv.genome['kernel_size_per_layer']), str(pv.genome['padding']), 
                     str(pv.genome['conv_layer_type']), pv.genome['pooling_after_conv'], pv.genome['pooling_final'], 
                     pv.genome['fc_layer'], str(pv.genome['architecture_order']), pv.genome['in_features'])
-            
+
             with open(genetic_search_path, 'a') as my_file:
                 my_file.write(line)
 

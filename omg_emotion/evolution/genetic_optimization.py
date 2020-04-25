@@ -195,7 +195,7 @@ def decision(probability):
     return random.random() < probability
 
 
-def mutate_by_unit(genotype, value_index, param, direction):
+def mutate_by_unit(genotype, value_index, param, direction, because_num_conv):
     if type(genotype[value_index]) == list:
         value = genotype[value_index].copy()
     else:
@@ -232,33 +232,39 @@ def mutate_by_unit(genotype, value_index, param, direction):
 
         assert len(value) == genotype[1]
 
+        do_mutation = True
+        if not because_num_conv is None:
+            if because_num_conv[0]:
+                if not decision(because_num_conv[1]):
+                    do_mutation = False
+
         # you can only add or subtract channels if the result is that the layer before it has less or
         # equal number of channels
-
-        eligible_chan_ind_ADD = []
-        eligible_chan_ind_SUB = []
-        for i in range(len(value)):
-            if i != len(value) - 1: # if i is not the last
-                if value[i] + unit <= value[i+1]:
-                    eligible_chan_ind_ADD.append(i)
-            else:
-                eligible_chan_ind_ADD.append(i)
-
-            if value[i] - unit >= unit:
-                if i == 0:
-                    eligible_chan_ind_SUB.append(i)
+        if do_mutation:
+            eligible_chan_ind_ADD = []
+            eligible_chan_ind_SUB = []
+            for i in range(len(value)):
+                if i != len(value) - 1: # if i is not the last
+                    if value[i] + unit <= value[i+1]:
+                        eligible_chan_ind_ADD.append(i)
                 else:
-                    if value[i] - unit >= value[i - 1]:
-                        eligible_chan_ind_SUB.append(i)
+                    eligible_chan_ind_ADD.append(i)
 
-        if direction:
-            if len(eligible_chan_ind_ADD) > 0:
-                indx = eligible_chan_ind_ADD[randrange(len(eligible_chan_ind_ADD))]
-                value[indx] = value[indx] + unit
-        else:
-            if len(eligible_chan_ind_SUB) > 0:
-                indx = eligible_chan_ind_SUB[randrange(len(eligible_chan_ind_SUB))]
-                value[indx] = value[indx] - unit
+                if value[i] - unit >= unit:
+                    if i == 0:
+                        eligible_chan_ind_SUB.append(i)
+                    else:
+                        if value[i] - unit >= value[i - 1]:
+                            eligible_chan_ind_SUB.append(i)
+
+            if direction:
+                if len(eligible_chan_ind_ADD) > 0:
+                    indx = eligible_chan_ind_ADD[randrange(len(eligible_chan_ind_ADD))]
+                    value[indx] = value[indx] + unit
+            else:
+                if len(eligible_chan_ind_SUB) > 0:
+                    indx = eligible_chan_ind_SUB[randrange(len(eligible_chan_ind_SUB))]
+                    value[indx] = value[indx] - unit
 
 
     elif param == 'kernel_size_per_layer':
@@ -274,14 +280,22 @@ def mutate_by_unit(genotype, value_index, param, direction):
 
         assert len(value) == genotype[1]
 
-        # choose one of the kernels
-        indx = randrange(len(value))
+        do_mutation = True
+        if not because_num_conv is None:
+            if because_num_conv[0]:
+                if not decision(because_num_conv[1]):
+                    do_mutation = False
 
-        if direction:
-            value[indx] = value[indx] + unit
-        else:
-            if value[indx] - unit >= 3:
-                value[indx] = value[indx] - unit
+        if do_mutation:
+            # choose one of the kernels
+            indx = randrange(len(value))
+
+            if direction:
+                if value[indx] + unit <= 7:
+                    value[indx] = value[indx] + unit
+            else:
+                if value[indx] - unit >= 3:
+                    value[indx] = value[indx] - unit
 
     elif param == 'conv_layer_type':
         # only makes sure size is correct
@@ -329,9 +343,9 @@ def mutation(genotype, crossover_ind, collapsed):
 
     # if L1, modify prob table, else modify L2 table
     if level == 1:
-        prob_tab = PROBABILITY_DICT_L1
+        prob_tab = PROBABILITY_DICT_L1.copy()
     else:
-        prob_tab = PROBABILITY_DICT_L2
+        prob_tab = PROBABILITY_DICT_L2.copy()
 
     # use crossover_ind to lower chances that good genes get changed
     for i in crossover_ind:
@@ -351,19 +365,31 @@ def mutation(genotype, crossover_ind, collapsed):
         prob_tab['kernel_size_per_layer'] = og_kernels
         prob_tab['conv_layer_type'] = og_conv_type
 
+        num_conv_changed = False
+
         for i, k in enumerate(GENOTYPE_KEYS):
             if i not in EXCEPTION_IND:
                     # get the prob
                 if decision(prob_tab[k]):
                     # if num_channels change, make sure channels and kernels are updated accordingly
                     if k == 'num_conv_layers':
-                        print('num_conv_layers will change')
+                        num_conv_changed = True
                         prob_tab['num_channels'] = 1
                         prob_tab['kernel_size_per_layer'] = 1
                         prob_tab['conv_layer_type'] = 1
 
+                    extra_instructions = None
+                    if num_conv_changed:
+                        if i == 2:
+                            # was_because_num_conv, og_prob
+                            extra_instructions = [True, og_num_chan]
+                        elif i == 3:
+                            extra_instructions = [True, og_kernels]
+                        elif i == 5:
+                            extra_instructions = [True, og_conv_type]
+
                     direction = randrange(2)
-                    template[i] = mutate_by_unit(template, i, k, direction)
+                    template[i] = mutate_by_unit(template, i, k, direction, extra_instructions)
 
         try:
             assert len(template[2]) == len(template[3]) == len(template[5]) == template[1]
