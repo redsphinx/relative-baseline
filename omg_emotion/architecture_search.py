@@ -150,7 +150,7 @@ def apply_same_settings(project_variable):
     project_variable.weight_transform = 'seq'
 
     project_variable.use_dali = True
-    project_variable.dali_workers = 8
+    project_variable.dali_workers = 32
     project_variable.dali_iterator_size = ['all', 'all', 0]
     # project_variable.dali_iterator_size = [5*27, 10*27, 0]
 
@@ -186,7 +186,7 @@ def process_results(results):
 
 def evolutionary_search(debug_mode=True):
     # generations = 100
-    generations = 15
+    generations = 20
     genetic_search_path = os.path.join(PP.jester_location, 'genetic_search_log.txt')
     if not os.path.exists(genetic_search_path):
         # delimiter = ';'
@@ -207,8 +207,7 @@ def evolutionary_search(debug_mode=True):
             ##                0   1   2                  3                  4       5            6  7  8      9                          10
             # genotype_1 = (3e-4, 4, [12, 18, 24, 32], [3, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0], 0, 1, 600, [0, 1, 0, 0, 0, 1, 2, 2], in_features_1)
 
-            genotype_1 = (3e-4, 5, [16, 32, 32, 48, 48], [5, 5, 5, 5, 5], [1, 1, 1, 0, 0], [0, 0, 0, 0, 0],
-                          0, 1, 1256, [0, 1, 0, 0, 0, 0, 1, 2, 2], 72)
+            genotype_1 = (5e-4, 3, [28, 38, 38], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 704, [0, 1, 0, 0, 1, 2, 2], 336)
 
             genome_1 = GO.write_genome(genotype_1)
 
@@ -220,11 +219,13 @@ def evolutionary_search(debug_mode=True):
 
             # in_features_3 = 182
             # genotype_3 = (3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
-            genotype_3 = (2e-4, 6, [16, 32, 32, 32, 48, 60], [3, 3, 5, 5, 5, 5], [1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0],
-                          0, 1, 1024, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
+            genotype_3 = (2e-4, 5, [16, 32, 32, 32, 48], [3, 3, 5, 5, 5], [1, 1, 0, 0, 0], [0, 0, 0, 0, 0],
+                          0, 1, 1024, [0, 1, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_3 = GO.write_genome(genotype_3)
 
-            
+
+
+
         else:
             assert results is not None
 

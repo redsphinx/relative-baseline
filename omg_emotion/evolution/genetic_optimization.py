@@ -206,9 +206,9 @@ def mutate_by_unit(genotype, value_index, param, direction, because_num_conv):
         if direction:
             value = value + unit
         else:
-            value = value - unit
+            if value - unit >= unit:
+                value = value - unit
     elif param == 'num_conv_layers':
-
 
         unit = 1
         if direction:
