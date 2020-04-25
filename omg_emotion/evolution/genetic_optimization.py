@@ -496,7 +496,7 @@ def calculate_in_features(genotype):
             padding[loc_start_pad] = padding[loc_start_pad] + 1
             # where_padding_added[loc_start_pad] = where_padding_added[loc_start_pad] + 1
             loc_start_pad = loc_start_pad + 1
-            if loc_start_pad == len(padding) - 1:
+            if loc_start_pad == len(padding):
                 loc_start_pad = 0
 
         else:
