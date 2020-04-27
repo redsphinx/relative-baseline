@@ -381,4 +381,44 @@ def run_calc_av_1():
 # run_calc_av_1()
 
 
+import os
+from PIL import Image
 
+
+def process_files(folder, new_folder=True, resize=None, start_from=1):
+    file_path = os.path.join('/media/gabi/DATADRIVE1/garden/', folder)
+    dest_path = file_path
+
+    if new_folder:
+        new_file_path = os.path.join('/media/gabi/DATADRIVE1/garden/', 'new_%s' % folder)
+        if not os.path.exists(new_file_path):
+            os.mkdir(new_file_path)
+        dest_path = new_file_path
+
+    frames = os.listdir(file_path)
+    frames.sort()
+
+    if resize is not None:
+        _tmp = os.path.join(file_path, frames[0])
+        _img = Image.open(_tmp)
+        img_size = _img.size
+        w = resize[0]
+        h = resize[1]
+
+    for ind, frame in enumerate(frames):
+
+        frame_path = os.path.join(file_path, frame)
+
+        img_frame = Image.open(frame_path)
+
+        if resize is not None:
+            img_frame = img_frame.resize((w, h), Image.ANTIALIAS)
+
+        name = '%05d.jpg' % (start_from)
+        name_path = os.path.join(dest_path, name)
+
+        img_frame.save(name_path)
+        start_from = start_from + 1
+
+
+process_files('copy_rose_25-', resize=(2304, 1296))
