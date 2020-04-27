@@ -128,7 +128,7 @@ def apply_same_settings(project_variable):
     project_variable.model_number = 16
     project_variable.sheet_number = 23
 
-    project_variable.end_epoch = 20
+    project_variable.end_epoch = 10
     # project_variable.end_epoch = 3
     project_variable.dataset = 'jester'
 
@@ -186,7 +186,7 @@ def process_results(results):
 
 def evolutionary_search(debug_mode=True):
     # generations = 100
-    generations = 50
+    generations = 20
     genetic_search_path = os.path.join(PP.jester_location, 'genetic_search_log.txt')
     if not os.path.exists(genetic_search_path):
         # delimiter = ';'
@@ -207,21 +207,20 @@ def evolutionary_search(debug_mode=True):
             ##                0   1   2                  3                  4       5            6  7  8      9                          10
             # genotype_1 = (3e-4, 4, [12, 18, 24, 32], [3, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0], 0, 1, 600, [0, 1, 0, 0, 0, 1, 2, 2], in_features_1)
 
-            genotype_1 = (5e-5, 6, [10, 14, 26, 26, 32, 38], [5, 7, 3, 3, 5, 5], [1, 1, 1, 1, 0, 0], [0, 0, 0, 0, 0, 0],
-                          0, 0, 1712, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
-
+            genotype_1 = (5e-5, 9, [10, 14, 20, 26, 38, 38, 44, 44, 44], [3, 3, 3, 5, 5, 5, 5, 7, 7], [2, 2, 1, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                          1, 0, 1456, [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_1 = GO.write_genome(genotype_1)
 
             # in_features_2 = 336
             # genotype_2 = (3e-4, 3, [16, 32, 32], [3, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 496, [0, 1, 0, 0, 1, 2, 2], in_features_2)
-            genotype_2 = (5e-5, 5, [10, 14, 26, 26, 32], [5, 5, 3, 3, 5], [1, 0, 0, 0, 0], [0, 0, 0, 0, 0],
-                          1, 0, 1456, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
+            genotype_2 = (5e-5, 9, [10, 14, 20, 26, 38, 38, 44, 44, 50], [5, 5, 5, 5, 5, 5, 5, 5, 5], [2, 2, 2, 1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                          1, 0, 1456, [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_2 = GO.write_genome(genotype_2)
 
             # in_features_3 = 182
             # genotype_3 = (3e-4, 3, [16, 32, 48], [5, 5, 5], [0, 0, 0], [0, 0, 0], 0, 1, 256, [0, 1, 0, 0, 1, 2, 2], in_features_3)
-            genotype_3 = (5e-5, 6, [10, 14, 26, 26, 32, 38], [5, 5, 3, 3, 5, 5], [1, 1, 1, 0, 0, 0], [0, 0, 0, 0, 0, 0],
-                          0, 1, 1584, [0, 1, 0, 0, 0, 0, 0, 1, 2, 2], 72)
+            genotype_3 = (5e-5, 9, [10, 14, 20, 20, 32, 38, 44, 44, 44], [3, 3, 3, 3, 3, 3, 3, 3, 3], [1, 1, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                          1, 1, 1200, [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2], 72)
             genome_3 = GO.write_genome(genotype_3)
 
 
