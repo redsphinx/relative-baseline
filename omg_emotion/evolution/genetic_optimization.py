@@ -31,6 +31,20 @@ PROBABILITY_DICT_L2 = {'lr': 0,
                        'architecture_order': 0,
                        'in_features': 0
                        }
+PROBABILITY_DICT_L3 = {'lr': 0.4,
+                       'num_conv_layers': 0.2,
+                       'num_channels': 0.7,
+                       'kernel_size_per_layer': 0.2,
+                       'padding': 0,
+                       'conv_layer_type': 0,
+                       'pooling_after_conv': 0.7,
+                       'pooling_final': 0.7,
+                       'fc_layer': 0.4,
+                       'architecture_order': 0,
+                       'in_features': 0
+                       }
+
+
 EXCEPTION_IND = [4, 9, 10]
 GENOTYPE_KEYS = list(PROBABILITY_DICT_L2.keys())
 LEN_GENOTYPE = len(GENOTYPE_KEYS)
@@ -212,12 +226,11 @@ def mutate_by_unit(genotype, value_index, param, direction, because_num_conv):
 
         unit = 1
         if direction:
-            value = value + unit
+            if value + unit <= 10:
+                value = value + unit
         else:
             if value - unit >= 2:
                 value = value - unit
-            else:
-                value = value + unit
 
     elif param == 'num_channels':
         unit = 6
@@ -329,23 +342,38 @@ def mutate_by_unit(genotype, value_index, param, direction, because_num_conv):
 
 
 
-def mutation(genotype, crossover_ind, collapsed):
+def mutation(genotype, crossover_ind, collapsed, val_accs):
     # determine if in L1 or L2
     # if none collapsed, L2 else L1
     collapsed = np.array(list(collapsed.items()), dtype=int)
+    val_accs = np.array(list(val_accs.items()), dtype=int)
+
+    val_bin = []
+    for i in range(3):
+        if val_accs[i, 1] > 1/27:
+            val_bin.append(1)
+        else:
+            val_bin.append(0)
 
     print(genotype)
 
+    # if there are no collapses
     if sum(collapsed[:, 1]) == 0:
-        level = 2
+        # if all validation accuracies are better than random
+        if sum(val_bin) == 3:
+            level = 3
+        else:
+            level = 2
     else:
         level = 1
 
     # if L1, modify prob table, else modify L2 table
     if level == 1:
         prob_tab = PROBABILITY_DICT_L1.copy()
-    else:
+    elif level == 2:
         prob_tab = PROBABILITY_DICT_L2.copy()
+    else:
+        prob_tab = PROBABILITY_DICT_L3.copy()
 
     # use crossover_ind to lower chances that good genes get changed
     for i in crossover_ind:
@@ -528,7 +556,7 @@ def generate_genotype(results, prev_genotypes):
 
     print('new geno ', new_geno)
 
-    new_genotypes = mutation(new_geno, crossover_ind, results[0])
+    new_genotypes = mutation(new_geno, crossover_ind, results[0], results[1])
     new_genotypes = create_architecture_order(new_genotypes)
 
     print('1 ', new_genotypes[0])

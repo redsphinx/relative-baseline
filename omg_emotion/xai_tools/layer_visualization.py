@@ -595,12 +595,14 @@ def our_gradient_method(project_variable, data_point, my_model, device):
                         highest_value = val
                         ind_1 = m
                         ind_2 = n
+                        # TODO also get the frame
 
             x_end[0, which_channel, 0, ind_1, ind_2].backward()
 
             image_grad = data.grad
 
             # FIX color
+            # TODO get the specific high activation frame
             if project_variable.dataset == 'jester':
                 final = image_grad[0, :, 0] * data[0, :, 0]
             else:

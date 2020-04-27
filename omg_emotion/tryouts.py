@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 # from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
 import skvideo.io
+from PIL import Image
 
 
 def plot_results():
@@ -377,4 +378,7 @@ def run_calc_av_1():
     t, h, w = calc_architecture_viability(t, h, w, 'pool', k=None, p=None, s=None, div=2)
 
 
-run_calc_av_1()
+# run_calc_av_1()
+
+
+
