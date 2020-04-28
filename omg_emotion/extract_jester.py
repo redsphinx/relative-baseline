@@ -429,7 +429,7 @@ def calculate_weights_for_loss(which='train'):
 
 
 def ffmpeg_clean(src, dest):
-    # command = "ffmpeg -loglevel fatal -i %s -map 0 -map -0:a -c copy -y %s" % (src, dest)
+    command = "ffmpeg -loglevel fatal -i %s -map 0 -map -0:a -c copy -y %s" % (src, dest)
     command = "ffmpeg -loglevel fatal -i %s -c copy -an %s" % (src, dest)
     subprocess.call(command, shell=True)
 

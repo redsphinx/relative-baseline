@@ -31,8 +31,8 @@ PROBABILITY_DICT_L2 = {'lr': 0,
                        'architecture_order': 0,
                        'in_features': 0
                        }
-PROBABILITY_DICT_L3 = {'lr': 0.4,
-                       'num_conv_layers': 0.2,
+PROBABILITY_DICT_L3 = {'lr': 0,
+                       'num_conv_layers': 0.4,
                        'num_channels': 0.7,
                        'kernel_size_per_layer': 0.2,
                        'padding': 0,
@@ -350,7 +350,7 @@ def mutation(genotype, crossover_ind, collapsed, val_accs):
 
     val_bin = []
     for i in range(3):
-        if val_accs[i, 1] > 1/27:
+        if val_accs[i, 1] > 0.1:
             val_bin.append(1)
         else:
             val_bin.append(0)
