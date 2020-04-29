@@ -81,7 +81,7 @@ def run(project_variable):
 
     # create the dali iterators
     if project_variable.use_dali:
-        if project_variable.nas:
+        if project_variable.nas or project_variable.debug_mode:
             train_file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
             val_file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
             test_file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')

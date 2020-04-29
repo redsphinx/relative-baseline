@@ -133,35 +133,6 @@ def e4_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
-def etes_conv3DTTN_jester():
-    set_init_1()
-    project_variable.model_number = 11
-    project_variable.experiment_number = 12234232323232
-    project_variable.sheet_number = 22
-    project_variable.device = 0
-    project_variable.end_epoch = 3
-    project_variable.repeat_experiments = 1
-    project_variable.batch_size = 5*27 # 10 * 27
-
-    project_variable.use_dali = True
-    project_variable.dali_workers = 8
-    # for now, use 'all' for val, since idk how to reset the iterator
-    project_variable.dali_iterator_size = [5*27, 'all', 0]
-
-    # project_variable.stop_at_collapse = True
-    # project_variable.early_stopping = True
-
-    project_variable.optimizer = 'adam'
-    project_variable.learning_rate = 0.0003
-    project_variable.use_adaptive_lr = True
-    project_variable.num_out_channels = [6, 16]
-    # project_variable.num_out_channels = [16, 32, 64, 128, 256]
-
-    main_file.run(project_variable)
-
-project_variable = ProjectVariable(debug_mode=True)
-
-
 def same_settings(pv):
     pv.nas = True
 
@@ -235,4 +206,32 @@ def parallel_experiment():
     # write the results to some file
 
 
-parallel_experiment()
+
+def e5_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 17
+    project_variable.experiment_number = 5
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 30
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 5 * 27
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [16, 20, 32, 32]
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=True)
+
+e5_conv3DTTN_jester()

@@ -21,4 +21,7 @@ project_variable.model_number
 13  lenet5 2dconv xD
 14  experimental model 3dconvTTN xD - 3 conv layers, 3 fc layers.   based on lenet-5
 15  experimental model 3dconvTTN xD - conv-relu-mp - 3 conv - avg pool - fc.    based on resnet without residual connections
-16  genetic search modular modelim
+16  genetic search modular model
+17  model17: resulting model from genetic search
+18  model18: resulting model from genetic search
+19  model19: resulting model from genetic search

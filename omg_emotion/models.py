@@ -2473,3 +2473,71 @@ class Experimental16_TTN3d_xD(torch.nn.Module):
 
         return x
 
+
+# 0.00005
+# 4
+# [16, 20, 32, 32]
+# [3, 3, 5, 3]
+# [0, 0, 0, 0]
+# ['conv3dttn', 'conv3dttn', 'conv3dttn', 'conv3dttn']
+# avg	avg	1968
+# ['conv', 'pool', 'conv', 'conv', 'conv', 'pool', 'fc', 'fc']	336
+
+class Model17(torch.nn.Module):
+    def __init__(self, project_variable):
+
+        if project_variable.dataset == 'jester':
+            t, h, w = 30, 50, 75
+        else:
+            t, h, w = None, None, None
+
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
+        super(Model17, self).__init__()
+
+        self.conv1 = make_ConvTTN3d_layer(project_variable, which_layer=1, k=3, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=0, s=1, div=None)
+
+        self.max_pool_1 = torch.nn.AvgPool3d(kernel_size=2)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        self.conv2 = make_ConvTTN3d_layer(project_variable, which_layer=2, k=3, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=0, s=1, div=None)
+
+        self.conv3 = make_ConvTTN3d_layer(project_variable, which_layer=3, k=5, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+
+        self.conv4 = make_ConvTTN3d_layer(project_variable, which_layer=4, k=3, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=0, s=1, div=None)
+
+        self.max_pool_2 = torch.nn.AvgPool3d(kernel_size=2)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        # out_channels of last conv layer - 1
+        in_features = t * h * w * project_variable.num_out_channels[4 - 1]
+        self.fc1 = torch.nn.Linear(in_features, 1968)
+        self.fc2 = torch.nn.Linear(1968, project_variable.label_size)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.max_pool_1(x)
+
+        x = self.conv2(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv4(x, device)
+        x = torch.nn.functional.relu(x)
+
+        x = self.max_pool_2(x)
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc2(x)
+
+        return x
