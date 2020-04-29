@@ -10006,10 +10006,50 @@ def debug_3DTTN_mnist():
     main_file.run(project_variable)
 
 
+def get_resnet_info():
+    project_variable.end_epoch = 1
+    project_variable.repeat_experiments = 1
+    project_variable.data_points = [20, 20, 0]
+    project_variable.batch_size = 2 * 10
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.srxy_smoothness = None
+    project_variable.weight_transform = 'seq'
+
+    project_variable.dataset = 'mnist'
+    project_variable.num_in_channels = 1
+    project_variable.label_size = 10
+    project_variable.load_num_frames = 30  # 50
+    project_variable.label_type = 'categories'
+
+    project_variable.save_only_best_run = True
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+
+    project_variable.experiment_state = 'new'
+    project_variable.eval_on = 'val'
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.001
+    project_variable.use_adaptive_lr = False
+    # project_variable.num_out_channels = [6, 16]
+
+    project_variable.experiment_number = 334334
+    project_variable.sheet_number = 18
+    project_variable.device = 2
+
+    project_variable.model_number = 0
+
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=True)
 
+get_resnet_info()
 
-debug_3DTTN_mnist()
+# debug_3DTTN_mnist()
 
 # e1399_3D_mnist()
 # e1399_3DTTN_mnist()

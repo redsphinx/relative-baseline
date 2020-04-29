@@ -7,7 +7,8 @@ import torch.nn as nn
 from torch.nn.modules import conv
 from torch.nn import functional as F
 from torch.nn.modules.utils import _triple
-from torch.nn.functional import conv3d
+from torch.nn import MaxPool2d, MaxPool3d, AdaptiveAvgPool3d, AdaptiveAvgPool2d, Conv3d, Conv2d, BatchNorm2d, BatchNorm3d
+
 
 
 class LeNet5_2d(torch.nn.Module):
@@ -2512,13 +2513,16 @@ class Model17(torch.nn.Module):
         self.conv4 = make_ConvTTN3d_layer(project_variable, which_layer=4, k=3, p=0)
         t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=0, s=1, div=None)
 
+        self.conv5 = make_ConvTTN3d_layer(project_variable, which_layer=5, k=5, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+
         self.max_pool_2 = torch.nn.AvgPool3d(kernel_size=2)
         t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
 
         # out_channels of last conv layer - 1
-        in_features = t * h * w * project_variable.num_out_channels[4 - 1]
-        self.fc1 = torch.nn.Linear(in_features, 1968)
-        self.fc2 = torch.nn.Linear(1968, project_variable.label_size)
+        in_features = t * h * w * project_variable.num_out_channels[5 - 1]
+        self.fc1 = torch.nn.Linear(in_features, 1456)
+        self.fc2 = torch.nn.Linear(1456, project_variable.label_size)
 
     def forward(self, x, device):
         x = self.conv1(x, device)
@@ -2531,6 +2535,8 @@ class Model17(torch.nn.Module):
         x = torch.nn.functional.relu(x)
         x = self.conv4(x, device)
         x = torch.nn.functional.relu(x)
+        x = self.conv5(x, device)
+        x = torch.nn.functional.relu(x)
 
         x = self.max_pool_2(x)
 
@@ -2541,3 +2547,126 @@ class Model17(torch.nn.Module):
         x = self.fc2(x)
 
         return x
+
+
+class Model18(torch.nn.Module):
+    def __init__(self, project_variable):
+
+        if project_variable.dataset == 'jester':
+            t, h, w = 30, 50, 75
+        else:
+            t, h, w = None, None, None
+
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
+        super(Model18, self).__init__()
+
+        self.conv1 = make_ConvTTN3d_layer(project_variable, which_layer=1, k=3, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=1, s=1, div=None)
+
+        self.max_pool_1 = torch.nn.MaxPool3d(kernel_size=2)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        self.conv2 = make_ConvTTN3d_layer(project_variable, which_layer=2, k=3, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=1, s=1, div=None)
+
+        self.conv3 = make_ConvTTN3d_layer(project_variable, which_layer=3, k=5, p=1)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=1, s=1, div=None)
+
+        self.conv4 = make_ConvTTN3d_layer(project_variable, which_layer=4, k=3, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=3, p=0, s=1, div=None)
+
+        self.conv5 = make_ConvTTN3d_layer(project_variable, which_layer=5, k=5, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+
+        self.conv6 = make_ConvTTN3d_layer(project_variable, which_layer=6, k=5, p=0)
+        t, h, w = auto_in_features_2(t, h, w, 'conv', k=5, p=0, s=1, div=None)
+
+        self.max_pool_2 = torch.nn.AvgPool3d(kernel_size=2)
+        t, h, w = auto_in_features_2(t, h, w, 'pool', k=None, p=None, s=None, div=2)
+
+        # out_channels of last conv layer - 1
+        in_features = t * h * w * project_variable.num_out_channels[6 - 1]
+        self.fc1 = torch.nn.Linear(in_features, 1328)
+        self.fc2 = torch.nn.Linear(1328, project_variable.label_size)
+
+    def forward(self, x, device):
+        x = self.conv1(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.max_pool_1(x)
+
+        x = self.conv2(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv3(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv4(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv5(x, device)
+        x = torch.nn.functional.relu(x)
+        x = self.conv6(x, device)
+        x = torch.nn.functional.relu(x)
+
+        x = self.max_pool_2(x)
+
+        _shape = x.shape
+        x = x.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        x = self.fc1(x)
+        x = torch.nn.functional.relu(x)
+        x = self.fc2(x)
+
+        return x
+
+
+class Layer(torch.nn.Sequential):
+    def __initi(self):
+
+        super(Layer, self).__init()
+
+    def forward(self, input):
+        pass
+
+
+class ResNet18_2D(torch.nn.Module):
+    def __init__(self, project_variable):
+        if project_variable.dataset == 'jester':
+            t, h, w = 30, 50, 75
+        else:
+            t, h, w = None, None, None
+
+        self.return_ind = False
+        if project_variable.return_ind:
+            self.return_ind = True
+
+        super(ResNet18_2D, self).__init__()
+
+        self.conv1 = Conv2d(in_channels=3,
+                            out_channels=64,
+                            kernel_size=7,
+                            padding=3,
+                            stride=2,
+                            bias=False)
+        self.bn1 = BatchNorm2d(64)
+
+        self.maxpool = MaxPool2d(kernel_size=3, padding=1, stride=2)
+
+        self.layer1 = Layer()
+
+        self.layer2 = Layer()
+
+        self.layer3 = Layer()
+
+        self.layer4 = Layer()
+
+
+
+
+
+
+    def forward(self, *input):
+
+        pass
+
+
+# model.layer3[0].conv1

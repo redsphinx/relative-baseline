@@ -281,17 +281,23 @@ def run(project_variable):
                 project_variable.val = False
                 project_variable.test = False
 
+
+
                 if project_variable.train:
+                    condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
+                    condition_2 = not project_variable.debug_mode
+
                     w = None
                     if project_variable.model_number == 0:
                         w = np.array([1955] * 7) / np.array([262, 96, 54, 503, 682, 339, 19])
-                    elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
+                    elif condition_1 or condition_2:
                         w = np.array([0.0379007, 0.03862456, 0.0370375, 0.03737979, 0.03620443,
                                       0.03648918, 0.03675273, 0.03750421, 0.03627937, 0.03738865,
                                       0.03676129, 0.03696806, 0.03817587, 0.0391227, 0.04904935,
                                       0.04642222, 0.0371072, 0.03684716, 0.0366673, 0.03648918,
                                       0.03607197, 0.03593228, 0.0370462, 0.03637139, 0.03608847,
                                       0.036873, 0.01644524])
+
                     if w is not None:
                         w = w.astype(dtype=np.float32)
                         w = torch.from_numpy(w).cuda(device)
@@ -335,10 +341,13 @@ def run(project_variable):
                 project_variable.test = False
 
                 if project_variable.val:
+                    condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
+                    condition_2 = not project_variable.debug_mode
+
                     w = None
                     if project_variable.model_number == 0:
                         w = np.array([481] * 7) / np.array([51, 34, 17, 156, 141, 75, 7])
-                    elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
+                    elif condition_1 or condition_2:
                         w = np.array([0.03913151, 0.03897372, 0.03606524, 0.03929058, 0.03464331, 0.0377558,
                                       0.03945095, 0.03913151, 0.03593117, 0.03593117, 0.03835509, 0.04044135,
                                       0.03731847, 0.0370325, 0.04931369, 0.04646867, 0.0354047, 0.03760889,
@@ -371,10 +380,13 @@ def run(project_variable):
                         project_variable.test = False
 
                     if project_variable.test:
+                        condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
+                        condition_2 = not project_variable.debug_mode
+
                         w = None
                         if project_variable.model_number == 0:
                             w = np.array([1989] * 7) / np.array([329, 135, 50, 550, 678, 231, 16])
-                        elif project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas:
+                        elif condition_1 or condition_2:
                             w = np.array([0.03897281, 0.04044657, 0.03819954, 0.03674154, 0.03716712, 0.0356529,
                                           0.03513242, 0.03578544, 0.03674154, 0.03804855, 0.03450281, 0.03437958,
                                           0.03674154, 0.0414926, 0.05093271, 0.05039939, 0.03804855, 0.03578544,

@@ -207,10 +207,10 @@ def parallel_experiment():
 
 
 
-def e5_conv3DTTN_jester():
+def e6_conv3DTTN_jester():
     set_init_1()
     project_variable.model_number = 17
-    project_variable.experiment_number = 5
+    project_variable.experiment_number = 6
     project_variable.sheet_number = 22
     project_variable.device = 0
     project_variable.end_epoch = 30
@@ -228,10 +228,37 @@ def e5_conv3DTTN_jester():
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.00005
     project_variable.use_adaptive_lr = True
-    project_variable.num_out_channels = [16, 20, 32, 32]
+    project_variable.num_out_channels = [10, 14, 32, 32, 50]
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=True)
 
-e5_conv3DTTN_jester()
+def e7_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 18
+    project_variable.experiment_number = 7
+    project_variable.sheet_number = 22
+    project_variable.device = 2
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 5 * 27
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [10, 20, 32, 32, 38, 44]
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
+
+# e6_conv3DTTN_jester()
+e7_conv3DTTN_jester()
