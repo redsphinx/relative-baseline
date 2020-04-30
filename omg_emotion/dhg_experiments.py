@@ -1241,10 +1241,51 @@ def e_test_3DTTN_dhg():
     main_file.run(project_variable)
 # --------------------------------------
 
+def thisistest():
+    project_variable.end_epoch = 2
+    project_variable.dataset = 'dhg'
+
+    project_variable.num_in_channels = 1
+    project_variable.label_size = 14
+    project_variable.load_num_frames = 50  # 50
+    project_variable.label_type = 'categories'
+
+    project_variable.repeat_experiments = 1
+    project_variable.save_only_best_run = True
+    project_variable.same_training_data = True
+    project_variable.randomize_training_data = True
+    project_variable.balance_training_data = True
+
+    project_variable.experiment_state = 'new'
+    project_variable.eval_on = 'val'
+
+    project_variable.theta_init = None
+    project_variable.srxy_init = 'eye'
+    project_variable.weight_transform = 'seq'
+
+    project_variable.repeat_experiments = 1
+
+    project_variable.experiment_number = 777656767
+    project_variable.sheet_number = 21
+    project_variable.device = 0
+
+    project_variable.model_number = 20
+    project_variable.data_points = [2 * 14, 2 * 14, 1 * 14]
+    project_variable.batch_size = 2 * 14
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 1e-4
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [6, 16]
+
+    main_file.run(project_variable)
+
 
 project_variable = ProjectVariable(debug_mode=True)
 
 # e71_3D_dhg()
 # e72_3DTTN_dhg()
 
-e_test_3DTTN_dhg()
+# e_test_3DTTN_dhg()
+
+thisistest()

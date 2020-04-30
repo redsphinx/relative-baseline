@@ -258,7 +258,91 @@ def e7_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
+
+def e8_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 17
+    project_variable.experiment_number = 8
+    project_variable.sheet_number = 22
+    project_variable.device = 2
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 5 * 27
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [10, 20, 32, 32, 38, 44, 44]
+
+    main_file.run(project_variable)
+
+
+def eRESNET_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 8
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 1 * 27
+
+    project_variable.data_points = [1 * 27, 1 * 27, 0 * 27]
+
+    # project_variable.use_dali = True
+    # project_variable.dali_workers = 32
+    # project_variable.dali_iterator_size = ['all', 'all', 0]
+    # project_variable.nas = False
+
+    # project_variable.stop_at_collapse = True
+    # project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    main_file.run(project_variable)
+
+
+def e9_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 9
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 5 * 27
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    main_file.run(project_variable)
+
+# project_variable = ProjectVariable(debug_mode=False)
 project_variable = ProjectVariable(debug_mode=False)
 
 # e6_conv3DTTN_jester()
-e7_conv3DTTN_jester()
+# e7_conv3DTTN_jester()
+# e8_conv3DTTN_jester()
+# eRESNET_jester()
+e9_conv3DTTN_jester()

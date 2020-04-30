@@ -8,6 +8,7 @@ import os
 from relative_baseline.omg_emotion import models as M
 from relative_baseline.omg_emotion import factorized_convolution as C3D
 from relative_baseline.omg_emotion.evolution.model_maker import ModularConv
+from relative_baseline.omg_emotion.model_resnet18 import ResNet18
 
 
 def prepare_model(project_variable, model):
@@ -179,6 +180,11 @@ def get_model(project_variable):
 
     elif project_variable.model_number == 18:
         model = M.Model18(project_variable)
+        if project_variable.load_model is not None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+    elif project_variable.model_number == 20:
+        model = ResNet18(project_variable)
         if project_variable.load_model is not None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
