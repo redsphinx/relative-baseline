@@ -229,11 +229,27 @@ def standardize_clips(b, e, he, wi, loc):
 
             elif leftover > frames:
                 to_add = leftover - frames
-                try:
-                    assert to_add == 1
-                except AssertionError:
-                    print('to_add != 1')
-                frames_to_remove.append(frames_to_remove[-1]-1)
+
+                if to_add == 1:
+                    frames_to_remove.append(frames_to_remove[-1]-1)
+                else:
+                    selection_list = [i for i in range(num_frames)]
+                    tmp = []
+                    ind = 0
+                    while len(tmp) != num_frames:
+                        tmp.append(selection_list.pop(ind))
+                        if ind == 0:
+                            ind = -1
+                        else:
+                            ind = 0
+
+                    for i in range(len(tmp)):
+                        if tmp[i] not in frames_to_remove:
+                            selection_list.append(tmp[i])
+
+                    for a_t in range(to_add):
+                        frames_to_remove.append(selection_list[a_t])
+
                 frames_to_remove.sort()
 
 
@@ -262,23 +278,26 @@ def standardize_clips(b, e, he, wi, loc):
             cntr = cntr + 1
 
 # 148092
-# DONE  standardize_clips(0, 3)
-# standardize_clips(0, 3, he=224, wi=336, loc='data_224_336')
-# standardize_clips(3, 10000, he=224, wi=336, loc='data_224_336')
+# DONE standardize_clips(0, 3, he=224, wi=336, loc='data_224_336')
+
+# standardize_clips(3+1267, 10000, he=224, wi=336, loc='data_224_336')  # 1267
 # standardize_clips(10000, 20000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(20000, 30000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(30000, 40000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(40000, 50000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(50000, 60000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(60000, 70000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(70000, 80000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(80000, 90000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(90000, 100000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(20000+395, 30000, he=224, wi=336, loc='data_224_336')  # 395
+# standardize_clips(30000+2017, 40000, he=224, wi=336, loc='data_224_336') # 2017
+
+# standardize_clips(40000+3862, 50000, he=224, wi=336, loc='data_224_336') # 3862
+# standardize_clips(50000+1531, 60000, he=224, wi=336, loc='data_224_336') # 1531
+# standardize_clips(60000+5580, 70000, he=224, wi=336, loc='data_224_336') # 5580
+# standardize_clips(70000+3711, 80000, he=224, wi=336, loc='data_224_336')  # 3711
+
+# standardize_clips(80000+716, 90000, he=224, wi=336, loc='data_224_336') # 716
+# standardize_clips(90000+2400, 100000, he=224, wi=336, loc='data_224_336') # 2400
 # standardize_clips(100000, 110000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(110000, 120000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(120000, 130000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(130000, 140000, he=224, wi=336, loc='data_224_336')
-standardize_clips(140000, 148092, he=224, wi=336, loc='data_224_336')
+# standardize_clips(110000+890, 120000, he=224, wi=336, loc='data_224_336') # 890
+
+# standardize_clips(120000+1331, 130000, he=224, wi=336, loc='data_224_336') # 1331
+# standardize_clips(130000+1992, 140000, he=224, wi=336, loc='data_224_336') # 1992
+standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336') # 305
 
 
 def triple_check_num_frames_in_folders():
