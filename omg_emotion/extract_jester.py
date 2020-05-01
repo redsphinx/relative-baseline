@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import os
 from PIL import Image, ImageDraw
 import matplotlib
@@ -157,16 +158,17 @@ def adjust_frame(image, h, w, c):
     # resize to height of h
     or_w, or_h = image.size
     new_w = int(h * or_w / or_h)
-    image = image.resize((new_w, h)) # w, h
+    image = image.resize((new_w, h), resample=Image.BICUBIC) # w, h
 
     if new_w > w:
         delta_w = (new_w - w) // 2
-        image = image.crop((delta_w, 0, new_w-delta_w-1, h)) # l, u, r, d
+        delta_w_2 = w + delta_w
+        image = image.crop((delta_w, 0, delta_w_2, h))  # l, u, r, d
     elif new_w < w:
         delta_w = (w - new_w) // 2
         image = np.array(image)
         pixel_mean = np.mean(np.mean(image, axis=0), axis=0)
-        pixel_mean =np.array(pixel_mean, dtype=int)
+        pixel_mean = np.array(pixel_mean, dtype=int)
         canvas = np.ones(shape=(h, w, c), dtype=np.uint8)
         canvas = canvas * pixel_mean
         # paste it
@@ -179,15 +181,15 @@ def adjust_frame(image, h, w, c):
     return image
 
 
-def standardize_clips(b, e):
+def standardize_clips(b, e, he, wi, loc):
     print(b, e)
-    height = 50
-    width = 75
+    height = he # 50
+    width = wi  # 75
     channels = 3
     frames = 30
 
     base_path = PP.jester_data
-    new_path = os.path.join(PP.jester_location, 'data_50_75')
+    new_path = os.path.join(PP.jester_location, loc)  # 'data_50_75')
 
     if not os.path.exists(new_path):
         os.mkdir(new_path)
@@ -196,6 +198,7 @@ def standardize_clips(b, e):
     all_videos.sort()
 
     for vid in tqdm.tqdm(range(b, e)):
+        # print('vid = ', vid)
         vid_path = os.path.join(base_path, all_videos[vid])
         new_vid_path = os.path.join(new_path, all_videos[vid])
         if not os.path.exists(new_vid_path):
@@ -207,14 +210,14 @@ def standardize_clips(b, e):
         num_frames = len(all_frames)
         if num_frames < frames:
             missing_frames = frames - num_frames
-            dupl_1 = [0 for n in range(missing_frames // 2)]
-            dupl_2 = [num_frames-1 for n in range(missing_frames - missing_frames // 2)]
+            dupl_1 = [0] * (missing_frames // 2)
+            dupl_2 = [num_frames-1] * (missing_frames - missing_frames // 2)
             dupl_mid = [n for n in range(num_frames)]
             frames_to_copy = dupl_1 + dupl_mid + dupl_2
             assert len(frames_to_copy) == frames
 
         elif num_frames > frames:
-            frames_to_remove = [n for n in range(0, num_frames, num_frames // (num_frames - frames))]
+            frames_to_remove = [n for n in range(0, num_frames, int(math.ceil(num_frames / (num_frames - frames))))]
             leftover = num_frames - len(frames_to_remove)
 
             if leftover < frames:
@@ -225,7 +228,14 @@ def standardize_clips(b, e):
                 assert num_frames - len(frames_to_remove) == frames
 
             elif leftover > frames:
-                print('leftover > frames')
+                to_add = leftover - frames
+                try:
+                    assert to_add == 1
+                except AssertionError:
+                    print('to_add != 1')
+                frames_to_remove.append(frames_to_remove[-1]-1)
+                frames_to_remove.sort()
+
 
             frames_to_copy = [n for n in range(num_frames)]
             for n in frames_to_remove:
@@ -253,21 +263,22 @@ def standardize_clips(b, e):
 
 # 148092
 # DONE  standardize_clips(0, 3)
-# standardize_clips(3, 10000)
-# standardize_clips(10000, 20000)
-# standardize_clips(20000, 30000)
-# standardize_clips(30000, 40000)
-# standardize_clips(40000, 50000)
-# standardize_clips(50000, 60000)
-# standardize_clips(60000, 70000)
-# standardize_clips(70000, 80000)
-# standardize_clips(80000, 90000)
-# standardize_clips(90000, 100000)
-# standardize_clips(100000, 110000)
-# standardize_clips(110000, 120000)
-# standardize_clips(120000, 130000)
-# standardize_clips(130000, 140000)
-# standardize_clips(140000, 148092)
+# standardize_clips(0, 3, he=224, wi=336, loc='data_224_336')
+# standardize_clips(3, 10000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(10000, 20000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(20000, 30000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(30000, 40000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(40000, 50000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(50000, 60000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(60000, 70000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(70000, 80000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(80000, 90000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(90000, 100000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(100000, 110000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(110000, 120000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(120000, 130000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(130000, 140000, he=224, wi=336, loc='data_224_336')
+standardize_clips(140000, 148092, he=224, wi=336, loc='data_224_336')
 
 
 def triple_check_num_frames_in_folders():
@@ -495,4 +506,5 @@ def short_balanced_selection(which, data_per_class=500):
             # print(line)
             my_file.write(line)
 
-short_balanced_selection('val', data_per_class=200)
+
+# short_balanced_selection('val', data_per_class=200)
