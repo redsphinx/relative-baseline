@@ -15,7 +15,8 @@ class ConvolutionBlock(torch.nn.Module):
                               kernel_size=7,
                               stride=2,
                               padding=3,
-                              project_variable=pv)
+                              project_variable=pv,
+                              bias=False)
         self.bn_conv = BatchNorm3d(out_channels)
 
     def forward(self, x, device):
@@ -32,13 +33,15 @@ class ResidualBlock(torch.nn.Module):
                                       out_channels=out_channels,
                                       kernel_size=3,
                                       padding=1,
-                                      project_variable=pv)
+                                      project_variable=pv,
+                                      bias=False)
         self.bn_branch2a = BatchNorm3d(out_channels)
         self.res_branch2b = ConvTTN3d(in_channels=in_channels,
                                       out_channels=out_channels,
                                       kernel_size=3,
                                       padding=1,
-                                      project_variable=pv)
+                                      project_variable=pv,
+                                      bias=False)
         self.bn_branch2b = BatchNorm3d(out_channels)
 
     def forward(self, x, device):
@@ -58,20 +61,23 @@ class ResidualBlockB(torch.nn.Module):
         self.res_branch1 = Conv3d(in_channels=in_channels,
                                   out_channels=out_channels,
                                   kernel_size=1,
-                                  stride=2)
+                                  stride=2,
+                                  bias=False)
         self.bn_branch1 = BatchNorm3d(out_channels)
         self.res_branch2a = ConvTTN3d(in_channels=in_channels,
                                       out_channels=out_channels,
                                       kernel_size=3,
                                       stride=2,
                                       padding=1,
-                                      project_variable=pv)
+                                      project_variable=pv,
+                                      bias=False)
         self.bn_branch2a = BatchNorm3d(out_channels)
         self.res_branch2b = ConvTTN3d(in_channels=out_channels,
                                       out_channels=out_channels,
                                       kernel_size=3,
                                       padding=1,
-                                      project_variable=pv)
+                                      project_variable=pv,
+                                      bias=False)
         self.bn_branch2b = BatchNorm3d(out_channels)
 
     def forward(self, x, device):
@@ -91,18 +97,18 @@ class ResidualBlockB(torch.nn.Module):
 class ResNet18(torch.nn.Module):
     def __init__(self, pv):
         super(ResNet18, self).__init__()
-        self.conv1_relu = ConvolutionBlock(3, 32, pv)
-        self.maxpool = MaxPool3d(kernel_size=3, padding=1, stride=2)
-        self.res2a_relu = ResidualBlock(32, 32, pv)
-        self.res2b_relu = ResidualBlock(32, 32, pv)
-        self.res3a_relu = ResidualBlockB(32, 64, pv)
-        self.res3b_relu = ResidualBlock(64, 64, pv)
-        self.res4a_relu = ResidualBlockB(64, 128, pv)
-        self.res4b_relu = ResidualBlock(128, 128, pv)
-        self.res5a_relu = ResidualBlockB(128, 256, pv)
-        self.res5b_relu = ResidualBlock(256, 256, pv)
+        self.conv1_relu = ConvolutionBlock(3, 64, pv)
+        self.maxpool = MaxPool3d(kernel_size=3, padding=1, stride=2, dilation=1)
+        self.res2a_relu = ResidualBlock(64, 64, pv)
+        self.res2b_relu = ResidualBlock(64, 64, pv)
+        self.res3a_relu = ResidualBlockB(64, 128, pv)
+        self.res3b_relu = ResidualBlock(128, 128, pv)
+        self.res4a_relu = ResidualBlockB(128, 256, pv)
+        self.res4b_relu = ResidualBlock(256, 256, pv)
+        self.res5a_relu = ResidualBlockB(256, 512, pv)
+        self.res5b_relu = ResidualBlock(512, 512, pv)
         self.avgpool = AdaptiveAvgPool3d(output_size=1)
-        self.fc = torch.nn.Linear(256, 27)
+        self.fc = torch.nn.Linear(512, 27)
 
     def forward(self, x, device):
         print(x.shape)

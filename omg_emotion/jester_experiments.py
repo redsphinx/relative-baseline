@@ -288,7 +288,7 @@ def e8_conv3DTTN_jester():
 def eRESNET_jester():
     set_init_1()
     project_variable.model_number = 20
-    project_variable.experiment_number = 8
+    project_variable.experiment_number = 8538953849588588
     project_variable.sheet_number = 22
     project_variable.device = 0
     project_variable.end_epoch = 100
@@ -296,6 +296,8 @@ def eRESNET_jester():
     project_variable.batch_size = 1 * 27
 
     project_variable.data_points = [1 * 27, 1 * 27, 0 * 27]
+
+    project_variable.load_model = True
 
     # project_variable.use_dali = True
     # project_variable.dali_workers = 32
@@ -339,10 +341,10 @@ def e9_conv3DTTN_jester():
     main_file.run(project_variable)
 
 # project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()
 # e8_conv3DTTN_jester()
-# eRESNET_jester()
-e9_conv3DTTN_jester()
+eRESNET_jester()
+# e9_conv3DTTN_jester()
