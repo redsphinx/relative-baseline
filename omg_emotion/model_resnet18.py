@@ -111,31 +111,229 @@ class ResNet18(torch.nn.Module):
         self.fc = torch.nn.Linear(512, 27)
 
     def forward(self, x, device):
-        print(x.shape)
         h = self.conv1_relu(x, device)
-        print(h.shape)
         h = self.maxpool(h)
-        print(h.shape)
         h = self.res2a_relu(h, device)
-        print(h.shape)
         h = self.res2b_relu(h, device)
-        print(h.shape)
         h = self.res3a_relu(h, device)
-        print(h.shape)
         h = self.res3b_relu(h, device)
-        print(h.shape)
         h = self.res4a_relu(h, device)
-        print(h.shape)
         h = self.res4b_relu(h, device)
-        print(h.shape)
         h = self.res5a_relu(h, device)
-        print(h.shape)
         h = self.res5b_relu(h, device)
-        print(h.shape)
         h = self.avgpool(h)
-        print(h.shape)
         _shape = h.shape
         h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         y = self.fc(h)
-        print(h.shape)
+        return y
+
+
+class ResNet18Explicit(torch.nn.Module):
+    def __init__(self, pv):
+        super(ResNet18Explicit, self).__init__()
+        # self.conv1_relu = ConvolutionBlock(3, 64, pv)
+        self.conv1 = ConvTTN3d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3, project_variable=pv, bias=False)
+        self.bn1 = BatchNorm3d(64)
+        
+        self.maxpool = MaxPool3d(kernel_size=3, padding=1, stride=2, dilation=1)
+        
+        # self.res2a_relu = ResidualBlock(64, 64, pv)
+        self.conv2 = ConvTTN3d(in_channels=64, out_channels=64, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn2 = BatchNorm3d(64)
+        self.conv3 = ConvTTN3d(in_channels=64, out_channels=64, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn3 = BatchNorm3d(64)
+        
+        # self.res2b_relu = ResidualBlock(64, 64, pv)
+        self.conv4 = ConvTTN3d(in_channels=64, out_channels=64, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn4 = BatchNorm3d(64)
+        self.conv5 = ConvTTN3d(in_channels=64, out_channels=64, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn5 = BatchNorm3d(64)
+        
+        # self.res3a_relu = ResidualBlockB(64, 128, pv)
+        self.conv6 = Conv3d(in_channels=64, out_channels=128, kernel_size=1, stride=2, bias=False)
+        self.bn6 = BatchNorm3d(128)
+        self.conv7 = ConvTTN3d(in_channels=64, out_channels=128, kernel_size=3, stride=2, padding=1, project_variable=pv, bias=False)
+        self.bn7 = BatchNorm3d(128)
+        self.conv8 = ConvTTN3d(in_channels=128, out_channels=128, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn8 = BatchNorm3d(128)
+        
+        # self.res3b_relu = ResidualBlock(128, 128, pv)
+        self.conv9 = ConvTTN3d(in_channels=128, out_channels=128, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn9 = BatchNorm3d(128)
+        self.conv10 = ConvTTN3d(in_channels=128, out_channels=128, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn10 = BatchNorm3d(128)
+        
+        # self.res4a_relu = ResidualBlockB(128, 256, pv)
+        self.conv11 = Conv3d(in_channels=128, out_channels=256, kernel_size=1, stride=2, bias=False)
+        self.bn11 = BatchNorm3d(256)
+        self.conv12 = ConvTTN3d(in_channels=128, out_channels=256, kernel_size=3, stride=2, padding=1, project_variable=pv, bias=False)
+        self.bn12 = BatchNorm3d(256)
+        self.conv13 = ConvTTN3d(in_channels=256, out_channels=256, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn13 = BatchNorm3d(256)
+        
+        # self.res4b_relu = ResidualBlock(256, 256, pv)
+        self.conv14 = ConvTTN3d(in_channels=256, out_channels=256, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn14 = BatchNorm3d(256)
+        self.conv15 = ConvTTN3d(in_channels=256, out_channels=256, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn15 = BatchNorm3d(256)
+        
+        # self.res5a_relu = ResidualBlockB(256, 512, pv)
+        self.conv16 = Conv3d(in_channels=256, out_channels=512, kernel_size=1, stride=2, bias=False)
+        self.bn16 = BatchNorm3d(512)
+        self.conv17 = ConvTTN3d(in_channels=256, out_channels=512, kernel_size=3, stride=2, padding=1, project_variable=pv, bias=False)
+        self.bn17 = BatchNorm3d(512)
+        self.conv18 = ConvTTN3d(in_channels=512, out_channels=512, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn18 = BatchNorm3d(512)
+        
+        # self.res5b_relu = ResidualBlock(512, 512, pv)
+        self.conv19 = ConvTTN3d(in_channels=512, out_channels=512, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn19 = BatchNorm3d(512)
+        self.conv20 = ConvTTN3d(in_channels=512, out_channels=512, kernel_size=3, padding=1, project_variable=pv, bias=False)
+        self.bn20 = BatchNorm3d(512)
+        
+        self.avgpool = AdaptiveAvgPool3d(output_size=1)
+        self.fc = torch.nn.Linear(512, 27)
+
+    def forward(self, x, device, stop_at=None):
+        # h = self.conv1_relu(x, device)
+
+        num = 1
+        h = self.conv1(x, device)
+        if stop_at == num:
+            return h
+        h = self.bn1(h)
+        h = relu(h)
+        
+        h = self.maxpool(h)
+        
+        # h = self.res2a_relu(h, device)
+        num = 2
+        h1 = self.conv2(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn2(h1)
+        h1 = relu(h1)
+        num = 3
+        h1 = self.conv3(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn3(h1)
+        h = h1 + h
+        h = relu(h)
+        
+        # h = self.res2b_relu(h, device)
+        num = 4
+        h1 = self.conv4(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn4(h1)
+        h1 = relu(h1)
+        num = 5
+        h1 = self.conv5(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn5(h1)
+        h = h1 + h
+        h = relu(h)
+        
+        # h = self.res3a_relu(h, device)
+        temp = self.conv6(h)
+        temp = self.bn6(temp)
+        num = 7
+        h1 = self.conv7(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn7(h1)
+        h1 = relu(h1)
+        num = 8
+        h1 = self.conv8(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn8(h1)
+        h = temp + h1
+        h = relu(h)
+        
+        # h = self.res3b_relu(h, device)
+        num = 9
+        h1 = self.conv9(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn9(h1)
+        h1 = relu(h1)
+        num = 10
+        h1 = self.conv10(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn10(h1)
+        h = h1 + h
+        h = relu(h)
+        
+        # h = self.res4a_relu(h, device)
+        temp = self.conv11(h)
+        temp = self.bn11(temp)
+        num = 12
+        h1 = self.conv12(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn12(h1)
+        h1 = relu(h1)
+        num = 13
+        h1 = self.conv13(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn13(h1)
+        h = temp + h1
+        h = relu(h)
+        
+        # h = self.res4b_relu(h, device)
+        num = 14
+        h1 = self.conv14(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn14(h1)
+        h1 = relu(h1)
+        num = 15
+        h1 = self.conv15(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn15(h1)
+        h = h1 + h
+        h = relu(h)
+        
+        # h = self.res5a_relu(h, device)
+        temp = self.conv16(h)
+        temp = self.bn16(temp)
+        num = 17
+        h1 = self.conv17(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn17(h1)
+        h1 = relu(h1)
+        num = 18
+        h1 = self.conv18(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn18(h1)
+        h = temp + h1
+        h = relu(h)
+        
+        # h = self.res5b_relu(h, device)
+        num = 19
+        h1 = self.conv19(h, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn19(h1)
+        h1 = relu(h1)
+        num = 20
+        h1 = self.conv20(h1, device)
+        if stop_at == num:
+            return h1
+        h1 = self.bn20(h1)
+        h = h1 + h
+        h = relu(h)
+        
+        h = self.avgpool(h)
+        _shape = h.shape
+        h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+        y = self.fc(h)
         return y

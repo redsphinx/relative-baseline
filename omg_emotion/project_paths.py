@@ -57,6 +57,9 @@ jester_data = '/scratch/users/gabras/jester/data'
 jester_data_50_75 = '/scratch/users/gabras/jester/data_50_75'
 jester_data_50_75_avi = '/scratch/users/gabras/jester/data_50_75_avi'
 jester_data_50_75_avi_clean = '/scratch/users/gabras/jester/data_50_75_avi_clean'
+jester_data_224_336 = '/scratch/users/gabras/jester/data_224_336'
+jester_data_224_336_avi = '/scratch/users/gabras/jester/data_224_336_avi'
+
 
 
 jester_frames = '/scratch/users/gabras/jester/frames.txt'

@@ -282,8 +282,11 @@ def add_xai(project_variable, my_model, device, data_point=None):
 
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
+
+        # TODO add mode for resnet18's
+
         # mode = 'slices'
-        if project_variable.model_number in [11, 14, 15, 16]:
+        if project_variable.model_number in [11, 14, 15, 16, 20]:
             mode = 'srxy' # only for 3DTTN
         else:
             mode = None

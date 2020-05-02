@@ -199,8 +199,10 @@ def standardize_clips(b, e, he, wi, loc):
 
     for vid in tqdm.tqdm(range(b, e)):
         # print('vid = ', vid)
-        vid_path = os.path.join(base_path, all_videos[vid])
-        new_vid_path = os.path.join(new_path, all_videos[vid])
+        # vid_path = os.path.join(base_path, all_videos[vid])
+        # new_vid_path = os.path.join(new_path, all_videos[vid])
+        vid_path = os.path.join(base_path, str(vid))
+        new_vid_path = os.path.join(new_path, str(vid))
         if not os.path.exists(new_vid_path):
             os.mkdir(new_vid_path)
 
@@ -297,23 +299,27 @@ def standardize_clips(b, e, he, wi, loc):
 
 # standardize_clips(120000+1331, 130000, he=224, wi=336, loc='data_224_336') # 1331
 # standardize_clips(130000+1992, 140000, he=224, wi=336, loc='data_224_336') # 1992
-standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336') # 305
-
+# standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336') # 305
+# standardize_clips(101138, 101138+1, he=224, wi=336, loc='data_224_336')
+# standardize_clips(101139, 101139+1, he=224, wi=336, loc='data_224_336')
 
 def triple_check_num_frames_in_folders():
-    path = PP.jester_data_50_75
-    save_path = os.path.join(PP.jester_location, 'missing_frames.txt')
+    # path = PP.jester_data_50_75
+    path = PP.jester_data_224_336
+    # save_path = os.path.join(PP.jester_location, 'missing_frames.txt')
+    save_path = os.path.join(PP.jester_location, 'missing_frames_224x336.txt')
 
     all_folders = os.listdir(path)
     all_folders.sort()
     for i in tqdm.tqdm(range(len(all_folders))):
         p1 = os.path.join(path, all_folders[i])
         num_frames = wc_l(p1)
-        if num_frames < 30:
+        if num_frames != 30:
             print(all_folders[i], num_frames)
             with open(save_path, 'a') as my_file:
                 my_file.write('%s,%d\n' % (all_folders[i], num_frames))
 
+# triple_check_num_frames_in_folders()
 
 def redo_folders_with_few_frames():
     folders_missing_frames = os.path.join(PP.jester_location, 'missing_frames.txt')
@@ -375,29 +381,29 @@ def to_avi(which, b, e):
     print('start and finish: ', b, e)
     assert which in ['test', 'val', 'train']
 
-    if not os.path.exists(PP.jester_data_50_75_avi):
-        os.mkdir(PP.jester_data_50_75_avi)
+    if not os.path.exists(PP.jester_data_224_336_avi):
+        os.mkdir(PP.jester_data_224_336_avi)
 
     labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
     labels = np.load(labels_path)
     labels = labels[b:e]
 
-    list_files_to_convert = [os.path.join(PP.jester_data_50_75, i) for i in labels[:, 0]]
+    list_files_to_convert = [os.path.join(PP.jester_data_224_336, i) for i in labels[:, 0]]
 
     for file_path in tqdm.tqdm(list_files_to_convert):
 
         fix_file_names_in_folder(file_path)
 
-        dest = os.path.join(PP.jester_data_50_75_avi, '%s.avi' % (file_path.split('/')[-1]))
+        dest = os.path.join(PP.jester_data_224_336_avi, '%s.avi' % (file_path.split('/')[-1]))
 
         jpg_to_avi(file_path, dest)
 
 
-# to_avi('val', 0, 100)
-# to_avi('val', 100, 10000)  # 7393
+# to_avi('val', 0, 3)
+# to_avi('val', 3, 10000)  # 7393
 
 # to_avi('train', 0, 10000)
-# to_avi('train', 10000, 20000)
+# to_avi('train', 10000+2069, 20000) # 2069
 # to_avi('train', 20000, 30000)
 # to_avi('train', 30000, 40000)
 # to_avi('train', 40000, 50000)

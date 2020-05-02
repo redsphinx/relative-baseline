@@ -187,7 +187,9 @@ def get_model(project_variable):
 
     elif project_variable.model_number == 20:
         model = ResNet18(project_variable)
-        if project_variable.load_model is not None:
+        if type(project_variable.load_model) != bool and not project_variable.load_model is None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        elif project_variable.load_model:
             # load resnet18 from pytorch
             tmp_resnet18 = resnet18(pretrained=True)
             # copy the weights
@@ -212,24 +214,24 @@ def get_model(project_variable):
             model.res5b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2))
             model.res5b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
 
-            # set weights of 3D conv to not require grad
-            model.conv1_relu.conv.weight.requires_grad = False
-            model.res2a_relu.res_branch2a.weight.requires_grad = False
-            model.res2a_relu.res_branch2b.weight.requires_grad = False
-            model.res2b_relu.res_branch2a.weight.requires_grad = False
-            model.res2b_relu.res_branch2b.weight.requires_grad = False
-            model.res3a_relu.res_branch2a.weight.requires_grad = False
-            model.res3a_relu.res_branch2b.weight.requires_grad = False
-            model.res3b_relu.res_branch2a.weight.requires_grad = False
-            model.res3b_relu.res_branch2b.weight.requires_grad = False
-            model.res4a_relu.res_branch2a.weight.requires_grad = False
-            model.res4a_relu.res_branch2b.weight.requires_grad = False
-            model.res4b_relu.res_branch2a.weight.requires_grad = False
-            model.res4b_relu.res_branch2b.weight.requires_grad = False
-            model.res5a_relu.res_branch2a.weight.requires_grad = False
-            model.res5a_relu.res_branch2b.weight.requires_grad = False
-            model.res5b_relu.res_branch2a.weight.requires_grad = False
-            model.res5b_relu.res_branch2b.weight.requires_grad = False
+        # set weights of 3D conv to not require grad
+        model.conv1_relu.conv.weight.requires_grad = False
+        model.res2a_relu.res_branch2a.weight.requires_grad = False
+        model.res2a_relu.res_branch2b.weight.requires_grad = False
+        model.res2b_relu.res_branch2a.weight.requires_grad = False
+        model.res2b_relu.res_branch2b.weight.requires_grad = False
+        model.res3a_relu.res_branch2a.weight.requires_grad = False
+        model.res3a_relu.res_branch2b.weight.requires_grad = False
+        model.res3b_relu.res_branch2a.weight.requires_grad = False
+        model.res3b_relu.res_branch2b.weight.requires_grad = False
+        model.res4a_relu.res_branch2a.weight.requires_grad = False
+        model.res4a_relu.res_branch2b.weight.requires_grad = False
+        model.res4b_relu.res_branch2a.weight.requires_grad = False
+        model.res4b_relu.res_branch2b.weight.requires_grad = False
+        model.res5a_relu.res_branch2a.weight.requires_grad = False
+        model.res5a_relu.res_branch2b.weight.requires_grad = False
+        model.res5b_relu.res_branch2a.weight.requires_grad = False
+        model.res5b_relu.res_branch2b.weight.requires_grad = False
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
