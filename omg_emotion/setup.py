@@ -259,7 +259,7 @@ def get_model(project_variable):
         # model.res5b_relu.res_branch2b.weight.requires_grad = False
 
         # explicit version
-        model.conv1_relu.conv.weight.requires_grad = False
+        model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
         model.conv3.weight.requires_grad = False
         model.conv4.weight.requires_grad = False

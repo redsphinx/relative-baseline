@@ -1095,19 +1095,20 @@ class VideoPipe(Pipeline):
                                      random_shuffle=shuffle,
                                      initial_fill=initial_fill)
 
-        self.scale_between_0_1 = ops.Normalize(mean=0.0,
-                                               stddev=1/255)
+        # self.scale_between_0_1 = ops.Normalize(device="gpu",
+        #                                        mean=0.0,
+        #                                        stddev=255)
 
-        self.normalize = ops.Normalize(mean=[0.485, 0.456, 0.406],
-                                       stddev=[0.229, 0.224, 0.225])
+        # self.normalize = ops.Normalize(mean=[0.485, 0.456, 0.406],
+        #                                stddev=[0.229, 0.224, 0.225])
         # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
         #                                  std=[0.229, 0.224, 0.225])
 
     def define_graph(self):
         output, labels = self.input(name="Reader")
-        result1 = self.scale_between_0_1(output)
-        result2 = self.normalize(result1)
-        return result2, labels
+        # result1 = self.scale_between_0_1(output)
+        # result2 = self.normalize(result1)
+        return output, labels
 
 
 def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_seed, iterator_size, reset, device):

@@ -11,6 +11,28 @@ from relative_baseline.omg_emotion import tensorboard_manager as TM
 from .settings import ProjectVariable
 
 
+def create_normalize(h, w, device):
+    means = np.ones((135, 3, 30, h, w))
+    means[:, 0, :] = means[:, 0, :] * 0.485
+    means[:, 1, :] = means[:, 1, :] * 0.456
+    means[:, 2, :] = means[:, 2, :] * 0.406
+
+    stds = np.ones((135, 3, 30, h, w))
+    stds[:, 0, :] = stds[:, 0, :] * 0.229
+    stds[:, 1, :] = stds[:, 1, :] * 0.224
+    stds[:, 2, :] = stds[:, 2, :] * 0.225
+
+    means = torch.from_numpy(means)
+    means = means.type(torch.float32)
+    means = means.cuda(device)
+
+    stds = torch.from_numpy(stds)
+    stds = stds.type(torch.float32)
+    stds = stds.cuda(device)
+
+    return means, stds
+
+
 def run(project_variable, all_data, my_model, my_optimizer, device):
     # if project_variable.use_dali, all_data = train iterator
     # all_data = np.array with the train datasplit depending
@@ -29,6 +51,11 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
 
     if project_variable.use_dali:
+        if project_variable.debug_mode:
+            means, stds = create_normalize(50, 75, device)
+        else:
+            means, stds = create_normalize(224, 336, device)
+
         steps = 0
 
         for i, data_and_labels in enumerate(all_data):
@@ -47,11 +74,11 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             data = data.permute(0, 4, 1, 2, 3)
             # convert to floattensor
             data = data.type(torch.float32)
+            data = (data/255 - means) / stds
             labels = labels.type(torch.long)
             labels = labels.flatten()
             labels = labels - 1
 
-            # TODO: check the label values
             my_optimizer.zero_grad()
 
             if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20]:

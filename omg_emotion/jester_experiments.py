@@ -420,8 +420,8 @@ def e11_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()
