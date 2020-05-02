@@ -86,9 +86,14 @@ def run(project_variable):
             val_file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
             test_file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
         else:
-            train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
-            val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
-            test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
+            if project_variable.model_number == 20:
+                train_file_list = os.path.join(PP.jester_location, 'filelist_train_224_336.txt')
+                val_file_list = os.path.join(PP.jester_location, 'filelist_val_224_336.txt')
+                test_file_list = os.path.join(PP.jester_location, 'filelist_test_224_336.txt')
+            else:
+                train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
+                val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
+                test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
 
         if project_variable.val:
             print('Loading validation iterator...')

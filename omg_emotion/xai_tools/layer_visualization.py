@@ -809,7 +809,7 @@ def visualize_resnet18(project_variable, data_point, my_model, device, kernel_vi
                 all_finals = []
                 all_finals.append(final)
 
-                # get transformations
+                # TODO: get transformations
 
                 for trafo in range(trafo_per_filter):
                     s = getattr(getattr(my_model, which_layer), 'scale')[trafo, which_channel]

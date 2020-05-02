@@ -418,17 +418,19 @@ def to_avi(which, b, e):
 # to_avi('test', 0, 10000)
 
 
-def create_file_list(which):
+def create_file_list(which, dest, jester_data_path):
     assert which in ['test', 'val', 'train']
 
-    dest_path = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+    # dest_path = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+    dest_path = os.path.join(PP.jester_location, 'filelist_%s_%s.txt' % (which, dest))
 
     labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
     labels = np.load(labels_path)
 
     with open(dest_path, 'a') as my_file:
         for i in range(len(labels)):
-            fname = os.path.join(os.path.join(PP.jester_data_50_75_avi, '%s.avi' % labels[i, 0]))
+            fname = os.path.join(os.path.join(jester_data_path, '%s.avi' % labels[i, 0]))
+            # fname = os.path.join(os.path.join(PP.jester_data_50_75_avi, '%s.avi' % labels[i, 0]))
             the_label = int(labels[i, 1]) + 1
 
             # NOTE: there *HAS* to be a space between the image path and the label
@@ -438,7 +440,8 @@ def create_file_list(which):
             my_file.write(line)
 
 
-# create_file_list('train')
+# create_file_list('test', dest='224_336', jester_data_path=PP.jester_data_224_336_avi)
+
 
 def calculate_weights_for_loss(which='train'):
     assert which in ['test', 'val', 'train']
@@ -533,3 +536,4 @@ def short_balanced_selection(which, data_per_class=500):
 
 
 # short_balanced_selection('val', data_per_class=200)
+

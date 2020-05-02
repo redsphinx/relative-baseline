@@ -8,7 +8,7 @@ import os
 from relative_baseline.omg_emotion import models as M
 from relative_baseline.omg_emotion import factorized_convolution as C3D
 from relative_baseline.omg_emotion.evolution.model_maker import ModularConv
-from relative_baseline.omg_emotion.model_resnet18 import ResNet18
+from relative_baseline.omg_emotion.model_resnet18 import ResNet18, ResNet18Explicit
 
 
 def prepare_model(project_variable, model):
@@ -186,52 +186,96 @@ def get_model(project_variable):
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
     elif project_variable.model_number == 20:
-        model = ResNet18(project_variable)
+        # model = ResNet18(project_variable)
+        model = ResNet18Explicit(project_variable)
         if type(project_variable.load_model) != bool and not project_variable.load_model is None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
         elif project_variable.load_model:
             # load resnet18 from pytorch
             tmp_resnet18 = resnet18(pretrained=True)
             # copy the weights
-            model.conv1_relu.conv.first_weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2))
-            model.res2a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2))
-            model.res2a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2))
-            model.res2b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2))
-            model.res2b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2))
-            model.res3a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2))
-            model.res3a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2))
-            model.res3a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2))
-            model.res3b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2))
-            model.res3b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2))
-            model.res4a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2))
-            model.res4a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2))
-            model.res4a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2))
-            model.res4b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2))
-            model.res4b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2))
-            model.res5a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2))
-            model.res5a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2))
-            model.res5a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2))
-            model.res5b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2))
-            model.res5b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
+            # Umut version
+            # model.conv1_relu.conv.first_weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2))
+            # model.res2a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2))
+            # model.res2a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2))
+            # model.res2b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2))
+            # model.res2b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2))
+            # model.res3a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2))
+            # model.res3a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2))
+            # model.res3a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2))
+            # model.res3b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2))
+            # model.res3b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2))
+            # model.res4a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2))
+            # model.res4a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2))
+            # model.res4a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2))
+            # model.res4b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2))
+            # model.res4b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2))
+            # model.res5a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2))
+            # model.res5a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2))
+            # model.res5a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2))
+            # model.res5b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2))
+            # model.res5b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
+
+            # explicit version
+            model.conv1.first_weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2))
+            model.conv2.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2))
+            model.conv3.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2))
+            model.conv4.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2))
+            model.conv5.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2))
+            model.conv6.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2))
+            model.conv7.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2))
+            model.conv8.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2))
+            model.conv9.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2))
+            model.conv10.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2))
+            model.conv11.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2))
+            model.conv12.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2))
+            model.conv13.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2))
+            model.conv14.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2))
+            model.conv15.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2))
+            model.conv16.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2))
+            model.conv17.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2))
+            model.conv18.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2))
+            model.conv19.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2))
+            model.conv20.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
 
         # set weights of 3D conv to not require grad
+        # Umut version
+        # model.conv1_relu.conv.weight.requires_grad = False
+        # model.res2a_relu.res_branch2a.weight.requires_grad = False
+        # model.res2a_relu.res_branch2b.weight.requires_grad = False
+        # model.res2b_relu.res_branch2a.weight.requires_grad = False
+        # model.res2b_relu.res_branch2b.weight.requires_grad = False
+        # model.res3a_relu.res_branch2a.weight.requires_grad = False
+        # model.res3a_relu.res_branch2b.weight.requires_grad = False
+        # model.res3b_relu.res_branch2a.weight.requires_grad = False
+        # model.res3b_relu.res_branch2b.weight.requires_grad = False
+        # model.res4a_relu.res_branch2a.weight.requires_grad = False
+        # model.res4a_relu.res_branch2b.weight.requires_grad = False
+        # model.res4b_relu.res_branch2a.weight.requires_grad = False
+        # model.res4b_relu.res_branch2b.weight.requires_grad = False
+        # model.res5a_relu.res_branch2a.weight.requires_grad = False
+        # model.res5a_relu.res_branch2b.weight.requires_grad = False
+        # model.res5b_relu.res_branch2a.weight.requires_grad = False
+        # model.res5b_relu.res_branch2b.weight.requires_grad = False
+
+        # explicit version
         model.conv1_relu.conv.weight.requires_grad = False
-        model.res2a_relu.res_branch2a.weight.requires_grad = False
-        model.res2a_relu.res_branch2b.weight.requires_grad = False
-        model.res2b_relu.res_branch2a.weight.requires_grad = False
-        model.res2b_relu.res_branch2b.weight.requires_grad = False
-        model.res3a_relu.res_branch2a.weight.requires_grad = False
-        model.res3a_relu.res_branch2b.weight.requires_grad = False
-        model.res3b_relu.res_branch2a.weight.requires_grad = False
-        model.res3b_relu.res_branch2b.weight.requires_grad = False
-        model.res4a_relu.res_branch2a.weight.requires_grad = False
-        model.res4a_relu.res_branch2b.weight.requires_grad = False
-        model.res4b_relu.res_branch2a.weight.requires_grad = False
-        model.res4b_relu.res_branch2b.weight.requires_grad = False
-        model.res5a_relu.res_branch2a.weight.requires_grad = False
-        model.res5a_relu.res_branch2b.weight.requires_grad = False
-        model.res5b_relu.res_branch2a.weight.requires_grad = False
-        model.res5b_relu.res_branch2b.weight.requires_grad = False
+        model.conv2.weight.requires_grad = False
+        model.conv3.weight.requires_grad = False
+        model.conv4.weight.requires_grad = False
+        model.conv5.weight.requires_grad = False
+        model.conv7.weight.requires_grad = False
+        model.conv8.weight.requires_grad = False
+        model.conv9.weight.requires_grad = False
+        model.conv10.weight.requires_grad = False
+        model.conv12.weight.requires_grad = False
+        model.conv13.weight.requires_grad = False
+        model.conv14.weight.requires_grad = False
+        model.conv15.weight.requires_grad = False
+        model.conv17.weight.requires_grad = False
+        model.conv18.weight.requires_grad = False
+        model.conv19.weight.requires_grad = False
+        model.conv20.weight.requires_grad = False
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
