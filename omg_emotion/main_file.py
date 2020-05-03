@@ -79,38 +79,53 @@ def run(project_variable):
         else:
             project_variable.train = False
 
-    # create the dali iterators
-    if project_variable.use_dali:
-        if project_variable.nas or project_variable.debug_mode:
-            train_file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
-            val_file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
-            test_file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
-        else:
-            if project_variable.model_number == 20:
-                train_file_list = os.path.join(PP.jester_location, 'filelist_train_224_336.txt')
-                val_file_list = os.path.join(PP.jester_location, 'filelist_val_224_336.txt')
-                test_file_list = os.path.join(PP.jester_location, 'filelist_test_224_336.txt')
-            else:
-                train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
-                val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
-                test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
+    # setup model, optimizer & device
+    my_model = setup.get_model(project_variable)
+    device = setup.get_device(project_variable)
 
-        if project_variable.val:
-            print('Loading validation iterator...')
-            val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0,
-                                              project_variable.dali_iterator_size[1], True, project_variable.device)
-        if project_variable.test:
-            print('Loading test iterator...')
-            test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0,
-                                               project_variable.dali_iterator_size[2], True, project_variable.device)
-        if not project_variable.inference_only_mode:
-            print('Loading training iterator...')
-            train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
-                                                project_variable.dali_workers,
-                                                project_variable.randomize_training_data, 6,
-                                                project_variable.dali_iterator_size[0], True, project_variable.device)
+    if project_variable.device is not None:
+        my_model.cuda(device)
 
+    if project_variable.inference_only_mode:
+        pass
     else:
+        my_optimizer = setup.get_optimizer(project_variable, my_model)
+
+    print('Loaded model number %d with %d trainable parameters' % (
+        project_variable.model_number, U.count_parameters(my_model)))
+
+    # create the dali iterators
+    if not project_variable.use_dali:
+
+        # if project_variable.nas or project_variable.debug_mode:
+        #     train_file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
+        #     val_file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
+        #     test_file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
+        # else:
+        #     if project_variable.model_number == 20:
+        #         train_file_list = os.path.join(PP.jester_location, 'filelist_train_224_336.txt')
+        #         val_file_list = os.path.join(PP.jester_location, 'filelist_val_224_336.txt')
+        #         test_file_list = os.path.join(PP.jester_location, 'filelist_test_224_336.txt')
+        #     else:
+        #         train_file_list = os.path.join(PP.jester_location, 'filelist_train.txt')
+        #         val_file_list = os.path.join(PP.jester_location, 'filelist_val.txt')
+        #         test_file_list = os.path.join(PP.jester_location, 'filelist_test.txt')
+        #
+        # if project_variable.val:
+        #     print('Loading validation iterator...')
+        #     val_iter = D.create_dali_iterator(10 * 27, val_file_list, 4, False, 0,
+        #                                       project_variable.dali_iterator_size[1], True, project_variable.device)
+        # if project_variable.test:
+        #     print('Loading test iterator...')
+        #     test_iter = D.create_dali_iterator(10 * 27, test_file_list, 4, False, 0,
+        #                                        project_variable.dali_iterator_size[2], True, project_variable.device)
+        # if not project_variable.inference_only_mode:
+        #     print('Loading training iterator...')
+        #     train_iter = D.create_dali_iterator(project_variable.batch_size, train_file_list,
+        #                                         project_variable.dali_workers,
+        #                                         project_variable.randomize_training_data, 6,
+        #                                         project_variable.dali_iterator_size[0], True, project_variable.device)
+
         data = D.load_data(project_variable, seed=None)
 
         if project_variable.train:
@@ -184,20 +199,7 @@ def run(project_variable):
         project_variable.writer = SummaryWriter(path)
         print('tensorboardX writer path: %s' % path)
 
-        # setup model, optimizer & device
-        my_model = setup.get_model(project_variable)
-        device = setup.get_device(project_variable)
 
-        if project_variable.device is not None:
-            my_model.cuda(device)
-
-        if project_variable.inference_only_mode:
-            pass
-        else:
-            my_optimizer = setup.get_optimizer(project_variable, my_model)
-
-        print('Loaded model number %d with %d trainable parameters' % (
-        project_variable.model_number, U.count_parameters(my_model)))
 
         if not project_variable.debug_mode:
             if num_runs == 0:
@@ -320,7 +322,7 @@ def run(project_variable):
 
                     # labels is list because can be more than one type of labels
                     if project_variable.use_dali:
-                        data = train_iter
+                        data = None
                         my_model.train()
                     else:
                         data = data_train, labels_train
@@ -364,7 +366,7 @@ def run(project_variable):
                         project_variable.loss_weights = w
 
                     if project_variable.use_dali:
-                        data = val_iter
+                        data = None
                     else:
                         data = data_val, labels_val
 
@@ -403,7 +405,7 @@ def run(project_variable):
                             project_variable.loss_weights = w
 
                         if project_variable.use_dali:
-                            data = test_iter
+                            data = None
                         else:
                             data = data_test, labels_test
 

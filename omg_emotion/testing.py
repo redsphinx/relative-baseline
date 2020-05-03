@@ -16,9 +16,10 @@ def run(project_variable, all_data, my_model, device):
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
+        the_iterator = DL.get_jester_iter('test', project_variable)
         steps = 0
 
-        for i, data_and_labels in enumerate(all_data):
+        for i, data_and_labels in enumerate(the_iterator):
 
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']

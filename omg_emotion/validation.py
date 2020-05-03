@@ -23,9 +23,10 @@ def run(project_variable, all_data, my_model, device):
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
+        the_iterator = DL.get_jester_iter('val', project_variable)
         steps = 0
 
-        for i, data_and_labels in enumerate(all_data):
+        for i, data_and_labels in enumerate(the_iterator):
 
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
@@ -34,6 +35,11 @@ def run(project_variable, all_data, my_model, device):
             data = data.permute(0, 4, 1, 2, 3)
             # convert to floattensor
             data = data.type(torch.float32)
+            data = data / 255
+            data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
+            data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
+            data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
+
             labels = labels.type(torch.long)
             labels = labels.flatten()
             labels = labels - 1

@@ -65,6 +65,8 @@ class ProjectVariable(object):
         # default is to use all of the data
         # this controls the number of steps: steps = dali_iterator_size / batch_size
         self._dali_iterator_size = ['all', 'all', 'all']
+        self._imnet_mean = None
+        self._imnet_std = None
         # for training in parallel
         # self._run_in_parallel = False
 
@@ -111,6 +113,7 @@ class ProjectVariable(object):
         # depending on debug mode
         if debug_mode:
             self._batch_size = 30
+            self._batch_size_val_test = 30
             self._start_epoch = -1
             self._end_epoch = 5
             self._train_steps = 10
@@ -121,6 +124,7 @@ class ProjectVariable(object):
             self._save_graphs = False
         else:
             self._batch_size = 30
+            self._batch_size_val_test = 30
             self._start_epoch = -1
             self._end_epoch = 20
             self._train_steps = 50
@@ -415,6 +419,22 @@ class ProjectVariable(object):
     def dali_iterator_size(self, value):
         self._dali_iterator_size = value
 
+    @property
+    def imnet_mean(self):
+        return self._imnet_mean
+
+    @imnet_mean.setter
+    def imnet_mean(self, value):
+        self._imnet_mean = value
+
+    @property
+    def imnet_std(self):
+        return self._imnet_std
+
+    @imnet_std.setter
+    def imnet_std(self, value):
+        self._imnet_std = value
+
     # @property
     # def run_in_parallel(self):
     #     return self._run_in_parallel
@@ -542,6 +562,14 @@ class ProjectVariable(object):
     @batch_size.setter
     def batch_size(self, value):
         self._batch_size = value
+
+    @property
+    def batch_size_val_test(self):
+        return self._batch_size_val_test
+
+    @batch_size_val_test.setter
+    def batch_size_val_test(self, value):
+        self._batch_size_val_test = value
 
     @property
     def start_epoch(self):

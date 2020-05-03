@@ -326,6 +326,7 @@ def e9_conv3DTTN_jester():
     project_variable.repeat_experiments = 3
     project_variable.batch_size = 5 * 27
 
+
     project_variable.use_dali = True
     project_variable.dali_workers = 32
     project_variable.dali_iterator_size = ['all', 'all', 0]
@@ -401,9 +402,39 @@ def e11_conv3DTTN_jester():
     project_variable.device = 0
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 3
-    project_variable.batch_size = 5 * 27
+    project_variable.batch_size = 16
+    project_variable.batch_size_val_test = 16
 
     project_variable.load_model = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    main_file.run(project_variable)
+
+
+def e12_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 12
+    project_variable.sheet_number = 22
+    project_variable.device = 2
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 3
+    project_variable.batch_size = 16
+    project_variable.batch_size_val_test = 16
+
+    project_variable.load_model = None
 
     project_variable.use_dali = True
     project_variable.dali_workers = 32
@@ -430,4 +461,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e9_conv3DTTN_jester()
 # e10_conv3DTTN_jester()
 # vis_conv3DTTN_jester()
-e11_conv3DTTN_jester()
+# e11_conv3DTTN_jester()
+e12_conv3DTTN_jester()

@@ -363,11 +363,24 @@ def generate_next_k_slice(flow_grid, k0):
 
 
 
+def create_normalize(h, w, device, project_variable):
+    means = np.ones((project_variable.batch_size, 3, 30, h, w))
+    means[:, 0, :] = means[:, 0, :] * 0.485
+    means[:, 1, :] = means[:, 1, :] * 0.456
+    means[:, 2, :] = means[:, 2, :] * 0.406
 
+    stds = np.ones((project_variable.batch_size, 3, 30, h, w))
+    stds[:, 0, :] = stds[:, 0, :] * 0.229
+    stds[:, 1, :] = stds[:, 1, :] * 0.224
+    stds[:, 2, :] = stds[:, 2, :] * 0.225
 
-def normalize_input(data):
-    'asdf'
+    means = torch.from_numpy(means)
+    means = means.type(torch.float32)
+    means = means.cuda(device)
 
-    return data
+    stds = torch.from_numpy(stds)
+    stds = stds.type(torch.float32)
+    stds = stds.cuda(device)
 
+    return means, stds
 

@@ -1081,6 +1081,8 @@ class VideoPipe(Pipeline):
                  step=-1,
                  stride=1,
                  initial_fill=1024,
+                 # initial_fill=512,
+                 # initial_fill=256,
                  seed=0):
 
         super(VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
@@ -1095,19 +1097,11 @@ class VideoPipe(Pipeline):
                                      random_shuffle=shuffle,
                                      initial_fill=initial_fill)
 
-        # self.scale_between_0_1 = ops.Normalize(device="gpu",
-        #                                        mean=0.0,
-        #                                        stddev=255)
-
-        # self.normalize = ops.Normalize(mean=[0.485, 0.456, 0.406],
-        #                                stddev=[0.229, 0.224, 0.225])
-        # normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-        #                                  std=[0.229, 0.224, 0.225])
+        self.normalize = ops.Normalize(device='gpu',
+                                       )
 
     def define_graph(self):
         output, labels = self.input(name="Reader")
-        # result1 = self.scale_between_0_1(output)
-        # result2 = self.normalize(result1)
         return output, labels
 
 
@@ -1132,3 +1126,39 @@ def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_see
                                     fill_last_batch=True, last_batch_padded=False)
 
     return dali_iter
+
+
+def get_jester_iter(which, project_variable):
+    assert which in ['train', 'val', 'test']
+
+    if project_variable.nas or project_variable.debug_mode:
+        if which == 'train':
+            file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
+        elif which == 'val':
+            file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
+        else:
+            file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
+    else:
+        if project_variable.model_number == 20:
+            file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336.txt' % which)
+        else:
+            file_list = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+    
+    if which == 'val':
+        print('Loading validation iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+                                        file_list, project_variable.dali_workers, False, 0,
+                                        project_variable.dali_iterator_size[1], True, project_variable.device)
+    elif which == 'test':
+        print('Loading test iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+                                        file_list, project_variable.dali_workers, False, 0,
+                                        project_variable.dali_iterator_size[2], True, project_variable.device)
+    else:
+        print('Loading training iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size, file_list,
+                                        project_variable.dali_workers,
+                                        project_variable.randomize_training_data, 6,
+                                        project_variable.dali_iterator_size[0], True, project_variable.device)
+
+    return the_iter
