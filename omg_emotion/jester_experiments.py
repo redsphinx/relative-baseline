@@ -3,6 +3,28 @@ from multiprocessing import Pool
 
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
+import subprocess
+import time
+
+
+def get_gpu_memory_map():
+    """Get the current gpu usage.
+
+    Returns
+    -------
+    usage: dict
+        Keys are device ids as integers.
+        Values are memory usage as integers in MB.
+    """
+    result = subprocess.check_output(
+        [
+            'nvidia-smi', '--query-gpu=memory.used',
+            '--format=csv,nounits,noheader'
+        ], encoding='utf-8')
+    # Convert lines into a dictionary
+    gpu_memory = [int(x) for x in result.strip().split('\n')]
+    gpu_memory_map = dict(zip(range(len(gpu_memory)), gpu_memory))
+    return gpu_memory_map
 
 
 def set_init_1():
@@ -394,10 +416,10 @@ def vis_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
-def e11_conv3DTTN_jester():
+def e13_conv3DTTN_jester():
     set_init_1()
     project_variable.model_number = 20
-    project_variable.experiment_number = 11
+    project_variable.experiment_number = 13
     project_variable.sheet_number = 22
     project_variable.device = 0
     project_variable.end_epoch = 100
@@ -405,7 +427,7 @@ def e11_conv3DTTN_jester():
     project_variable.batch_size = 16
     project_variable.batch_size_val_test = 16
 
-    project_variable.load_model = True
+    project_variable.load_model = [11, 20, 3, 0]
 
     project_variable.use_dali = True
     project_variable.dali_workers = 32
@@ -423,10 +445,11 @@ def e11_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
-def e12_conv3DTTN_jester():
+def e14_conv3DTTN_jester():
     set_init_1()
+
     project_variable.model_number = 20
-    project_variable.experiment_number = 12
+    project_variable.experiment_number = 14
     project_variable.sheet_number = 22
     project_variable.device = 2
     project_variable.end_epoch = 100
@@ -434,7 +457,7 @@ def e12_conv3DTTN_jester():
     project_variable.batch_size = 16
     project_variable.batch_size_val_test = 16
 
-    project_variable.load_model = None
+    project_variable.load_model = [12, 20, 3, 0]
 
     project_variable.use_dali = True
     project_variable.dali_workers = 32
@@ -448,6 +471,14 @@ def e12_conv3DTTN_jester():
     project_variable.learning_rate = 0.00005
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [0]
+
+    go = False
+    while not go:
+        gpu_available = get_gpu_memory_map()
+        if gpu_available[project_variable.device] < 100:
+            go = True
+        else:
+            time.sleep(10)
 
     main_file.run(project_variable)
 
@@ -462,4 +493,6 @@ project_variable = ProjectVariable(debug_mode=False)
 # e10_conv3DTTN_jester()
 # vis_conv3DTTN_jester()
 # e11_conv3DTTN_jester()
-e12_conv3DTTN_jester()
+# e12_conv3DTTN_jester()
+# e13_conv3DTTN_jester()
+e14_conv3DTTN_jester()

@@ -767,20 +767,22 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
 def visualize_resnet18(project_variable, data_point, my_model, device, kernel_visualizations=True, srxy_plots=True):
     # it plots and saves the first 10 channels of each layer in 3x3 and 7x7 conv
     assert project_variable.model_number == 20
-    num_channels = 10
+    num_channels = 2
 
     if kernel_visualizations:
 
         all_outputs = []
         data = None
         all_srxy_params = []
-        # Todo: remove later
-        trafo_per_filter = project_variable.transformations_per_filter
+        trafo_per_layer = []
 
         # get all the layers and the names
         conv_layers = [i+1 for i in range(20) if i not in [6, 11, 16]]
 
         for ind in conv_layers:
+            channels = []
+            srxy_params = []
+
             for ch in range(num_channels):
                 data = data_point.copy()
                 data = torch.nn.Parameter(data, requires_grad=True)
@@ -809,99 +811,19 @@ def visualize_resnet18(project_variable, data_point, my_model, device, kernel_vi
                 all_finals = []
                 all_finals.append(final)
 
-                # TODO: get transformations
+                # get the size of transformation
+                _conv_name = 'conv%d' % ind
+                transformations = getattr(my_model, _conv_name)
+                num_transformations = transformations.shape[0]
+                # to keep track of how many transformations we have in a channel in a layer
+                if ch == 0:
+                    trafo_per_layer.append(num_transformations)
 
-                for trafo in range(trafo_per_filter):
-                    s = getattr(getattr(my_model, which_layer), 'scale')[trafo, which_channel]
-                    r = getattr(getattr(my_model, which_layer), 'rotate')[trafo, which_channel]
-                    x = getattr(getattr(my_model, which_layer), 'translate_x')[trafo, which_channel]
-                    y = getattr(getattr(my_model, which_layer), 'translate_y')[trafo, which_channel]
-
-                    # apply them on the final image
-                    next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
-                    all_finals.append(next_final)
-
-                    # translate parameters to interpretable things
-                    # scale -> 1/s
-                    # rotation -> degrees counterclockwise
-                    # x, y -> half of size image
-
-                    srxy_params.append([1 / float(s), -1 * float(r), -0.5 * float(x), 0.5 * float(y)])
-
-                channels.append(all_finals)
-            srxy_params = np.reshape(srxy_params, (len(project_variable.which_channels[l]), trafo_per_filter, 4))
-            all_srxy_params.append(srxy_params)
-
-            all_outputs.append(channels)
-
-
-        for l in range(len(project_variable.which_layers)):
-            channels = []
-            srxy_params = []
-
-            for c in range(len(project_variable.which_channels[l])):
-                which_layer = project_variable.which_layers[l]
-                which_channel = project_variable.which_channels[l][c]
-
-                data = data_point
-                data = torch.nn.Parameter(data, requires_grad=True)
-
-                # cntr = 0
-                x_end = None
-
-                layer_number = int(which_layer[-1])
-
-                for cntr in range(layer_number):
-                    # print('cntr: ', cntr)
-                    if cntr == 0:
-                        the_input = data
-
-                    x_conv = getattr(my_model, 'conv%d' % (cntr + 1))
-                    x_conv = x_conv(the_input, device)
-
-                    x_max_pool = getattr(my_model, 'max_pool_%d' % (cntr + 1))
-                    if project_variable.return_ind:
-                        x_max_pool, _ = x_max_pool(x_conv)
-                    else:
-                        x_max_pool = x_max_pool(x_conv)
-
-                    x_end = torch.nn.functional.relu(x_max_pool)
-                    the_input = x_end
-
-                _, ch, d, h, w = x_end.shape
-
-                highest_value = 0
-                ind_1, ind_2 = 0, 0
-                for m in range(h):
-                    for n in range(w):
-                        val = float(x_end[0, which_channel, 0, m, n].data.cpu())
-                        if val > highest_value:
-                            highest_value = val
-                            ind_1 = m
-                            ind_2 = n
-                            # TODO also get the frame
-
-                x_end[0, which_channel, 0, ind_1, ind_2].backward()
-
-                image_grad = data.grad
-
-                # FIX color
-                # TODO get the specific high activation frame
-                if project_variable.dataset == 'jester':
-                    final = image_grad[0, :, 0] * data[0, :, 0]
-                else:
-                    final = image_grad[0, 0, 0] * data[0, 0, 0]
-
-                all_finals = []
-                all_finals.append(final)
-
-                # get transformations
-
-                for trafo in range(trafo_per_filter):
-                    s = getattr(getattr(my_model, which_layer), 'scale')[trafo, which_channel]
-                    r = getattr(getattr(my_model, which_layer), 'rotate')[trafo, which_channel]
-                    x = getattr(getattr(my_model, which_layer), 'translate_x')[trafo, which_channel]
-                    y = getattr(getattr(my_model, which_layer), 'translate_y')[trafo, which_channel]
+                for trafo in range(num_transformations):
+                    s = getattr(transformations, 'scale')[trafo, ch]
+                    r = getattr(transformations, 'rotate')[trafo, ch]
+                    x = getattr(transformations, 'translate_x')[trafo, ch]
+                    y = getattr(transformations, 'translate_y')[trafo, ch]
 
                     # apply them on the final image
                     next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
@@ -912,34 +834,33 @@ def visualize_resnet18(project_variable, data_point, my_model, device, kernel_vi
                     # rotation -> degrees counterclockwise
                     # x, y -> half of size image
 
-                    srxy_params.append([1 / float(s), -1 * float(r), -0.5 * float(x), 0.5 * float(y)])
+                    _params = [1 / float(s), -1 * float(r), -0.5 * float(x), 0.5 * float(y)]
+
+                    srxy_params.append(_params)
 
                 channels.append(all_finals)
-            srxy_params = np.reshape(srxy_params, (len(project_variable.which_channels[l]), trafo_per_filter, 4))
+                # can't rescale since the number of transformations can differ
+            # srxy_params = np.reshape(srxy_params, (num_channels, num_transformations, 4))
             all_srxy_params.append(srxy_params)
 
             all_outputs.append(channels)
 
-        if project_variable.dataset == 'jester':
-            data = data[0, :, 0]
-        else:
-            data = data[0, 0, 0]
-            data = data.unsqueeze(0)
+        print('here')
+        data = data[0, :]
 
         data = np.array(data.data.cpu(), dtype=np.uint8)
-
         processed_outputs = []
 
-        for l in range(len(project_variable.which_layers)):
+        for l in range(len(conv_layers)):
             channels = []
 
-            for c in range(len(project_variable.which_channels[l])):
+            for c in range(10):
                 all_finals = []
 
-                for t in range(trafo_per_filter + 1):
+                for t in range(trafo_per_layer[l] + 1):
 
                     processed_final = all_outputs[l][c][t]
-                    # TODO: finis debugging the coloring
+                    # TODO: finish debugging the coloring
                     # save as jpg
                     # transpose channels
                     # no normalization
@@ -962,7 +883,6 @@ def visualize_resnet18(project_variable, data_point, my_model, device, kernel_vi
         # processed_final = np.expand_dims(processed_final, 0)
 
         return data, all_outputs, all_srxy_params
-
 
 
 def gradient_method(project_variable, data_point, my_model, device, mode):
