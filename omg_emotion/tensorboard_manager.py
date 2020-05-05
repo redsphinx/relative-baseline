@@ -304,11 +304,12 @@ def add_xai(project_variable, my_model, device, data_point=None):
                 mode = None
 
             which_methods = 'gradient_method'
-            dp, rest, optional_srxy = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
+            dp, rest, optional_srxy, frames = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
 
             if mode == 'srxy':
                 assert optional_srxy is not None
 
+                start_count = 0
                 for j in range(len(project_variable.which_layers)):
                     for k in range(len(project_variable.which_channels[j] + 1)):
                         which_layers = project_variable.which_layers[j]
@@ -322,7 +323,7 @@ def add_xai(project_variable, my_model, device, data_point=None):
                             c_ = 1
 
                         output = np.zeros(shape=(temporal_dim + 1, c_, h_, w_), dtype=np.uint8)
-                        output[0] = dp
+                        output[0] = np.expand_dims(dp[frames[start_count]], axis=0)
 
                         for t in range(temporal_dim):
                             output[t + 1] = rest[j][:][k][t]
@@ -334,14 +335,16 @@ def add_xai(project_variable, my_model, device, data_point=None):
                                                           vid_tensor=output,
                                                           global_step=project_variable.current_epoch, fps=2)
 
-                        fig = VZ.plot_srxy(optional_srxy, j, k)
-                        project_variable.writer.add_figure(tag='srxy_params/layer_%d/channel_%d'
-                                                               % (j+1, k+1), figure=fig,
-                                                           global_step=project_variable.current_epoch)
+                        # fig = VZ.plot_srxy(optional_srxy, j, k)
+                        # project_variable.writer.add_figure(tag='srxy_params/layer_%d/channel_%d'
+                        #                                        % (j+1, k+1), figure=fig,
+                        #                                    global_step=project_variable.current_epoch)
 
-                project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
-                                                  img_tensor=dp,
-                                                  global_step=project_variable.current_epoch)
+                        start_count = start_count + 1
+
+                # project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
+                #                                   img_tensor=dp,
+                #                                   global_step=project_variable.current_epoch)
 
             else:
                 for j in range(len(project_variable.which_layers)):

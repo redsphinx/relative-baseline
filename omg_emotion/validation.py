@@ -121,8 +121,8 @@ def run(project_variable, all_data, my_model, device):
     # save_epochs = np.arange(project_variable.end_epoch)
     save_epochs = [9 + (i * 10) for i in range(project_variable.end_epoch // 10)]
 
-    which_datapoint = 15
-    # which_datapoint = 1
+    # which_datapoint = 15
+    which_datapoint = 1
 
     if project_variable.inference_only_mode:
 

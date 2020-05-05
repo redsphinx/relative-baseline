@@ -25,4 +25,5 @@ project_variable.model_number
 17  model17: resulting model from genetic search
 18  model18: resulting model from genetic search
 19  model19: resulting model from genetic search
-20  resnet18 3dttn
+20  resnet18 3TConv
+21  resnet18 3DConv

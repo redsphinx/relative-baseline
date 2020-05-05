@@ -550,6 +550,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     data = None
     trafo_per_filter = project_variable.transformations_per_filter
     all_srxy_params = []
+    notable_frames = []
 
     for l in range(len(project_variable.which_layers)):
         channels = []
@@ -587,26 +588,36 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             _, ch, d, h, w = x_end.shape
 
             highest_value = 0
-            ind_1, ind_2 = 0, 0
-            for m in range(h):
-                for n in range(w):
-                    val = float(x_end[0, which_channel, 0, m, n].data.cpu())
-                    if val > highest_value:
-                        highest_value = val
-                        ind_1 = m
-                        ind_2 = n
-                        # TODO also get the frame
+            ind_1, ind_2, ind_3 = 0, 0, 0
+            for p in range(d):
+                for m in range(h):
+                    for n in range(w):
+                        val = float(x_end[0, which_channel, p, m, n].data.cpu())
+                        if val > highest_value:
+                            highest_value = val
+                            ind_1 = p
+                            ind_2 = m
+                            ind_3 = n
 
-            x_end[0, which_channel, 0, ind_1, ind_2].backward()
+            x_end[0, which_channel, ind_1, ind_2, ind_3].backward()
 
             image_grad = data.grad
 
             # FIX color
             # TODO get the specific high activation frame
+            # TODO: how to choose frame? -> ind_1 <- can't use that. doesnt match data shape
+
             if project_variable.dataset == 'jester':
                 final = image_grad[0, :, 0] * data[0, :, 0]
+
             else:
-                final = image_grad[0, 0, 0] * data[0, 0, 0]
+                # final = image_grad[0, 0, 0] * data[0, 0, 0]
+                copy_image_grad = image_grad[0][0]
+                copy_image_grad = copy_image_grad.mean(dim=1).mean(dim=1)
+                most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
+                notable_frames.append(most_notable_frame)
+                print(most_notable_frame)
+                final = image_grad[0, 0, most_notable_frame] * data[0, 0, most_notable_frame]
 
             all_finals = []
             all_finals.append(final)
@@ -637,10 +648,10 @@ def our_gradient_method(project_variable, data_point, my_model, device):
         all_outputs.append(channels)
 
     if project_variable.dataset == 'jester':
-        data = data[0, :, 0]
+        data = data[0, :]
     else:
-        data = data[0, 0, 0]
-        data = data.unsqueeze(0)
+        data = data[0, 0]
+        # data = data.unsqueeze(0)
 
     data = np.array(data.data.cpu(), dtype=np.uint8)
 
@@ -662,7 +673,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
                 # normalization per channel
 
                 # TODO: turn on normalization again once the network starts training better
-                # processed_final = normalize(processed_final)
+                processed_final = normalize(processed_final)
                 processed_final = processed_final.unsqueeze(0)
                 processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 
@@ -677,7 +688,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
     # processed_final = whiten_bg(processed_final)
     # processed_final = np.expand_dims(processed_final, 0)
 
-    return data, all_outputs, all_srxy_params
+    return data, all_outputs, all_srxy_params, notable_frames
 
 
 def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):

@@ -440,7 +440,7 @@ def create_file_list(which, dest, jester_data_path):
             my_file.write(line)
 
 
-# create_file_list('test', dest='224_336', jester_data_path=PP.jester_data_224_336_avi)
+# create_file_list('test', dest='224_336_fast', jester_data_path=PP.fast_jester_data_224_336_avi)
 
 
 def calculate_weights_for_loss(which='train'):
