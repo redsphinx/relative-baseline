@@ -81,6 +81,7 @@ def run(project_variable):
 
     # setup model, optimizer & device
     my_model = setup.get_model(project_variable)
+    print(U.count_parameters(my_model))
     device = setup.get_device(project_variable)
 
     if project_variable.device is not None:

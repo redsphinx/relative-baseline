@@ -1139,7 +1139,7 @@ def get_jester_iter(which, project_variable):
         else:
             file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
     else:
-        if project_variable.model_number in [20, 21]:
+        if project_variable.model_number in [20, 21, 22]:
             if project_variable.load_from_fast:
                 file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
             else:
