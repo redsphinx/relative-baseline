@@ -713,6 +713,7 @@ def e21_conv3DTTN_jester():
 
     project_variable.load_model = True
     project_variable.load_from_fast = True
+    # project_variable.server
 
     project_variable.use_dali = True
     project_variable.dali_workers = 32
@@ -729,8 +730,8 @@ def e21_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
-# project_variable = ProjectVariable(debug_mode=True)
+# project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()
@@ -749,5 +750,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e18_conv3D_jester()
 # e19_conv3Dreduced_jester()
 # e20_conv3Dreducedpretrained_jester()
-e20_conv3DTTN_jester()
-# e21_conv3DTTN_jester()
+# e20_conv3DTTN_jester()
+e21_conv3DTTN_jester()

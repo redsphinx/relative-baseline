@@ -8,6 +8,8 @@ if server == 'schmidhuber':
 elif server == 'lovelace':
     server_path = '/huge/gabras'
     # server_path = '/home/gabras/scratch'
+elif server == 'godel':
+    server_path = '/fast/gabras'
 else:
     print('server unknown')
     server_path = None

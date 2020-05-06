@@ -63,6 +63,8 @@ class ProjectVariable(object):
         self._use_dali = False
         self._dali_workers = 4
         self._load_from_fast = False
+        # values: lovelace, godel
+        self._server = 'lovelace'
         # default is to use all of the data
         # this controls the number of steps: steps = dali_iterator_size / batch_size
         self._dali_iterator_size = ['all', 'all', 'all']
@@ -419,6 +421,14 @@ class ProjectVariable(object):
     @load_from_fast.setter
     def load_from_fast(self, value):
         self._load_from_fast = value
+
+    @property
+    def server(self):
+        return self._server
+
+    @server.setter
+    def server(self, value):
+        self._server = value
     
     @property
     def dali_iterator_size(self):
