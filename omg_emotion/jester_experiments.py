@@ -702,7 +702,7 @@ def e20_conv3DTTN_jester():
 
 def e21_conv3DTTN_jester():
     set_init_1()
-    project_variable.model_number = 20
+    project_variable.model_number = 23
     project_variable.experiment_number = 21
     project_variable.sheet_number = 22
     project_variable.device = 2

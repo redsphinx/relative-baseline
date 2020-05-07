@@ -1,4 +1,4 @@
-from torchvision.models import resnet18
+from torchvision.models import resnet18, googlenet
 from torch.optim.adam import Adam
 from torch.optim.sgd import SGD
 import torch
@@ -9,7 +9,7 @@ from relative_baseline.omg_emotion import models as M
 from relative_baseline.omg_emotion import factorized_convolution as C3D
 from relative_baseline.omg_emotion.evolution.model_maker import ModularConv
 from relative_baseline.omg_emotion.model_resnet18 import ResNet18, ResNet18Explicit, ResNet18Explicit3DConv, ResNet18Explicit3DConvReduced
-
+from relative_baseline.omg_emotion.model_googlenet import Googlenet3TConv_explicit
 
 def prepare_model(project_variable, model):
     # resnet
@@ -293,30 +293,16 @@ def get_model(project_variable):
         model = ResNet18Explicit3DConvReduced()
         if type(project_variable.load_model) != bool and not project_variable.load_model is None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+    elif project_variable.model_number == 23:
+        tmp_googlenet = googlenet(pretrained=True)
+        model = Googlenet3TConv_explicit()
+        if type(project_variable.load_model) != bool and not project_variable.load_model is None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
         elif project_variable.load_model:
-            # load resnet18 from pytorch
-            tmp_resnet18 = resnet18(pretrained=True)
-            # TODO: FIX
-            model.conv1.weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2) / 7)
-            model.conv2.weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2) / 3)
-            model.conv3.weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2) / 3)
-            model.conv4.weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2) / 3)
-            model.conv5.weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2) / 3)
-            model.conv6.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2))
-            model.conv7.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2) / 3)
-            model.conv8.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2) / 3)
-            model.conv9.weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2) / 3)
-            model.conv10.weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2) / 3)
-            model.conv11.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2))
-            model.conv12.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2) / 3)
-            model.conv13.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2) / 3)
-            model.conv14.weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2) / 3)
-            model.conv15.weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2) / 3)
-            model.conv16.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2))
-            model.conv17.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2) / 3)
-            model.conv18.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2) / 3)
-            model.conv19.weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2) / 3)
-            model.conv20.weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2) / 3)
+            # load googlenet from pytorch
+            tmp_googlenet = googlenet(pretrained=True)
+            print('asdf')
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)

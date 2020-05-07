@@ -36,7 +36,7 @@ def run(project_variable, all_data, my_model, device):
             with torch.no_grad():
                 # my_optimizer.zero_grad()
                 # predictions = my_model.forward(data)
-                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20]:
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23]:
                     predictions = my_model(data, device)
                 elif project_variable.model_number in [16]:
                     predictions = my_model(data, device, project_variable.genome)
@@ -60,7 +60,7 @@ def run(project_variable, all_data, my_model, device):
             with torch.no_grad():
                 # my_optimizer.zero_grad()
                 # predictions = my_model.forward(data)
-                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16]:
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16, 23]:
                     predictions = my_model(data, device)
                 else:
                     predictions = my_model(data)

@@ -27,4 +27,5 @@ project_variable.model_number
 19  model19: resulting model from genetic search
 20  resnet18 3TConv
 21  resnet18 3DConv
-22  resnet18 3DConv reduced
+22  resnet18 3DConv reduced channels
+23  googlenet 3TConv
