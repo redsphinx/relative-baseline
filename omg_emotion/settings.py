@@ -1,10 +1,12 @@
 import numpy as np
-from relative_baseline.omg_emotion import project_paths as PP
 
 
 class ProjectVariable(object):
     def __init__(self, debug_mode=True):
-        print("\nRUNNING ON '%s' SERVER\n" % PP.server)
+        # values: lovelace, godel
+        self._server = 'lovelace'
+
+        print("\nRUNNING ON '%s' SERVER\n" % self._server)
         if debug_mode:
             print("running in debug mode")
 
@@ -63,8 +65,7 @@ class ProjectVariable(object):
         self._use_dali = False
         self._dali_workers = 4
         self._load_from_fast = False
-        # values: lovelace, godel
-        self._server = 'lovelace'
+
         # default is to use all of the data
         # this controls the number of steps: steps = dali_iterator_size / batch_size
         self._dali_iterator_size = ['all', 'all', 'all']

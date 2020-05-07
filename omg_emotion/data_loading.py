@@ -1,5 +1,6 @@
 import os
 import numpy as np
+# from relative_baseline.omg_emotion.project_paths import Paths
 import relative_baseline.omg_emotion.project_paths as PP
 from relative_baseline.omg_emotion import utils as U1
 import random
@@ -1130,6 +1131,7 @@ def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_see
 
 def get_jester_iter(which, project_variable):
     assert which in ['train', 'val', 'test']
+
 
     if project_variable.nas or project_variable.debug_mode:
         if which == 'train':

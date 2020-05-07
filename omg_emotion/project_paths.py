@@ -1,7 +1,7 @@
 import os
 
+
 server = 'lovelace'
-# server = 'schmidhuber'
 
 if server == 'schmidhuber':
     server_path = '/scratch/users/gabras/data'
@@ -54,6 +54,7 @@ dhg_hand_only_28_28_50_frames = '/huge/gabras/DHG_hand_only_28_28_50_frames'
 dhg_mean_std = '/huge/gabras/DHG/mean_std.npy'
 
 # Jester
+# symbolic link on godel:   /scratch/users -> /fast
 jester_location = '/scratch/users/gabras/jester'
 jester_data = '/scratch/users/gabras/jester/data'
 jester_data_50_75 = '/scratch/users/gabras/jester/data_50_75'
