@@ -46,7 +46,7 @@ def str_list_to_num_arr(input_list, to_type):
     return input_list
 
 
-def calculate_loss(project_variable, input, target):
+def calculate_loss(project_variable, inp, target):
     loss_name = project_variable.loss_function
     if project_variable.model_number == 0:
         if loss_name == 'cross_entropy':
@@ -57,28 +57,38 @@ def calculate_loss(project_variable, input, target):
 
         loss_function = CrossEntropyLoss(weight=project_variable.loss_weights)
 
-    loss = loss_function(input, target)
+    loss = loss_function(inp, target)
     return loss
 
 
-def calculate_accuracy(input, target):
+def googlenet_loss(project_variable, aux1, aux2, inp, target):
+
+    loss_function = CrossEntropyLoss(weight=project_variable.loss_weights)
+    l1 = loss_function(inp, target)
+    l2 = loss_function(aux1, target)
+    l3 = loss_function(aux2, target)
+    loss = l1 + 0.3 * (l2 + l3)
+    return loss
+
+
+def calculate_accuracy(inp, target):
     # accuracy of step
     predictions = []
     labels = []
 
     acc = 0
 
-    input = input.cpu()
-    input = np.array(input.data)
+    inp = inp.cpu()
+    inp = np.array(inp.data)
 
     target = target.cpu()
     target = np.array(target.data)
 
-    for i in range(len(input)):
-        predictions.append(input[i].argmax())
+    for i in range(len(inp)):
+        predictions.append(inp[i].argmax())
         labels.append(target[i])
 
-        if input[i].argmax() == target[i]:
+        if inp[i].argmax() == target[i]:
             acc += 1
 
     # print('predictions: %s\n'
@@ -87,16 +97,16 @@ def calculate_accuracy(input, target):
     return acc
 
 
-def confusion_matrix(matrix, input, target):
+def confusion_matrix(matrix, inp, target):
     # col = target, row = prediction
-    input = input.cpu()
-    input = np.array(input.data)
+    inp = inp.cpu()
+    inp = np.array(inp.data)
 
     target = target.cpu()
     target = np.array(target.data)
 
-    for i in range(len(input)):
-        matrix[target[i], input[i].argmax()] += 1
+    for i in range(len(inp)):
+        matrix[target[i], inp[i].argmax()] += 1
 
     return matrix
 

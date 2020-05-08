@@ -37,12 +37,17 @@ def run(project_variable, all_data, my_model, device):
                 # my_optimizer.zero_grad()
                 # predictions = my_model.forward(data)
                 if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23]:
-                    predictions = my_model(data, device)
+                    if project_variable.model_number == 23:
+                        aux1, aux2, predictions = my_model(data, device, None, False)
+                        assert aux1 is None and aux2 is None
+                    else:
+                        predictions = my_model(data, device)
                 elif project_variable.model_number in [16]:
                     predictions = my_model(data, device, project_variable.genome)
                 else:
                     predictions = my_model(data)
                 # print(predictions)
+
                 loss = U.calculate_loss(project_variable, predictions, labels)
                 # print('loss raw: %s' % str(loss))
                 loss = loss.detach()
@@ -61,7 +66,11 @@ def run(project_variable, all_data, my_model, device):
                 # my_optimizer.zero_grad()
                 # predictions = my_model.forward(data)
                 if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16, 23]:
-                    predictions = my_model(data, device)
+                    if project_variable.model_number == 23:
+                        aux1, aux2, predictions = my_model(data, device, None, False)
+                        assert aux1 is None and aux2 is None
+                    else:
+                        predictions = my_model(data, device)
                 else:
                     predictions = my_model(data)
                 # print(predictions)

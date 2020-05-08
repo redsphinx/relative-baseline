@@ -66,21 +66,27 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             my_optimizer.zero_grad()
 
             if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23]:
-                predictions = my_model(data, device)
                 if project_variable.model_number == 23:
                     aux1, aux2, predictions = my_model(data, device)
+                    assert aux1 is not None and aux2 is not None
                     # https://discuss.pytorch.org/t/why-auxiliary-logits-set-to-false-in-train-mode/40705
                     # TODO: implement this in utils.py
                     # loss1 = criterion(outputs, target)
                     # loss2 = criterion(aux1, target)
                     # loss3 = criterion(aux2, target)
                     # loss = loss1 + 0.3 * (loss2 + loss3)
+                else:
+                    predictions = my_model(data, device)
+
             elif project_variable.model_number in [16]:
                 predictions = my_model(data, device, project_variable.genome)
             else:
                 predictions = my_model(data)
 
-            loss = U.calculate_loss(project_variable, predictions, labels)
+            if project_variable.model_number == 23:
+                loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
+            else:
+                loss = U.calculate_loss(project_variable, predictions, labels)
             # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
             loss.backward()
 
@@ -108,11 +114,18 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             my_optimizer.zero_grad()
 
             if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16, 20, 23]:
-                predictions = my_model(data, device)
+                if project_variable.model_number == 23:
+                    aux1, aux2, predictions = my_model(data, device)
+                    assert aux1 is not None and aux2 is not None
+                else:
+                    predictions = my_model(data, device)
             else:
                 predictions = my_model(data)
 
-            loss = U.calculate_loss(project_variable, predictions, labels)
+            if project_variable.model_number == 23:
+                loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
+            else:
+                loss = U.calculate_loss(project_variable, predictions, labels)
             # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
             loss.backward()
 
