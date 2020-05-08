@@ -295,7 +295,7 @@ def get_model(project_variable):
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
     elif project_variable.model_number == 23:
-        tmp_googlenet = googlenet(pretrained=True)
+        tmp_googlenet = googlenet(pretrained=True, aux_logits=True, transform_input=False)
         model = Googlenet3TConv_explicit()
         if type(project_variable.load_model) != bool and not project_variable.load_model is None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))

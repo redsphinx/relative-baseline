@@ -67,6 +67,14 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
             if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23]:
                 predictions = my_model(data, device)
+                if project_variable.model_number == 23:
+                    aux1, aux2, predictions = my_model(data, device)
+                    # https://discuss.pytorch.org/t/why-auxiliary-logits-set-to-false-in-train-mode/40705
+                    # TODO: implement this in utils.py
+                    # loss1 = criterion(outputs, target)
+                    # loss2 = criterion(aux1, target)
+                    # loss3 = criterion(aux2, target)
+                    # loss = loss1 + 0.3 * (loss2 + loss3)
             elif project_variable.model_number in [16]:
                 predictions = my_model(data, device, project_variable.genome)
             else:
