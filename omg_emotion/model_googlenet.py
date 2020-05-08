@@ -13,20 +13,20 @@ class Googlenet3TConv_explicit(torch.nn.Module):
 
         self.conv1 = ConvTTN3d(in_channels=3, out_channels=64, kernel_size=7, padding=3, stride=2, project_variable=pv, bias=False)
         self.bn1 = BatchNorm3d(64)
-        self.maxpool1 = MaxPool3d(kernel_size=3, padding=0, stride=2)
+        self.maxpool1 = MaxPool3d(kernel_size=(1, 3, 3), padding=0, stride=(1, 2, 2))
         self.conv2 = Conv3d(in_channels=64, out_channels=64, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn2 = BatchNorm3d(64)
         self.conv3 = ConvTTN3d(in_channels=64, out_channels=192, kernel_size=3, padding=1, stride=1, project_variable=pv, bias=False)
         self.bn3 = BatchNorm3d(192)
-        self.maxpool2 = MaxPool3d(kernel_size=3, padding=0, stride=2)
+        self.maxpool2 = MaxPool3d(kernel_size=(1, 3, 3), padding=0, stride=(1, 2, 2))
 
         # inception 3a
         self.conv4 = Conv3d(in_channels=192, out_channels=64, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn4 = BatchNorm3d(64)
         self.conv5 = Conv3d(in_channels=192, out_channels=96, kernel_size=1, padding=0, stride=1, bias=False)
-        self.bn5 = BatchNorm3d(64)
+        self.bn5 = BatchNorm3d(96)
         self.conv6 = ConvTTN3d(in_channels=96, out_channels=128, kernel_size=3, padding=1, stride=1, project_variable=pv, bias=False)
-        self.bn6 = BatchNorm3d(64)
+        self.bn6 = BatchNorm3d(128)
         self.conv7 = Conv3d(in_channels=192, out_channels=16, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn7 = BatchNorm3d(16)
         self.conv8 = ConvTTN3d(in_channels=16, out_channels=32, kernel_size=3, padding=1, stride=1, project_variable=pv, bias=False)
@@ -79,13 +79,13 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         self.conv26 = ConvTTN3d(in_channels=24, out_channels=64, kernel_size=3, padding=1, stride=1, project_variable=pv, bias=False)
         self.bn26 = BatchNorm3d(64)
         self.maxpool7 = MaxPool3d(kernel_size=3, padding=1, stride=1)
-        self.conv27 = Conv3d(in_channels=512, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
-        self.bn27 = BatchNorm3d(128)
+        self.conv27 = Conv3d(in_channels=512, out_channels=64, kernel_size=1, padding=0, stride=1, bias=False)
+        self.bn27 = BatchNorm3d(64)
 
         self.avgpool1 = AvgPool3d(kernel_size=5, padding=0, stride=3)
         self.conv28 = Conv3d(in_channels=512, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn28 = BatchNorm3d(128)
-        self.fc1 = Linear(in_features=2048, out_features=1024)
+        self.fc1 = Linear(in_features=2304, out_features=1024)
         self.dropout1 = Dropout3d(p=0.7)
         self.fc2 = Linear(in_features=1024, out_features=27)
 
@@ -137,7 +137,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         self.avgpool2 = AvgPool3d(kernel_size=5, padding=0, stride=3)
         self.conv47 = Conv3d(in_channels=528, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn47 = BatchNorm3d(128)
-        self.fc3 = Linear(in_features=2048, out_features=1024)
+        self.fc3 = Linear(in_features=2304, out_features=1024)
         self.dropout2 = Dropout3d(p=0.7)
         self.fc4 = Linear(in_features=1024, out_features=27)
 
@@ -302,6 +302,8 @@ class Googlenet3TConv_explicit(torch.nn.Module):
             aux1 = self.conv28(aux1)
             aux1 = self.bn28(aux1)
             aux1 = relu(aux1)
+            _shape = aux1.shape
+            aux1 = aux1.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
             aux1 = self.fc1(aux1)
             aux1 = relu(aux1)
             aux1 = self.dropout1(aux1)
@@ -390,6 +392,8 @@ class Googlenet3TConv_explicit(torch.nn.Module):
             aux2 = self.conv47(aux2)
             aux2 = self.bn47(aux2)
             aux2 = relu(aux2)
+            _shape = aux2.shape
+            aux2 = aux2.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
             aux2 = self.fc3(aux2)
             aux2 = relu(aux2)
             aux2 = self.dropout2(aux2)
@@ -453,7 +457,9 @@ class Googlenet3TConv_explicit(torch.nn.Module):
 
         h = self.avgpool3(h)
         h = self.dropout3(h)
+        _shape = h.shape
+        h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
         y = self.fc5(h)
         return aux1, aux2, y
 
-# [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56. 58]
+# [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]

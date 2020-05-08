@@ -708,8 +708,8 @@ def e21_conv3DTTN_jester():
     project_variable.device = 2
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 3
-    project_variable.batch_size = 16
-    project_variable.batch_size_val_test = 16
+    project_variable.batch_size = 8
+    project_variable.batch_size_val_test = 8
 
     project_variable.load_model = True
     project_variable.load_from_fast = True

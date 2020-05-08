@@ -1132,7 +1132,6 @@ def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_see
 def get_jester_iter(which, project_variable):
     assert which in ['train', 'val', 'test']
 
-
     if project_variable.nas or project_variable.debug_mode:
         if which == 'train':
             file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
@@ -1141,7 +1140,7 @@ def get_jester_iter(which, project_variable):
         else:
             file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
     else:
-        if project_variable.model_number in [20, 21, 22]:
+        if project_variable.model_number in [20, 21, 22, 23]:
             if project_variable.load_from_fast:
                 file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
             else:

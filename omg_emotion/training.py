@@ -70,11 +70,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                     aux1, aux2, predictions = my_model(data, device)
                     assert aux1 is not None and aux2 is not None
                     # https://discuss.pytorch.org/t/why-auxiliary-logits-set-to-false-in-train-mode/40705
-                    # TODO: implement this in utils.py
-                    # loss1 = criterion(outputs, target)
-                    # loss2 = criterion(aux1, target)
-                    # loss3 = criterion(aux2, target)
-                    # loss = loss1 + 0.3 * (loss2 + loss3)
                 else:
                     predictions = my_model(data, device)
 
