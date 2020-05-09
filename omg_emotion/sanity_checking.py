@@ -146,9 +146,9 @@ def matrix_transforms_test():
     # x = 0.02
     # y = 0.02
 
-    s = 1
+    s = 1.1
     r = 0
-    x = -1
+    x = 0
     y = 0
 
     ss = torch.Tensor(np.array([s]))

@@ -72,30 +72,65 @@ def plot_confusion_matrix(confusion_matrix, dataset):
 def plot_srxy(optional_srxy, which_layer, which_channel):
     datapoints = optional_srxy[which_layer]
     datapoints = datapoints[which_channel]  # should be 2D now
+    
+    # jester
+    image_width = 336
+    image_height = 224
 
-    x = np.arange(1, 5)
+    # x = np.arange(1, 5)
+    x = len(datapoints[0, 0])
 
-    fig, axs = plt.subplots(4, 1, constrained_layout=True)
-    axs[0].plot(x, datapoints[:, 0])
-    axs[0].set_ylabel('ratio')
+    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+
+    scale_data = []
+    for i in range(len(datapoints[:, 0])):
+        if i == 0:
+            scale_data.append(datapoints[i, 0])
+        else:
+            scale_data.append(datapoints[i, 0] * scale_data[i - 1])
+
+    # axs[0].plot(x, datapoints[:, 0])
+    axs[0].plot(x, scale_data)
+    axs[0].set_ylabel('size ratio')
     axs[0].set_title('scale')
     axs[0].grid(True)
+
+    # TODO: how to do polar coordinates
+    rotate_data = []
+    for i in range(len(datapoints[:, 1])):
+        if i == 0:
+            rotate_data.append()
 
     axs[1].plot(x, datapoints[:, 1])
     axs[1].set_ylabel('degrees')
     axs[1].set_title('rotation')
     axs[1].grid(True)
 
-    axs[2].plot(x, datapoints[:, 2])
-    axs[2].set_ylabel('image portion')
-    axs[2].set_title('move x')
-    axs[2].grid(True)
+    
+    x_location_data = []
+    y_location_data = []
+    
+    for i in range(len(datapoints[:, 0])):
+        if i == 0:
+            x_location_data.append(0)
+            y_location_data.append(0)
+        else:
+            x_location_data.append(x_location_data[i - 1] + datapoints[i, 2] * image_width)
+            y_location_data.append(y_location_data[i - 1] + datapoints[i, 3] * image_height)
 
-    axs[3].plot(x, datapoints[:, 3])
-    axs[3].set_ylabel('image portion')
-    axs[3].set_title('move y')
-    axs[3].grid(True)
-    axs[0].set_xlabel('time')
+    axs[2].plot(x_location_data, y_location_data)
+    axs[2].set_title('X and Y location in pixels')
+
+    # axs[2].plot(x, datapoints[:, 2])
+    axs[2].set_ylabel('y')
+    # axs[2].set_title('move x')
+    axs[2].grid(True)
+    # axs[3].plot(x, datapoints[:, 3])
+    # axs[3].set_ylabel('image portion')
+    # axs[3].set_title('move y')
+    # axs[3].grid(True)
+    axs[0].set_xlabel('x')
+    # TODO: time info per point
 
     # fig.tight_layout()
     fig.suptitle('layer %d channel %d' % (which_layer + 1, which_channel + 1))
