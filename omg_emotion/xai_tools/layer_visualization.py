@@ -825,7 +825,9 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                 copy_image_grad = copy_image_grad.mean(dim=0).mean(dim=-1).mean(dim=-1)
                 most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
                 notable_frames.append(most_notable_frame)
-                final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
+                # final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
+                final = image_grad[0, :, most_notable_frame].data.cpu() * og_data_point[0, :, most_notable_frame].data.cpu()
+
                 # --
 
                 all_finals = []
@@ -833,8 +835,9 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
 
                 # get the size of transformation
                 _conv_name = 'conv%d' % ind
-                transformations = getattr(my_model, _conv_name)
+                transformations = getattr(getattr(my_model, _conv_name), 'scale')
                 num_transformations = transformations.shape[0]
+                transformations = getattr(my_model, _conv_name)
                 # to keep track of how many transformations we have in a channel in a layer
                 if ch == 0:
                     trafo_per_layer.append(num_transformations)
@@ -846,6 +849,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                     y = getattr(transformations, 'translate_y')[trafo, ch]
 
                     # apply them on the final image
+                    # FIX: issue that final is not on GPU
                     next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
                     all_finals.append(next_final)
 
