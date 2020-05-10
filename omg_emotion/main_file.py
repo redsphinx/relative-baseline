@@ -1,6 +1,7 @@
 from relative_baseline.omg_emotion import training
 from relative_baseline.omg_emotion import validation
 from relative_baseline.omg_emotion import testing
+from relative_baseline.omg_emotion import xai_mode
 from relative_baseline.omg_emotion import setup
 from relative_baseline.omg_emotion import data_loading as D
 from relative_baseline.omg_emotion import project_paths as PP
@@ -280,9 +281,11 @@ def run(project_variable):
                 #                 [arousal, valence, categories]]
 
                 # ------------------------------------------------------------------------------------------------
-                # TRAINING
                 # ------------------------------------------------------------------------------------------------
-                if project_variable.inference_only_mode:
+                # HERE: TRAINING
+                # ------------------------------------------------------------------------------------------------
+                # ------------------------------------------------------------------------------------------------
+                if project_variable.inference_only_mode or project_variable.xai_only_mode:
                     project_variable.train = False
                 else:
                     project_variable.train = True
@@ -335,13 +338,17 @@ def run(project_variable):
                     else:
                         train_accuracy = training.run(project_variable, data, my_model, my_optimizer, device)
                 # ------------------------------------------------------------------------------------------------
-                # VALIDATION
+                # ------------------------------------------------------------------------------------------------
+                # HERE: VALIDATION
+                # ------------------------------------------------------------------------------------------------
                 # ------------------------------------------------------------------------------------------------
                 if project_variable.inference_only_mode:
                     if project_variable.eval_on == 'val':
                         project_variable.val = True
                     else:
                         project_variable.val = False
+                elif project_variable.xai_only_mode:
+                    project_variable.val = False
                 else:
                     project_variable.val = True
 
@@ -376,16 +383,21 @@ def run(project_variable):
                     else:
                         val_accuracy = validation.run(project_variable, data, my_model, device)
                 # ------------------------------------------------------------------------------------------------
-                # TESTING
+                # ------------------------------------------------------------------------------------------------
+                # HERE: TESTING
+                # ------------------------------------------------------------------------------------------------
                 # ------------------------------------------------------------------------------------------------
                 # only run at the last epoch
                 if e == project_variable.end_epoch - 1 or project_variable.inference_only_mode:
-                    project_variable.train = False
-                    project_variable.val = False
+                    # project_variable.train = False
+                    # project_variable.val = False
                     if project_variable.eval_on == 'test':
                         project_variable.test = True
                     else:
                         project_variable.test = False
+                else:
+                    project_variable.test = False
+
 
                     if project_variable.test:
                         condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
@@ -411,6 +423,13 @@ def run(project_variable):
                             data = data_test, labels_test
 
                         testing.run(project_variable, data, my_model, device)
+                # ------------------------------------------------------------------------------------------------
+                # ------------------------------------------------------------------------------------------------
+                # HERE: XAI, VISUALIZATION: load trained model and perform analyses
+                # ------------------------------------------------------------------------------------------------
+                # ------------------------------------------------------------------------------------------------
+                if project_variable.xai_only_mode:
+                    xai_mode.run(project_variable, my_model, device)
 
                 # ------------------------------------------------------------------------------------------------
                 # ------------------------------------------------------------------------------------------------

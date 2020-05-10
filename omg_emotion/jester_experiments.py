@@ -730,6 +730,40 @@ def e21_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
+
+# VISUALIZATION
+def e22_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 22
+    project_variable.sheet_number = 22
+    project_variable.device = 2
+    project_variable.end_epoch = 1
+    project_variable.repeat_experiments = 1
+    project_variable.batch_size = 1
+    project_variable.batch_size_val_test = 1
+
+    project_variable.xai_only_mode = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+
+    project_variable.load_model = [13, 20, 14, 0]  # exp, model, epoch, run
+    # project_variable.inference_only_mode = True
+
+    project_variable.do_xai = True
+    project_variable.which_methods = ['gradient_method']
+    project_variable.which_layers = ['conv1']
+    project_variable.which_channels = [np.array([0, 1])]
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = False
+    project_variable.num_out_channels = [0]
+
+    main_file.run(project_variable)
+
+
 # project_variable = ProjectVariable(debug_mode=False)
 project_variable = ProjectVariable(debug_mode=True)
 
@@ -751,4 +785,5 @@ project_variable = ProjectVariable(debug_mode=True)
 # e19_conv3Dreduced_jester()
 # e20_conv3Dreducedpretrained_jester()
 # e20_conv3DTTN_jester()
-e21_conv3DTTN_jester()
+# e21_conv3DTTN_jester()
+e22_conv3DTTN_jester()

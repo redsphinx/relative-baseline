@@ -775,10 +775,11 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
     return the_data, all_outputs, None
 
 
-def visualize_resnet18(project_variable, data_point, my_model, device, kernel_visualizations=True, srxy_plots=True):
+def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model, device, kernel_visualizations=True, srxy_plots=True):
     # it plots and saves the first 10 channels of each layer in 3x3 and 7x7 conv
     assert project_variable.model_number == 20
     num_channels = 2
+    notable_frames = []
 
     if kernel_visualizations:
 
@@ -795,29 +796,37 @@ def visualize_resnet18(project_variable, data_point, my_model, device, kernel_vi
             srxy_params = []
 
             for ch in range(num_channels):
-                data = data_point.copy()
+                data = mod_data_point.clone()
                 data = torch.nn.Parameter(data, requires_grad=True)
 
                 feature_map = my_model(data, device, stop_at=ind)
 
-                _, ch, d, h, w = feature_map.shape
+                _, chan, d, h, w = feature_map.shape
 
                 highest_value = 0
                 ind_1, ind_2, ind_3 = 0, 0, 0
                 for l in range(d):
                     for m in range(h):
                         for n in range(w):
+                            # print(l, m, n)
                             val = float(feature_map[0, ch, l, m, n].data.cpu())
                             if val > highest_value:
                                 highest_value = val
-                                ind_1 = d
+                                ind_1 = l
                                 ind_2 = m
                                 ind_3 = n
 
                 feature_map[0, ch, ind_1, ind_2, ind_3].backward()
                 image_grad = data.grad
-                final = image_grad[0, :] * data[0, :]
-                # TODO: which frame to select?
+                # final = image_grad[0, :] * data[0, :]
+
+                # --
+                copy_image_grad = image_grad[0]
+                copy_image_grad = copy_image_grad.mean(dim=0).mean(dim=-1).mean(dim=-1)
+                most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
+                notable_frames.append(most_notable_frame)
+                final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
+                # --
 
                 all_finals = []
                 all_finals.append(final)

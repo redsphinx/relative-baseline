@@ -173,3 +173,6 @@ def make_pacman_frame(pacman_img, matrix):
     # M = np.float32([[1,0,100],[0,1,50]])
     # dst = cv2.warpAffine(img,M,(cols,rows))
 
+# TODO: method that saves the kernel visualzations
+def save_kernels():
+    pass

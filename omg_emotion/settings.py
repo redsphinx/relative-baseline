@@ -35,6 +35,9 @@ class ProjectVariable(object):
         self._inference_in_batches = [False, None, None, None]
         # for zeiler2014 in xai_tools
         self._return_ind = False
+        # to run xai only mode
+        self._xai_only_mode = False
+        
 
         # which google sheet to write to
         self._sheet_number = None
@@ -309,6 +312,14 @@ class ProjectVariable(object):
     @return_ind.setter
     def return_ind(self, value):
         self._return_ind = value
+
+    @property
+    def xai_only_mode(self):
+        return self._xai_only_mode
+
+    @xai_only_mode.setter
+    def xai_only_mode(self, value):
+        self._xai_only_mode = value
     
     
     @property

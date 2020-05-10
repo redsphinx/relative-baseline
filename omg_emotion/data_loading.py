@@ -1130,9 +1130,12 @@ def create_dali_iterator(batch_size, file_list, num_workers, do_shuffle, the_see
 
 
 def get_jester_iter(which, project_variable):
-    assert which in ['train', 'val', 'test']
+    if not project_variable.xai_only_mode:
+        assert which in ['train', 'val', 'test']
 
-    if project_variable.nas or project_variable.debug_mode:
+    if project_variable.xai_only_mode:
+        file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
+    elif project_variable.nas or project_variable.debug_mode:
         if which == 'train':
             file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
         elif which == 'val':
@@ -1158,11 +1161,16 @@ def get_jester_iter(which, project_variable):
         the_iter = create_dali_iterator(project_variable.batch_size_val_test,
                                         file_list, project_variable.dali_workers, False, 0,
                                         project_variable.dali_iterator_size[2], True, project_variable.device)
-    else:
+    elif which == 'train':
         print('Loading training iterator...')
         the_iter = create_dali_iterator(project_variable.batch_size, file_list,
                                         project_variable.dali_workers,
                                         project_variable.randomize_training_data, 6,
                                         project_variable.dali_iterator_size[0], True, project_variable.device)
+    else:
+        print('Loading XAI only mode iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+                                        file_list, project_variable.dali_workers, False, 0,
+                                        project_variable.dali_iterator_size[1], True, project_variable.device)
 
     return the_iter

@@ -283,95 +283,87 @@ def add_xai(project_variable, my_model, device, data_point=None):
     if 'gradient_method' in project_variable.which_methods:
         assert (data_point is not None)
 
-        # TODO add mode for resnet18's
-        if project_variable.model_number == 20:
-            dp, rest, optional_srxy = layer_vis.visualize_resnet18(project_variable, data_point, my_model, device)
-            # rest shape = [num_conv, 10 (channels), transformations]
-            print('asdf')
+        # Fix: this is moving to it's own mode
+        # if project_variable.model_number == 20:
+        #     dp, rest, optional_srxy = layer_vis.visualize_resnet18(project_variable, data_point, my_model, device)
+        #     # rest shape = [num_conv, 10 (channels), transformations]
+        #     print('asdf')
 
+        # mode = 'slices'
+        if project_variable.model_number in [11, 14, 15, 16]:
+            mode = 'srxy' # only for 3DTTN
+        else:
+            mode = None
 
+        which_methods = 'gradient_method'
+        dp, rest, optional_srxy, frames = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
 
+        if mode == 'srxy':
+            assert optional_srxy is not None
 
+            start_count = 0
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j] + 1)):
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
+
+                    temporal_dim = len(rest[0][0])
+                    if project_variable.dataset == 'jester':
+                        _, c_, h_, w_ = rest[0][0][0].shape
+                    else:
+                        _, h_, w_ = rest[0][0][0].shape
+                        c_ = 1
+
+                    output = np.zeros(shape=(temporal_dim + 1, c_, h_, w_), dtype=np.uint8)
+                    output[0] = np.expand_dims(dp[frames[start_count]], axis=0)
+
+                    for t in range(temporal_dim):
+                        output[t + 1] = rest[j][:][k][t]
+
+                    output = np.expand_dims(output, 0)
+
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                    which_channels),
+                                                      vid_tensor=output,
+                                                      global_step=project_variable.current_epoch, fps=2)
+
+                    # fig = VZ.plot_srxy(optional_srxy, j, k)
+                    # project_variable.writer.add_figure(tag='srxy_params/layer_%d/channel_%d'
+                    #                                        % (j+1, k+1), figure=fig,
+                    #                                    global_step=project_variable.current_epoch)
+
+                    start_count = start_count + 1
+
+            # project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
+            #                                   img_tensor=dp,
+            #                                   global_step=project_variable.current_epoch)
 
         else:
+            for j in range(len(project_variable.which_layers)):
+                for k in range(len(project_variable.which_channels[j])):
+                    which_layers = project_variable.which_layers[j]
+                    which_channels = project_variable.which_channels[j][k]
 
+                    temporal_dim = len(rest[0][0])
+                    _, h_, w_ = rest[0][0][0].shape
 
+                    output = np.zeros(shape=(temporal_dim, 1, h_, w_), dtype=np.uint8)
 
-            # mode = 'slices'
-            if project_variable.model_number in [11, 14, 15, 16]:
-                mode = 'srxy' # only for 3DTTN
-            else:
-                mode = None
+                    for t in range(temporal_dim):
+                        output[t] = rest[j][k][t]
 
-            which_methods = 'gradient_method'
-            dp, rest, optional_srxy, frames = layer_vis.gradient_method(project_variable, data_point, my_model, device, mode)
+                    output = np.expand_dims(output, 0)
 
-            if mode == 'srxy':
-                assert optional_srxy is not None
+                    project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
+                                                                                    which_channels),
+                                                      vid_tensor=output,
+                                                      global_step=project_variable.current_epoch, fps=2)
 
-                start_count = 0
-                for j in range(len(project_variable.which_layers)):
-                    for k in range(len(project_variable.which_channels[j] + 1)):
-                        which_layers = project_variable.which_layers[j]
-                        which_channels = project_variable.which_channels[j][k]
-
-                        temporal_dim = len(rest[0][0])
-                        if project_variable.dataset == 'jester':
-                            _, c_, h_, w_ = rest[0][0][0].shape
-                        else:
-                            _, h_, w_ = rest[0][0][0].shape
-                            c_ = 1
-
-                        output = np.zeros(shape=(temporal_dim + 1, c_, h_, w_), dtype=np.uint8)
-                        output[0] = np.expand_dims(dp[frames[start_count]], axis=0)
-
-                        for t in range(temporal_dim):
-                            output[t + 1] = rest[j][:][k][t]
-
-                        output = np.expand_dims(output, 0)
-
-                        project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
-                                                                                        which_channels),
-                                                          vid_tensor=output,
-                                                          global_step=project_variable.current_epoch, fps=2)
-
-                        # fig = VZ.plot_srxy(optional_srxy, j, k)
-                        # project_variable.writer.add_figure(tag='srxy_params/layer_%d/channel_%d'
-                        #                                        % (j+1, k+1), figure=fig,
-                        #                                    global_step=project_variable.current_epoch)
-
-                        start_count = start_count + 1
-
-                # project_variable.writer.add_image(tag='xai/%s/0_original' % (which_methods),
-                #                                   img_tensor=dp,
-                #                                   global_step=project_variable.current_epoch)
-
-            else:
-                for j in range(len(project_variable.which_layers)):
-                    for k in range(len(project_variable.which_channels[j])):
-                        which_layers = project_variable.which_layers[j]
-                        which_channels = project_variable.which_channels[j][k]
-
-                        temporal_dim = len(rest[0][0])
-                        _, h_, w_ = rest[0][0][0].shape
-
-                        output = np.zeros(shape=(temporal_dim, 1, h_, w_), dtype=np.uint8)
-
-                        for t in range(temporal_dim):
-                            output[t] = rest[j][k][t]
-
-                        output = np.expand_dims(output, 0)
-
-                        project_variable.writer.add_video(tag='xai/%s/%s/channel %d' % (which_methods, which_layers,
-                                                                                        which_channels),
-                                                          vid_tensor=output,
-                                                          global_step=project_variable.current_epoch, fps=2)
-
-                dp = np.array(dp)
-                dp = np.expand_dims(dp, 0)
-                project_variable.writer.add_video(tag='xai/%s/0_original' % (which_methods),
-                                                  vid_tensor=dp,
-                                                  global_step=project_variable.current_epoch, fps=2)
+            dp = np.array(dp)
+            dp = np.expand_dims(dp, 0)
+            project_variable.writer.add_video(tag='xai/%s/0_original' % (which_methods),
+                                              vid_tensor=dp,
+                                              global_step=project_variable.current_epoch, fps=2)
 
 
 def add_histograms_srxy(project_variable, my_model):
