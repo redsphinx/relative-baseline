@@ -35,15 +35,15 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
         steps = 0
 
-        for i, data_and_labels in enumerate(the_iterator):
+        for i, data_and_labels in tqdm(enumerate(the_iterator)):
 
-            print('\n'
-                  '\n'
-                  '\n'
-                  'STEP %d'
-                  '\n'
-                  '\n'
-                  '\n' % steps)
+            # print('\n'
+            #       '\n'
+            #       '\n'
+            #       'STEP %d'
+            #       '\n'
+            #       '\n'
+            #       '\n' % steps)
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
 

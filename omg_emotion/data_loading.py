@@ -1136,18 +1136,21 @@ def get_jester_iter(which, project_variable):
     if project_variable.xai_only_mode:
         file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
     elif project_variable.nas or project_variable.debug_mode:
-        if which == 'train':
-            file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
-        elif which == 'val':
-            file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
-        else:
-            file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
+        file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
+        # if which == 'train':
+        #     file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
+        # elif which == 'val':
+        #     file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
+        # else:
+        #     file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
     else:
         if project_variable.model_number in [20, 21, 22, 23]:
-            if project_variable.load_from_fast:
-                file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
-            else:
-                file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336.txt' % which)
+            # default is to load from fast
+            file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
+            # if project_variable.load_from_fast:
+            #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
+            # else:
+            #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336.txt' % which)
         else:
             file_list = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
     

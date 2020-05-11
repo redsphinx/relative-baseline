@@ -26,7 +26,7 @@ def run(project_variable, all_data, my_model, device):
         the_iterator = DL.get_jester_iter('val', project_variable)
         steps = 0
 
-        for i, data_and_labels in enumerate(the_iterator):
+        for i, data_and_labels in tqdm(enumerate(the_iterator)):
 
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']

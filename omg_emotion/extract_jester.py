@@ -427,7 +427,6 @@ def to_avi(which, b, e):
 # to_avi('train', 90000, 100000)
 # to_avi('train', 100000, 110000)
 
-# HERE
 # to_avi('train', 110000, 120000)
 # to_avi('test', 0, 10000)
 
@@ -455,6 +454,8 @@ def create_file_list(which, dest, jester_data_path):
 
 
 # create_file_list('test', dest='224_336_fast', jester_data_path=PP.fast_jester_data_224_336_avi)
+create_file_list('test', dest='150_224_fast', jester_data_path=PP.fast_jester_data_150_224_avi)
+
 
 
 def calculate_weights_for_loss(which='train'):
