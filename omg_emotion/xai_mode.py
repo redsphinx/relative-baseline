@@ -62,18 +62,21 @@ def run(project_variable, my_model, device):
         labels = int(labels.data.cpu())
         all_predictions.append(prediction)
         all_labels.append(labels)
+        print('prediction: %d, correct answer: %d' % (prediction, labels))
 
-        tmp, kernel_vis, srxy_params = layer_vis.visualize_resnet18(project_variable, og_data, data, my_model, device,
-                                                                    kernel_visualizations=True, srxy_plots=True)
-        del tmp
+        print('calculating kernels...')
+        notable_frames, kernel_vis, srxy_params = layer_vis.visualize_resnet18(project_variable, og_data, data, my_model,
+                                                                               device, kernel_visualizations=True, srxy_plots=True)
 
         info = (project_variable.model_number, project_variable.load_model)
 
 
         # TODO: modify and implement defs below
         # save kernel_vis as gifs
-        save_kernels(kernel_vis, og_data, info)
+        print('saving the kernels...')
+        save_kernels(kernel_vis, og_data, info, notable_frames)
         # save srxy params as graphs
         # plot_srxy(srxy_params, 'all', 2)
+        print('asdf')
 
 

@@ -121,6 +121,7 @@ def binarize(data):
 
 
 def normalize(data, use_opencv=False):
+
     z = 255
     y = 0
     if use_opencv:
@@ -784,33 +785,36 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
 def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model, device, kernel_visualizations=True, srxy_plots=True):
     # it plots and saves the first 10 channels of each layer in 3x3 and 7x7 conv
     assert project_variable.model_number == 20
-    num_channels = 2
-    notable_frames = []
+    num_channels = 5
+
 
     if kernel_visualizations:
-
         all_outputs = []
-        data = None
         all_srxy_params = []
         trafo_per_layer = []
+        all_notable_frames = []
 
         # get all the layers and the names
-        conv_layers = [i+1 for i in range(19) if (i+1) not in [6, 11, 16]]
+        conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+        # temp
+        conv_layers = [conv_layers[0]]
 
         for ind in conv_layers:
             channels = []
             srxy_params = []
+            notable_frames = []
 
             for ch in range(num_channels):
                 data = mod_data_point.clone()
                 data = torch.nn.Parameter(data, requires_grad=True)
 
+                # my_model.eval()
                 feature_map = my_model(data, device, stop_at=ind)
 
                 try:
                     _, chan, d, h, w = feature_map.shape
                 except ValueError:
-                    print('we got a error')
+                    print('we got an error')
 
                 highest_value = 0
                 ind_1, ind_2, ind_3 = 0, 0, 0
@@ -831,11 +835,29 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
 
                 # --
                 copy_image_grad = image_grad[0]
-                copy_image_grad = copy_image_grad.mean(dim=0).mean(dim=-1).mean(dim=-1)
-                most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
+
+                # vis_image_grad = 255 * image_grad[0]
+                # vis_image_grad = np.array(vis_image_grad.data.cpu(), dtype=np.uint8)
+                # vis_image_grad = vis_image_grad.transpose(1, 2, 3, 0)
+                # for fr in range(30):
+                #     img = vis_image_grad[fr]
+                #     img = Image.fromarray(img, mode='RGB')
+                #     path = os.path.join('/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging', '%d.jpg' % fr)
+                #     img.save(path)
+
+                copy_image_grad = 255 * copy_image_grad
+                copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
+                copy_image_grad = np.where(copy_image_grad < 0, -1 * copy_image_grad, copy_image_grad)
+                copy_image_grad = np.mean(np.mean(np.mean(copy_image_grad, axis=0), axis=-1), axis=-1)
+                # copy_image_grad = copy_image_grad.mean(dim=0).mean(dim=-1).mean(dim=-1)
+                # copy_image_grad = copy_image_grad.permute(1, 0, 2, 3)
+                # most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
+                most_notable_frame = copy_image_grad.argmax()
                 notable_frames.append(most_notable_frame)
                 # final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
                 final = image_grad[0, :, most_notable_frame].data.cpu() * og_data_point[0, :, most_notable_frame].data.cpu()
+
+                my_model.zero_grad()
 
                 # --
 
@@ -858,7 +880,6 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                     y = getattr(transformations, 'translate_y')[trafo, ch]
 
                     # apply them on the final image
-                    # FIX: issue that final is not on GPU
                     next_final = create_next_frame(s, r, x, y, all_finals[trafo], device)
                     all_finals.append(next_final)
 
@@ -875,13 +896,15 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                 # can't reshape since the number of transformations can differ
             # srxy_params = np.reshape(srxy_params, (num_channels, num_transformations, 4))
             all_srxy_params.append(srxy_params)
-
             all_outputs.append(channels)
+            all_notable_frames.append(notable_frames)
+
 
         print('here')
-        data = data[0, :]
-
-        data = np.array(data.data.cpu(), dtype=np.uint8)
+        data = all_notable_frames
+        # data = data[0, :]
+        #
+        # data = np.array(data.data.cpu(), dtype=np.uint8)
         processed_outputs = []
 
         for l in range(len(conv_layers)):

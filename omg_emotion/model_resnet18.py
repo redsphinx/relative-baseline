@@ -199,10 +199,10 @@ class ResNet18Explicit(torch.nn.Module):
 
         num = 1
         h = self.conv1(x, device)
-        if stop_at == num:
-            return h
         h = self.bn1(h)
         h = relu(h)
+        if stop_at == num:
+            return h
         
         h = self.maxpool(h)
         

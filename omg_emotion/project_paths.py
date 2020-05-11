@@ -63,6 +63,8 @@ jester_data_50_75_avi_clean = '/scratch/users/gabras/jester/data_50_75_avi_clean
 jester_data_224_336 = '/scratch/users/gabras/jester/data_224_336'
 jester_data_224_336_avi = '/scratch/users/gabras/jester/data_224_336_avi'
 fast_jester_data_224_336_avi = '/fast/gabras/jester/data_224_336_avi'
+fast_jester_data_150_224 = '/fast/gabras/jester/data_150_224'
+fast_jester_data_150_224_avi = '/fast/gabras/jester/data_150_224_avi'
 
 
 jester_frames = '/scratch/users/gabras/jester/frames.txt'

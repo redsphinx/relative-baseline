@@ -199,10 +199,14 @@ def standardize_clips(b, e, he, wi, loc):
 
     for vid in tqdm.tqdm(range(b, e)):
         # print('vid = ', vid)
-        # vid_path = os.path.join(base_path, all_videos[vid])
-        # new_vid_path = os.path.join(new_path, all_videos[vid])
-        vid_path = os.path.join(base_path, str(vid))
-        new_vid_path = os.path.join(new_path, str(vid))
+
+        # business as usual:
+        vid_path = os.path.join(base_path, all_videos[vid])
+        new_vid_path = os.path.join(new_path, all_videos[vid])
+
+        # to fix specific things
+        # vid_path = os.path.join(base_path, str(vid))
+        # new_vid_path = os.path.join(new_path, str(vid))
         if not os.path.exists(new_vid_path):
             os.mkdir(new_vid_path)
 
@@ -282,26 +286,27 @@ def standardize_clips(b, e, he, wi, loc):
 # 148092
 # standardize_clips(0, 3, he=150, wi=224, loc='data_150_224')
 
-# standardize_clips(3+1267, 10000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(10000, 20000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(20000+395, 30000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(30000+2017, 40000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(0, 10000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(10000, 20000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(20000, 30000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(30000, 40000, he=150, wi=224, loc='data_150_224')
 
-# standardize_clips(40000+3862, 50000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(50000+1531, 60000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(60000+5580, 70000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(70000+3711, 80000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(40000, 50000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(50000, 60000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(60000, 70000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(70000, 80000, he=150, wi=224, loc='data_150_224')
 
-# standardize_clips(80000+716, 90000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(90000+2400, 100000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(100000, 110000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(110000+890, 120000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(80000, 90000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(90000, 100000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(100000, 110000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(110000, 120000, he=150, wi=224, loc='data_150_224')
 
-# standardize_clips(120000+1331, 130000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(130000+1992, 140000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336')
-# standardize_clips(101138, 101138+1, he=224, wi=336, loc='data_224_336')
-# standardize_clips(101139, 101139+1, he=224, wi=336, loc='data_224_336')
+# standardize_clips(120000, 130000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(130000, 140000, he=150, wi=224, loc='data_150_224')
+# standardize_clips(140000, 148092, he=150, wi=224, loc='data_150_224')
+
+# standardize_clips(101138, 101138+1, he=224, wi=336, loc='data_150_224')
+# standardize_clips(101139, 101139+1, he=224, wi=336, loc='data_150_224')
 
 def triple_check_num_frames_in_folders():
     # path = PP.jester_data_50_75
@@ -381,40 +386,49 @@ def to_avi(which, b, e):
     print('start and finish: ', b, e)
     assert which in ['test', 'val', 'train']
 
-    if not os.path.exists(PP.jester_data_224_336_avi):
-        os.mkdir(PP.jester_data_224_336_avi)
+    jpg_path = PP.fast_jester_data_150_224
+    avi_path = PP.fast_jester_data_150_224_avi
+
+    if not os.path.exists(avi_path):
+        os.mkdir(avi_path)
 
     labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
     labels = np.load(labels_path)
     labels = labels[b:e]
 
-    list_files_to_convert = [os.path.join(PP.jester_data_224_336, i) for i in labels[:, 0]]
+    list_files_to_convert = [os.path.join(jpg_path, i) for i in labels[:, 0]]
 
     for file_path in tqdm.tqdm(list_files_to_convert):
 
         fix_file_names_in_folder(file_path)
 
-        dest = os.path.join(PP.jester_data_224_336_avi, '%s.avi' % (file_path.split('/')[-1]))
+        dest = os.path.join(avi_path, '%s.avi' % (file_path.split('/')[-1]))
 
         jpg_to_avi(file_path, dest)
 
 
 # to_avi('val', 0, 3)
 # to_avi('val', 3, 10000)  # 7393
-
 # to_avi('train', 0, 10000)
-# to_avi('train', 10000+2069, 20000) # 2069
+# to_avi('train', 10000, 20000) # 2069
+
+
 # to_avi('train', 20000, 30000)
 # to_avi('train', 30000, 40000)
 # to_avi('train', 40000, 50000)
+
+
 # to_avi('train', 50000, 60000)
 # to_avi('train', 60000, 70000)
 # to_avi('train', 70000, 80000)
+
+
 # to_avi('train', 80000, 90000)
 # to_avi('train', 90000, 100000)
 # to_avi('train', 100000, 110000)
-# to_avi('train', 110000, 120000)
 
+# HERE
+# to_avi('train', 110000, 120000)
 # to_avi('test', 0, 10000)
 
 

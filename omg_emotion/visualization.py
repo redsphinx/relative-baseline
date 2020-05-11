@@ -178,7 +178,7 @@ def make_pacman_frame(pacman_img, matrix):
     # M = np.float32([[1,0,100],[0,1,50]])
     # dst = cv2.warpAffine(img,M,(cols,rows))
 
-def save_kernels(kernel_vis, og_data, info):
+def save_kernels(kernel_vis, og_data, info, all_notable_frames):
     # setting up correct save paths
     if type(info[1]) == list:
         if len(info[1]) == 4:
@@ -199,6 +199,7 @@ def save_kernels(kernel_vis, og_data, info):
     # saving the images
     if info[0] == 20:
         conv_layers = [i + 1 for i in range(19) if (i + 1) not in [6, 11, 16]]
+        conv_layers = [conv_layers[0]]
     elif info[0] == 23:
         conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
     else:
@@ -209,10 +210,21 @@ def save_kernels(kernel_vis, og_data, info):
 
     for i, layer in tqdm(enumerate(conv_layers)):
         layer_path = os.path.join(folder_path, 'conv_%d' % layer)
+
+
         for channel in range(len(kernel_vis[i])):
             channel_path = os.path.join(layer_path, 'channel_%d' % channel)
             if not os.path.exists(channel_path):
                 os.makedirs(channel_path)
+
+            # save the notable frame for this channel
+            notable_frame = all_notable_frames[i][channel]
+            notable_path = os.path.join(channel_path, 'og_frame.jpg')
+            frame = og_data[0, :, notable_frame]
+            frame = frame.permute(1, 2, 0)
+            frame = np.array(frame.data.cpu())
+            img = Image.fromarray(frame, mode='RGB')
+            img.save(notable_path)
 
             for kernel_slice in range(len(kernel_vis[i][channel])):
                 frame = kernel_vis[i][channel][kernel_slice]
