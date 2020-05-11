@@ -73,6 +73,9 @@ pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pa
 erhan2009 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/erhan2009'
 zeiler2014 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2014'
 
+xai_visualizations = '/huge/gabras/omg_emotion/saving_data/xai'
+our_method = '/huge/gabras/omg_emotion/saving_data/xai/our_method'
+
 # NAS saving location
 nas_location = '/huge/gabras/omg_emotion/saving_data/nas'
 

@@ -2,6 +2,9 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
+import relative_baseline.omg_emotion.project_paths as PP
+
+import os
 from textwrap import wrap
 import re
 import itertools
@@ -10,6 +13,8 @@ from sklearn.metrics import confusion_matrix
 import torch
 from torchviz import make_dot
 import cv2 as cv
+import PIL.Image as Image
+from tqdm import tqdm
 
 
 # def plot_confusion_matrix(correct_labels, predict_labels, labels, title='Confusion matrix', tensor_name = 'MyFigure/image', normalize=False):
@@ -173,6 +178,50 @@ def make_pacman_frame(pacman_img, matrix):
     # M = np.float32([[1,0,100],[0,1,50]])
     # dst = cv2.warpAffine(img,M,(cols,rows))
 
-# TODO: method that saves the kernel visualzations
-def save_kernels():
-    pass
+def save_kernels(kernel_vis, og_data, info):
+    # setting up correct save paths
+    if type(info[1]) == list:
+        if len(info[1]) == 4:
+            folder_name = 'experiment_%d_model_%d_run_%d_epoch_%d' % (info[1][0], info[1][1], info[1][2], info[1][3])
+        else:
+            print('len info is not 4')
+            folder_name = None
+    elif type(info[1]) == bool:
+        folder_name = 'model_%d_pretrain_%d' % (info[0], int(info[1]))
+    else:
+        print('unknown behavior, what is list?')
+        folder_name = None
+
+    folder_path = os.path.join(PP.our_method, folder_name)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+
+    # saving the images
+    if info[0] == 20:
+        conv_layers = [i + 1 for i in range(19) if (i + 1) not in [6, 11, 16]]
+    elif info[0] == 23:
+        conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+    else:
+        conv_layers = None
+        print('model number is unknown')
+
+    assert len(conv_layers) == len(kernel_vis)
+
+    for i, layer in tqdm(enumerate(conv_layers)):
+        layer_path = os.path.join(folder_path, 'conv_%d' % layer)
+        for channel in range(len(kernel_vis[i])):
+            channel_path = os.path.join(layer_path, 'channel_%d' % channel)
+            if not os.path.exists(channel_path):
+                os.makedirs(channel_path)
+
+            for kernel_slice in range(len(kernel_vis[i][channel])):
+                frame = kernel_vis[i][channel][kernel_slice]
+                name = 'k_%d.jpg' % kernel_slice
+                slice_path = os.path.join(channel_path, name)
+
+                frame = frame[0].transpose(1, 2, 0)
+                img = Image.fromarray(frame, mode='RGB')
+
+                # print(slice_path)
+
+                img.save(slice_path)

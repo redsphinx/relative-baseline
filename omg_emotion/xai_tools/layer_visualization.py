@@ -63,6 +63,12 @@ def make_affine_matrix(sc, ro, tx, ty, use_opencv=False):
     
         matrix = torch.zeros((1, 2, 3))
 
+        # for making visualization for resnet18 and googlenet
+        sc = sc.data.cpu()
+        ro = ro.data.cpu()
+        tx = tx.data.cpu()
+        ty = ty.data.cpu()
+
         matrix[0, 0, 0] = sc * torch.cos(ro)
         matrix[0, 0, 1] = -sc * torch.sin(ro)
         matrix[0, 0, 2] = tx * sc * torch.cos(ro) - ty * sc * torch.sin(ro)
@@ -91,7 +97,7 @@ def create_next_frame(s, r, x, y, data, device, use_opencv=False):
             c_, h_, w_ = data.shape
 
         affine_matrix = F.affine_grid(theta=affine_matrix, size=[1, c_, h_, w_])
-        affine_matrix = affine_matrix.cuda(device)
+        # affine_matrix = affine_matrix.cuda(device)
         if len(data.shape) == 2:
             data = data.unsqueeze(0).unsqueeze(0)
             affine_matrix = F.grid_sample(data, affine_matrix)
@@ -789,7 +795,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
         trafo_per_layer = []
 
         # get all the layers and the names
-        conv_layers = [i+1 for i in range(20) if i not in [6, 11, 16]]
+        conv_layers = [i+1 for i in range(19) if (i+1) not in [6, 11, 16]]
 
         for ind in conv_layers:
             channels = []
@@ -801,7 +807,10 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
 
                 feature_map = my_model(data, device, stop_at=ind)
 
-                _, chan, d, h, w = feature_map.shape
+                try:
+                    _, chan, d, h, w = feature_map.shape
+                except ValueError:
+                    print('we got a error')
 
                 highest_value = 0
                 ind_1, ind_2, ind_3 = 0, 0, 0
@@ -863,7 +872,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                     srxy_params.append(_params)
 
                 channels.append(all_finals)
-                # can't rescale since the number of transformations can differ
+                # can't reshape since the number of transformations can differ
             # srxy_params = np.reshape(srxy_params, (num_channels, num_transformations, 4))
             all_srxy_params.append(srxy_params)
 
@@ -878,7 +887,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
         for l in range(len(conv_layers)):
             channels = []
 
-            for c in range(10):
+            for c in range(num_channels):
                 all_finals = []
 
                 for t in range(trafo_per_layer[l] + 1):

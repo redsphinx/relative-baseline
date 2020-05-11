@@ -67,10 +67,13 @@ def run(project_variable, my_model, device):
                                                                     kernel_visualizations=True, srxy_plots=True)
         del tmp
 
+        info = (project_variable.model_number, project_variable.load_model)
+
+
         # TODO: modify and implement defs below
         # save kernel_vis as gifs
-        save_kernels()
+        save_kernels(kernel_vis, og_data, info)
         # save srxy params as graphs
-        plot_srxy(srxy_params, 'all', 2)
+        # plot_srxy(srxy_params, 'all', 2)
 
 

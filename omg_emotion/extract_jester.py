@@ -280,26 +280,26 @@ def standardize_clips(b, e, he, wi, loc):
             cntr = cntr + 1
 
 # 148092
-# DONE standardize_clips(0, 3, he=224, wi=336, loc='data_224_336')
+# standardize_clips(0, 3, he=150, wi=224, loc='data_150_224')
 
-# standardize_clips(3+1267, 10000, he=224, wi=336, loc='data_224_336')  # 1267
+# standardize_clips(3+1267, 10000, he=224, wi=336, loc='data_224_336')
 # standardize_clips(10000, 20000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(20000+395, 30000, he=224, wi=336, loc='data_224_336')  # 395
-# standardize_clips(30000+2017, 40000, he=224, wi=336, loc='data_224_336') # 2017
+# standardize_clips(20000+395, 30000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(30000+2017, 40000, he=224, wi=336, loc='data_224_336')
 
-# standardize_clips(40000+3862, 50000, he=224, wi=336, loc='data_224_336') # 3862
-# standardize_clips(50000+1531, 60000, he=224, wi=336, loc='data_224_336') # 1531
-# standardize_clips(60000+5580, 70000, he=224, wi=336, loc='data_224_336') # 5580
-# standardize_clips(70000+3711, 80000, he=224, wi=336, loc='data_224_336')  # 3711
+# standardize_clips(40000+3862, 50000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(50000+1531, 60000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(60000+5580, 70000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(70000+3711, 80000, he=224, wi=336, loc='data_224_336')
 
-# standardize_clips(80000+716, 90000, he=224, wi=336, loc='data_224_336') # 716
-# standardize_clips(90000+2400, 100000, he=224, wi=336, loc='data_224_336') # 2400
+# standardize_clips(80000+716, 90000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(90000+2400, 100000, he=224, wi=336, loc='data_224_336')
 # standardize_clips(100000, 110000, he=224, wi=336, loc='data_224_336')
-# standardize_clips(110000+890, 120000, he=224, wi=336, loc='data_224_336') # 890
+# standardize_clips(110000+890, 120000, he=224, wi=336, loc='data_224_336')
 
-# standardize_clips(120000+1331, 130000, he=224, wi=336, loc='data_224_336') # 1331
-# standardize_clips(130000+1992, 140000, he=224, wi=336, loc='data_224_336') # 1992
-# standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336') # 305
+# standardize_clips(120000+1331, 130000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(130000+1992, 140000, he=224, wi=336, loc='data_224_336')
+# standardize_clips(140000+305, 148092, he=224, wi=336, loc='data_224_336')
 # standardize_clips(101138, 101138+1, he=224, wi=336, loc='data_224_336')
 # standardize_clips(101139, 101139+1, he=224, wi=336, loc='data_224_336')
 
