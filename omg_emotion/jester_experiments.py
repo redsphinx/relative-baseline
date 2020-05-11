@@ -822,6 +822,35 @@ def e24_conv3DTTN_jester():
 
     main_file.run(project_variable)
 
+def e25_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 25
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 1
+    project_variable.batch_size = 32
+    project_variable.batch_size_val_test = 32
+
+    project_variable.load_model = True
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.000005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    main_file.run(project_variable)
+
 project_variable = ProjectVariable(debug_mode=False)
 # project_variable = ProjectVariable(debug_mode=True)
 
@@ -846,4 +875,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e21_conv3DTTN_jester()
 # e22_conv3DTTN_jester()
 # e23_conv3DTTN_jester()
-e24_conv3DTTN_jester()
+# e24_conv3DTTN_jester()
+e25_conv3DTTN_jester()

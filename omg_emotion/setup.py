@@ -217,7 +217,7 @@ def get_model(project_variable):
             # model.res5b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
 
             # explicit version
-            divide = True
+            divide = False
             if divide:
                 div1 = 7
                 div2 = 3
