@@ -369,17 +369,28 @@ class ConvTTN3d(conv._ConvNd):
         theta = theta[1:]
 
         try:
-            _ = F.affine_grid(theta[0],
-                              [self.out_channels, self.kernel_size[0]-1, self.kernel_size[1],
-                               self.kernel_size[2]], align_corners=True)
+            if torch.__version__ == '1.2.0':
+                _ = F.affine_grid(theta[0],
+                                  [self.out_channels, self.kernel_size[0] - 1, self.kernel_size[1],
+                                   self.kernel_size[2]])
+            else:
+                _ = F.affine_grid(theta[0],
+                                  [self.out_channels, self.kernel_size[0]-1, self.kernel_size[1],
+                                   self.kernel_size[2]], align_corners=True)
         except RuntimeError:
             torch.backends.cudnn.deterministic = True
             print('ok cudnn')
 
         for i in range(self.kernel_size[0] - 1):
-            tmp = F.affine_grid(theta[i],
-                                [self.out_channels, self.kernel_size[0], self.kernel_size[1],
-                                 self.kernel_size[2]], align_corners=True)
+            if torch.__version__ == '1.2.0':
+                tmp = F.affine_grid(theta[i],
+                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1],
+                                     self.kernel_size[2]])
+            else:
+                tmp = F.affine_grid(theta[i],
+                                    [self.out_channels, self.kernel_size[0], self.kernel_size[1],
+                                     self.kernel_size[2]], align_corners=True)
+
             grid = torch.cat((grid, tmp.unsqueeze(0)), 0)
 
         return grid
@@ -407,8 +418,11 @@ class ConvTTN3d(conv._ConvNd):
         # ---
         # needed to deal with the cudnn error
         try:
-            _ = F.grid_sample(self.first_weight[:, :, 0], grid[0], mode='bilinear', padding_mode='zeros',
-                              align_corners=True)
+            if torch.__version__ == '1.2.0':
+                _ = F.grid_sample(self.first_weight[:, :, 0], grid[0], mode='bilinear', padding_mode='zeros')
+            else:
+                _ = F.grid_sample(self.first_weight[:, :, 0], grid[0], mode='bilinear', padding_mode='zeros',
+                                  align_corners=True)
         except RuntimeError:
             torch.backends.cudnn.deterministic = True
             print('ok cudnn')
@@ -418,8 +432,11 @@ class ConvTTN3d(conv._ConvNd):
 
         # default: weight_transform = 'seq'
         for i in range(self.kernel_size[0] - 1):
-            tmp = F.grid_sample(new_weight[:, :, -1], grid[i], mode='bilinear', padding_mode='zeros',
-                                align_corners=True)
+            if torch.__version__ == '1.2.0':
+                tmp = F.grid_sample(new_weight[:, :, -1], grid[i], mode='bilinear', padding_mode='zeros')
+            else:
+                tmp = F.grid_sample(new_weight[:, :, -1], grid[i], mode='bilinear', padding_mode='zeros',
+                                    align_corners=True)
             new_weight = torch.cat((new_weight, tmp.unsqueeze(2)), 2)
 
         self.weight = torch.nn.Parameter(new_weight)

@@ -100,7 +100,7 @@ def create_next_frame(s, r, x, y, data, device, use_opencv=False):
         # affine_matrix = affine_matrix.cuda(device)
         if len(data.shape) == 2:
             data = data.unsqueeze(0).unsqueeze(0)
-            affine_matrix = F.grid_sample(data, affine_matrix)
+            affine_matrix = F.grid_sample(data, affine_matrix,)
             return affine_matrix[0][0]
         else:
             data = data.unsqueeze(0)
@@ -120,9 +120,8 @@ def binarize(data):
     return data
 
 
-def normalize(data, use_opencv=False):
+def normalize(data, use_opencv=False, z=255.):
 
-    z = 255
     y = 0
     if use_opencv:
         a = float(data.max())
@@ -137,6 +136,19 @@ def normalize(data, use_opencv=False):
             for c in range(data.shape[0]):
                 a_s.append(float(data[c].max().cpu()))
                 b_s.append(float(data[c].min().cpu()))
+            
+            a1, a2 = data[0].shape
+            a_tmp = np.ones(shape=(3, a1, a2))
+            a_tmp[0] = a_tmp[0] * a_s[0]
+            a_tmp[1] = a_tmp[1] * a_s[1]
+            a_tmp[2] = a_tmp[2] * a_s[2]
+            a_s = a_tmp
+
+            b_tmp = np.ones(shape=(3, a1, a2))
+            b_tmp[0] = b_tmp[0] * b_s[0]
+            b_tmp[1] = b_tmp[1] * b_s[1]
+            b_tmp[2] = b_tmp[2] * b_s[2]
+            b_s = b_tmp
 
     if len(data.shape) == 2:
         for i in range(data.shape[0]):
@@ -144,12 +156,22 @@ def normalize(data, use_opencv=False):
                 c = data[i, j]
                 data[i, j] = (c - a) * (z - y) / (b - a) + y
     else:
-        for i in range(data.shape[0]):
-            for j in range(data.shape[1]):
-                for k in range(data.shape[2]):
-                    c = data[i, j, k]
-                    data[i, j] = (c - a_s[i]) * (z - y) / (b_s[i] - a_s[i]) + y
+        # for i in range(data.shape[0]):
+        #     for j in range(data.shape[1]):
+        #         for k in range(data.shape[2]):
+        #             c = data[i, j, k]
+        #             # data[i, j, k] = (c - a_s[i]) * (z - y) / (b_s[i] - a_s[i]) + y
+        #             data[i, j, k] = ((c - b_s[i]) / (a_s[i]-b_s[i])) * (z-y) + y
 
+        y_tmp = np.ones(shape=data[0].shape) * y
+        y = y_tmp
+        z_tmp = np.ones(shape=data[0].shape) * z
+        z = z_tmp
+        
+        for i in range(data.shape[0]):
+            c = data[i]
+            data[i] = ((c - b_s[i]) / (a_s[i]-b_s[i])) * (z-y) + y
+            
     return data
 
 
@@ -620,6 +642,7 @@ def our_gradient_method(project_variable, data_point, my_model, device):
             else:
                 # final = image_grad[0, 0, 0] * data[0, 0, 0]
                 copy_image_grad = image_grad[0][0]
+                # FIx this: this is not the right way to find the frame with most activations
                 copy_image_grad = copy_image_grad.mean(dim=1).mean(dim=1)
                 most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
                 notable_frames.append(most_notable_frame)
@@ -804,9 +827,17 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
             srxy_params = []
             notable_frames = []
 
+            # TODO: how to find the best channels??
             for ch in range(num_channels):
+                try:
+                    del data
+                    print('data variable deleted')
+                except NameError:
+                    print('data variable is not defined')
+
                 data = mod_data_point.clone()
                 data = torch.nn.Parameter(data, requires_grad=True)
+                # TODO: try data as a tensor
 
                 # my_model.eval()
                 feature_map = my_model(data, device, stop_at=ind)
@@ -816,35 +847,53 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                 except ValueError:
                     print('we got an error')
 
+                feature_map_arr = np.array(feature_map[0][ch].data.cpu())
                 highest_value = 0
                 ind_1, ind_2, ind_3 = 0, 0, 0
                 for l in range(d):
-                    for m in range(h):
-                        for n in range(w):
-                            # print(l, m, n)
-                            val = float(feature_map[0, ch, l, m, n].data.cpu())
-                            if val > highest_value:
-                                highest_value = val
-                                ind_1 = l
-                                ind_2 = m
-                                ind_3 = n
+                    max_index = feature_map_arr[l].argmax()
+                    indices = np.unravel_index(max_index, (h, w))
+                    if feature_map_arr[l, indices[0], indices[1]] > highest_value:
+                        highest_value = feature_map_arr[l, indices[0], indices[1]]
+                        ind_1 = l
+                        ind_2, ind_3 = indices
+
+                # highest_value = 0
+                # ind_1, ind_2, ind_3 = 0, 0, 0
+                # for l in range(d):
+                #     for m in range(h):
+                #         for n in range(w):
+                #             # print(l, m, n)
+                #             val = float(feature_map[0, ch, l, m, n].data.cpu())
+                #             if val > highest_value:
+                #                 highest_value = val
+                #                 ind_1 = l
+                #                 ind_2 = m
+                #                 ind_3 = n
 
                 feature_map[0, ch, ind_1, ind_2, ind_3].backward()
+                # feature_map[0, ch, ind_1].backward(torch.Tensor(np.ones(shape=(112, 168))).cuda(device))
+                # TODO: what is difference with feature_map.backward() ?
                 image_grad = data.grad
                 # final = image_grad[0, :] * data[0, :]
 
                 # --
+
+                save = False
+                if save:
+                    vis_image_grad = 255 * image_grad[0]
+                    vis_image_grad = np.array(vis_image_grad.data.cpu(), dtype=np.uint8)
+                    vis_image_grad = vis_image_grad.transpose(1, 2, 3, 0)
+                    for fr in range(30):
+                        img = vis_image_grad[fr]
+                        img = Image.fromarray(img, mode='RGB')
+                        dest = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging'
+                        if not os.path.exists(dest):
+                            os.makedirs(dest)
+                        path = os.path.join(dest, '%d.jpg' % fr)
+                        img.save(path)
+
                 copy_image_grad = image_grad[0]
-
-                # vis_image_grad = 255 * image_grad[0]
-                # vis_image_grad = np.array(vis_image_grad.data.cpu(), dtype=np.uint8)
-                # vis_image_grad = vis_image_grad.transpose(1, 2, 3, 0)
-                # for fr in range(30):
-                #     img = vis_image_grad[fr]
-                #     img = Image.fromarray(img, mode='RGB')
-                #     path = os.path.join('/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging', '%d.jpg' % fr)
-                #     img.save(path)
-
                 copy_image_grad = 255 * copy_image_grad
                 copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
                 copy_image_grad = np.where(copy_image_grad < 0, -1 * copy_image_grad, copy_image_grad)
@@ -854,10 +903,34 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                 # most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
                 most_notable_frame = copy_image_grad.argmax()
                 notable_frames.append(most_notable_frame)
+                if og_data_point.dtype == torch.uint8:
+                    og_data_point = og_data_point.type(torch.float32)
+
                 # final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
-                final = image_grad[0, :, most_notable_frame].data.cpu() * og_data_point[0, :, most_notable_frame].data.cpu()
+
+                # normalize the frame gradient between 0 and 1
+                # this way it acts like a weighting on the important pixels
+                frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
+                frame_gradient = torch.where(frame_gradient < torch.Tensor([0]), torch.Tensor([0]), frame_gradient)
+                frame_gradient = np.array(frame_gradient.data.cpu())
+                frame_gradient = normalize(frame_gradient, z=1.)*10
+                frame_gradient = torch.Tensor(frame_gradient)
+
+                final = frame_gradient * og_data_point[0, :, most_notable_frame].data.cpu()
+
+                save = True
+                if save:
+                    ff = np.array(final, dtype=np.uint8)
+                    ff = ff.transpose(1, 2, 0)
+                    img = Image.fromarray(ff, mode='RGB')
+                    path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/final_demo_grad_normalized.jpg'
+                    img.save(path)
 
                 my_model.zero_grad()
+
+                if data.grad is not None:
+                    data.grad.detach_()
+                    data.grad.zero_()
 
                 # --
 

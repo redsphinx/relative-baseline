@@ -578,4 +578,6 @@ def xai_selection():
             # print(line)
             my_file.write(line)
 
+# xai_selection()
+
 
