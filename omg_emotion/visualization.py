@@ -199,7 +199,7 @@ def save_kernels(kernel_vis, og_data, info, all_notable_frames):
     # saving the images
     if info[0] == 20:
         conv_layers = [i + 1 for i in range(19) if (i + 1) not in [6, 11, 16]]
-        conv_layers = [conv_layers[0]]
+        conv_layers = conv_layers[:5]
     elif info[0] == 23:
         conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
     else:

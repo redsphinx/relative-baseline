@@ -134,8 +134,8 @@ def normalize(data, use_opencv=False, z=255.):
             a_s = []
             b_s = []
             for c in range(data.shape[0]):
-                a_s.append(float(data[c].max().cpu()))
-                b_s.append(float(data[c].min().cpu()))
+                a_s.append(float(data[c].max()))
+                b_s.append(float(data[c].min()))
             
             a1, a2 = data[0].shape
             a_tmp = np.ones(shape=(3, a1, a2))
@@ -808,7 +808,7 @@ def our_gradient_method_no_srxy(project_variable, data_point, my_model, device):
 def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model, device, kernel_visualizations=True, srxy_plots=True):
     # it plots and saves the first 10 channels of each layer in 3x3 and 7x7 conv
     assert project_variable.model_number == 20
-    num_channels = 5
+    num_channels = 'all'
 
 
     if kernel_visualizations:
@@ -820,7 +820,10 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
         # get all the layers and the names
         conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
         # temp
-        conv_layers = [conv_layers[0]]
+        conv_layers = conv_layers[:5]
+
+        # keep track of the sum of the activations and sort them by most to least amount of activation
+        channels_sorted = []
 
         for ind in conv_layers:
             channels = []
@@ -828,24 +831,36 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
             notable_frames = []
 
             # TODO: how to find the best channels??
-            for ch in range(num_channels):
+            if num_channels == 'all':
+                range_channels = getattr(my_model, 'conv%d' % ind)
+                range_channels = range_channels.weight.shape[0]
+            else:
+                range_channels = num_channels
+
+            activation_per_channel = []
+
+            for ch in range(range_channels):
                 try:
                     del data
-                    print('data variable deleted')
+                    # print('data variable deleted')
                 except NameError:
-                    print('data variable is not defined')
+                    pass
+                    # print('data variable is not defined')
 
                 data = mod_data_point.clone()
                 data = torch.nn.Parameter(data, requires_grad=True)
-                # TODO: try data as a tensor
 
                 # my_model.eval()
                 feature_map = my_model(data, device, stop_at=ind)
-
                 try:
                     _, chan, d, h, w = feature_map.shape
                 except ValueError:
                     print('we got an error')
+
+                ff = feature_map.clone()[0][ch]
+                ff = torch.nn.functional.relu(ff.detach())
+                ff = np.array(ff.data.cpu())
+                activation_per_channel.append(ff.sum())
 
                 feature_map_arr = np.array(feature_map[0][ch].data.cpu())
                 highest_value = 0
@@ -857,19 +872,6 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                         highest_value = feature_map_arr[l, indices[0], indices[1]]
                         ind_1 = l
                         ind_2, ind_3 = indices
-
-                # highest_value = 0
-                # ind_1, ind_2, ind_3 = 0, 0, 0
-                # for l in range(d):
-                #     for m in range(h):
-                #         for n in range(w):
-                #             # print(l, m, n)
-                #             val = float(feature_map[0, ch, l, m, n].data.cpu())
-                #             if val > highest_value:
-                #                 highest_value = val
-                #                 ind_1 = l
-                #                 ind_2 = m
-                #                 ind_3 = n
 
                 feature_map[0, ch, ind_1, ind_2, ind_3].backward()
                 # feature_map[0, ch, ind_1].backward(torch.Tensor(np.ones(shape=(112, 168))).cuda(device))
@@ -911,14 +913,15 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                 # normalize the frame gradient between 0 and 1
                 # this way it acts like a weighting on the important pixels
                 frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
-                frame_gradient = torch.where(frame_gradient < torch.Tensor([0]), torch.Tensor([0]), frame_gradient)
-                frame_gradient = np.array(frame_gradient.data.cpu())
+                frame_gradient = torch.nn.functional.relu(frame_gradient)
+                # frame_gradient = torch.where(frame_gradient < torch.Tensor([0]), torch.Tensor([0]), frame_gradient)
+                frame_gradient = np.array(frame_gradient)
                 frame_gradient = normalize(frame_gradient, z=1.)*10
                 frame_gradient = torch.Tensor(frame_gradient)
 
                 final = frame_gradient * og_data_point[0, :, most_notable_frame].data.cpu()
 
-                save = True
+                save = False
                 if save:
                     ff = np.array(final, dtype=np.uint8)
                     ff = ff.transpose(1, 2, 0)
@@ -972,6 +975,9 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
             all_outputs.append(channels)
             all_notable_frames.append(notable_frames)
 
+            channel_list = [i for i in range(range_channels)]
+            activations, which_channels = zip(*sorted(zip(activation_per_channel, channel_list), reverse=True))
+            channels_sorted.append(which_channels)
 
         print('here')
         data = all_notable_frames
@@ -983,20 +989,13 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
         for l in range(len(conv_layers)):
             channels = []
 
-            for c in range(num_channels):
+            for c in range(range_channels):
                 all_finals = []
 
                 for t in range(trafo_per_layer[l] + 1):
 
                     processed_final = all_outputs[l][c][t]
-                    # TODO: finish debugging the coloring
-                    # save as jpg
-                    # transpose channels
-                    # no normalization
-                    # normalization per channel
-
-                    # TODO: turn on normalization again once the network starts training better
-                    # processed_final = normalize(processed_final)
+                    # processed_final = normalize(processed_final, z=255.)
                     processed_final = processed_final.unsqueeze(0)
                     processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 
@@ -1011,7 +1010,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
         # processed_final = whiten_bg(processed_final)
         # processed_final = np.expand_dims(processed_final, 0)
 
-        return data, all_outputs, all_srxy_params
+        return data, all_outputs, all_srxy_params, channels_sorted
 
 
 def gradient_method(project_variable, data_point, my_model, device, mode):

@@ -30,6 +30,8 @@ def run(project_variable, my_model, device):
 
 
     for i, data_and_labels in tqdm(enumerate(the_iterator)):
+        if i > 0:
+            break
 
         prediction = None
 
@@ -65,10 +67,13 @@ def run(project_variable, my_model, device):
         print('prediction: %d, correct answer: %d' % (prediction, labels))
 
         print('calculating kernels...')
-        notable_frames, kernel_vis, srxy_params = layer_vis.visualize_resnet18(project_variable, og_data, data, my_model,
+        notable_frames, kernel_vis, srxy_params, channels_sorted = layer_vis.visualize_resnet18(project_variable, og_data, data, my_model,
                                                                                device, kernel_visualizations=True, srxy_plots=True)
 
         info = (project_variable.model_number, project_variable.load_model)
+
+        for jj in range(len(channels_sorted)):
+            print(channels_sorted[jj])
 
 
         # TODO: modify and implement defs below
