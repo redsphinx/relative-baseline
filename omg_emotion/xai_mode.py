@@ -67,8 +67,10 @@ def run(project_variable, my_model, device):
         print('prediction: %d, correct answer: %d' % (prediction, labels))
 
         print('calculating kernels...')
-        notable_frames, kernel_vis, srxy_params, channels_sorted = layer_vis.visualize_resnet18(project_variable, og_data, data, my_model,
-                                                                               device, kernel_visualizations=True, srxy_plots=True)
+        notable_frames, kernel_vis, srxy_params, channels_sorted = layer_vis.visualize_resnet18(project_variable,
+                                                                                                og_data, data, my_model,
+                                                                                                device,
+                                                                                                num_channels='all')
 
         info = (project_variable.model_number, project_variable.load_model)
 

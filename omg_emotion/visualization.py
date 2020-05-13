@@ -198,8 +198,8 @@ def save_kernels(kernel_vis, og_data, info, all_notable_frames):
 
     # saving the images
     if info[0] == 20:
-        conv_layers = [i + 1 for i in range(19) if (i + 1) not in [6, 11, 16]]
-        conv_layers = conv_layers[:5]
+        conv_layers = [i + 1 for i in range(20) if (i + 1) not in [6, 11, 16]]
+        # conv_layers = conv_layers[:2]
     elif info[0] == 23:
         conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
     else:
@@ -210,7 +210,6 @@ def save_kernels(kernel_vis, og_data, info, all_notable_frames):
 
     for i, layer in tqdm(enumerate(conv_layers)):
         layer_path = os.path.join(folder_path, 'conv_%d' % layer)
-
 
         for channel in range(len(kernel_vis[i])):
             channel_path = os.path.join(layer_path, 'channel_%d' % channel)
@@ -230,8 +229,8 @@ def save_kernels(kernel_vis, og_data, info, all_notable_frames):
                 frame = kernel_vis[i][channel][kernel_slice]
                 name = 'k_%d.jpg' % kernel_slice
                 slice_path = os.path.join(channel_path, name)
-
-                frame = frame[0].transpose(1, 2, 0)
+                frame = np.array(frame.data.cpu(), dtype=np.uint8)
+                frame = frame.transpose(1, 2, 0)
                 img = Image.fromarray(frame, mode='RGB')
 
                 # print(slice_path)
