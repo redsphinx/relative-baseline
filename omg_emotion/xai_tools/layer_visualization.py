@@ -170,7 +170,11 @@ def normalize(data, use_opencv=False, z=255.):
         
         for i in range(data.shape[0]):
             c = data[i]
-            data[i] = ((c - b_s[i]) / (a_s[i]-b_s[i])) * (z-y) + y
+            num = (c - b_s[i])
+            denom = (a_s[i]-b_s[i])
+            denom = np.where(denom == 0, 1, denom)
+            # print('normalization: ', num, denom)
+            data[i] = (num / denom) * (z-y) + y
             
     return data
 
@@ -810,34 +814,157 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
     assert project_variable.model_number == 20
     num_channels = 'all'
 
+    all_outputs = []
+    all_srxy_params = []
+    trafo_per_layer = []
+    all_notable_frames = []
 
-    if kernel_visualizations:
-        all_outputs = []
-        all_srxy_params = []
-        trafo_per_layer = []
-        all_notable_frames = []
+    # get all the layers and the names
+    conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+    # temp
+    conv_layers = conv_layers[:5]
 
-        # get all the layers and the names
-        conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
-        # temp
-        conv_layers = conv_layers[:5]
+    # keep track of the sum of the activations and sort them by most to least amount of activation
+    channels_sorted = []
 
-        # keep track of the sum of the activations and sort them by most to least amount of activation
-        channels_sorted = []
+    for ind in conv_layers:
+        channels = []
+        srxy_params = []
+        notable_frames = []
 
-        for ind in conv_layers:
-            channels = []
-            srxy_params = []
-            notable_frames = []
+        if num_channels == 'all':
+            range_channels = getattr(my_model, 'conv%d' % ind)
+            range_channels = range_channels.weight.shape[0]
+        else:
+            range_channels = num_channels
 
-            # TODO: how to find the best channels??
-            if num_channels == 'all':
-                range_channels = getattr(my_model, 'conv%d' % ind)
-                range_channels = range_channels.weight.shape[0]
-            else:
-                range_channels = num_channels
+        activation_per_channel = []
 
-            activation_per_channel = []
+        # mode = 'default'
+        mode = 'only_high_activations'
+
+        if mode == 'only_high_activations':
+            for ch in range(range_channels):
+                try:
+                    del data
+                    # print('data variable deleted')
+                except NameError:
+                    pass
+                    # print('data variable is not defined')
+
+                data = mod_data_point.clone()
+                data = torch.nn.Parameter(data, requires_grad=True)
+
+                feature_map = my_model(data, device, stop_at=ind)
+                try:
+                    _, chan, d, h, w = feature_map.shape
+                except ValueError:
+                    print('we got an error')
+
+                ff = feature_map.clone()[0][ch]
+                ff = torch.nn.functional.relu(ff.detach())
+                ff = np.array(ff.data.cpu())
+                activation_per_channel.append(ff.sum())
+
+                feature_map_arr = np.array(feature_map[0][ch].data.cpu())
+                highest_value = 0
+                ind_1, ind_2, ind_3 = 0, 0, 0
+                for l in range(d):
+                    max_index = feature_map_arr[l].argmax()
+                    indices = np.unravel_index(max_index, (h, w))
+                    if feature_map_arr[l, indices[0], indices[1]] > highest_value:
+                        highest_value = feature_map_arr[l, indices[0], indices[1]]
+                        ind_1 = l
+                        ind_2, ind_3 = indices
+
+                feature_map[0, ch, ind_1, ind_2, ind_3].backward()
+                image_grad = data.grad
+
+                # --
+
+                # mean_grad, max_grad,
+                # frame_criteria = 'mean_grad'
+                frame_criteria = 'max_grad'
+
+                copy_image_grad = image_grad[0]
+                copy_image_grad = 255 * copy_image_grad
+                copy_image_grad = torch.nn.functional.relu(copy_image_grad)
+                # copy_image_grad = np.where(copy_image_grad < 0, -1 * copy_image_grad, copy_image_grad)
+                copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
+
+                if frame_criteria == 'mean_grad':
+                    copy_image_grad = np.mean(np.mean(np.mean(copy_image_grad, axis=0), axis=-1), axis=-1)
+                    most_notable_frame = copy_image_grad.argmax()
+                elif frame_criteria == 'max_grad':
+                    copy_image_grad = copy_image_grad.transpose(1, 0, 2, 3)
+                    frames, og_channels, h, w = copy_image_grad.shape
+
+                    highest_value = 0
+                    ind_1 = 0
+                    for l in range(frames):
+                        max_index = copy_image_grad[l].argmax()
+                        indices = np.unravel_index(max_index, (og_channels, h, w))
+                        if copy_image_grad[l, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = copy_image_grad[l, indices[0], indices[1], indices[2]]
+                            ind_1 = l
+                    most_notable_frame = ind_1
+                else:
+                    most_notable_frame = 0
+
+
+                notable_frames.append(most_notable_frame)
+                if og_data_point.dtype == torch.uint8:
+                    og_data_point = og_data_point.type(torch.float32)
+
+
+                single_frame = True
+                if single_frame:
+                    # normalize the frame gradient between 0 and 1
+                    # this way it acts like a weighting on the important pixels
+                    frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
+                    frame_gradient = torch.nn.functional.relu(frame_gradient)
+                    frame_gradient = np.array(frame_gradient)
+                    frame_gradient = normalize(frame_gradient, z=1.) * 10
+                    frame_gradient = torch.Tensor(frame_gradient)
+
+                    final = frame_gradient * og_data_point[0, :, most_notable_frame].data.cpu()
+
+                    save = True
+                    if save:
+                        ff = np.array(final, dtype=np.uint8)
+                        ff = ff.transpose(1, 2, 0)
+                        img = Image.fromarray(ff, mode='RGB')
+                        path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/channel_%d_frame_%d_xgrad.jpg' % (ch, most_notable_frame)
+                        img.save(path)
+                else:
+                    frame_gradient = image_grad[0].data.cpu()
+                    frame_gradient = torch.nn.functional.relu(frame_gradient)
+                    frame_gradient = np.array(frame_gradient)
+                    _shape = frame_gradient.shape
+                    for jj in range(_shape[1]):
+                        sing_fr = frame_gradient[:, jj]
+                        sing_fr = normalize(sing_fr, z=1.) * 10
+                        sing_fr = torch.Tensor(sing_fr)
+
+                        final = sing_fr * og_data_point[0, :, jj].data.cpu()
+
+                        save = True
+                        if save:
+                            ff = np.array(final, dtype=np.uint8)
+                            ff = ff.transpose(1, 2, 0)
+                            img = Image.fromarray(ff, mode='RGB')
+                            path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/all_frame_grads_%d.jpg' % jj
+                            img.save(path)
+
+                my_model.zero_grad()
+
+                if data.grad is not None:
+                    data.grad.detach_()
+                    data.grad.zero_()
+
+            print('the end of for loop')
+
+        elif mode == 'default':
 
             for ch in range(range_channels):
                 try:
@@ -895,39 +1022,86 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                         path = os.path.join(dest, '%d.jpg' % fr)
                         img.save(path)
 
+
+                # mean_grad, max_grad,
+                # frame_criteria = 'mean_grad'
+                frame_criteria = 'max_grad'
+
                 copy_image_grad = image_grad[0]
                 copy_image_grad = 255 * copy_image_grad
+                copy_image_grad = torch.nn.functional.relu(copy_image_grad)
+                # copy_image_grad = np.where(copy_image_grad < 0, -1 * copy_image_grad, copy_image_grad)
                 copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
-                copy_image_grad = np.where(copy_image_grad < 0, -1 * copy_image_grad, copy_image_grad)
-                copy_image_grad = np.mean(np.mean(np.mean(copy_image_grad, axis=0), axis=-1), axis=-1)
+
+
+                if frame_criteria == 'mean_grad':
+                    copy_image_grad = np.mean(np.mean(np.mean(copy_image_grad, axis=0), axis=-1), axis=-1)
+                    most_notable_frame = copy_image_grad.argmax()
+                elif frame_criteria == 'max_grad':
+                    copy_image_grad = copy_image_grad.transpose(1, 0, 2, 3)
+                    frames, og_channels, h, w = copy_image_grad.shape
+
+                    highest_value = 0
+                    ind_1 = 0
+                    for l in range(frames):
+                        max_index = copy_image_grad[l].argmax()
+                        indices = np.unravel_index(max_index, (og_channels, h, w))
+                        if copy_image_grad[l, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = copy_image_grad[l, indices[0], indices[1], indices[2]]
+                            ind_1 = l
+                    most_notable_frame = ind_1
+                else:
+                    most_notable_frame = 0
+
                 # copy_image_grad = copy_image_grad.mean(dim=0).mean(dim=-1).mean(dim=-1)
                 # copy_image_grad = copy_image_grad.permute(1, 0, 2, 3)
                 # most_notable_frame = int(torch.argmax(copy_image_grad).cpu())
-                most_notable_frame = copy_image_grad.argmax()
+
                 notable_frames.append(most_notable_frame)
                 if og_data_point.dtype == torch.uint8:
                     og_data_point = og_data_point.type(torch.float32)
 
                 # final = image_grad[0, :, most_notable_frame] * og_data_point[0, :, most_notable_frame]
 
-                # normalize the frame gradient between 0 and 1
-                # this way it acts like a weighting on the important pixels
-                frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
-                frame_gradient = torch.nn.functional.relu(frame_gradient)
-                # frame_gradient = torch.where(frame_gradient < torch.Tensor([0]), torch.Tensor([0]), frame_gradient)
-                frame_gradient = np.array(frame_gradient)
-                frame_gradient = normalize(frame_gradient, z=1.)*10
-                frame_gradient = torch.Tensor(frame_gradient)
+                single_frame = False
+                if single_frame:
+                    # normalize the frame gradient between 0 and 1
+                    # this way it acts like a weighting on the important pixels
+                    frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
+                    frame_gradient = torch.nn.functional.relu(frame_gradient)
+                    # frame_gradient = torch.where(frame_gradient < torch.Tensor([0]), torch.Tensor([0]), frame_gradient)
+                    frame_gradient = np.array(frame_gradient)
+                    frame_gradient = normalize(frame_gradient, z=1.)*10
+                    frame_gradient = torch.Tensor(frame_gradient)
 
-                final = frame_gradient * og_data_point[0, :, most_notable_frame].data.cpu()
+                    final = frame_gradient * og_data_point[0, :, most_notable_frame].data.cpu()
 
-                save = False
-                if save:
-                    ff = np.array(final, dtype=np.uint8)
-                    ff = ff.transpose(1, 2, 0)
-                    img = Image.fromarray(ff, mode='RGB')
-                    path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/final_demo_grad_normalized.jpg'
-                    img.save(path)
+                    save = True
+                    if save:
+                        ff = np.array(final, dtype=np.uint8)
+                        ff = ff.transpose(1, 2, 0)
+                        img = Image.fromarray(ff, mode='RGB')
+                        path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/final_demo_grad_normalized.jpg'
+                        img.save(path)
+                else:
+                    frame_gradient = image_grad[0].data.cpu()
+                    frame_gradient = torch.nn.functional.relu(frame_gradient)
+                    frame_gradient = np.array(frame_gradient)
+                    _shape = frame_gradient.shape
+                    for jj in range(_shape[1]):
+                        sing_fr = frame_gradient[:, jj]
+                        sing_fr = normalize(sing_fr, z=1.) * 10
+                        sing_fr = torch.Tensor(sing_fr)
+
+                        final = sing_fr * og_data_point[0, :, jj].data.cpu()
+
+                        save = True
+                        if save:
+                            ff = np.array(final, dtype=np.uint8)
+                            ff = ff.transpose(1, 2, 0)
+                            img = Image.fromarray(ff, mode='RGB')
+                            path = '/huge/gabras/omg_emotion/saving_data/xai/our_method/debugging/all_frame_grads_%d.jpg' % jj
+                            img.save(path)
 
                 my_model.zero_grad()
 
@@ -969,6 +1143,9 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
                     srxy_params.append(_params)
 
                 channels.append(all_finals)
+                # END channels loop-----------------------
+
+
                 # can't reshape since the number of transformations can differ
             # srxy_params = np.reshape(srxy_params, (num_channels, num_transformations, 4))
             all_srxy_params.append(srxy_params)
@@ -979,38 +1156,38 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
             activations, which_channels = zip(*sorted(zip(activation_per_channel, channel_list), reverse=True))
             channels_sorted.append(which_channels)
 
-        print('here')
-        data = all_notable_frames
-        # data = data[0, :]
-        #
-        # data = np.array(data.data.cpu(), dtype=np.uint8)
-        processed_outputs = []
+    print('here')
+    data = all_notable_frames
+    # data = data[0, :]
+    #
+    # data = np.array(data.data.cpu(), dtype=np.uint8)
+    processed_outputs = []
 
-        for l in range(len(conv_layers)):
-            channels = []
+    for l in range(len(conv_layers)):
+        channels = []
 
-            for c in range(range_channels):
-                all_finals = []
+        for c in range(range_channels):
+            all_finals = []
 
-                for t in range(trafo_per_layer[l] + 1):
+            for t in range(trafo_per_layer[l] + 1):
 
-                    processed_final = all_outputs[l][c][t]
-                    # processed_final = normalize(processed_final, z=255.)
-                    processed_final = processed_final.unsqueeze(0)
-                    processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
+                processed_final = all_outputs[l][c][t]
+                # processed_final = normalize(processed_final, z=255.)
+                processed_final = processed_final.unsqueeze(0)
+                processed_final = np.array(processed_final.data.cpu(), dtype=np.uint8)
 
-                    all_finals.append(processed_final)
+                all_finals.append(processed_final)
 
-                channels.append(all_finals)
+            channels.append(all_finals)
 
-            processed_outputs.append(channels)
+        processed_outputs.append(channels)
 
-        all_outputs = processed_outputs
+    all_outputs = processed_outputs
 
-        # processed_final = whiten_bg(processed_final)
-        # processed_final = np.expand_dims(processed_final, 0)
+    # processed_final = whiten_bg(processed_final)
+    # processed_final = np.expand_dims(processed_final, 0)
 
-        return data, all_outputs, all_srxy_params, channels_sorted
+    return data, all_outputs, all_srxy_params, channels_sorted
 
 
 def gradient_method(project_variable, data_point, my_model, device, mode):
