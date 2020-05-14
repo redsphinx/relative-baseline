@@ -1,4 +1,4 @@
-from torchvision.models import resnet18, googlenet
+from torchvision.models import resnet18, googlenet, vgg19_bn
 from torch.optim.adam import Adam
 from torch.optim.sgd import SGD
 import torch
@@ -10,6 +10,7 @@ from relative_baseline.omg_emotion import factorized_convolution as C3D
 from relative_baseline.omg_emotion.evolution.model_maker import ModularConv
 from relative_baseline.omg_emotion.model_resnet18 import ResNet18, ResNet18Explicit, ResNet18Explicit3DConv, ResNet18Explicit3DConvReduced
 from relative_baseline.omg_emotion.model_googlenet import Googlenet3TConv_explicit
+from relative_baseline.omg_emotion.model_vgg19bn import VGG19BN_Explicit_3T #, VGG16Explicit_3D
 
 def prepare_model(project_variable, model):
     # resnet
@@ -22,7 +23,7 @@ def prepare_model(project_variable, model):
 def get_model(project_variable):
     # project_variable = ProjectVariable()
     if type(project_variable.load_model) == bool:
-        print('loading weights from resnet18')
+        print('loading weights from torchvision model')
     elif project_variable.load_model is not None:
         if len(project_variable.load_model) == 3:
             ex, mo, ep = project_variable.load_model
@@ -194,36 +195,13 @@ def get_model(project_variable):
             # load resnet18 from pytorch
             tmp_resnet18 = resnet18(pretrained=True)
             # copy the weights
-            # Umut version
-            # model.conv1_relu.conv.first_weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2))
-            # model.res2a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2))
-            # model.res2a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2))
-            # model.res2b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2))
-            # model.res2b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2))
-            # model.res3a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2))
-            # model.res3a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2))
-            # model.res3a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2))
-            # model.res3b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2))
-            # model.res3b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2))
-            # model.res4a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2))
-            # model.res4a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2))
-            # model.res4a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2))
-            # model.res4b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2))
-            # model.res4b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2))
-            # model.res5a_relu.res_branch1.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2))
-            # model.res5a_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2))
-            # model.res5a_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2))
-            # model.res5b_relu.res_branch2a.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2))
-            # model.res5b_relu.res_branch2b.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2))
-
-            # explicit version
             divide = False
             if divide:
-                div1 = 7
-                div2 = 3
+                div1 = 7.
+                div2 = 3.
             else:
-                div1 = 1
-                div2 = 1
+                div1 = 1.
+                div2 = 1.
             model.conv1.first_weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2) / div1)
             model.conv2.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2) / div2)
             model.conv3.first_weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2) / div2)
@@ -246,26 +224,6 @@ def get_model(project_variable):
             model.conv20.first_weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2) / div2)
 
         # set weights of 3D conv to not require grad
-        # Umut version
-        # model.conv1_relu.conv.weight.requires_grad = False
-        # model.res2a_relu.res_branch2a.weight.requires_grad = False
-        # model.res2a_relu.res_branch2b.weight.requires_grad = False
-        # model.res2b_relu.res_branch2a.weight.requires_grad = False
-        # model.res2b_relu.res_branch2b.weight.requires_grad = False
-        # model.res3a_relu.res_branch2a.weight.requires_grad = False
-        # model.res3a_relu.res_branch2b.weight.requires_grad = False
-        # model.res3b_relu.res_branch2a.weight.requires_grad = False
-        # model.res3b_relu.res_branch2b.weight.requires_grad = False
-        # model.res4a_relu.res_branch2a.weight.requires_grad = False
-        # model.res4a_relu.res_branch2b.weight.requires_grad = False
-        # model.res4b_relu.res_branch2a.weight.requires_grad = False
-        # model.res4b_relu.res_branch2b.weight.requires_grad = False
-        # model.res5a_relu.res_branch2a.weight.requires_grad = False
-        # model.res5a_relu.res_branch2b.weight.requires_grad = False
-        # model.res5b_relu.res_branch2a.weight.requires_grad = False
-        # model.res5b_relu.res_branch2b.weight.requires_grad = False
-
-        # explicit version
         model.conv1.weight.requires_grad = False
         model.conv2.weight.requires_grad = False
         model.conv3.weight.requires_grad = False
@@ -286,8 +244,40 @@ def get_model(project_variable):
 
     elif project_variable.model_number == 21:
         model = ResNet18Explicit3DConv()
-        if project_variable.load_model is not None:
+        if type(project_variable.load_model) != bool and not project_variable.load_model is None:
             model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        elif project_variable.load_model:
+            # load resnet18 from pytorch
+            tmp_resnet18 = resnet18(pretrained=True)
+            # copy the weights
+            divide = True
+            if divide:
+                div1 = 7.
+                div2 = 3.
+            else:
+                div1 = 1.
+                div2 = 1.
+
+            model.conv1.weight = torch.nn.Parameter(tmp_resnet18.conv1.weight.unsqueeze(2).repeat_interleave(7, dim=2) / div1)
+            model.conv2.weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv3.weight = torch.nn.Parameter(tmp_resnet18.layer1[0].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv4.weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv5.weight = torch.nn.Parameter(tmp_resnet18.layer1[1].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv6.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].downsample[0].weight.unsqueeze(2) / div2)
+            model.conv7.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv8.weight = torch.nn.Parameter(tmp_resnet18.layer2[0].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv9.weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv10.weight = torch.nn.Parameter(tmp_resnet18.layer2[1].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv11.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].downsample[0].weight.unsqueeze(2) / div2)
+            model.conv12.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv13.weight = torch.nn.Parameter(tmp_resnet18.layer3[0].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv14.weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv15.weight = torch.nn.Parameter(tmp_resnet18.layer3[1].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv16.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].downsample[0].weight.unsqueeze(2) / div2)
+            model.conv17.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv18.weight = torch.nn.Parameter(tmp_resnet18.layer4[0].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv19.weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv1.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
+            model.conv20.weight = torch.nn.Parameter(tmp_resnet18.layer4[1].conv2.weight.unsqueeze(2).repeat_interleave(3, dim=2) / div2)
 
     elif project_variable.model_number == 22:
         model = ResNet18Explicit3DConvReduced()
@@ -390,6 +380,15 @@ def get_model(project_variable):
             model.conv52.weight.requires_grad = False
             model.conv56.weight.requires_grad = False
             model.conv58.weight.requires_grad = False
+
+    elif project_variable.model_number == 24:
+        model = VGG19BN_Explicit_3T(project_variable)
+        if type(project_variable.load_model) != bool and not project_variable.load_model is None:
+            model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        elif project_variable.load_model:
+            # load vgg19_bn from pytorch
+            tmp_vgg19_bn = vgg19_bn(pretrained=True)
+            print('asdf')
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
