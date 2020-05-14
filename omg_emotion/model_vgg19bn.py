@@ -39,7 +39,7 @@ class VGG19BN_Explicit_3T (torch.nn.Module):
         self.bn11 = BatchNorm3d(512)
         self.conv12 = ConvTTN3d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1, project_variable=pv, bias=True)
         self.bn12 = BatchNorm3d(512)
-        self.maxpool4 = MaxPool3d(kernel_size=2, padding=0, stride=2)
+        self.maxpool4 = MaxPool3d(kernel_size=2, padding=0, stride=1)
 
         self.conv13 = ConvTTN3d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1, project_variable=pv, bias=True)
         self.bn13 = BatchNorm3d(512)
@@ -51,7 +51,7 @@ class VGG19BN_Explicit_3T (torch.nn.Module):
         self.bn16 = BatchNorm3d(512)
         self.maxpool5 = MaxPool3d(kernel_size=2, padding=0, stride=2)
 
-        self.avgpool = AdaptiveAvgPool3d(output_size=(7, 7))
+        self.avgpool = AdaptiveAvgPool3d(output_size=(1, 7, 7))
         self.fc1 = Linear(25088, 4096)
         self.dropout1 = Dropout(p=0.5)
         self.fc2 = Linear(4096, 4096)

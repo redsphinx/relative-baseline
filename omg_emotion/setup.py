@@ -1,4 +1,4 @@
-from torchvision.models import resnet18, googlenet, vgg19_bn
+from torchvision.models import resnet18, googlenet, vgg19_bn, vgg16_bn
 from torch.optim.adam import Adam
 from torch.optim.sgd import SGD
 import torch
@@ -388,8 +388,58 @@ def get_model(project_variable):
         elif project_variable.load_model:
             # load vgg19_bn from pytorch
             tmp_vgg19_bn = vgg19_bn(pretrained=True)
-            print('asdf')
+            # tmp_vgg19_bn = vgg16_bn(pretrained=True)
 
+            model.conv1.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[0].weight.unsqueeze(2))
+            model.conv1.bias = torch.nn.Parameter(tmp_vgg19_bn.features[0].bias)
+            model.conv2.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[3].weight.unsqueeze(2))
+            model.conv2.bias = torch.nn.Parameter(tmp_vgg19_bn.features[3].bias)
+            model.conv3.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[7].weight.unsqueeze(2))
+            model.conv3.bias = torch.nn.Parameter(tmp_vgg19_bn.features[7].bias)
+            model.conv4.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[10].weight.unsqueeze(2))
+            model.conv4.bias = torch.nn.Parameter(tmp_vgg19_bn.features[10].bias)
+            model.conv5.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[14].weight.unsqueeze(2))
+            model.conv5.bias = torch.nn.Parameter(tmp_vgg19_bn.features[14].bias)
+            model.conv6.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[17].weight.unsqueeze(2))
+            model.conv6.bias = torch.nn.Parameter(tmp_vgg19_bn.features[17].bias)
+            model.conv7.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[20].weight.unsqueeze(2))
+            model.conv7.bias = torch.nn.Parameter(tmp_vgg19_bn.features[20].bias)
+            model.conv8.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[23].weight.unsqueeze(2))
+            model.conv8.bias = torch.nn.Parameter(tmp_vgg19_bn.features[23].bias)
+            model.conv9.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[27].weight.unsqueeze(2)) # 27
+            model.conv9.bias = torch.nn.Parameter(tmp_vgg19_bn.features[27].bias)
+            model.conv10.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[30].weight.unsqueeze(2)) # 30
+            model.conv10.bias = torch.nn.Parameter(tmp_vgg19_bn.features[30].bias)
+            model.conv11.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[33].weight.unsqueeze(2)) # 33
+            model.conv11.bias = torch.nn.Parameter(tmp_vgg19_bn.features[33].bias)
+            model.conv12.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[36].weight.unsqueeze(2))
+            model.conv12.bias = torch.nn.Parameter(tmp_vgg19_bn.features[36].bias)
+            model.conv13.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[40].weight.unsqueeze(2)) # 40
+            model.conv13.bias = torch.nn.Parameter(tmp_vgg19_bn.features[40].bias)
+            model.conv14.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[43].weight.unsqueeze(2)) # 43
+            model.conv14.bias = torch.nn.Parameter(tmp_vgg19_bn.features[43].bias)
+            model.conv15.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[46].weight.unsqueeze(2)) # 46
+            model.conv15.bias = torch.nn.Parameter(tmp_vgg19_bn.features[46].bias)
+            model.conv16.first_weight = torch.nn.Parameter(tmp_vgg19_bn.features[49].weight.unsqueeze(2))
+            model.conv16.bias = torch.nn.Parameter(tmp_vgg19_bn.features[49].bias)
+            
+            model.conv1.weight.requires_grad = False
+            model.conv2.weight.requires_grad = False
+            model.conv3.weight.requires_grad = False
+            model.conv4.weight.requires_grad = False
+            model.conv5.weight.requires_grad = False
+            model.conv6.weight.requires_grad = False
+            model.conv7.weight.requires_grad = False
+            model.conv8.weight.requires_grad = False
+            model.conv9.weight.requires_grad = False
+            model.conv10.weight.requires_grad = False
+            model.conv11.weight.requires_grad = False
+            model.conv12.weight.requires_grad = False
+            model.conv13.weight.requires_grad = False
+            model.conv14.weight.requires_grad = False
+            model.conv15.weight.requires_grad = False
+            model.conv16.weight.requires_grad = False
+            
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)
         model = None

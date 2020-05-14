@@ -36,7 +36,7 @@ def run(project_variable, all_data, my_model, device):
             with torch.no_grad():
                 # my_optimizer.zero_grad()
                 # predictions = my_model.forward(data)
-                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23]:
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23, 24]:
                     if project_variable.model_number == 23:
                         aux1, aux2, predictions = my_model(data, device, None, False)
                         assert aux1 is None and aux2 is None

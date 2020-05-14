@@ -884,14 +884,14 @@ def e26_conv3D_jester():
 
 def e27_conv3T_jester():
     set_init_1()
-    project_variable.model_number = 24
+    project_variable.model_number = 23
     project_variable.experiment_number = 27
     project_variable.sheet_number = 22
     project_variable.device = 2
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
-    project_variable.batch_size = 32
-    project_variable.batch_size_val_test = 32
+    project_variable.batch_size = 20
+    project_variable.batch_size_val_test = 20
 
     project_variable.load_model = True
     project_variable.load_from_fast = True
@@ -913,8 +913,8 @@ def e27_conv3T_jester():
 
 
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()

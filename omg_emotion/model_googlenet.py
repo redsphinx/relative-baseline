@@ -85,7 +85,8 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         self.avgpool1 = AvgPool3d(kernel_size=5, padding=0, stride=3)
         self.conv28 = Conv3d(in_channels=512, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn28 = BatchNorm3d(128)
-        self.fc1 = Linear(in_features=2304, out_features=1024)
+        # self.fc1 = Linear(in_features=2304, out_features=1024)
+        self.fc1 = Linear(in_features=768, out_features=1024)  # 768
         self.dropout1 = Dropout3d(p=0.7)
         self.fc2 = Linear(in_features=1024, out_features=27)
 
@@ -137,7 +138,8 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         self.avgpool2 = AvgPool3d(kernel_size=5, padding=0, stride=3)
         self.conv47 = Conv3d(in_channels=528, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn47 = BatchNorm3d(128)
-        self.fc3 = Linear(in_features=2304, out_features=1024)
+        # self.fc3 = Linear(in_features=2304, out_features=1024)
+        self.fc3 = Linear(in_features=768, out_features=1024)
         self.dropout2 = Dropout3d(p=0.7)
         self.fc4 = Linear(in_features=1024, out_features=27)
 
