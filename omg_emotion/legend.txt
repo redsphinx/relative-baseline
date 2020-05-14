@@ -30,4 +30,4 @@ project_variable.model_number
 22  resnet18 3DConv reduced channels
 23  googlenet 3TConv
 24  VGG16 3TConv
-25  VGG16 3DConv
+25  googlenet 3DConv

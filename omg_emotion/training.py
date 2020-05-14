@@ -73,12 +73,18 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                 else:
                     predictions = my_model(data, device)
 
+            elif project_variable.model_number in [25]:
+                aux1, aux2, predictions = my_model(data)
+                assert aux1 is not None and aux2 is not None
+
             elif project_variable.model_number in [16]:
                 predictions = my_model(data, device, project_variable.genome)
+
             else:
                 predictions = my_model(data)
 
-            if project_variable.model_number == 23:
+
+            if project_variable.model_number in [23, 25]:
                 loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
             else:
                 loss = U.calculate_loss(project_variable, predictions, labels)
