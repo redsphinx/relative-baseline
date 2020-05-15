@@ -240,7 +240,7 @@ def run(project_variable):
         collapse_tracker = 0
 
         # keeping track of validation accuracy for early stopping
-        check_every_num_epoch = 10
+        check_every_num_epoch = 5
         checking_at_epochs = [9 + (i * check_every_num_epoch) for i in
                               range(project_variable.end_epoch // check_every_num_epoch)]
         checking_at_epochs = [0] + checking_at_epochs
