@@ -65,10 +65,12 @@ jester_data_224_336_avi = '/scratch/users/gabras/jester/data_224_336_avi'
 fast_jester_data_224_336_avi = '/fast/gabras/jester/data_224_336_avi'
 fast_jester_data_150_224 = '/fast/gabras/jester/data_150_224'
 fast_jester_data_150_224_avi = '/fast/gabras/jester/data_150_224_avi'
-
-
 jester_frames = '/scratch/users/gabras/jester/frames.txt'
 jester_zero = '/scratch/users/gabras/jester/zero.txt'
+
+# UCF101
+ucf101_root = '/fast/gabras/ucf101/og_data'
+ucf101_annotations = '/fast/gabras/ucf101/og_labels'
 
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'

@@ -1177,3 +1177,4 @@ def get_jester_iter(which, project_variable):
                                         project_variable.dali_iterator_size[1], True, project_variable.device)
 
     return the_iter
+

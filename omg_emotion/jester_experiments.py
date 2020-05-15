@@ -947,7 +947,7 @@ def e29_conv3DTTN_jester():
     project_variable.model_number = 20
     project_variable.experiment_number = 29
     project_variable.sheet_number = 22
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
     project_variable.batch_size = 32
@@ -981,8 +981,8 @@ def e29_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()
@@ -1010,5 +1010,5 @@ project_variable = ProjectVariable(debug_mode=True)
 # e25_conv3DTTN_jester()
 # e26_conv3D_jester()
 # e27_conv3T_jester()
-e28_conv3T_jester()
-# e29_conv3DTTN_jester()
+# e28_conv3T_jester()
+e29_conv3DTTN_jester()
