@@ -42,7 +42,7 @@ def get_specific_row(experiment_number, sheet_number):
         start = 16
     elif sheet_number in [2, 17]:
         start = 11
-    elif sheet_number in [0, 10, 15, 18, 22]:
+    elif sheet_number in [0, 10, 15, 18, 22, 23]:
         start = 13
     elif sheet_number in [4, 6, 12]:
         start = 17
@@ -384,6 +384,25 @@ def write_settings(project_variable):
 
         ]]
         end_letter = 'U'
+    elif project_variable.sheet_number in [23]:
+        values = [[
+            date.today().strftime('%d-%m-%Y'),  # date                      #A
+            datetime.now().strftime('%H:%M:%S'),  # start time experiment   #B
+            '',  # end time experiment                                      #C
+            project_variable.experiment_number,  # D
+            '',  # parameters                                               #E
+            '',  # mean accuracy                                            #F
+            '',  # std                                                      #G
+            '',  # best run                                                 # H
+            str(project_variable.load_model),
+            project_variable.learning_rate,
+            project_variable.model_number,
+            project_variable.batch_size,
+            '',  # best run stop epoch
+            ''  # number of collapses
+
+        ]]
+        end_letter = 'N'
     else:
         print('Error: sheet_number not supported')
         return None
@@ -464,17 +483,35 @@ def extra_write_results(best_run_stop, num_runs_collapsed, row, sheet_number):
         best_run_stop,  # mean accuracy                                      #T
         num_runs_collapsed  # std                                            #U
     ]]
-    range_name = 'Sheet%d!T%d:U%d' % (sheet_number, row, row)
-    data = [
-        {
-            'range': range_name,
-            'values': values
-        }  # ,
-    ]
-    body = {
-        'valueInputOption': VALUE_INPUT_OPTION,
-        'data': data
-    }
+
+    if sheet_number == 22:
+        range_name = 'Sheet%d!T%d:U%d' % (sheet_number, row, row)
+        data = [
+            {
+                'range': range_name,
+                'values': values
+            }  # ,
+        ]
+        body = {
+            'valueInputOption': VALUE_INPUT_OPTION,
+            'data': data
+        }
+    elif sheet_number == 23:
+        range_name = 'Sheet%d!M%d:N%d' % (sheet_number, row, row)
+        data = [
+            {
+                'range': range_name,
+                'values': values
+            }  # ,
+        ]
+        body = {
+            'valueInputOption': VALUE_INPUT_OPTION,
+            'data': data
+        }
+    else:
+        body = None
+        print('no body')
+
     result = SERVICE.spreadsheets().values().batchUpdate(
         spreadsheetId=SPREADSHEET_ID, body=body).execute()
 

@@ -211,6 +211,7 @@ def standardize_clips(b, e, he, wi, loc):
             os.mkdir(new_vid_path)
 
         all_frames = os.listdir(vid_path)
+        all_frames.sort()
         # new_video = np.zeros(shape=(num_fames, channels, height, width), dtype=int)
 
         num_frames = len(all_frames)
@@ -268,7 +269,7 @@ def standardize_clips(b, e, he, wi, loc):
         else:
             frames_to_copy = [n for n in range(num_frames)]
 
-        all_frames.sort()
+
         cntr = 1
         for i in frames_to_copy:
             frame_path = os.path.join(vid_path, all_frames[i])

@@ -88,7 +88,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         # self.fc1 = Linear(in_features=2304, out_features=1024)
         self.fc1 = Linear(in_features=768, out_features=1024)  # 768
         self.dropout1 = Dropout3d(p=0.7)
-        self.fc2 = Linear(in_features=1024, out_features=27)
+        self.fc2 = Linear(in_features=1024, out_features=pv.label_size)
 
         # inception 4c
         self.conv29 = Conv3d(in_channels=512, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
@@ -141,7 +141,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         # self.fc3 = Linear(in_features=2304, out_features=1024)
         self.fc3 = Linear(in_features=768, out_features=1024)
         self.dropout2 = Dropout3d(p=0.7)
-        self.fc4 = Linear(in_features=1024, out_features=27)
+        self.fc4 = Linear(in_features=1024, out_features=pv.label_size)
 
         self.maxpool11 = MaxPool3d(kernel_size=3, padding=0, stride=2)
 
@@ -177,7 +177,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
 
         self.avgpool3 = AdaptiveAvgPool3d(1)
         self.dropout3 = Dropout3d(p=0.4)
-        self.fc5 = Linear(in_features=1024, out_features=27)
+        self.fc5 = Linear(in_features=1024, out_features=pv.label_size)
 
     def forward(self, x, device, stop_at=None, aux=True):
         # set aux=False during inference
@@ -468,7 +468,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
 
 
 class Googlenet3DConv_explicit(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, pv):
         super(Googlenet3DConv_explicit, self).__init__()
 
         self.conv1 = Conv3d(in_channels=3, out_channels=64, kernel_size=7, padding=3, stride=2, bias=False)
@@ -548,7 +548,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         # self.fc1 = Linear(in_features=2304, out_features=1024)
         self.fc1 = Linear(in_features=768, out_features=1024)  # 768
         self.dropout1 = Dropout3d(p=0.7)
-        self.fc2 = Linear(in_features=1024, out_features=27)
+        self.fc2 = Linear(in_features=1024, out_features=pv.label_size)
 
         # inception 4c
         self.conv29 = Conv3d(in_channels=512, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
@@ -601,7 +601,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         # self.fc3 = Linear(in_features=2304, out_features=1024)
         self.fc3 = Linear(in_features=768, out_features=1024)
         self.dropout2 = Dropout3d(p=0.7)
-        self.fc4 = Linear(in_features=1024, out_features=27)
+        self.fc4 = Linear(in_features=1024, out_features=pv.label_size)
 
         self.maxpool11 = MaxPool3d(kernel_size=3, padding=0, stride=2)
 
@@ -637,7 +637,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
 
         self.avgpool3 = AdaptiveAvgPool3d(1)
         self.dropout3 = Dropout3d(p=0.4)
-        self.fc5 = Linear(in_features=1024, out_features=27)
+        self.fc5 = Linear(in_features=1024, out_features=pv.label_size)
 
     def forward(self, x, stop_at=None, aux=True):
         # set aux=False during inference

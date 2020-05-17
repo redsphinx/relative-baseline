@@ -33,7 +33,12 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
     if project_variable.use_dali:
         # https://towardsdatascience.com/nvidia-dali-speeding-up-pytorch-876c80182440
         # to reduce GPU memory usage
-        the_iterator = DL.get_jester_iter('train', project_variable)
+        if project_variable.dataset == 'jester':
+            the_iterator = DL.get_jester_iter('train', project_variable)
+        elif project_variable.dataset == 'ucf101':
+            the_iterator = DL.get_ucf101_iter('train', project_variable)
+        else:
+            the_iterator = None
 
         steps = 0
 

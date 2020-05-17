@@ -71,6 +71,7 @@ jester_zero = '/scratch/users/gabras/jester/zero.txt'
 # UCF101
 ucf101_root = '/fast/gabras/ucf101/og_data'
 ucf101_annotations = '/fast/gabras/ucf101/og_labels'
+ucf101_168_224 = '/fast/gabras/ucf101/data_168_224'
 
 # visualization saving locations
 pacman_location = '/home/gabras/deployed/relative_baseline/omg_emotion/images/pacman.jpg'
@@ -84,5 +85,5 @@ our_method = '/huge/gabras/omg_emotion/saving_data/xai/our_method'
 nas_location = '/huge/gabras/omg_emotion/saving_data/nas'
 
 # todo: IMPORTANT: DO NOT CHANGE EXISTING PATHS. SHIT WILL BE DELETED.
-# todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> main_file.py
+# todo: IF YOU REALLY REALLY WANT TO, MAKE SURE WRITER_PATH IS VALID -> see main_file.py
 

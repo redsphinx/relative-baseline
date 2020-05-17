@@ -192,7 +192,7 @@ class ResNet18Explicit(torch.nn.Module):
         self.bn20 = BatchNorm3d(512)
         
         self.avgpool = AdaptiveAvgPool3d(output_size=1)
-        self.fc = torch.nn.Linear(512, 27)
+        self.fc = torch.nn.Linear(512, pv.label_size)
 
     def forward(self, x, device, stop_at=None):
         # h = self.conv1_relu(x, device)
@@ -345,7 +345,7 @@ class ResNet18Explicit(torch.nn.Module):
 # ------------------------------------------------------------------------------------------------
 
 class ResNet18Explicit3DConv(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, pv):
         super(ResNet18Explicit3DConv, self).__init__()
         # self.conv1_relu = ConvolutionBlock(3, 64, pv)
         self.conv1 = Conv3d(in_channels=3, out_channels=64, kernel_size=7, stride=2, padding=3, bias=False)
@@ -408,7 +408,7 @@ class ResNet18Explicit3DConv(torch.nn.Module):
         self.bn20 = BatchNorm3d(512)
 
         self.avgpool = AdaptiveAvgPool3d(output_size=1)
-        self.fc = torch.nn.Linear(512, 27)
+        self.fc = torch.nn.Linear(512, pv.label_size)
 
 
     def forward(self, x, stop_at=None):

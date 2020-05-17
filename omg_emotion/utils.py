@@ -394,3 +394,12 @@ def create_normalize(h, w, device, project_variable):
 
     return means, stds
 
+
+def opt_mkdir(the_path):
+    if not os.path.exists(the_path):
+        os.mkdir(the_path)
+
+
+def opt_makedirs(the_path):
+    if not os.path.exists(the_path):
+        os.makedirs(the_path)

@@ -1144,7 +1144,7 @@ def get_jester_iter(which, project_variable):
         # else:
         #     file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
     else:
-        if project_variable.model_number in [20, 21, 22, 23, 24]:
+        if project_variable.model_number in [20, 21, 22, 23, 24, 25]:
             # default is to load from fast
             file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
             # if project_variable.load_from_fast:
@@ -1178,3 +1178,116 @@ def get_jester_iter(which, project_variable):
 
     return the_iter
 
+
+class UCF101VideoPipe(Pipeline):
+    def __init__(self, batch_size,
+                 num_threads=6,
+                 device_id=0,
+                 file_root='',
+                 shuffle=False,
+                 sequence_length=30,
+                 step=-1,
+                 stride=1,
+                 initial_fill=1024,
+                 # initial_fill=512,
+                 # initial_fill=256,
+                 seed=0):
+
+        super(UCF101VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
+
+        self.input = ops.VideoReader(device='gpu',
+                                     file_root=file_root,
+                                     sequence_length=sequence_length,
+                                     step=step,
+                                     stride=stride,
+                                     shard_id=0,
+                                     num_shards=1,
+                                     random_shuffle=shuffle,
+                                     initial_fill=initial_fill)
+
+        self.normalize = ops.Normalize(device='gpu',
+                                       )
+
+    def define_graph(self):
+        output, labels = self.input(name="Reader")
+        return output, labels
+
+
+def ucf101_create_dali_iterator(batch_size, file_root, num_workers, do_shuffle, the_seed, iterator_size, reset, device):
+    pipe = UCF101VideoPipe(batch_size=batch_size,
+                           file_root=file_root,
+                           shuffle=do_shuffle,
+                           initial_fill=batch_size,
+                           num_threads=num_workers,
+                           seed=the_seed,
+                           device_id=device
+                           )
+    pipe.build()
+
+    if iterator_size == 'all':
+        it_size = pipe.epoch_size("Reader")
+    else:
+        it_size = iterator_size
+
+    dali_iter = DALIGenericIterator([pipe], ['data', 'labels'], size=it_size, auto_reset=reset,
+                                    fill_last_batch=True, last_batch_padded=False)
+
+    return dali_iter
+
+
+def get_ucf101_iter(which, project_variable):
+    if not project_variable.xai_only_mode:
+        assert which in ['train', 'val', 'test']
+
+
+    file_root = PP.ucf101_168_224
+
+    print('Loading dummy ucf101 iterator...')
+    the_iter = ucf101_create_dali_iterator(project_variable.batch_size_val_test,
+                                           file_root, project_variable.dali_workers, False, 0,
+                                           'all', True, project_variable.device)
+
+    # if project_variable.xai_only_mode:
+    #     file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
+    # elif project_variable.nas or project_variable.debug_mode:
+    #     file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
+    #     # if which == 'train':
+    #     #     file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
+    #     # elif which == 'val':
+    #     #     file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
+    #     # else:
+    #     #     file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
+    # else:
+    #     if project_variable.model_number in [20, 21, 22, 23, 24, 25]:
+    #         # default is to load from fast
+    #         file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
+    #         # if project_variable.load_from_fast:
+    #         #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
+    #         # else:
+    #         #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336.txt' % which)
+    #     else:
+    #         file_list = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
+    #
+    # if which == 'val':
+    #     print('Loading validation iterator...')
+    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+    #                                     file_list, project_variable.dali_workers, False, 0,
+    #                                     project_variable.dali_iterator_size[1], True, project_variable.device)
+    # elif which == 'test':
+    #     print('Loading test iterator...')
+    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+    #                                     file_list, project_variable.dali_workers, False, 0,
+    #                                     project_variable.dali_iterator_size[2], True, project_variable.device)
+    # elif which == 'train':
+    #     print('Loading training iterator...')
+    #     the_iter = create_dali_iterator(project_variable.batch_size, file_list,
+    #                                     project_variable.dali_workers,
+    #                                     project_variable.randomize_training_data, 6,
+    #                                     project_variable.dali_iterator_size[0], True, project_variable.device)
+    # else:
+    #     print('Loading XAI only mode iterator...')
+    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+    #                                     file_list, project_variable.dali_workers, False, 0,
+    #                                     project_variable.dali_iterator_size[1], True, project_variable.device)
+
+    return the_iter

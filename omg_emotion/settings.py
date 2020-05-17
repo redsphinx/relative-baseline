@@ -50,7 +50,7 @@ class ProjectVariable(object):
 
         # UNUSED? ================================================================================
         # list of str, which datasets to train, val and test on
-        # implemented sets: omg_emotion, affectnet, dhg, jester, mov_mnist, mnist, kth_actions
+        # implemented sets: omg_emotion, affectnet, dhg, jester, mov_mnist, mnist, kth_actions, ucf101
         self._dataset_train = ['omg_emotion']
         self._dataset_val = ['omg_emotion']
         self._dataset_test = ['omg_emotion']
