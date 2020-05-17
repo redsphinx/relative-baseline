@@ -1239,55 +1239,21 @@ def get_ucf101_iter(which, project_variable):
     if not project_variable.xai_only_mode:
         assert which in ['train', 'val', 'test']
 
-
-    file_root = PP.ucf101_168_224
-
-    print('Loading dummy ucf101 iterator...')
-    the_iter = ucf101_create_dali_iterator(project_variable.batch_size_val_test,
-                                           file_root, project_variable.dali_workers, False, 0,
-                                           'all', True, project_variable.device)
-
-    # if project_variable.xai_only_mode:
-    #     file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
-    # elif project_variable.nas or project_variable.debug_mode:
-    #     file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
-    #     # if which == 'train':
-    #     #     file_list = os.path.join(PP.jester_location, 'filelist_train_500perclass.txt')
-    #     # elif which == 'val':
-    #     #     file_list = os.path.join(PP.jester_location, 'filelist_val_200perclass.txt')
-    #     # else:
-    #     #     file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
-    # else:
-    #     if project_variable.model_number in [20, 21, 22, 23, 24, 25]:
-    #         # default is to load from fast
-    #         file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
-    #         # if project_variable.load_from_fast:
-    #         #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336_fast.txt' % which)
-    #         # else:
-    #         #     file_list = os.path.join(PP.jester_location, 'filelist_%s_224_336.txt' % which)
-    #     else:
-    #         file_list = os.path.join(PP.jester_location, 'filelist_%s.txt' % which)
-    #
-    # if which == 'val':
-    #     print('Loading validation iterator...')
-    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
-    #                                     file_list, project_variable.dali_workers, False, 0,
-    #                                     project_variable.dali_iterator_size[1], True, project_variable.device)
-    # elif which == 'test':
-    #     print('Loading test iterator...')
-    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
-    #                                     file_list, project_variable.dali_workers, False, 0,
-    #                                     project_variable.dali_iterator_size[2], True, project_variable.device)
-    # elif which == 'train':
-    #     print('Loading training iterator...')
-    #     the_iter = create_dali_iterator(project_variable.batch_size, file_list,
-    #                                     project_variable.dali_workers,
-    #                                     project_variable.randomize_training_data, 6,
-    #                                     project_variable.dali_iterator_size[0], True, project_variable.device)
-    # else:
-    #     print('Loading XAI only mode iterator...')
-    #     the_iter = create_dali_iterator(project_variable.batch_size_val_test,
-    #                                     file_list, project_variable.dali_workers, False, 0,
-    #                                     project_variable.dali_iterator_size[1], True, project_variable.device)
+    if which in ['val', 'test']:
+        print('Loading validation/test iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+                                        PP.ucf101_168_224_test, project_variable.dali_workers, False, 0,
+                                        project_variable.dali_iterator_size[1], True, project_variable.device)
+    elif which == 'train':
+        print('Loading training iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size, PP.ucf101_168_224_train,
+                                        project_variable.dali_workers,
+                                        project_variable.randomize_training_data, 6,
+                                        project_variable.dali_iterator_size[0], True, project_variable.device)
+    else:
+        print('Loading XAI only mode iterator...')
+        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
+                                        PP.ucf101_168_224_xai, project_variable.dali_workers, False, 0,
+                                        project_variable.dali_iterator_size[1], True, project_variable.device)
 
     return the_iter

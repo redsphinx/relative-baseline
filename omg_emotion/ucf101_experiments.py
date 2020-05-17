@@ -78,7 +78,6 @@ def e1_conv3DTTN_ucf101():
     project_variable.optimizer = 'adam'
     project_variable.learning_rate = 0.00005
     project_variable.use_adaptive_lr = True
-    project_variable.num_out_channels = [0]
 
     # go = False
     # while not go:
@@ -98,3 +97,4 @@ project_variable = ProjectVariable(debug_mode=True)
 
 e1_conv3DTTN_ucf101()
 
+57629

@@ -19,6 +19,9 @@ PATH_UCF101 = '/fast/gabras/ucf101/og_data'
 NEW_PATH_UCF101 = '/fast/gabras/ucf101/data_168_224'
 opt_mkdir(NEW_PATH_UCF101)
 
+ucf101_annotations_train1 = '/fast/gabras/ucf101/og_labels/trainlist01.txt'
+ucf101_annotations_test1 = '/fast/gabras/ucf101/og_labels/testlist01.txt'
+
 
 def resize_frame(image, h, w, c):
     # resize to height of h
@@ -189,3 +192,66 @@ def standardize_clips(b, e, h=168, w=224, frames=30):
 # standardize_clips(80, 90)
 # standardize_clips(90, 110)
 
+
+def make_splits():
+    which = ['train', 'test']
+
+    for split in which:
+        dest_path = '/fast/gabras/ucf101/data_168_224/%s' % split
+        opt_mkdir(dest_path)
+
+        path_names = '/fast/gabras/ucf101/og_labels/%slist01.txt' % split
+        names = np.genfromtxt(path_names, delimiter=' ', dtype=str)
+
+        if len(names.shape) > 1:
+            names = names[:, 0]
+
+        for nam in tqdm(names):
+            src = os.path.join(NEW_PATH_UCF101, nam)
+
+            if os.path.exists(src):
+                dest = os.path.join(dest_path, nam)
+
+                class_dir = nam.split('/')[0]
+                class_dir = os.path.join(dest_path, class_dir)
+                opt_mkdir(class_dir)
+
+                shutil.move(src, dest)
+
+def del_empty_files():
+    dirs = os.listdir(NEW_PATH_UCF101)
+
+    for i, name in enumerate(dirs):
+        dir_path = os.path.join(NEW_PATH_UCF101, name)
+        if name in ['train', 'test']:
+            pass
+        elif len(os.listdir(dir_path)) == 0:
+            # print(i, dir_path)
+            # os.rmdir(dir_path)
+            pass
+
+
+
+def make_xai_split(per_class=3):
+    src_path =  '/fast/gabras/ucf101/data_168_224/test'
+    dest_path = '/fast/gabras/ucf101/data_168_224/xai'
+    opt_mkdir(dest_path)
+
+    all_classes = os.listdir(src_path)
+
+    all_classes.sort()
+
+    for cl in all_classes:
+        class_path = os.path.join(src_path, cl)
+        new_class_path = os.path.join(dest_path, cl)
+        opt_mkdir(new_class_path)
+
+        for i in range(per_class):
+            name = 'v_%s_g0%d_c0%d.avi' % (cl, i+1, i+1)
+            src = os.path.join(class_path, name)
+            # watch out for HandstandPushups/v_HandStandPushups_g01_c01.avi
+            if os.path.exists(src):
+                dest = os.path.join(new_class_path, name)
+                shutil.copyfile(src, dest)
+            else:
+                print('path does not exist: %s' % src)
