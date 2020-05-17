@@ -1241,19 +1241,19 @@ def get_ucf101_iter(which, project_variable):
 
     if which in ['val', 'test']:
         print('Loading validation/test iterator...')
-        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
-                                        PP.ucf101_168_224_test, project_variable.dali_workers, False, 0,
-                                        project_variable.dali_iterator_size[1], True, project_variable.device)
+        the_iter = ucf101_create_dali_iterator(project_variable.batch_size_val_test,
+                                               PP.ucf101_168_224_test, project_variable.dali_workers, False, 0,
+                                               project_variable.dali_iterator_size[1], True, project_variable.device)
     elif which == 'train':
         print('Loading training iterator...')
-        the_iter = create_dali_iterator(project_variable.batch_size, PP.ucf101_168_224_train,
-                                        project_variable.dali_workers,
-                                        project_variable.randomize_training_data, 6,
-                                        project_variable.dali_iterator_size[0], True, project_variable.device)
+        the_iter = ucf101_create_dali_iterator(project_variable.batch_size, PP.ucf101_168_224_train,
+                                               project_variable.dali_workers,
+                                               project_variable.randomize_training_data, 6,
+                                               project_variable.dali_iterator_size[0], True, project_variable.device)
     else:
         print('Loading XAI only mode iterator...')
-        the_iter = create_dali_iterator(project_variable.batch_size_val_test,
-                                        PP.ucf101_168_224_xai, project_variable.dali_workers, False, 0,
-                                        project_variable.dali_iterator_size[1], True, project_variable.device)
+        the_iter = ucf101_create_dali_iterator(project_variable.batch_size_val_test,
+                                               PP.ucf101_168_224_xai, project_variable.dali_workers, False, 0,
+                                               project_variable.dali_iterator_size[1], True, project_variable.device)
 
     return the_iter

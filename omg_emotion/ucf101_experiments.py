@@ -54,15 +54,43 @@ def set_init_1():
     project_variable.eval_on = 'val'
 
 
-def e1_conv3DTTN_ucf101():
+def e1000_3D_ucf101():
     set_init_1()
-    project_variable.model_number = 20
-    project_variable.experiment_number = 31
+    project_variable.model_number = 21
+    project_variable.experiment_number = 1000
     project_variable.sheet_number = 23
     project_variable.device = 0
     project_variable.end_epoch = 100
-    project_variable.batch_size = 1
-    project_variable.batch_size_val_test = 1
+    project_variable.batch_size = 30
+    project_variable.batch_size_val_test = 30
+
+    project_variable.load_model = True  # exp, model, epoch, run
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.000005
+    project_variable.use_adaptive_lr = True
+
+    main_file.run(project_variable)
+
+
+def e1001_3T_ucf101():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 1001
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 30
+    project_variable.batch_size_val_test = 30
 
     project_variable.load_model = True  # exp, model, epoch, run
     project_variable.load_from_fast = True
@@ -79,22 +107,69 @@ def e1_conv3DTTN_ucf101():
     project_variable.learning_rate = 0.00005
     project_variable.use_adaptive_lr = True
 
-    # go = False
-    # while not go:
-    #     gpu_available = get_gpu_memory_map()
-    #     if gpu_available[project_variable.device] < 100:
-    #         go = True
-    #     else:
-    #         print('waiting for gpu %d...' % project_variable.device)
-    #         time.sleep(10)
+    main_file.run(project_variable)
+
+
+def e1002_3D_ucf101():
+    set_init_1()
+    project_variable.model_number = 25
+    project_variable.experiment_number = 1002
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 20
+    project_variable.batch_size_val_test = 20
+
+    project_variable.load_model = True  # exp, model, epoch, run
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.000005
+    project_variable.use_adaptive_lr = True
 
     main_file.run(project_variable)
 
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+def e1003_3T_ucf101():
+    set_init_1()
+    project_variable.model_number = 23
+    project_variable.experiment_number = 1003
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 19
+    project_variable.batch_size_val_test = 19
+
+    project_variable.load_model = True  # exp, model, epoch, run
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+
+    main_file.run(project_variable)
+
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 
-e1_conv3DTTN_ucf101()
-
-57629
+# e1000_3D_ucf101()
+# e1001_3T_ucf101()
+# e1002_3D_ucf101()
+# e1003_3T_ucf101()

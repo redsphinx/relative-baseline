@@ -42,7 +42,8 @@ def run(project_variable, all_data, my_model, device):
 
             labels = labels.type(torch.long)
             labels = labels.flatten()
-            labels = labels - 1
+            if project_variable.dataset == 'jester':
+                labels = labels - 1
 
             my_model.eval()
             with torch.no_grad():

@@ -68,7 +68,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             # data = (data/255 - project_variable.imnet_mean) / project_variable.imnet_stds
             labels = labels.type(torch.long)
             labels = labels.flatten()
-            labels = labels - 1
+            if project_variable.dataset == 'jester':
+                labels = labels - 1
 
             my_optimizer.zero_grad()
 
