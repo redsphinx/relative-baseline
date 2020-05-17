@@ -296,7 +296,7 @@ def run(project_variable):
 
                 if project_variable.train:
                     condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
-                    condition_2 = not project_variable.debug_mode
+                    condition_2 = not project_variable.debug_mode and project_variable.dataset == 'jester'
 
                     w = None
                     if project_variable.model_number == 0:
@@ -357,7 +357,7 @@ def run(project_variable):
 
                 if project_variable.val:
                     condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
-                    condition_2 = not project_variable.debug_mode
+                    condition_2 = not project_variable.debug_mode and project_variable.dataset == 'jester'
 
                     w = None
                     if project_variable.model_number == 0:
@@ -401,7 +401,7 @@ def run(project_variable):
 
                     if project_variable.test:
                         condition_1 = project_variable.dataset == 'jester' and project_variable.use_dali and not project_variable.nas
-                        condition_2 = not project_variable.debug_mode
+                        condition_2 = not project_variable.debug_mode and project_variable.dataset == 'jester'
 
                         w = None
                         if project_variable.model_number == 0:

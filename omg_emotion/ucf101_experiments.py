@@ -170,6 +170,6 @@ project_variable = ProjectVariable(debug_mode=False)
 
 
 # e1000_3D_ucf101()
-# e1001_3T_ucf101()
+e1001_3T_ucf101()
 # e1002_3D_ucf101()
 # e1003_3T_ucf101()
