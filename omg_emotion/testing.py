@@ -16,7 +16,12 @@ def run(project_variable, all_data, my_model, device):
         U.initialize(project_variable, all_data)
 
     if project_variable.use_dali:
-        the_iterator = DL.get_jester_iter('test', project_variable)
+        if project_variable.dataset == 'jester':
+            the_iterator = DL.get_jester_iter('test', project_variable)
+        elif project_variable.dataset == 'ucf101':
+            the_iterator = DL.get_ucf101_iter('test', project_variable)
+        else:
+            the_iterator = None
         steps = 0
 
         for i, data_and_labels in enumerate(the_iterator):

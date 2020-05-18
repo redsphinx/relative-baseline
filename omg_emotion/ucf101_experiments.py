@@ -59,7 +59,7 @@ def e1000_3D_ucf101():
     project_variable.model_number = 21
     project_variable.experiment_number = 1000
     project_variable.sheet_number = 23
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.end_epoch = 100
     project_variable.batch_size = 30
     project_variable.batch_size_val_test = 30
@@ -115,7 +115,7 @@ def e1002_3D_ucf101():
     project_variable.model_number = 25
     project_variable.experiment_number = 1002
     project_variable.sheet_number = 23
-    project_variable.device = 0
+    project_variable.device = 1
     project_variable.end_epoch = 100
     project_variable.batch_size = 20
     project_variable.batch_size_val_test = 20
@@ -170,6 +170,6 @@ project_variable = ProjectVariable(debug_mode=False)
 
 
 # e1000_3D_ucf101()
-e1001_3T_ucf101()
-# e1002_3D_ucf101()
+# e1001_3T_ucf101()
+e1002_3D_ucf101()
 # e1003_3T_ucf101()
