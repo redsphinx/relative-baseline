@@ -30,7 +30,7 @@ def init(dataset, model):
     proj_var.use_dali = True
     proj_var.batch_size_val_test = 1
     proj_var.dali_workers = 32
-    proj_var.device = 0
+    proj_var.device = 1
     proj_var.load_num_frames = 30
     if dataset == 'jester':
         proj_var.label_size = 27
@@ -75,6 +75,7 @@ def map_to_names(the_dict, name_path, dataset):
             fol_path = os.path.join(name_path, fol)
             nam = os.listdir(fol_path)
             nam.sort()
+            nam = [os.path.join(PP.ucf101_168_224_xai, fol, nam[i]) for i in range(len(nam))]
             names.extend(nam)
 
     # assert len(the_dict) == len(names)
@@ -102,11 +103,11 @@ def get_max_activation(model, model_number, data, device):
             if model_number == 20: # RN18 3T
                 feature_map = model(data, device, stop_at=conv)
             elif model_number == 23: # GN 3T
-                aux1, aux2, feature_map = model(data, device, None, False)
+                feature_map = model(data, device, stop_at=conv, aux=False)
             elif model_number == 21: # RN18 3D
                 feature_map = model(data, stop_at=conv)
             elif model_number == 25: # GN 3D
-                aux1, aux2, feature_map = model(data, None, False)
+                feature_map = model(data, stop_at=conv, aux=False)
 
             layer_max = np.array(feature_map.data.cpu()).max()
             model_max = model_max + layer_max
@@ -135,8 +136,8 @@ def find_best_videos(dataset, model):
     wrong_pred = dict()
 
     for i, data_and_labels in tqdm(enumerate(the_iterator)):
-        if i > 3:
-            break
+        # if i > 2:
+        #     break
         prediction = None
 
         data = data_and_labels[0]['data']
@@ -149,6 +150,10 @@ def find_best_videos(dataset, model):
             prediction = my_model(data, proj_var.device)
         elif proj_var.model_number == 23:
             aux1, aux2, prediction = my_model(data, proj_var.device, None, False)
+        elif proj_var.model_number == 21:
+            prediction = my_model(data)
+        elif proj_var.model_number == 25:
+            aux1, aux2, prediction = my_model(data, None, False)
 
         my_model.zero_grad()
         prediction = np.array(prediction[0].data.cpu()).argmax()
@@ -177,7 +182,10 @@ def find_best_videos(dataset, model):
 
     filename_correct = 'high_act_vids-correct_pred-%s-exp_%d_mod_%d_ep_%d.txt' % (dataset, model[0], model[1], model[2])
     filename_wrong = 'high_act_vids-wrong_pred-%s-exp_%d_mod_%d_ep_%d.txt' % (dataset, model[0], model[1], model[2])
-
+    
+    filename_correct = os.path.join(PP.xai_metadata, filename_correct)
+    filename_wrong = os.path.join(PP.xai_metadata, filename_wrong)
+    
     with open(filename_correct, 'a') as my_file:
         for k in correct_pred:
             line = '%s %f\n' % (k, correct_pred[k])
@@ -201,4 +209,11 @@ def find_best_videos(dataset, model):
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
 
-find_best_videos('jester', [31, 20, 8, 0])
+# find_best_videos('jester', [31, 20, 8, 0])
+# find_best_videos('ucf101', [1001, 20, 45, 0])
+# find_best_videos('jester', [26, 21, 45, 0])
+# find_best_videos('ucf101', [1000, 21, 40, 0])
+# find_best_videos('jester', [28, 25, 25, 0])
+# find_best_videos('ucf101', [1002, 25, 54, 0])
+# find_best_videos('jester', [30, 23, 28, 0])
+# find_best_videos('ucf101', [1003, 23, 12, 0])
