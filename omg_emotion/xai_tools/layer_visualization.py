@@ -1,20 +1,15 @@
 import os
 import numpy as np
 from PIL import Image
-import cv2 as cv
 from scipy import stats
 from tqdm import tqdm
 
 import torch
 from torch.optim import Adam
-from torch.autograd import Variable
 from torch.nn import functional as F
 
-from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
-import relative_baseline.omg_emotion.project_paths as PP
 import relative_baseline.omg_emotion.data_loading as DL
-from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import visualization as VZ
 
 
@@ -830,7 +825,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
     for ind in tqdm(conv_layers):
         channels = []
         srxy_params = []
-        notable_frames = []
+        notable_frames = [] # 30838
 
         if num_channels == 'all':
             start = 0
