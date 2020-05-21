@@ -1,5 +1,6 @@
 import numpy as np
 from multiprocessing import Pool
+from datetime import datetime
 
 from relative_baseline.omg_emotion.settings import ProjectVariable
 from relative_baseline.omg_emotion import main_file
@@ -25,6 +26,23 @@ def get_gpu_memory_map():
     gpu_memory = [int(x) for x in result.strip().split('\n')]
     gpu_memory_map = dict(zip(range(len(gpu_memory)), gpu_memory))
     return gpu_memory_map
+
+
+def wait_for_gpu(wait, device_num=None, threshold=100):
+
+    if wait:
+        go = False
+        while not go:
+            gpu_available = get_gpu_memory_map()
+            if gpu_available[device_num] < threshold:
+                go = True
+            else:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print('%s Waiting for gpu %d...' % (current_time, device_num))
+                time.sleep(10)
+    else:
+        return
 
 
 def set_init_1():
@@ -1050,6 +1068,40 @@ def e31_conv3DTTN_jester():
     main_file.run(project_variable)
 
 
+# HERE: UNPRETRAINED
+
+# computer: AWS
+def e32_conv3DTTN_jester():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 31
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 1
+    project_variable.batch_size = 32
+    project_variable.batch_size_val_test = 32
+
+    project_variable.load_model = None
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    wait_for_gpu(wait=False)
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 # project_variable = ProjectVariable(debug_mode=True)
 
@@ -1082,4 +1134,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e28_conv3D_jester()
 # e29_conv3DTTN_jester()
 # e30_conv3T_jester()
-e31_conv3DTTN_jester()
+# e31_conv3DTTN_jester()
+e32_conv3DTTN_jester()
