@@ -83,6 +83,7 @@ zeiler2014 = '/home/gabras/deployed/relative_baseline/omg_emotion/images/zeiler2
 xai_visualizations = '/huge/gabras/omg_emotion/saving_data/xai'
 our_method = '/huge/gabras/omg_emotion/saving_data/xai/our_method'
 xai_metadata = '/huge/gabras/omg_emotion/saving_data/xai/metadata'
+srxy_plots = '/huge/gabras/omg_emotion/saving_data/xai/srxy_plots'
 
 # NAS saving location
 nas_location = '/huge/gabras/omg_emotion/saving_data/nas'

@@ -953,7 +953,7 @@ def visualize_resnet18(project_variable, og_data_point, mod_data_point, my_model
             if ch == 0:
                 trafo_per_layer.append(num_transformations)
 
-            # TODO: debug here to figure out why the second transofmration is not showing
+            # TODO: debug hier to figure out why the second transofmration is not showing
             for trafo in range(num_transformations):
                 s = getattr(transformations, 'scale')[trafo, ch]
                 r = getattr(transformations, 'rotate')[trafo, ch]

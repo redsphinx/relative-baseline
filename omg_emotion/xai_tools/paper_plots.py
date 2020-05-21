@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 from PIL import Image
@@ -14,14 +17,15 @@ from relative_baseline.omg_emotion.settings import ProjectVariable as pv
 from relative_baseline.omg_emotion import setup
 import relative_baseline.omg_emotion.data_loading as DL
 import relative_baseline.omg_emotion.project_paths as PP
+from relative_baseline.omg_emotion.utils import opt_mkdir, opt_makedirs
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
-from relative_baseline.omg_emotion import utils as U
+
 from relative_baseline.omg_emotion import visualization as VZ
 
 
-def init(dataset, model):
+def init1(dataset, model):
     proj_var = pv(debug_mode=True)
     proj_var.dataset = dataset
     proj_var.load_model = model
@@ -116,7 +120,7 @@ def get_max_activation(model, model_number, data, device):
 
 
 def find_best_videos(dataset, model):
-    proj_var = init(dataset, model)
+    proj_var = init1(dataset, model)
     # model num 21, 20, 25, 23
     # dataset jester, ucf101
 
@@ -197,6 +201,126 @@ def find_best_videos(dataset, model):
             my_file.write(line)
 
 
+# find_best_videos('jester', [31, 20, 8, 0])
+# find_best_videos('ucf101', [1001, 20, 45, 0])
+# find_best_videos('jester', [26, 21, 45, 0])
+# find_best_videos('ucf101', [1000, 21, 40, 0])
+# find_best_videos('jester', [28, 25, 25, 0])
+# find_best_videos('ucf101', [1002, 25, 54, 0])
+# find_best_videos('jester', [30, 23, 28, 0])
+# find_best_videos('ucf101', [1003, 23, 12, 0])
+
+def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
+    x_axis = np.arange(len(scales)+1)
+    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+
+    if dataset == 'jester':
+        h, w = 150, 224
+    elif dataset == 'ucf101':
+        h, w = 168, 224
+    
+    new_scales = [1.]
+    new_rotations = [0.]
+    new_xs = [0.]
+    new_ys = [0.]
+
+    for i in range(len(scales)):
+        new_scales.append(scales[i] * new_scales[-1])
+        new_rotations.append(rotations[i] + new_rotations[-1])
+        new_xs.append(xs[i]*w + new_xs[-1])
+        new_ys.append(ys[i]*h + new_ys[-1])
+
+    axs[0].plot(x_axis, new_scales)
+    axs[0].set_ylabel('size ratio')
+    axs[0].set_xlabel('time')
+    axs[0].set_title('cumulative scale')
+    axs[0].grid(True)
+
+    axs[1].plot(x_axis, new_rotations)
+    axs[1].set_ylabel('degrees')
+    axs[1].set_xlabel('time')
+    axs[1].set_title('cumulative rotation')
+    axs[1].grid(True)
+
+    txt = ['t'+str(i) for i in range(len(new_scales))]
+    axs[2].plot(new_xs, new_ys)
+    axs[2].set_title('X and Y location in pixels')
+    axs[2].set_ylabel('y')
+    axs[2].set_xlabel('x')
+    axs[2].grid(True)
+    for i, j in enumerate(txt):
+        axs[2].annotate(j, (new_xs[i], new_ys[i]))
+
+    if model[1] == 21:
+        m = '3D-ResNet18'
+    elif model[1] == 20:
+        m = '3T-ResNet18'
+    elif model[1] == 25:
+        m = '3D-GoogLeNet'
+    elif model[1] == 23:
+        m = '3T-GoogLeNet'
+
+    fig.suptitle('%s on %s, layer %d channel %d' % (m, dataset, conv, ch + 1))
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    p2 = 'layer_%d_channel_%d.jpg' % (conv, ch+1)
+    save_location = os.path.join(PP.srxy_plots, p1, p2)
+
+    intermediary_path = os.path.join(PP.srxy_plots, p1)
+    opt_mkdir(intermediary_path)
+
+    plt.savefig(save_location)
+
+
+def plot_all_srxy(dataset, model):
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    # device = setup.get_device(proj_var)
+    # my_model.cuda(device)
+
+    if model[1] in [21, 20]: # resnet18
+        conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+    else: # googlenet
+        conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+
+    for ind in tqdm(conv_layers):
+        end = getattr(my_model, 'conv%d' % ind)
+        end = end.weight.shape[0]
+
+        for ch in range(0, end):
+            _conv_name = 'conv%d' % ind
+            transformations = getattr(getattr(my_model, _conv_name), 'scale')
+            num_transformations = transformations.shape[0]
+            transformations = getattr(my_model, _conv_name)
+
+            scales = []
+            rotations = []
+            xs = []
+            ys = []
+
+            for trafo in range(num_transformations):
+                s = getattr(transformations, 'scale')[trafo, ch]
+                r = getattr(transformations, 'rotate')[trafo, ch]
+                x = getattr(transformations, 'translate_x')[trafo, ch]
+                y = getattr(transformations, 'translate_y')[trafo, ch]
+                
+                # translate parameters to interpretable things
+                # scale -> 1/s
+                # rotation -> degrees counterclockwise
+                # x, y -> half of size image
+
+                s = 1 / float(s)
+                r = -1 * float(r)
+                x = -0.5 * float(x)
+                y = 0.5 * float(y)
+                
+                scales.append(s)
+                rotations.append(r)
+                xs.append(x)
+                ys.append(y)
+
+            save_as_plot(scales, rotations, xs, ys, model, ind, ch, dataset)
+
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
 # +---------+------------+--------------+
@@ -209,11 +333,4 @@ def find_best_videos(dataset, model):
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
 
-# find_best_videos('jester', [31, 20, 8, 0])
-# find_best_videos('ucf101', [1001, 20, 45, 0])
-# find_best_videos('jester', [26, 21, 45, 0])
-# find_best_videos('ucf101', [1000, 21, 40, 0])
-# find_best_videos('jester', [28, 25, 25, 0])
-# find_best_videos('ucf101', [1002, 25, 54, 0])
-# find_best_videos('jester', [30, 23, 28, 0])
-# find_best_videos('ucf101', [1003, 23, 12, 0])
+plot_all_srxy('jester', [31, 20, 8, 0])
