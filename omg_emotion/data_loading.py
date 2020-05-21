@@ -1134,7 +1134,9 @@ def get_jester_iter(which, project_variable):
         assert which in ['train', 'val', 'test']
 
     if project_variable.xai_only_mode:
-        file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
+        # file_list = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
+        file_list = os.path.join(PP.jester_location, 'filelist_test_xai_150_224.txt')
+
     elif project_variable.nas or project_variable.debug_mode:
         file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
         # if which == 'train':

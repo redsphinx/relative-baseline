@@ -582,3 +582,28 @@ def xai_selection():
 # xai_selection()
 
 
+def xai_150_224_selection():
+    which = 'test'
+    data_per_class = 10
+
+    num_classes = 27
+    all_lines = np.genfromtxt(os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which), dtype=str, delimiter=' ')
+    labels = all_lines[:, 1]
+
+    chosen = []
+    for i in range(num_classes):
+        # need to start at 1
+        indices = np.arange(len(all_lines))[labels == str(i + 1)]
+        chosen.extend(indices[:data_per_class])
+
+    chosen_lines = all_lines[chosen]
+
+    new_file = os.path.join(PP.jester_location, 'filelist_%s_xai_150_224.txt' % (which))
+    with open(new_file, 'a') as my_file:
+        for i in range(len(chosen_lines)):
+            # must be separated by space
+            line = '%s %s\n' % (chosen_lines[i][0], chosen_lines[i][1])
+            # print(line)
+            my_file.write(line)
+
+# xai_150_224_selection()

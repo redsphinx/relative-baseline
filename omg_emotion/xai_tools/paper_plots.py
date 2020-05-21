@@ -77,7 +77,7 @@ def map_to_names(the_dict, name_path, dataset):
             nam.sort()
             names.extend(nam)
 
-    assert len(the_dict) == len(names)
+    # assert len(the_dict) == len(names)
 
     for k in the_dict:
         new_key = names[k]
@@ -108,8 +108,8 @@ def get_max_activation(model, model_number, data, device):
             elif model_number == 25: # GN 3D
                 aux1, aux2, feature_map = model(data, None, False)
 
-        layer_max = np.array(feature_map.data.cpu()).max()
-        model_max = model_max + layer_max
+            layer_max = np.array(feature_map.data.cpu()).max()
+            model_max = model_max + layer_max
 
     return model_max
 
@@ -121,6 +121,7 @@ def find_best_videos(dataset, model):
 
     my_model = setup.get_model(proj_var)
     device = setup.get_device(proj_var)
+    my_model.cuda(device)
 
     if dataset == 'jester':
         the_iterator = DL.get_jester_iter(None, proj_var)
@@ -134,6 +135,8 @@ def find_best_videos(dataset, model):
     wrong_pred = dict()
 
     for i, data_and_labels in tqdm(enumerate(the_iterator)):
+        if i > 3:
+            break
         prediction = None
 
         data = data_and_labels[0]['data']
@@ -176,11 +179,26 @@ def find_best_videos(dataset, model):
     filename_wrong = 'high_act_vids-wrong_pred-%s-exp_%d_mod_%d_ep_%d.txt' % (dataset, model[0], model[1], model[2])
 
     with open(filename_correct, 'a') as my_file:
-        for k, v in correct_pred:
-            line = '%s %f\n' % (k, v)
-            # my_file.write(line)
+        for k in correct_pred:
+            line = '%s %f\n' % (k, correct_pred[k])
+            my_file.write(line)
 
     with open(filename_wrong, 'a') as my_file:
-        for k, v in wrong_pred:
-            line = '%s %f\n' % (k, v)
-            # my_file.write(line)
+        for k in wrong_pred:
+            line = '%s %f\n' % (k, wrong_pred[k])
+            my_file.write(line)
+
+
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3D | 26, 21, 45 | 1000, 21, 40 |
+# +---------+------------+--------------+
+# | RN18 3T |  31, 20, 8 | 1001, 20, 45 |
+# +---------+------------+--------------+
+# | GN 3D   | 28, 25, 25 | 1002, 25, 54 |
+# +---------+------------+--------------+
+# | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
+# +---------+------------+--------------+
+
+find_best_videos('jester', [31, 20, 8, 0])
