@@ -85,6 +85,7 @@ our_method = '/huge/gabras/omg_emotion/saving_data/xai/our_method'
 xai_metadata = '/huge/gabras/omg_emotion/saving_data/xai/metadata'
 srxy_plots = '/huge/gabras/omg_emotion/saving_data/xai/srxy_plots'
 filters_conv1 = '/huge/gabras/omg_emotion/saving_data/xai/filters_conv1'
+act_max = '/huge/gabras/omg_emotion/saving_data/xai/act_max'
 
 # NAS saving location
 nas_location = '/huge/gabras/omg_emotion/saving_data/nas'

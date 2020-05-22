@@ -9,7 +9,7 @@ from scipy import stats
 from tqdm import tqdm
 
 import torch
-from torch.optim import Adam
+from torch.optim import AdamW
 from torch.autograd import Variable
 from torch.nn import functional as F
 
@@ -350,7 +350,7 @@ def plot_all_srxy(dataset, model):
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
-
+# TODO: fix plots
 # plot_all_srxy('jester', [31, 20, 8, 0])
 
 def visualize_all_first_layer_filters(dataset, model):
@@ -418,6 +418,117 @@ def visualize_all_first_layer_filters(dataset, model):
             img.save(save_path)
 
 
+# visualize_all_first_layer_filters('jester', [31, 20, 8, 0])
+# visualize_all_first_layer_filters('ucf101', [1001, 20, 45, 0])
+# visualize_all_first_layer_filters('jester', [26, 21, 45, 0])
+# visualize_all_first_layer_filters('ucf101', [1000, 21, 40, 0])
+# visualize_all_first_layer_filters('jester', [28, 25, 25, 0])
+# visualize_all_first_layer_filters('ucf101', [1002, 25, 54, 0])
+# visualize_all_first_layer_filters('jester', [30, 23, 28, 0])
+# visualize_all_first_layer_filters('ucf101', [1003, 23, 12, 0])
+
+
+def remove_imagenet_mean_std(data):
+    data = data * 1.
+    data = data / 255
+    data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
+    data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
+    data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
+    return data
+
+
+def add_imagenet_mean_std(data):
+    data = data * 255
+    data[0] = data[0] * 0.229 + 0.485
+    data[1] = data[1] * 0.224 + 0.456
+    data[2] = data[2] * 0.225 + 0.406
+    return data
+
+
+def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500):
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = 2
+    device = setup.get_device(proj_var)
+    my_model.cuda(device)
+
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    intermediary_path = os.path.join(PP.act_max, p1)
+    opt_mkdir(intermediary_path)
+
+    if model[1] in [21, 20]: # resnet18
+        conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+    else: # googlenet
+        conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+
+
+    for ind in conv_layers:
+        print('conv layer %d' % ind)
+        if num_channels is None:
+            end = getattr(my_model, 'conv%d' % ind)
+            end = end.weight.shape[0]
+        else:
+            end = num_channels
+
+        p2 = os.path.join(intermediary_path, 'conv_%d' % ind)
+        opt_mkdir(p2)
+
+        np.random.seed(seed)
+        if dataset == 'jester':
+            random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, 150, 224))
+        elif dataset == 'ucf101':
+            random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, 168, 224))
+        random_img = remove_imagenet_mean_std(random_img)
+        random_img = torch.Tensor(random_img)
+        random_img = random_img.cuda(device)
+        random_img = torch.nn.Parameter(random_img)
+        random_img.requires_grad = True
+
+        for ch in range(end):
+            optimizer = AdamW([random_img], lr=0.004, weight_decay=0.1)
+
+
+            for me in tqdm(range(steps)):
+
+                optimizer.zero_grad()
+                random_video = random_img.repeat(1, 1, 30, 1, 1)
+
+                my_model.eval()
+                if proj_var.model_number == 20:
+                    prediction = my_model(random_video, proj_var.device, stop_at=ind)
+                elif proj_var.model_number == 23:
+                    aux1, aux2, prediction = my_model(random_video, proj_var.device, ind, False)
+                elif proj_var.model_number == 21:
+                    prediction = my_model(random_video, stop_at=ind)
+                elif proj_var.model_number == 25:
+                    aux1, aux2, prediction = my_model(random_video, ind, False)
+
+                loss = -1 * torch.mean(prediction[0, ch])
+                # loss = -1 * torch.mean(prediction[0, ch]**2)
+                loss.backward()
+                optimizer.step()
+                my_model.zero_grad()
+
+                if (me+1) % 100 == 0:
+                    img = np.array(random_img.clone().data.cpu())
+                    img = img[0,:,0]
+                    img = add_imagenet_mean_std(img)
+                    img = normalize(img)
+                    img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)
+                    img = Image.fromarray(img, mode='RGB')
+                    name = 'chan_%d_step_%d.jpg' % (ch+1, me)
+                    path = os.path.join(p2, name)
+                    img.save(path)
+
+
+
+
+
+activation_maximization_single_channels('jester', [31, 20, 8, 0])
+
+
+
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
 # +---------+------------+--------------+
@@ -429,12 +540,3 @@ def visualize_all_first_layer_filters(dataset, model):
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
-
-# visualize_all_first_layer_filters('jester', [31, 20, 8, 0])
-# visualize_all_first_layer_filters('ucf101', [1001, 20, 45, 0])
-# visualize_all_first_layer_filters('jester', [26, 21, 45, 0])
-# visualize_all_first_layer_filters('ucf101', [1000, 21, 40, 0])
-# visualize_all_first_layer_filters('jester', [28, 25, 25, 0])
-# visualize_all_first_layer_filters('ucf101', [1002, 25, 54, 0])
-# visualize_all_first_layer_filters('jester', [30, 23, 28, 0])
-# visualize_all_first_layer_filters('ucf101', [1003, 23, 12, 0])
