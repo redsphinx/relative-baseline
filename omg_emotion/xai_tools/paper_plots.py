@@ -212,7 +212,9 @@ def find_best_videos(dataset, model):
 
 def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     x_axis = np.arange(len(scales)+1)
-    fig, axs = plt.subplots(3, 1, constrained_layout=True)
+    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3)
+    # plt.setp(ax3, adjustable='box', aspect='equal')
+
 
     if dataset == 'jester':
         h, w = 150, 224
@@ -230,26 +232,39 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
         new_xs.append(xs[i]*w + new_xs[-1])
         new_ys.append(ys[i]*h + new_ys[-1])
 
-    axs[0].plot(x_axis, new_scales)
-    axs[0].set_ylabel('size ratio')
-    axs[0].set_xlabel('time')
-    axs[0].set_title('cumulative scale')
-    axs[0].grid(True)
+    # FIX: yticks and xticks
+    # FIX: labelsize
+    # FIX: spacing
+    # FIX: overall fig shape
+    ax1.plot(x_axis, new_scales, 'o-', linewidth=1, markersize=5)
+    ax1.set_ylabel('size ratio')
+    ax1.set_xlabel('time')
+    ax1.set_title('cumulative scale')
+    # ax1.set_aspect('equal', 'box')
+    # ax1.set(adjustable='box')
+    ax1.grid(True)
+    ax1.axis('square')
 
-    axs[1].plot(x_axis, new_rotations)
-    axs[1].set_ylabel('degrees')
-    axs[1].set_xlabel('time')
-    axs[1].set_title('cumulative rotation')
-    axs[1].grid(True)
+    ax2.plot(x_axis, new_rotations, 'o-', linewidth=1, markersize=5)
+    ax2.set_ylabel('degrees')
+    ax2.set_xlabel('time')
+    ax2.set_title('cumulative rotation')
+    # ax2.set_aspect('equal', 'box')
+    # ax2.set(adjustable='box')
+    ax2.grid(True)
+    ax2.axis('square')
 
     txt = ['t'+str(i) for i in range(len(new_scales))]
-    axs[2].plot(new_xs, new_ys)
-    axs[2].set_title('X and Y location in pixels')
-    axs[2].set_ylabel('y')
-    axs[2].set_xlabel('x')
-    axs[2].grid(True)
+    ax3.plot(new_xs, new_ys, 'o-', linewidth=1, markersize=5)
+    ax3.set_title('X and Y location in pixels')
+    ax3.set_ylabel('y')
+    ax3.set_xlabel('x')
+    # ax3.set_aspect('equal', 'box')
+    # ax3.set(adjustable='box')
+    ax3.grid(True)
+    ax3.axis('square')
     for i, j in enumerate(txt):
-        axs[2].annotate(j, (new_xs[i], new_ys[i]))
+        ax3.annotate(j, (new_xs[i], new_ys[i]))
 
     if model[1] == 21:
         m = '3D-ResNet18'
@@ -261,6 +276,8 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
         m = '3T-GoogLeNet'
 
     fig.suptitle('%s on %s, layer %d channel %d' % (m, dataset, conv, ch + 1))
+
+    # fig.tight_layout()
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
     p2 = 'layer_%d_channel_%d.jpg' % (conv, ch+1)
