@@ -18,6 +18,7 @@ from relative_baseline.omg_emotion import setup
 import relative_baseline.omg_emotion.data_loading as DL
 import relative_baseline.omg_emotion.project_paths as PP
 from relative_baseline.omg_emotion.utils import opt_mkdir, opt_makedirs
+from relative_baseline.omg_emotion.xai_tools.layer_visualization import create_next_frame, normalize
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
@@ -350,4 +351,90 @@ def plot_all_srxy(dataset, model):
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
 
-plot_all_srxy('jester', [31, 20, 8, 0])
+# plot_all_srxy('jester', [31, 20, 8, 0])
+
+def visualize_all_first_layer_filters(dataset, model):
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = None
+    device = setup.get_device(proj_var)
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    intermediary_path = os.path.join(PP.filters_conv1, p1)
+    opt_mkdir(intermediary_path)
+
+    num_channels = getattr(my_model, 'conv1')
+    num_channels = num_channels.weight.shape[0]
+
+    if model[1] in [21, 25]: # 3D
+        w = np.array(my_model.conv1.weight.data)
+    else: # 3T
+        w = my_model.conv1.first_weight.data
+        s = my_model.conv1.scale.data
+        r = my_model.conv1.rotate.data
+        x = my_model.conv1.translate_x.data
+        y = my_model.conv1.translate_y.data
+
+
+    for ch in tqdm(range(num_channels)):
+        # if ch > 2:
+        #     break
+        channel_path = os.path.join(intermediary_path, 'channel_%d' % (ch + 1))
+        opt_mkdir(channel_path)
+
+        if model[1] in [20, 23]: # 3T
+            k0 = w[ch, :, 0,]
+            num_transformations = s.shape[0]
+            w3d = np.zeros(shape=(w.shape[1], w.shape[2] + num_transformations, w.shape[3], w.shape[4]), dtype=np.float32)
+            w3d[:, 0] = np.array(k0.clone().data)
+            _s, _r, _x, _y = s[0, ch], r[0, ch], x[0, ch], y[0, ch]
+            for i in range(num_transformations):
+                # apply them on the final image
+                if i == 0:
+                    next_k = create_next_frame(_s, _r, _x, _y, k0, device)
+                    w3d[:, i+1] = np.array(next_k.clone().data)
+                else:
+                    _s = _s * s[i, ch]
+                    _r = _r + r[i, ch]
+                    _x = _x + x[i, ch]
+                    _y = _y + y[i, ch]
+                    next_k = create_next_frame(_s, _r, _x, _y, k0, device)
+                    w3d[:, i+1] = np.array(next_k.clone().data)
+            w_chan = w3d.copy()
+        else:
+            w_chan = w[ch].copy()
+
+        w_chan = w_chan.transpose(1, 2, 3, 0)
+        num_slices = w_chan.shape[0]
+
+        for slc in range(num_slices):
+            w_slice = w_chan[slc]
+            w_slice = normalize(w_slice.transpose(2, 0, 1))
+            w_slice = np.array(w_slice.transpose(1, 2, 0), dtype=np.uint8)
+
+            img = Image.fromarray(w_slice, mode='RGB')
+            name = 'slice_%d.jpg' % (slc+1)
+            save_path = os.path.join(channel_path, name)
+            img.save(save_path)
+
+
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3D | 26, 21, 45 | 1000, 21, 40 |
+# +---------+------------+--------------+
+# | RN18 3T |  31, 20, 8 | 1001, 20, 45 |
+# +---------+------------+--------------+
+# | GN 3D   | 28, 25, 25 | 1002, 25, 54 |
+# +---------+------------+--------------+
+# | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
+# +---------+------------+--------------+
+
+# visualize_all_first_layer_filters('jester', [31, 20, 8, 0])
+# visualize_all_first_layer_filters('ucf101', [1001, 20, 45, 0])
+# visualize_all_first_layer_filters('jester', [26, 21, 45, 0])
+# visualize_all_first_layer_filters('ucf101', [1000, 21, 40, 0])
+# visualize_all_first_layer_filters('jester', [28, 25, 25, 0])
+# visualize_all_first_layer_filters('ucf101', [1002, 25, 54, 0])
+# visualize_all_first_layer_filters('jester', [30, 23, 28, 0])
+# visualize_all_first_layer_filters('ucf101', [1003, 23, 12, 0])

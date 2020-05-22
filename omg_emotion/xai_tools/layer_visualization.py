@@ -60,10 +60,11 @@ def make_affine_matrix(sc, ro, tx, ty, use_opencv=False):
         matrix = torch.zeros((1, 2, 3))
 
         # for making visualization for resnet18 and googlenet
-        sc = sc.data.cpu()
-        ro = ro.data.cpu()
-        tx = tx.data.cpu()
-        ty = ty.data.cpu()
+        if sc.device.type != 'cpu':
+            sc = sc.data.cpu()
+            ro = ro.data.cpu()
+            tx = tx.data.cpu()
+            ty = ty.data.cpu()
 
         matrix[0, 0, 0] = sc * torch.cos(ro)
         matrix[0, 0, 1] = -sc * torch.sin(ro)
