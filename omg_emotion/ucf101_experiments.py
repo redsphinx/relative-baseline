@@ -31,9 +31,7 @@ def set_init_1():
     project_variable.end_epoch = 100
     project_variable.dataset = 'ucf101'
 
-    # if you want all the data: train: 4200, val: 250, test: 250
-    # "missing" files are the REAL test
-    # total_dp = {'train': 118562, 'val': 7393, 'test': 7394}
+    # total_dp = {'train': 9537, 'val/test': 3783}
     project_variable.num_in_channels = 3
     project_variable.data_points = [2 * 27,  1 * 27, 0 * 27]
     project_variable.label_size = 101
@@ -165,11 +163,74 @@ def e1003_3T_ucf101():
 
     main_file.run(project_variable)
 
-project_variable = ProjectVariable(debug_mode=False)
-# project_variable = ProjectVariable(debug_mode=True)
+# UNPRETRAINED
+
+def e1004_3T_ucf101():
+    set_init_1()
+    project_variable.model_number = 20
+    project_variable.experiment_number = 1004
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 30
+    project_variable.batch_size_val_test = 30
+
+    project_variable.load_model = None  # exp, model, epoch, run
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+
+    main_file.run(project_variable)
+
+
+def e1005_3T_ucf101():
+    set_init_1()
+    project_variable.model_number = 23
+    project_variable.experiment_number = 1005
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 19
+    project_variable.batch_size_val_test = 19
+
+    project_variable.load_model = None  # exp, model, epoch, run
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+
+    main_file.run(project_variable)
+
+
+# project_variable = ProjectVariable(debug_mode=False)
+project_variable = ProjectVariable(debug_mode=True)
+
+
 
 
 # e1000_3D_ucf101()
 # e1001_3T_ucf101()
-e1002_3D_ucf101()
+# e1002_3D_ucf101()
 # e1003_3T_ucf101()
+
+# e1004_3T_ucf101()
+e1005_3T_ucf101()
