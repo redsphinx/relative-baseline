@@ -198,10 +198,10 @@ def e1005_3T_ucf101():
     project_variable.model_number = 23
     project_variable.experiment_number = 1005
     project_variable.sheet_number = 23
-    project_variable.device = 0
+    project_variable.device = 2
     project_variable.end_epoch = 100
-    project_variable.batch_size = 19
-    project_variable.batch_size_val_test = 19
+    project_variable.batch_size = 18
+    project_variable.batch_size_val_test = 18
 
     project_variable.load_model = None  # exp, model, epoch, run
     project_variable.load_from_fast = True
@@ -221,8 +221,8 @@ def e1005_3T_ucf101():
     main_file.run(project_variable)
 
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 
 

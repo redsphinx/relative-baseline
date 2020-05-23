@@ -4,14 +4,14 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from PIL import Image
-import cv2 as cv
-from scipy import stats
 from tqdm import tqdm
+import subprocess
+import time
+from datetime import datetime
+
 
 import torch
 from torch.optim import AdamW
-from torch.autograd import Variable
-from torch.nn import functional as F
 
 from relative_baseline.omg_emotion.settings import ProjectVariable as pv
 from relative_baseline.omg_emotion import setup
@@ -19,11 +19,49 @@ import relative_baseline.omg_emotion.data_loading as DL
 import relative_baseline.omg_emotion.project_paths as PP
 from relative_baseline.omg_emotion.utils import opt_mkdir, opt_makedirs
 from relative_baseline.omg_emotion.xai_tools.layer_visualization import create_next_frame, normalize
+import relative_baseline.omg_emotion.xai_tools.feature_visualization as FV
+
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
 
 from relative_baseline.omg_emotion import visualization as VZ
+
+def get_gpu_memory_map():
+    """Get the current gpu usage.
+
+    Returns
+    -------
+    usage: dict
+        Keys are device ids as integers.
+        Values are memory usage as integers in MB.
+    """
+    result = subprocess.check_output(
+        [
+            'nvidia-smi', '--query-gpu=memory.used',
+            '--format=csv,nounits,noheader'
+        ], encoding='utf-8')
+    # Convert lines into a dictionary
+    gpu_memory = [int(x) for x in result.strip().split('\n')]
+    gpu_memory_map = dict(zip(range(len(gpu_memory)), gpu_memory))
+    return gpu_memory_map
+
+
+def wait_for_gpu(wait, device_num=None, threshold=100):
+
+    if wait:
+        go = False
+        while not go:
+            gpu_available = get_gpu_memory_map()
+            if gpu_available[device_num] < threshold:
+                go = True
+            else:
+                now = datetime.now()
+                current_time = now.strftime("%H:%M:%S")
+                print('%s Waiting for gpu %d...' % (current_time, device_num))
+                time.sleep(10)
+    else:
+        return
 
 
 def init1(dataset, model):
@@ -448,14 +486,15 @@ def add_imagenet_mean_std(data):
 def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500):
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
-    proj_var.device = 2
+    proj_var.device = 0
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=3000)
     device = setup.get_device(proj_var)
     my_model.cuda(device)
 
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
     intermediary_path = os.path.join(PP.act_max, p1)
-    opt_mkdir(intermediary_path)
+    opt_makedirs(intermediary_path)
 
     if model[1] in [21, 20]: # resnet18
         conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
@@ -476,12 +515,22 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
 
         np.random.seed(seed)
         if dataset == 'jester':
-            random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, 150, 224))
+            h = 150
+            w = 224
         elif dataset == 'ucf101':
-            random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, 168, 224))
+            h = 168
+            w = 224
+        random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, h, w))
         random_img = remove_imagenet_mean_std(random_img)
         random_img = torch.Tensor(random_img)
         random_img = random_img.cuda(device)
+        
+        # HERE
+        random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0])
+        random_img = FV.rgb_to_fft(h, w, random_img)
+        # HERE
+        
+
         random_img = torch.nn.Parameter(random_img)
         random_img.requires_grad = True
 
@@ -492,7 +541,20 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
             for me in tqdm(range(steps)):
 
                 optimizer.zero_grad()
-                random_video = random_img.repeat(1, 1, 30, 1, 1)
+
+                # HERE
+                img = FV.fft_to_rgb(h, w, random_img)
+                img = FV.lucid_colorspace_to_rgb(img)
+                # stats = FV.tensor_stats(img)
+                img = torch.sigmoid(img)
+                img = FV.normalize(img)
+                img = FV.lucid_transforms(img)
+
+                img = img.unsqueeze(2)
+                # HERE
+
+                random_video = img.repeat(1, 1, 30, 1, 1)
+                # random_video = random_img.repeat(1, 1, 30, 1, 1)
 
                 my_model.eval()
                 if proj_var.model_number == 20:
@@ -510,9 +572,17 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                 optimizer.step()
                 my_model.zero_grad()
 
-                if (me+1) % 100 == 0:
-                    img = np.array(random_img.clone().data.cpu())
-                    img = img[0,:,0]
+                if (me+1) % 10 == 0:
+                    # HERE
+                    img = FV.fft_to_rgb(h, w, random_img.clone())
+                    img = FV.lucid_colorspace_to_rgb(img)
+                    img = torch.sigmoid(img)
+                    # HERE
+
+                    img = np.array(img.data.cpu())
+                    # img = img[0,:,0]
+                    img = img[0]
+
                     img = add_imagenet_mean_std(img)
                     img = normalize(img)
                     img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)
@@ -520,14 +590,6 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                     name = 'chan_%d_step_%d.jpg' % (ch+1, me)
                     path = os.path.join(p2, name)
                     img.save(path)
-
-
-
-
-
-activation_maximization_single_channels('jester', [31, 20, 8, 0])
-
-
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
@@ -540,3 +602,7 @@ activation_maximization_single_channels('jester', [31, 20, 8, 0])
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
+# activation_maximization_single_channels('jester', [31, 20, 8, 0])
+activation_maximization_single_channels('ucf101', [1001, 20, 45, 0])
+
+
