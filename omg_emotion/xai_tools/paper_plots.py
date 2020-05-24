@@ -388,6 +388,13 @@ def plot_all_srxy(dataset, model):
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3T | 36, 20, 13 | 1008, 20, 11 |
+# +---------+------------+--------------+
+# | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
+# +---------+------------+--------------+
 # TODO: fix plots
 # plot_all_srxy('jester', [31, 20, 8, 0])
 
@@ -491,8 +498,8 @@ def init_random(h, w, seed, device, mode):
         random_img = remove_imagenet_mean_std(random_img)
         random_img = torch.Tensor(random_img)
         random_img = random_img.cuda(device)
-        random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0])  # torch.Size([1, 3, 150, 224])
-        random_img = FV.rgb_to_fft(h, w, random_img)  # torch.Size([1, 3, 150, 113, 2])
+        random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0], device)  # torch.Size([1, 3, 150, 224])
+        random_img = FV.rgb_to_fft(h, w, random_img, device)  # torch.Size([1, 3, 150, 113, 2])
         random_img = torch.nn.Parameter(random_img)  # torch.Size([1, 3, 150, 113, 2])
         random_img.requires_grad = True
         return random_img
@@ -502,8 +509,8 @@ def init_random(h, w, seed, device, mode):
         random_vol = remove_imagenet_mean_std(random_vol)
         random_vol = torch.Tensor(random_vol)
         random_vol = random_vol.cuda(device)  # torch.Size([1, 3, 30, 150, 224])
-        random_vol = FV.rgb_to_lucid_colorspace(random_vol)  # torch.Size([1, 3, 30, 150, 224])
-        random_vol = FV.rgb_to_fft(h, w, random_vol)  # torch.Size([1, 3, 30, 150, 113, 2])
+        random_vol = FV.rgb_to_lucid_colorspace(random_vol, device)  # torch.Size([1, 3, 30, 150, 224])
+        random_vol = FV.rgb_to_fft(h, w, random_vol, device)  # torch.Size([1, 3, 30, 150, 113, 2])
         volume = torch.nn.ParameterList()
         for _f in range(30):
             volume.append(torch.nn.Parameter(random_vol[:, :, _f]))
@@ -513,11 +520,11 @@ def init_random(h, w, seed, device, mode):
 def preprocess(the_input, h, w, mode, device):
     
     if mode == 'image':
-        img = FV.fft_to_rgb(h, w, the_input)  # torch.Size([1, 3, 150, 224])
-        img = FV.lucid_colorspace_to_rgb(img)  # torch.Size([1, 3, 150, 224])
+        img = FV.fft_to_rgb(h, w, the_input, device)  # torch.Size([1, 3, 150, 224])
+        img = FV.lucid_colorspace_to_rgb(img, device)  # torch.Size([1, 3, 150, 224])
         img = torch.sigmoid(img)
-        img = FV.normalize(img)
-        img = FV.lucid_transforms(img)
+        img = FV.normalize(img, device)
+        img = FV.lucid_transforms(img, device)
         img = img.unsqueeze(2)  # torch.Size([1, 3, 1, 150, 224])
         random_video = img.repeat(1, 1, 30, 1, 1)  #torch.Size([1, 3, 30, 150, 224])
     elif mode == 'volume':
@@ -525,11 +532,11 @@ def preprocess(the_input, h, w, mode, device):
         random_video = random_video.cuda(device)
 
         for _f in range(30):
-            vid = FV.fft_to_rgb(h, w, the_input[_f])
-            vid = FV.lucid_colorspace_to_rgb(vid)  # torch.Size([1, 3, 150, 224])
+            vid = FV.fft_to_rgb(h, w, the_input[_f], device)
+            vid = FV.lucid_colorspace_to_rgb(vid, device)  # torch.Size([1, 3, 150, 224])
             vid = torch.sigmoid(vid)
-            vid = FV.normalize(vid)
-            vid = FV.lucid_transforms(vid)
+            vid = FV.normalize(vid, device)
+            vid = FV.lucid_transforms(vid, device)
             random_video = torch.cat((random_video, vid.unsqueeze(2)), 2)
 
 
@@ -543,10 +550,10 @@ def preprocess(the_input, h, w, mode, device):
     return random_video
 
 
-def postprocess(h, w, the_input, mode):
+def postprocess(h, w, the_input, mode, device):
     if mode == 'image':
-        img = FV.fft_to_rgb(h, w, the_input.clone())
-        img = FV.lucid_colorspace_to_rgb(img)
+        img = FV.fft_to_rgb(h, w, the_input.clone(), device)
+        img = FV.lucid_colorspace_to_rgb(img, device)
         img = torch.sigmoid(img)
         img = np.array(img.data.cpu())
         img = img[0]
@@ -556,8 +563,8 @@ def postprocess(h, w, the_input, mode):
         vid = np.zeros(shape=(3, 30, h, w))
 
         for _f in range(30):
-            v = FV.fft_to_rgb(h, w, the_input[_f].clone())  # torch.Size([1, 3, 150, 224])
-            v = FV.lucid_colorspace_to_rgb(v)
+            v = FV.fft_to_rgb(h, w, the_input[_f].clone(), device)  # torch.Size([1, 3, 150, 224])
+            v = FV.lucid_colorspace_to_rgb(v, device)
             v = torch.sigmoid(v)
             v = np.array(v.data.cpu())
             v = v[0]  # (3, 150, 224)
@@ -589,12 +596,13 @@ def save_output(output, mode, p2, ch, me):
             img.save(path)
 
 
-def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500, mode='image'):
+def activation_maximization_single_channels(dataset, model, begin=0, num_channels=1, seed=6, steps=500, mode='image', gpunum=0, layer_begin=None):
     assert mode in ['image', 'volume']
+    print('\nMODEL %s\n' % (str(model)))
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
-    proj_var.device = 0
-    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=3000)
+    proj_var.device = gpunum
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
     device = setup.get_device(proj_var)
     my_model.cuda(device)
 
@@ -608,6 +616,9 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
     else: # googlenet
         conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
 
+    if layer_begin is not None:
+        ind = conv_layers.index(layer_begin)
+        conv_layers = conv_layers[ind:]
 
     for ind in conv_layers:
         print('conv layer %d' % ind)
@@ -627,7 +638,7 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
             h = 168
             w = 224
 
-        for ch in range(end):
+        for ch in range(begin, end):
             
             the_input = init_random(h, w, seed, device, mode)
             if mode == 'image':
@@ -645,11 +656,11 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                 if proj_var.model_number == 20:
                     prediction = my_model(random_input, proj_var.device, stop_at=ind)
                 elif proj_var.model_number == 23:
-                    aux1, aux2, prediction = my_model(random_input, proj_var.device, ind, False)
+                    prediction = my_model(random_input, proj_var.device, ind, False)
                 elif proj_var.model_number == 21:
                     prediction = my_model(random_input, stop_at=ind)
                 elif proj_var.model_number == 25:
-                    aux1, aux2, prediction = my_model(random_input, ind, False)
+                    prediction = my_model(random_input, ind, False)
 
                 loss = -1 * torch.mean(prediction[0, ch])
                 # loss = -1 * torch.mean(prediction[0, ch]**2)
@@ -657,9 +668,9 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                 optimizer.step()
                 my_model.zero_grad()
 
-                liist = [0, 10, 50, 100, 200, 300, 400, 499]
+                liist = [0, 499]
                 if me in liist:
-                    output = postprocess(h, w, the_input, mode)  # (3, 30, 150, 224)
+                    output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
 
                     
@@ -676,5 +687,33 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
-activation_maximization_single_channels('jester', [31, 20, 8, 0], mode='volume')
-# activation_maximization_single_channels('jester', [1000, 21, 40, 0])
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3T | 36, 20, 13 | 1008, 20, 11 |
+# +---------+------------+--------------+
+# | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
+# +---------+------------+--------------+
+
+# RN18 3T
+# activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
+# activation_maximization_single_channels('ucf101', [1001, 20, 45, 0], begin=0, num_channels=5, mode='image', gpunum=1, layer_begin=12, seed=6)
+# GN 3T
+# activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=666)
+# activation_maximization_single_channels('ucf101', [1003, 23, 12, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=6666)
+#
+# # RN18 3D
+# activation_maximization_single_channels('jester', [26, 21, 45, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=1)
+# activation_maximization_single_channels('ucf101', [1000, 21, 40, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=11)
+# # GN 3D
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=111)
+# activation_maximization_single_channels('ucf101', [1002, 25, 54, 0], begin=0, num_channels=5, mode='volume', gpunum=0, seed=1111)
+#
+# # [[ scratch ]]
+# # RN18 3T
+# fix: run one more for this one at begin=0
+# activation_maximization_single_channels('jester', [36, 20, 13, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66666)
+# activation_maximization_single_channels('ucf101', [1008, 20, 11, 0], begin=0, num_channels=5, mode='image', gpunum=1, seed=666666, layer_begin=5)
+# # GN 3T
+# activation_maximization_single_channels('jester', [33, 23, 33, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=6666666)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=66666666)
