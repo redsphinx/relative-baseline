@@ -469,21 +469,83 @@ def visualize_all_first_layer_filters(dataset, model):
 def remove_imagenet_mean_std(data):
     data = data * 1.
     data = data / 255
-    data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
-    data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
-    data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
+    data[:, 0] = (data[:, 0] - 0.485) / 0.229
+    data[:, 1] = (data[:, 1] - 0.456) / 0.224
+    data[:, 2] = (data[:, 2] - 0.406) / 0.225
     return data
 
 
 def add_imagenet_mean_std(data):
-    data = data * 255
     data[0] = data[0] * 0.229 + 0.485
     data[1] = data[1] * 0.224 + 0.456
     data[2] = data[2] * 0.225 + 0.406
+    data = data * 255
     return data
 
 
-def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500):
+def init_random(h, w, seed, device, mode):
+    np.random.seed(seed)
+        
+    if mode == 'image':
+        random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, h, w))
+        random_img = remove_imagenet_mean_std(random_img)
+        random_img = torch.Tensor(random_img)
+        random_img = random_img.cuda(device)
+        random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0])  # torch.Size([1, 3, 150, 224])
+        random_img = FV.rgb_to_fft(h, w, random_img)  # torch.Size([1, 3, 150, 113, 2])
+        # shape = torch.Size([1, 3, 150, 113, 2])
+        random_img = torch.nn.Parameter(random_img)
+        random_img.requires_grad = True
+        return random_img
+        
+    elif mode == 'volume':
+        random_vol = np.random.randint(low=0, high=255, size=(1, 3, 30, h, w))
+        random_vol = remove_imagenet_mean_std(random_vol)
+        random_vol = torch.Tensor(random_vol)
+        random_vol = random_vol.cuda(device)  # torch.Size([1, 3, 30, 150, 224])
+        random_vol = FV.rgb_to_lucid_colorspace(random_vol)  # torch.Size([1, 3, 30, 150, 224])
+        random_vol = FV.rgb_to_fft(h, w, random_vol)  # torch.Size([1, 3, 30, 150, 113, 2])
+        volume = torch.nn.ParameterList()
+        for _f in range(30):
+            volume.append(torch.nn.Parameter(random_vol[:, :, _f]))
+        return volume
+    
+
+def preprocess(the_input, h, w, mode, device):
+    
+    if mode == 'image':
+        img = FV.fft_to_rgb(h, w, the_input)  # torch.Size([1, 3, 150, 224])
+        img = FV.lucid_colorspace_to_rgb(img)  # torch.Size([1, 3, 150, 224])
+        img = torch.sigmoid(img)
+        img = FV.normalize(img)
+        img = FV.lucid_transforms(img)
+        img = img.unsqueeze(2)  # torch.Size([1, 3, 1, 150, 224])
+        random_video = img.repeat(1, 1, 30, 1, 1)  #torch.Size([1, 3, 30, 150, 224])
+    elif mode == 'volume':
+        random_video = torch.Tensor([])
+        random_video = random_video.cuda(device)
+
+        for _f in range(30):
+            vid = FV.fft_to_rgb(h, w, the_input[_f])
+            vid = FV.lucid_colorspace_to_rgb(vid)  # torch.Size([1, 3, 150, 224])
+            vid = torch.sigmoid(vid)
+            vid = FV.normalize(vid)
+            vid = FV.lucid_transforms(vid)
+            random_video = torch.cat((random_video, vid.unsqueeze(2)), 2)
+
+
+        # vol = FV.fft_to_rgb(h, w, random_vol)  # torch.Size([1, 3, 30, 150, 224])
+        # vol = FV.lucid_colorspace_to_rgb(vol)  # torch.Size([1, 3, 30, 150, 224])
+        # vol = torch.sigmoid(vol)
+        # vol = FV.normalize(vol)
+        # vol = FV.lucid_transforms_vol(vol)
+        # random_video = vol
+
+    return random_video
+
+
+def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500, mode='image'):
+    assert mode in ['image', 'volume']
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
     proj_var.device = 0
@@ -512,59 +574,37 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
 
         p2 = os.path.join(intermediary_path, 'conv_%d' % ind)
         opt_mkdir(p2)
-
-        np.random.seed(seed)
+        
         if dataset == 'jester':
             h = 150
             w = 224
         elif dataset == 'ucf101':
             h = 168
             w = 224
-        random_img = np.random.randint(low=0, high=255, size=(1, 3, 1, h, w))
-        random_img = remove_imagenet_mean_std(random_img)
-        random_img = torch.Tensor(random_img)
-        random_img = random_img.cuda(device)
-        
-        # HERE
-        random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0])
-        random_img = FV.rgb_to_fft(h, w, random_img)
-        # HERE
-        
-
-        random_img = torch.nn.Parameter(random_img)
-        random_img.requires_grad = True
 
         for ch in range(end):
-            optimizer = AdamW([random_img], lr=0.004, weight_decay=0.1)
-
+            
+            the_input = init_random(h, w, seed, device, mode)
+            if mode == 'image':
+                optimizer = AdamW([the_input], lr=0.004, weight_decay=0.1)
+            else:
+                optimizer = AdamW(the_input, lr=0.004, weight_decay=0.1)
 
             for me in tqdm(range(steps)):
-
+                
                 optimizer.zero_grad()
-
-                # HERE
-                img = FV.fft_to_rgb(h, w, random_img)
-                img = FV.lucid_colorspace_to_rgb(img)
-                # stats = FV.tensor_stats(img)
-                img = torch.sigmoid(img)
-                img = FV.normalize(img)
-                img = FV.lucid_transforms(img)
-
-                img = img.unsqueeze(2)
-                # HERE
-
-                random_video = img.repeat(1, 1, 30, 1, 1)
-                # random_video = random_img.repeat(1, 1, 30, 1, 1)
+                
+                random_input = preprocess(the_input, h, w, mode, device)
 
                 my_model.eval()
                 if proj_var.model_number == 20:
-                    prediction = my_model(random_video, proj_var.device, stop_at=ind)
+                    prediction = my_model(random_input, proj_var.device, stop_at=ind)
                 elif proj_var.model_number == 23:
-                    aux1, aux2, prediction = my_model(random_video, proj_var.device, ind, False)
+                    aux1, aux2, prediction = my_model(random_input, proj_var.device, ind, False)
                 elif proj_var.model_number == 21:
-                    prediction = my_model(random_video, stop_at=ind)
+                    prediction = my_model(random_input, stop_at=ind)
                 elif proj_var.model_number == 25:
-                    aux1, aux2, prediction = my_model(random_video, ind, False)
+                    aux1, aux2, prediction = my_model(random_input, ind, False)
 
                 loss = -1 * torch.mean(prediction[0, ch])
                 # loss = -1 * torch.mean(prediction[0, ch]**2)
@@ -574,7 +614,7 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
 
                 if (me+1) % 10 == 0:
                     # HERE
-                    img = FV.fft_to_rgb(h, w, random_img.clone())
+                    img = FV.fft_to_rgb(h, w, random_input.clone())
                     img = FV.lucid_colorspace_to_rgb(img)
                     img = torch.sigmoid(img)
                     # HERE
@@ -589,7 +629,7 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                     img = Image.fromarray(img, mode='RGB')
                     name = 'chan_%d_step_%d.jpg' % (ch+1, me)
                     path = os.path.join(p2, name)
-                    img.save(path)
+                    # img.save(path)
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
@@ -602,7 +642,5 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
 # +---------+------------+--------------+
 # | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
 # +---------+------------+--------------+
-# activation_maximization_single_channels('jester', [31, 20, 8, 0])
-activation_maximization_single_channels('ucf101', [1001, 20, 45, 0])
-
-
+activation_maximization_single_channels('jester', [31, 20, 8, 0], mode='volume')
+# activation_maximization_single_channels('jester', [1000, 21, 40, 0])

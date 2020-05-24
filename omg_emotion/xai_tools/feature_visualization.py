@@ -11,7 +11,7 @@ def init_fft_buf(h, w, rand_sd=0.01, **kwargs):
     spectrum_t = tensor(img_buf).float().cuda()
     return spectrum_t
 
-def get_fft_scale(h, w, decay_power=.75, **kwargs):
+def get_fft_scale(h, w, decay_power=.75):
     d=.5**.5 # set center frequency scale to 1
     fy = np.fft.fftfreq(h,d=d)[:,None]
     if w % 2 == 1:
@@ -24,15 +24,32 @@ def get_fft_scale(h, w, decay_power=.75, **kwargs):
     return scale
 
 def fft_to_rgb(h, w, t, **kwargs):
-    scale = get_fft_scale(h, w, **kwargs)
-    t = scale * t
-    t = torch.irfft(t, 2, normalized=True, signal_sizes=(h,w))
+    _shape = t.shape
+    if len(_shape) == 5:
+        scale = get_fft_scale(h, w, **kwargs)
+        t = scale * t
+        t = torch.irfft(t, 2, normalized=True, signal_sizes=(h,w))
+    elif len(_shape) == 6:
+        for i in range(_shape[2]):
+            scale = get_fft_scale(h, w, **kwargs)
+            t[:, :, i] = scale * t[:, :, i]
+        t = torch.irfft(t, 3, normalized=True, signal_sizes=(30,h,w))
     return t
 
-def rgb_to_fft(h, w, t, **kwargs):
-    t = torch.rfft(t, normalized=True, signal_ndim=2)
-    scale = get_fft_scale(h, w, **kwargs)
-    t = t / scale
+def rgb_to_fft(h, w, t):
+    _shape = t.shape
+    if len(_shape) == 4:
+        t = torch.rfft(t, normalized=True, signal_ndim=2)
+        scale = get_fft_scale(h, w)
+        t = t / scale
+        
+    elif len(_shape) == 5:
+        t = torch.rfft(t, normalized=True, signal_ndim=3)  # torch.Size([1, 3, 30, 150, 113, 2])
+
+        for i in range(_shape[2]):
+            # t[:, :, i] = torch.rfft(t[:, :, i], normalized=True, signal_ndim=2)
+            scale = get_fft_scale(h, w)
+            t[:, :, i] = t[:, :, i] / scale
     return t
 
 def color_correlation_normalized():
@@ -44,16 +61,31 @@ def color_correlation_normalized():
     return color_correlation_normalized
 
 def lucid_colorspace_to_rgb(t):
-    t_flat = t.permute(0,2,3,1)
-    t_flat = torch.matmul(t_flat, color_correlation_normalized().T)
-    t = t_flat.permute(0,3,1,2)
+    _shape = t.shape
+    if len(_shape) == 4:
+        t_flat = t.permute(0,2,3,1)
+        t_flat = torch.matmul(t_flat, color_correlation_normalized().T)
+        t = t_flat.permute(0,3,1,2)
+    elif len(_shape) == 5:
+        t_flat = t.permute(0,2,3,4,1)
+        t_flat = torch.matmul(t_flat, color_correlation_normalized().T)
+        t = t_flat.permute(0,4,1,2,3)
     return t
 
 def rgb_to_lucid_colorspace(t):
-    t_flat = t.permute(0,2,3,1)
-    inverse = torch.inverse(color_correlation_normalized().T)
-    t_flat = torch.matmul(t_flat, inverse)
-    t = t_flat.permute(0,3,1,2)
+    _shape = t.shape
+
+    if len(_shape) == 4:  # n, c, h, w
+        t_flat = t.permute(0,2,3,1)  # n, h, w, c
+        inverse = torch.inverse(color_correlation_normalized().T)
+        t_flat = torch.matmul(t_flat, inverse)
+        t = t_flat.permute(0,3,1,2)  # n, c, h, w
+
+    elif len(_shape) == 5:  # n, c, d, h, w
+        t_flat = t.permute(0,2,3,4,1)  # n, d, h, w, c
+        inverse = torch.inverse(color_correlation_normalized().T)
+        t_flat = torch.matmul(t_flat, inverse)
+        t = t_flat.permute(0,4,1,2,3)  # n, c, d, h, w
     return t
 
 def imagenet_mean_std():
@@ -66,7 +98,11 @@ def denormalize(x):
 
 def normalize(x):
     mean, std = imagenet_mean_std()
-    return (x-mean[...,None,None]) / std[...,None,None]
+    _shape = x.shape
+    if len(_shape) == 4:
+        return (x-mean[...,None,None]) / std[...,None,None]
+    elif len(_shape) == 5:
+        return (x-mean[...,None,None,None]) / std[...,None,None,None]
 
 def image_buf_to_rgb(h, w, img_buf, **kwargs):
     img = img_buf.detach()
@@ -87,13 +123,27 @@ def show_rgb(img, label=None, ax=None, dpi=25, **kwargs):
 
 def gpu_affine_grid(size):
     size = ((1,)+size)
-    N, C, H, W = size
-    grid = torch.FloatTensor(N, H, W, 2).cuda()
-    linear_points = torch.linspace(-1, 1, W) if W > 1 else tensor([-1.])
-    grid[:, :, :, 0] = torch.ger(torch.ones(H), linear_points).expand_as(grid[:, :, :, 0])
-    linear_points = torch.linspace(-1, 1, H) if H > 1 else tensor([-1.])
-    grid[:, :, :, 1] = torch.ger(linear_points, torch.ones(W)).expand_as(grid[:, :, :, 1])
-    return vision.FlowField(size[2:], grid)
+
+    if len(size) == 4:
+        N, C, H, W = size
+        grid = torch.FloatTensor(N, H, W, 2).cuda()
+        linear_points = torch.linspace(-1, 1, W) if W > 1 else tensor([-1.])
+        grid[:, :, :, 0] = torch.ger(torch.ones(H), linear_points).expand_as(grid[:, :, :, 0])
+
+        linear_points = torch.linspace(-1, 1, H) if H > 1 else tensor([-1.])
+        grid[:, :, :, 1] = torch.ger(linear_points, torch.ones(W)).expand_as(grid[:, :, :, 1])
+        return vision.FlowField(size[2:], grid)
+    elif len(size) == 5:
+        N, C, D, H, W = size
+        grid = torch.FloatTensor(N, D, H, W, 2).cuda()
+
+        linear_points = torch.linspace(-1, 1, W) if W > 1 else tensor([-1.])
+        grid[:, :, :, :, 0] = torch.ger(torch.ones(H), linear_points).expand_as(grid[:, :, :, :, 0])
+
+        linear_points = torch.linspace(-1, 1, H) if H > 1 else tensor([-1.])
+        grid[:, :, :, :, 1] = torch.ger(linear_points, torch.ones(W)).expand_as(grid[:, :, :, :, 1])
+
+        return vision.FlowField(size[2:], grid)
 
 def lucid_transforms(img, jitter=None, scale=.5, degrees=45, **kwargs):
     h,w = img.shape[-2], img.shape[-1]
@@ -128,6 +178,43 @@ def lucid_transforms(img, jitter=None, scale=.5, degrees=45, **kwargs):
     vision.transform.crop_pad()(fastai_image, (h,w), row_pct=np.random.rand(), col_pct=np.random.rand())
 
     return fastai_image.data[None,:]
+
+
+# def lucid_transforms_vol(vol, jitter=None, scale=.5, degrees=45, **kwargs):
+#
+#     d,h,w = vol.shape[-3], vol.shape[-2], vol.shape[-1]
+#     if jitter is None:
+#         jitter = min(d,h,w)//2
+#     fastai_vol = vision.Image(vol.squeeze())
+#
+#     # pad
+#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)  # (30, 150, 224)
+#     vision.transform.pad()(fastai_vol, jitter)
+#
+#     # jitter
+#     first_jitter = int((jitter*(2/3)))
+#     vision.transform.crop_pad()(fastai_vol,
+#                                 (h+first_jitter,w+first_jitter),
+#                                 row_pct=np.random.rand(), col_pct=np.random.rand())
+#
+#     # scale
+#     percent = scale * 100 # scale up to integer to avoid float repr errors
+#     scale_factors = [(100 - percent + percent/5. * i)/100 for i in range(11)]
+#     rand_scale = scale_factors[int(np.random.rand()*len(scale_factors))]
+#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)
+#     vision.transform.zoom()(fastai_vol, rand_scale)
+#
+#     # rotate
+#     rotate_factors = list(range(-degrees, degrees+1)) + degrees//2 * [0]
+#     rand_rotate = rotate_factors[int(np.random.rand()*len(rotate_factors))]
+#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)
+#     vision.transform.rotate()(fastai_vol, rand_rotate)
+#
+#     # jitter
+#     vision.transform.crop_pad()(fastai_vol, (h,w), row_pct=np.random.rand(), col_pct=np.random.rand())
+#
+#     return fastai_vol.data[None,:]
+
 
 def tensor_stats(t, label=""):
     if len(label) > 0: label += " "
