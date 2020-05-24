@@ -493,8 +493,7 @@ def init_random(h, w, seed, device, mode):
         random_img = random_img.cuda(device)
         random_img = FV.rgb_to_lucid_colorspace(random_img[:,:,0])  # torch.Size([1, 3, 150, 224])
         random_img = FV.rgb_to_fft(h, w, random_img)  # torch.Size([1, 3, 150, 113, 2])
-        # shape = torch.Size([1, 3, 150, 113, 2])
-        random_img = torch.nn.Parameter(random_img)
+        random_img = torch.nn.Parameter(random_img)  # torch.Size([1, 3, 150, 113, 2])
         random_img.requires_grad = True
         return random_img
         
@@ -542,6 +541,52 @@ def preprocess(the_input, h, w, mode, device):
         # random_video = vol
 
     return random_video
+
+
+def postprocess(h, w, the_input, mode):
+    if mode == 'image':
+        img = FV.fft_to_rgb(h, w, the_input.clone())
+        img = FV.lucid_colorspace_to_rgb(img)
+        img = torch.sigmoid(img)
+        img = np.array(img.data.cpu())
+        img = img[0]
+        return img
+    elif mode == 'volume':
+        _shape = the_input[0].shape  # 1, 3, 150, 224
+        vid = np.zeros(shape=(3, 30, h, w))
+
+        for _f in range(30):
+            v = FV.fft_to_rgb(h, w, the_input[_f].clone())  # torch.Size([1, 3, 150, 224])
+            v = FV.lucid_colorspace_to_rgb(v)
+            v = torch.sigmoid(v)
+            v = np.array(v.data.cpu())
+            v = v[0]  # (3, 150, 224)
+            vid[:, _f] = v
+
+        return vid
+
+
+def save_output(output, mode, p2, ch, me):
+    if mode == 'image':
+        img = add_imagenet_mean_std(output)
+        img = normalize(img)
+        img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)
+        img = Image.fromarray(img, mode='RGB')
+        name = 'chan_%d_step_%d.jpg' % (ch+1, me)
+        path = os.path.join(p2, name)
+        img.save(path)
+
+    elif mode == 'volume':
+        p3 = os.path.join(p2, 'frames_chan_%d_step_%d' % (ch+1, me))
+        opt_mkdir(p3)
+        for _f in range(30):
+            img = add_imagenet_mean_std(output[:, _f])
+            img = normalize(img)
+            img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)  # (150, 224, 3)
+            img = Image.fromarray(img, mode='RGB')
+            name = 'frame_%d.jpg' % (_f)
+            path = os.path.join(p3, name)
+            img.save(path)
 
 
 def activation_maximization_single_channels(dataset, model, num_channels=1, seed=6, steps=500, mode='image'):
@@ -612,24 +657,13 @@ def activation_maximization_single_channels(dataset, model, num_channels=1, seed
                 optimizer.step()
                 my_model.zero_grad()
 
-                if (me+1) % 10 == 0:
-                    # HERE
-                    img = FV.fft_to_rgb(h, w, random_input.clone())
-                    img = FV.lucid_colorspace_to_rgb(img)
-                    img = torch.sigmoid(img)
-                    # HERE
+                liist = [0, 10, 50, 100, 200, 300, 400, 499]
+                if me in liist:
+                    output = postprocess(h, w, the_input, mode)  # (3, 30, 150, 224)
+                    save_output(output, mode, p2, ch, me)
 
-                    img = np.array(img.data.cpu())
-                    # img = img[0,:,0]
-                    img = img[0]
+                    
 
-                    img = add_imagenet_mean_std(img)
-                    img = normalize(img)
-                    img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)
-                    img = Image.fromarray(img, mode='RGB')
-                    name = 'chan_%d_step_%d.jpg' % (ch+1, me)
-                    path = os.path.join(p2, name)
-                    # img.save(path)
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
