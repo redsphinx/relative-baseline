@@ -73,7 +73,7 @@ def init1(dataset, model):
     proj_var.use_dali = True
     proj_var.batch_size_val_test = 1
     proj_var.dali_workers = 32
-    proj_var.device = 1
+    proj_var.device = 0
     proj_var.load_num_frames = 30
     if dataset == 'jester':
         proj_var.label_size = 27
@@ -158,13 +158,17 @@ def get_max_activation(model, model_number, data, device):
     return model_max
 
 
-def find_best_videos(dataset, model):
+def find_best_videos(dataset, model, device):
+    print('\n running function find_best_videos for %s\n' % (str(model)))
+
     proj_var = init1(dataset, model)
+    proj_var.device = device
     # model num 21, 20, 25, 23
     # dataset jester, ucf101
 
     my_model = setup.get_model(proj_var)
     device = setup.get_device(proj_var)
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
     my_model.cuda(device)
 
     if dataset == 'jester':
@@ -213,7 +217,7 @@ def find_best_videos(dataset, model):
     wrong_pred = sort_dict(wrong_pred)
 
     if dataset == 'jester':
-        names = os.path.join(PP.jester_location, 'filelist_test_xai.txt')
+        names = os.path.join(PP.jester_location, 'filelist_test_xai_150_224.txt')
     elif dataset == 'ucf101':
         names = PP.ucf101_168_224_xai
     else:
@@ -240,20 +244,33 @@ def find_best_videos(dataset, model):
             my_file.write(line)
 
 
-# find_best_videos('jester', [31, 20, 8, 0])
-# find_best_videos('ucf101', [1001, 20, 45, 0])
-# find_best_videos('jester', [26, 21, 45, 0])
-# find_best_videos('ucf101', [1000, 21, 40, 0])
-# find_best_videos('jester', [28, 25, 25, 0])
-# find_best_videos('ucf101', [1002, 25, 54, 0])
-# find_best_videos('jester', [30, 23, 28, 0])
-# find_best_videos('ucf101', [1003, 23, 12, 0])
+# find_best_videos('jester', [31, 20, 8, 0], device=0)
+# find_best_videos('ucf101', [1001, 20, 45, 0], device=0)
+# find_best_videos('jester', [26, 21, 45, 0], device=0)
+# find_best_videos('ucf101', [1000, 21, 40, 0], device=0)
+# find_best_videos('jester', [28, 25, 25, 0], device=0)
+# find_best_videos('ucf101', [1002, 25, 54, 0], device=1)
+# find_best_videos('jester', [30, 23, 28, 0], device=1)
+# find_best_videos('ucf101', [1003, 23, 12, 0], device=0)
+
+# find_best_videos('jester', [36, 20, 13, 0], device=0)
+# find_best_videos('ucf101', [1008, 20, 11, 0], device=0)
+# find_best_videos('jester', [33, 23, 33, 0], device=1)
+# find_best_videos('ucf101', [1005, 23, 28, 0], device=1)
+
 
 def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     x_axis = np.arange(len(scales)+1)
-    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3)
+    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(8, 3))
     # plt.setp(ax3, adjustable='box', aspect='equal')
 
+    fontsize_label = 8
+    fontsize_title = 10
+    fontsize_suptitle = 12
+    fontsize_ticks = 6
+    fontsize_anno = 9
+    markersize = 3
+    linewidth = 1
 
     if dataset == 'jester':
         h, w = 150, 224
@@ -271,39 +288,52 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
         new_xs.append(xs[i]*w + new_xs[-1])
         new_ys.append(ys[i]*h + new_ys[-1])
 
-    # FIX: yticks and xticks
-    # FIX: labelsize
-    # FIX: spacing
-    # FIX: overall fig shape
-    ax1.plot(x_axis, new_scales, 'o-', linewidth=1, markersize=5)
-    ax1.set_ylabel('size ratio')
-    ax1.set_xlabel('time')
-    ax1.set_title('cumulative scale')
-    # ax1.set_aspect('equal', 'box')
+    ax1.plot(x_axis, new_scales, 'o-', linewidth=linewidth, markersize=markersize)
+    # ax1.axis('square')
+    ax1.set_ylabel('size ratio', fontsize=fontsize_label)
+    plt.ylim(min(new_scales), max(new_scales))
+    # ax1.set_ylim([min(new_scales), max(new_scales)])
+    ax1.set_xlabel('time', fontsize=fontsize_label)
+    ax1.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
+    ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
+    # ax.tick_params(axis='both', which='minor', labelsize=8)
+    ax1.set_title('cumulative scale', fontsize=fontsize_title)
+    # ax1.set_aspect('equal')
     # ax1.set(adjustable='box')
     ax1.grid(True)
-    ax1.axis('square')
 
-    ax2.plot(x_axis, new_rotations, 'o-', linewidth=1, markersize=5)
-    ax2.set_ylabel('degrees')
-    ax2.set_xlabel('time')
-    ax2.set_title('cumulative rotation')
+    # xticks(np.arange(5), ('Tom', 'Dick', 'Harry', 'Sally', 'Sue'))
+
+    ax2.plot(x_axis, new_rotations, 'o-', linewidth=linewidth, markersize=markersize)
+    # ax2.axis('square')
+    ax2.set_ylabel('degrees', fontsize=fontsize_label)
+    plt.ylim(min(new_rotations), max(new_rotations))
+    # ax2.set_ylim([min(new_rotations), max(new_rotations)])
+    ax2.set_xlabel('time', fontsize=fontsize_label)
+    ax2.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
+    ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
+    ax2.set_title('cumulative rotation', fontsize=fontsize_title)
     # ax2.set_aspect('equal', 'box')
     # ax2.set(adjustable='box')
     ax2.grid(True)
-    ax2.axis('square')
 
     txt = ['t'+str(i) for i in range(len(new_scales))]
-    ax3.plot(new_xs, new_ys, 'o-', linewidth=1, markersize=5)
-    ax3.set_title('X and Y location in pixels')
-    ax3.set_ylabel('y')
-    ax3.set_xlabel('x')
+    ax3.plot(new_xs, new_ys, 'o-', linewidth=linewidth, markersize=markersize)
+    ax3.set_title('X and Y location in pixels', fontsize=fontsize_title)
+    ax3.set_ylabel('y', fontsize=fontsize_label)
+    ax3.set_xlabel('x', fontsize=fontsize_label)
+    eps_x = (max(new_xs) - min(new_xs)) / 10
+    eps_y = (max(new_ys) - min(new_ys)) / 10
+    plt.xlim(min(new_xs)-eps_x, max(new_xs)+eps_x)
+    plt.ylim(min(new_ys)-eps_y, max(new_ys)+eps_y)
+
+    ax3.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # ax3.set_aspect('equal', 'box')
     # ax3.set(adjustable='box')
     ax3.grid(True)
     ax3.axis('square')
     for i, j in enumerate(txt):
-        ax3.annotate(j, (new_xs[i], new_ys[i]))
+        ax3.annotate(j, xy=(new_xs[i], new_ys[i]), xytext=(new_xs[i], new_ys[i]), fontsize=fontsize_anno)
 
     if model[1] == 21:
         m = '3D-ResNet18'
@@ -314,16 +344,16 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     elif model[1] == 23:
         m = '3T-GoogLeNet'
 
-    fig.suptitle('%s on %s, layer %d channel %d' % (m, dataset, conv, ch + 1))
+    # fig.suptitle('%s on %s, layer %d channel %d\n' % (m, dataset, conv, ch + 1), fontsize=fontsize_suptitle)
 
-    # fig.tight_layout()
+    fig.tight_layout()
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
     p2 = 'layer_%d_channel_%d.jpg' % (conv, ch+1)
     save_location = os.path.join(PP.srxy_plots, p1, p2)
 
     intermediary_path = os.path.join(PP.srxy_plots, p1)
-    opt_mkdir(intermediary_path)
+    opt_makedirs(intermediary_path)
 
     plt.savefig(save_location)
 
@@ -395,10 +425,13 @@ def plot_all_srxy(dataset, model):
 # +---------+------------+--------------+
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
-# TODO: fix plots
-# plot_all_srxy('jester', [31, 20, 8, 0])
+plot_all_srxy('jester', [31, 20, 8, 0])
+
+
+
 
 def visualize_all_first_layer_filters(dataset, model):
+    print('\nrunning function: visualize_all_first_layer_filters for model %s\n' % (str(model)))
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
     proj_var.device = None
@@ -406,7 +439,7 @@ def visualize_all_first_layer_filters(dataset, model):
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
     intermediary_path = os.path.join(PP.filters_conv1, p1)
-    opt_mkdir(intermediary_path)
+    opt_makedirs(intermediary_path)
 
     num_channels = getattr(my_model, 'conv1')
     num_channels = num_channels.weight.shape[0]
@@ -471,6 +504,11 @@ def visualize_all_first_layer_filters(dataset, model):
 # visualize_all_first_layer_filters('ucf101', [1002, 25, 54, 0])
 # visualize_all_first_layer_filters('jester', [30, 23, 28, 0])
 # visualize_all_first_layer_filters('ucf101', [1003, 23, 12, 0])
+
+# visualize_all_first_layer_filters('jester', [36, 20, 13, 0])
+# visualize_all_first_layer_filters('ucf101', [1008, 20, 11, 0])
+# visualize_all_first_layer_filters('jester', [33, 23, 33, 0])
+# visualize_all_first_layer_filters('ucf101', [1005, 23, 28, 0])
 
 
 def remove_imagenet_mean_std(data):
@@ -538,14 +576,6 @@ def preprocess(the_input, h, w, mode, device):
             vid = FV.normalize(vid, device)
             vid = FV.lucid_transforms(vid, device)
             random_video = torch.cat((random_video, vid.unsqueeze(2)), 2)
-
-
-        # vol = FV.fft_to_rgb(h, w, random_vol)  # torch.Size([1, 3, 30, 150, 224])
-        # vol = FV.lucid_colorspace_to_rgb(vol)  # torch.Size([1, 3, 30, 150, 224])
-        # vol = torch.sigmoid(vol)
-        # vol = FV.normalize(vol)
-        # vol = FV.lucid_transforms_vol(vol)
-        # random_video = vol
 
     return random_video
 
@@ -696,24 +726,118 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # +---------+------------+--------------+
 
 # RN18 3T
-# activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
-# activation_maximization_single_channels('ucf101', [1001, 20, 45, 0], begin=0, num_channels=5, mode='image', gpunum=1, layer_begin=12, seed=6)
+# DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
+# DONE activation_maximization_single_channels('ucf101', [1001, 20, 45, 0], begin=0, num_channels=5, mode='image', gpunum=1, layer_begin=12, seed=6)
 # GN 3T
-# activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=666)
-# activation_maximization_single_channels('ucf101', [1003, 23, 12, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=6666)
+# DONE activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=3, num_channels=5, mode='image', gpunum=0, seed=666, layer_begin=58)
+# DONE activation_maximization_single_channels('ucf101', [1003, 23, 12, 0], begin=2, num_channels=5, mode='image', gpunum=0, seed=6666, layer_begin=58)
 #
 # # RN18 3D
-# activation_maximization_single_channels('jester', [26, 21, 45, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=1)
-# activation_maximization_single_channels('ucf101', [1000, 21, 40, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=11)
+# DONE activation_maximization_single_channels('jester', [26, 21, 45, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=1)
+# DONE activation_maximization_single_channels('ucf101', [1000, 21, 40, 0], begin=1, num_channels=5, mode='volume', gpunum=0, seed=11, layer_begin=20)
 # # GN 3D
-# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=111)
-# activation_maximization_single_channels('ucf101', [1002, 25, 54, 0], begin=0, num_channels=5, mode='volume', gpunum=0, seed=1111)
+# DONE activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=111, layer_begin=50)
+# DONE activation_maximization_single_channels('ucf101', [1002, 25, 54, 0], begin=0, num_channels=5, mode='volume', gpunum=1, seed=1111, layer_begin=26)
 #
 # # [[ scratch ]]
 # # RN18 3T
-# fix: run one more for this one at begin=0
-# activation_maximization_single_channels('jester', [36, 20, 13, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66666)
-# activation_maximization_single_channels('ucf101', [1008, 20, 11, 0], begin=0, num_channels=5, mode='image', gpunum=1, seed=666666, layer_begin=5)
+# DONE activation_maximization_single_channels('jester', [36, 20, 13, 0], begin=0, num_channels=1, mode='image', gpunum=0, seed=66666)
+# DONE activation_maximization_single_channels('ucf101', [1008, 20, 11, 0], begin=0, num_channels=5, mode='image', gpunum=1, seed=666666, layer_begin=5)
 # # GN 3T
-# activation_maximization_single_channels('jester', [33, 23, 33, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=6666666)
-# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=0, num_channels=5, mode='image', gpunum=0, seed=66666666)
+# DONE activation_maximization_single_channels('jester', [33, 23, 33, 0], begin=2, num_channels=5, mode='image', gpunum=1, seed=6666666, layer_begin=58)
+# DONE activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=2, num_channels=5, mode='image', gpunum=0, seed=66666666, layer_begin=58)
+
+
+def combine_results(list_videos, dataset):
+        vid_sets = []
+        list_vid_dicts = []
+        list_videos.sort()
+        for _vid in list_videos:
+            path = os.path.join(PP.xai_metadata, _vid)
+            vids = np.genfromtxt(path, dtype=str, delimiter=' ')
+            vid_dict = {vids[i, 0]: i for i in range(len(vids))}
+            list_vid_dicts.append(vid_dict)
+            vids = vids[:, 0]
+            vids = set(vids)
+            vid_sets.append(vids)
+
+        present_in_all_sets = vid_sets[0]
+        for i in range(1, len(vid_sets)):
+            present_in_all_sets = present_in_all_sets.intersection(vid_sets[i])
+
+        print('number of videos present in all lists: %d' % len(present_in_all_sets))
+
+        if len(present_in_all_sets) == 0:
+            print("don't know what to do now...")
+        else:
+            if dataset == 'jester':
+                labels_path = os.path.join(PP.jester_location, 'filelist_test_xai_150_224.txt')
+                labels = np.genfromtxt(labels_path, dtype=str, delimiter=' ')
+                labels_dict = {labels[i, 0]: labels[i, 1] for i in range(len(labels))}
+
+                vid_score = {}
+                score = np.zeros(len(present_in_all_sets))
+
+                # map video to score
+                for i, _vid in enumerate(present_in_all_sets):
+                    for ind in range(len(list_vid_dicts)):
+                        score[i] = score[i] + list_vid_dicts[ind][_vid]
+
+                    vid_score[_vid] = score[i]
+
+                # sort on lowest score -> lower the sore, the higher on the list
+                vid_score = {k: v for k, v in sorted(vid_score.items(), reverse=False, key=lambda item: item[1])}
+
+                # create ordered mapping from video to scores and labels
+                vid_score_class = {k: (vid_score[k], labels_dict[k]) for k in vid_score.keys()}
+
+                return vid_score_class
+
+
+def find_top_xai_videos(dataset, prediction_type):
+    video_files = os.listdir(PP.xai_metadata)
+
+    which_file = 'high_act_vids-%s_pred-%s' % (prediction_type, dataset)
+
+    chosen_files = [i for i in video_files if which_file in i]
+
+    top_videos = combine_results(chosen_files, dataset)
+
+    return top_videos
+
+
+def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, layer_begin=None, gpunum=0):
+    assert mode in ['image', 'volume']
+    assert prediction_type in ['correct', 'wrong']
+
+    print('\nrunning function save_gradients for MODEL %s\n' % (str(model)))
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = gpunum
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
+    device = setup.get_device(proj_var)
+    my_model.cuda(device)
+
+    # top_videos = find_top_xai_videos(dataset, prediction_type)
+    get_features_from_layer = []
+    if model[2] in [26, 31, 36, 100, 1001, 1008]: # resnet18
+        get_features_from_layer = [7, 12, 17]
+    else:  # googlenet
+        get_features_from_layer = [12, 31, 50]
+
+
+
+    '''
+    
+    get the video that activates most
+    for the chosen layers pass through conv
+    find the unit with highest activation
+    project back from that unit
+    
+    '''
+
+
+    print('asdf')
+
+
+# save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct')
