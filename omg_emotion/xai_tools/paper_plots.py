@@ -850,6 +850,19 @@ def grad_x_frame(frame_gradient, most_notable_frame, og_datapoint):
     frame_gradient = np.array(frame_gradient)
     frame_gradient = normalize(frame_gradient, z=1.) * 3
     final = frame_gradient * og_datapoint[:, most_notable_frame]
+    # hard light blending mode from GIMP: https://docs.gimp.org/en/gimp-concepts-layer-modes.html
+    # M = frame_gradient, I = og_datapoint
+    def E1(M, I):
+        return 254 - ((254 - 2 * (M - 128)) * (254-I)) / 255
+
+    def E2(M, I):
+        return (2 * M * I) / 255
+
+    for i in range(3):
+        final[i] = np.where(final[i] > 128,
+                            E1(final[i], og_datapoint[i, most_notable_frame]),
+                            E2(final[i], og_datapoint[i, most_notable_frame]))
+
     return final
 
 
@@ -886,11 +899,16 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
             p2 = os.path.join(intermediary_path, 'vid_%d' % _i, 'conv_%d' % ind)
             opt_makedirs(p2)
-            
             datapoint_1 = data[vid].copy()
             og_datapoint = data[vid].copy()
-            # og_datapoint = torch.Tensor(og_datapoint).cuda(device)
-            
+
+            if mode == 'volume':
+                vid_path = os.path.join(intermediary_path, 'vid_%d' % _i, 'video')
+                opt_mkdir(vid_path)
+                for _f in range(30):
+                    path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
+                    save_image(og_datapoint[:, _f], path)
+
             channels = []
             
             for ch in range(begin, num_channels):
@@ -982,8 +1000,8 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                         path = os.path.join(p3, 'grad_x_frame_%d.jpg' % _f)
                         save_image(final, path)
 
-                        path = os.path.join(p3, 'og_frame_%d.jpg' % _f)
-                        save_image(og_datapoint[:, _f], path)
+                        # path = os.path.join(p3, 'og_frame_%d.jpg' % _f)
+                        # save_image(og_datapoint[:, _f], path)
 
                 my_model.zero_grad()
     print('THE END')
@@ -992,7 +1010,7 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 # save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
 # save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
 #
-# save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
-# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
+# save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
+# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
 
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
