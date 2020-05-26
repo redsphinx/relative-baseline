@@ -1,6 +1,7 @@
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 import os
 import numpy as np
 from PIL import Image
@@ -263,16 +264,18 @@ def find_best_videos(dataset, model, device):
 
 def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     x_axis = np.arange(len(scales)+1)
-    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(8, 3))
+    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(9, 3))
     # plt.setp(ax3, adjustable='box', aspect='equal')
+    gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])
 
-    fontsize_label = 8
-    fontsize_title = 10
+    fontsize_label = 9
+    fontsize_title = 11
     fontsize_suptitle = 12
-    fontsize_ticks = 6
-    fontsize_anno = 9
-    markersize = 3
-    linewidth = 1
+    fontsize_ticks = 7
+    fontsize_anno = 10
+    markersize = 4
+    linewidth = 1.1
+    linecolor = 'b'
 
     if dataset == 'jester':
         h, w = 150, 224
@@ -290,13 +293,17 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
         new_xs.append(xs[i]*w + new_xs[-1])
         new_ys.append(ys[i]*h + new_ys[-1])
 
-    ax1.plot(x_axis, new_scales, 'o-', linewidth=linewidth, markersize=markersize)
+    ax1 = plt.subplot(gs[0])
+    ax1.plot(x_axis, new_scales, 'o-', linewidth=linewidth, markersize=markersize, color=linecolor)
     # ax1.axis('square')
     ax1.set_ylabel('size ratio', fontsize=fontsize_label)
-    plt.ylim(min(new_scales), max(new_scales))
+    eps = (max(new_scales) - min(new_scales)) / 10
+    plt.ylim(min(new_scales)-eps, max(new_scales)+eps)
     # ax1.set_ylim([min(new_scales), max(new_scales)])
     ax1.set_xlabel('time', fontsize=fontsize_label)
-    ax1.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
+    ax1.xaxis.set_ticks(x_axis)
+    # ax1.yaxis.set_ticks()
+    # ax1.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
     ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # ax.tick_params(axis='both', which='minor', labelsize=8)
     ax1.set_title('cumulative scale', fontsize=fontsize_title)
@@ -304,38 +311,48 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax1.set(adjustable='box')
     ax1.grid(True)
 
-    # xticks(np.arange(5), ('Tom', 'Dick', 'Harry', 'Sally', 'Sue'))
 
-    ax2.plot(x_axis, new_rotations, 'o-', linewidth=linewidth, markersize=markersize)
+    ax2 = plt.subplot(gs[1])
+    ax2.plot(x_axis, new_rotations, 'o-', linewidth=linewidth, markersize=markersize, color=linecolor)
     # ax2.axis('square')
     ax2.set_ylabel('degrees', fontsize=fontsize_label)
-    plt.ylim(min(new_rotations), max(new_rotations))
+    eps = (max(new_rotations) - min(new_rotations)) / 10
+    plt.ylim(min(new_rotations)-eps, max(new_rotations)+eps)
     # ax2.set_ylim([min(new_rotations), max(new_rotations)])
     ax2.set_xlabel('time', fontsize=fontsize_label)
-    ax2.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
+    # ax2.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
+    ax2.xaxis.set_ticks(x_axis)
     ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     ax2.set_title('cumulative rotation', fontsize=fontsize_title)
     # ax2.set_aspect('equal', 'box')
     # ax2.set(adjustable='box')
     ax2.grid(True)
 
-    txt = ['t'+str(i) for i in range(len(new_scales))]
-    ax3.plot(new_xs, new_ys, 'o-', linewidth=linewidth, markersize=markersize)
-    ax3.set_title('X and Y location in pixels', fontsize=fontsize_title)
+    # txt = ['t'+str(i) for i in range(len(new_scales))]
+    txt = [str(i) for i in range(len(new_scales))]
+    ax3 = plt.subplot(gs[2])
+    ax3.plot(new_xs, new_ys, 'o-', linewidth=linewidth, markersize=markersize, color=linecolor)
+    ax3.set_title('x and y location in pixels', fontsize=fontsize_title)
     ax3.set_ylabel('y', fontsize=fontsize_label)
     ax3.set_xlabel('x', fontsize=fontsize_label)
-    eps_x = (max(new_xs) - min(new_xs)) / 10
-    eps_y = (max(new_ys) - min(new_ys)) / 10
-    plt.xlim(min(new_xs)-eps_x, max(new_xs)+eps_x)
-    plt.ylim(min(new_ys)-eps_y, max(new_ys)+eps_y)
+    # eps_x = (max(new_xs) - min(new_xs)) / 10
+    # eps_y = (max(new_ys) - min(new_ys)) / 10
+    # plt.xlim(min(new_xs)-eps_x, max(new_xs)+eps_x)
+    # plt.ylim(min(new_ys)-eps_y, max(new_ys)+eps_y)
 
     ax3.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # ax3.set_aspect('equal', 'box')
     # ax3.set(adjustable='box')
     ax3.grid(True)
-    ax3.axis('square')
+    # ax3.axis('square')
+    eps = 0
     for i, j in enumerate(txt):
-        ax3.annotate(j, xy=(new_xs[i], new_ys[i]), xytext=(new_xs[i], new_ys[i]), fontsize=fontsize_anno)
+        ax3.annotate(j, xy=(new_xs[i]-eps, new_ys[i]-eps), xytext=(new_xs[i], new_ys[i]), fontsize=fontsize_anno,
+                     horizontalalignment='left', verticalalignment='bottom')
+
+    # ax3.quiver(new_xs[:-1], new_ys[:-1], np.array(new_xs[1:])-np.array(new_xs[:-1]),
+    #            np.array(new_ys[1:])-np.array(new_ys[:-1]), scale_units='xy', angles='xy', scale=2,
+    #            headwidth=8, headlength=7, color='b', linestyle='None')
 
     if model[1] == 21:
         m = '3D-ResNet18'
@@ -349,6 +366,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # fig.suptitle('%s on %s, layer %d channel %d\n' % (m, dataset, conv, ch + 1), fontsize=fontsize_suptitle)
 
     fig.tight_layout()
+    # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=True)
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
     p2 = 'layer_%d_channel_%d.jpg' % (conv, ch+1)
@@ -360,22 +378,31 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     plt.savefig(save_location)
 
 
-def plot_all_srxy(dataset, model):
+def plot_all_srxy(dataset, model, convlayer=None, channel=None):
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
     # device = setup.get_device(proj_var)
     # my_model.cuda(device)
 
-    if model[1] in [21, 20]: # resnet18
-        conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
-    else: # googlenet
-        conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+    if convlayer is None:
+        if model[1] in [21, 20]: # resnet18
+            conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+        else: # googlenet
+            conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+    else:
+        conv_layers = [convlayer]
 
     for ind in tqdm(conv_layers):
-        end = getattr(my_model, 'conv%d' % ind)
-        end = end.weight.shape[0]
 
-        for ch in range(0, end):
+        if channel is None:
+            start = 0
+            end = getattr(my_model, 'conv%d' % ind)
+            end = end.weight.shape[0]
+        else:
+            start = channel
+            end = start + 1
+
+        for ch in range(start, end):
             _conv_name = 'conv%d' % ind
             transformations = getattr(getattr(my_model, _conv_name), 'scale')
             num_transformations = transformations.shape[0]
@@ -428,6 +455,119 @@ def plot_all_srxy(dataset, model):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 # plot_all_srxy('jester', [31, 20, 8, 0])
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=0)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=1, channel=2)
+
+
+def make_distribution_plots(scales, rotations, xs, ys, layer=None):
+    pass
+
+
+def distribution_plots(dataset, model, mode='model', convlayer=None):
+    assert mode in ['model', 'layer']
+
+    print('\nRunning function: distribution_plots for model %s\n' % (str(model)))
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = None
+    device = setup.get_device(proj_var)
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    intermediary_path = os.path.join(PP.distributions, p1)
+    opt_makedirs(intermediary_path)
+
+    if mode == 'model':
+        if model[1] in [21, 20]: # resnet18
+            conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+        else: # googlenet
+            conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+
+        scales = []
+        rotations = []
+        xs = []
+        ys = []
+
+        for ind in tqdm(conv_layers):
+            start = 0
+            end = getattr(my_model, 'conv%d' % ind)
+            end = end.weight.shape[0]
+
+            for ch in range(start, end):
+                _conv_name = 'conv%d' % ind
+                transformations = getattr(getattr(my_model, _conv_name), 'scale')
+                num_transformations = transformations.shape[0]
+                transformations = getattr(my_model, _conv_name)
+
+                for trafo in range(num_transformations):
+                    s = getattr(transformations, 'scale')[trafo, ch]
+                    r = getattr(transformations, 'rotate')[trafo, ch]
+                    x = getattr(transformations, 'translate_x')[trafo, ch]
+                    y = getattr(transformations, 'translate_y')[trafo, ch]
+
+                    # translate parameters to interpretable things
+                    # scale -> 1/s
+                    # rotation -> degrees counterclockwise
+                    # x, y -> half of size image
+
+                    s = 1 / float(s)
+                    r = -1 * float(r)
+                    x = -0.5 * float(x)
+                    y = 0.5 * float(y)
+
+                    scales.append(s)
+                    rotations.append(r)
+                    xs.append(x)
+                    ys.append(y)
+
+        make_distribution_plots(scales, rotations, xs, ys)
+
+    elif mode == 'layer':
+        assert convlayer is not None
+        if model[1] in [21, 20]: # resnet18
+            conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+        else: # googlenet
+            conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+
+
+
+        for ind in tqdm(conv_layers):
+            start = 0
+            end = getattr(my_model, 'conv%d' % ind)
+            end = end.weight.shape[0]
+
+            scales = []
+            rotations = []
+            xs = []
+            ys = []
+
+            for ch in range(start, end):
+                _conv_name = 'conv%d' % ind
+                transformations = getattr(getattr(my_model, _conv_name), 'scale')
+                num_transformations = transformations.shape[0]
+                transformations = getattr(my_model, _conv_name)
+
+                for trafo in range(num_transformations):
+                    s = getattr(transformations, 'scale')[trafo, ch]
+                    r = getattr(transformations, 'rotate')[trafo, ch]
+                    x = getattr(transformations, 'translate_x')[trafo, ch]
+                    y = getattr(transformations, 'translate_y')[trafo, ch]
+
+                    # translate parameters to interpretable things
+                    # scale -> 1/s
+                    # rotation -> degrees counterclockwise
+                    # x, y -> half of size image
+
+                    s = 1 / float(s)
+                    r = -1 * float(r)
+                    x = -0.5 * float(x)
+                    y = 0.5 * float(y)
+
+                    scales.append(s)
+                    rotations.append(r)
+                    xs.append(x)
+                    ys.append(y)
+
+            make_distribution_plots(scales, rotations, xs, ys, layer)
 
 
 
@@ -705,27 +845,6 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                     output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
 
-                    
-
-
-# +---------+------------+--------------+
-# |         |   Jester   |    UCF101    |
-# +---------+------------+--------------+
-# | RN18 3D | 26, 21, 45 | 1000, 21, 40 |
-# +---------+------------+--------------+
-# | RN18 3T |  31, 20, 8 | 1001, 20, 45 |
-# +---------+------------+--------------+
-# | GN 3D   | 28, 25, 25 | 1002, 25, 54 |
-# +---------+------------+--------------+
-# | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
-# +---------+------------+--------------+
-# +---------+------------+--------------+
-# |         |   Jester   |    UCF101    |
-# +---------+------------+--------------+
-# | RN18 3T | 36, 20, 13 | 1008, 20, 11 |
-# +---------+------------+--------------+
-# | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
-# +---------+------------+--------------+
 
 # RN18 3T
 # DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
@@ -1013,16 +1132,18 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 # save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
 
 # 3T convs
-save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 # save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 #
 # save_gradients('ucf101', [1001, 20, 45, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 # save_gradients('ucf101', [1003, 23, 12, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 #
-# save_gradients('jester', [36, 20, 13, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
-# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [36, 20, 13, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=0)
+# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=0)
 #
 # save_gradients('ucf101', [1008, 20, 11, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 # save_gradients('ucf101', [1005, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
+
+
