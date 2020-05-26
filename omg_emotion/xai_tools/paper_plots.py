@@ -895,15 +895,15 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
     for ind in tqdm(conv_layers):
         
-        for _i, vid in enumerate(range(num_videos)):
+        for vid in range(num_videos):
 
-            p2 = os.path.join(intermediary_path, 'vid_%d' % _i, 'conv_%d' % ind)
+            p2 = os.path.join(intermediary_path, 'vid_%d' % vid, 'conv_%d' % ind)
             opt_makedirs(p2)
             datapoint_1 = data[vid].copy()
             og_datapoint = data[vid].copy()
 
             if mode == 'volume':
-                vid_path = os.path.join(intermediary_path, 'vid_%d' % _i, 'video')
+                vid_path = os.path.join(intermediary_path, 'vid_%d' % vid, 'video')
                 opt_mkdir(vid_path)
                 for _f in range(30):
                     path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
@@ -985,7 +985,7 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                     save_image(final, path)
 
                     path = os.path.join(p3, 'og_frame_%d.jpg' % most_notable_frame)
-                    save_image(og_datapoint[0, :, most_notable_frame], path)
+                    save_image(og_datapoint[:, most_notable_frame], path)
 
                 elif mode == 'volume':
                     if og_datapoint.dtype == np.uint8:
@@ -1006,11 +1006,23 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                 my_model.zero_grad()
     print('THE END')
 
-
+# 3D convs
 # save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
 # save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
-#
 # save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
 # save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
+
+# 3T convs
+save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+#
+# save_gradients('ucf101', [1001, 20, 45, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('ucf101', [1003, 23, 12, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+#
+# save_gradients('jester', [36, 20, 13, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+#
+# save_gradients('ucf101', [1008, 20, 11, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('ucf101', [1005, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
