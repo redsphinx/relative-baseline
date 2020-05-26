@@ -8,6 +8,7 @@ from tqdm import tqdm
 import subprocess
 import time
 from datetime import datetime
+import skvideo.io as skvid
 
 
 import torch
@@ -91,11 +92,12 @@ def prepare_data(data, labels, dataset):
     data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
     data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
     data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
-
-    labels = labels.type(torch.long)
-    labels = labels.flatten()
-    if dataset == 'jester':
-        labels = labels - 1
+    
+    if labels is not None:
+        labels = labels.type(torch.long)
+        labels = labels.flatten()
+        if dataset == 'jester':
+            labels = labels - 1
 
     return og_data, data, labels
 
@@ -425,7 +427,7 @@ def plot_all_srxy(dataset, model):
 # +---------+------------+--------------+
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
-plot_all_srxy('jester', [31, 20, 8, 0])
+# plot_all_srxy('jester', [31, 20, 8, 0])
 
 
 
@@ -748,6 +750,8 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # DONE activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=2, num_channels=5, mode='image', gpunum=0, seed=66666666, layer_begin=58)
 
 
+# combines the results for the relevant categories to produce a ranking of videos
+# Note: has not been debugged
 def combine_results(list_videos, dataset):
         vid_sets = []
         list_vid_dicts = []
@@ -794,23 +798,66 @@ def combine_results(list_videos, dataset):
                 return vid_score_class
 
 
-def find_top_xai_videos(dataset, prediction_type):
+def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
     video_files = os.listdir(PP.xai_metadata)
 
-    which_file = 'high_act_vids-%s_pred-%s' % (prediction_type, dataset)
-
-    chosen_files = [i for i in video_files if which_file in i]
-
-    top_videos = combine_results(chosen_files, dataset)
+    if combine:
+        which_file = 'high_act_vids-%s_pred-%s' % (prediction_type, dataset)
+        chosen_files = [i for i in video_files if which_file in i]
+        top_videos = combine_results(chosen_files, dataset)
+    else:
+        assert model is not None
+        # high_act_vids-wrong_pred-jester-exp_36_mod_20_ep_13.txt
+        which_file = 'high_act_vids-%s_pred-%s-exp_%d_mod_%d_ep_%d.txt' % (prediction_type, dataset, model[0], model[1],
+                                                                           model[2])
+        top_videos = np.genfromtxt(os.path.join(PP.xai_metadata, which_file), dtype=str, delimiter=' ')[:, 0]
 
     return top_videos
 
 
-def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, layer_begin=None, gpunum=0):
+# has not been made for the combined mode
+def load_videos(list_paths, combine=False):
+    data = None
+    
+    if not combine:
+        dataset = list_paths[0].split('/')[3]
+        if dataset == 'jester':
+            h, w = 150, 224
+        elif dataset == 'ucf101':
+            h, w = 168, 224
+
+        data = np.zeros(shape=(len(list_paths), 3, 30, h, w))
+
+        list_paths.sort()
+        for i, _path in enumerate(list_paths):
+            videodata = skvid.vread(_path)
+            data[i] = videodata
+            
+    return data
+    
+
+def save_image(nparray, path):
+    if nparray.dtype != np.uint8:
+        nparray = nparray.astype(np.uint8)
+
+    nparray = nparray.transpose(1, 2, 0)
+    nparray = Image.fromarray(nparray, mode='RGB')
+    nparray.save(path)
+
+
+def grad_x_frame(frame_gradient, most_notable_frame, og_datapoint):
+    frame_gradient = torch.nn.functional.relu(frame_gradient)
+    frame_gradient = np.array(frame_gradient)
+    frame_gradient = normalize(frame_gradient, z=1.)
+    final = frame_gradient * og_datapoint[0, :, most_notable_frame]
+    return final
+
+
+def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0):
     assert mode in ['image', 'volume']
     assert prediction_type in ['correct', 'wrong']
 
-    print('\nrunning function save_gradients for MODEL %s\n' % (str(model)))
+    print('\nRunning function save_gradients for MODEL %s\n' % (str(model)))
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
     proj_var.device = gpunum
@@ -818,26 +865,130 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
     device = setup.get_device(proj_var)
     my_model.cuda(device)
 
-    # top_videos = find_top_xai_videos(dataset, prediction_type)
-    get_features_from_layer = []
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    intermediary_path = os.path.join(PP.gradient, p1)
+    opt_makedirs(intermediary_path)
+
+    top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
+    top_videos = top_videos[:num_videos]
+
+    data = load_videos(top_videos)
+
     if model[2] in [26, 31, 36, 100, 1001, 1008]: # resnet18
-        get_features_from_layer = [7, 12, 17]
+        conv_layers = [7, 12, 17]
     else:  # googlenet
-        get_features_from_layer = [12, 31, 50]
+        conv_layers = [12, 31, 50]
 
 
+    for ind in tqdm(conv_layers):
+        
+        for vid in range(num_videos):
+            
+            datapoint = data[vid].copy()
+            og_datapoint = datapoint[vid].copy()
+            # og_datapoint = torch.Tensor(og_datapoint).cuda(device)
+            
+            channels = []
+            
+            for ch in range(begin, num_channels):
 
-    '''
-    
-    get the video that activates most
-    for the chosen layers pass through conv
-    find the unit with highest activation
-    project back from that unit
-    
-    '''
+                datapoint = torch.Tensor(datapoint).cuda(device)
+                datapoint = prepare_data(datapoint, None, dataset)
+                datapoint = torch.nn.Parameter(datapoint, requires_grad=True)
+                
+                # get feature map
+                if proj_var.model_number == 20:
+                    feature_map = my_model(datapoint, proj_var.device, stop_at=ind)
+                elif proj_var.model_number == 23:
+                    feature_map = my_model(datapoint, proj_var.device, ind, False)
+                elif proj_var.model_number == 21:
+                    feature_map = my_model(datapoint, stop_at=ind)
+                elif proj_var.model_number == 25:
+                    feature_map = my_model(datapoint, ind, False)
+                    
+                _, chan, d, h, w = feature_map.shape
+                
+                # find the channel with the highest activation
+                feature_map_arr = np.array(feature_map[0].clone().data.cpu())
+                highest_value = 0
+                ind_0, ind_1, ind_2, ind_3 = 0, 0, 0, 0
+
+                for k in range(chan):
+                    if k not in channels:
+                        # for l in range(d):
+                        max_index = feature_map_arr[k].argmax()
+                        indices = np.unravel_index(max_index, (d, h, w))
+                        if feature_map_arr[k, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = feature_map_arr[k, indices[0], indices[1], indices[2]]
+                            ind_0 = k
+                            ind_1, ind_2, ind_3 = indices
+
+                print('\n Conv%d: %d Highest unit value of %f found at channel %d\n' % (ind, ch, highest_value, ind_0))
+                channels.append(ind_0)
+                
+                p2 = os.path.join(intermediary_path, 'rank_%d_channel_%d' % (ch, ind_0))
+                opt_makedirs(p2)
+
+                # calculate d(max(feature_map)) / d(data)
+                feature_map[0, ind_0, ind_1, ind_2, ind_3].backward()
+                image_grad = datapoint.grad
+
+                # if in image mode, find the frame with the greatest gradient
+                if mode == 'image':
+                    copy_image_grad = image_grad[0].clone()
+                    copy_image_grad = 255 * copy_image_grad
+                    copy_image_grad = torch.nn.functional.relu(copy_image_grad)
+                    copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
+
+                    copy_image_grad = copy_image_grad.transpose(1, 0, 2, 3)
+                    frames, og_channels, h, w = copy_image_grad.shape
+
+                    highest_value = 0
+                    ind_1 = 0
+                    for l in range(frames):
+                        max_index = copy_image_grad[l].argmax()
+                        indices = np.unravel_index(max_index, (og_channels, h, w))
+                        if copy_image_grad[l, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = copy_image_grad[l, indices[0], indices[1], indices[2]]
+                            ind_1 = l
+                    most_notable_frame = ind_1
+
+                    if og_datapoint.dtype == np.uint8:
+                        og_datapoint = og_datapoint.astype(np.float32)
+
+                    frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
+                    final = grad_x_frame(frame_gradient, most_notable_frame, og_datapoint)
+
+                    # save the image and the original
+                    path = os.path.join(p2, 'grad_x_frame_%d.jpg' % most_notable_frame)
+                    save_image(final, path)
+
+                    path = os.path.join(p2, 'og_frame_%d.jpg' % most_notable_frame)
+                    save_image(og_datapoint[0, :, most_notable_frame], path)
+
+                elif mode == 'volume':
+                    if og_datapoint.dtype == np.uint8:
+                        og_datapoint = og_datapoint.astype(np.float32)
+
+                    frames, og_channels, h, w = image_grad.shape
+                    for _f in range(frames):
+                        frame_gradient = image_grad[0, :, _f].data.cpu()
+                        final = grad_x_frame(frame_gradient, _f, og_datapoint)
+
+                        # save the image and the original
+                        path = os.path.join(p2, 'grad_x_frame_%d.jpg' % _f)
+                        save_image(final, path)
+
+                        path = os.path.join(p2, 'og_frame_%d.jpg' % _f)
+                        save_image(og_datapoint[0, :, _f], path)
+
+
+                my_model.zero_grad()
+
 
 
     print('asdf')
 
 
-# save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct')
+save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=1)
+# save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
