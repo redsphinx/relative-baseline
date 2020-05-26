@@ -89,9 +89,9 @@ def prepare_data(data, labels, dataset):
     # convert to floattensor
     data = data.type(torch.float32)
     data = data / 255
-    data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
-    data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
-    data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
+    data[:, 0] = (data[:, 0] - 0.485) / 0.229
+    data[:, 1] = (data[:, 1] - 0.456) / 0.224
+    data[:, 2] = (data[:, 2] - 0.406) / 0.225
     
     if labels is not None:
         labels = labels.type(torch.long)
@@ -826,11 +826,11 @@ def load_videos(list_paths, combine=False):
         elif dataset == 'ucf101':
             h, w = 168, 224
 
-        data = np.zeros(shape=(len(list_paths), 3, 30, h, w))
+        data = np.zeros(shape=(len(list_paths), 3, 30, h, w), dtype=np.float32)
 
-        list_paths.sort()
         for i, _path in enumerate(list_paths):
             videodata = skvid.vread(_path)
+            videodata = videodata.transpose(3, 0, 1, 2)
             data[i] = videodata
             
     return data
@@ -848,8 +848,8 @@ def save_image(nparray, path):
 def grad_x_frame(frame_gradient, most_notable_frame, og_datapoint):
     frame_gradient = torch.nn.functional.relu(frame_gradient)
     frame_gradient = np.array(frame_gradient)
-    frame_gradient = normalize(frame_gradient, z=1.)
-    final = frame_gradient * og_datapoint[0, :, most_notable_frame]
+    frame_gradient = normalize(frame_gradient, z=1.) * 3
+    final = frame_gradient * og_datapoint[:, most_notable_frame]
     return final
 
 
@@ -874,7 +874,7 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
     data = load_videos(top_videos)
 
-    if model[2] in [26, 31, 36, 100, 1001, 1008]: # resnet18
+    if model[1] in [21, 20]: # resnet18
         conv_layers = [7, 12, 17]
     else:  # googlenet
         conv_layers = [12, 31, 50]
@@ -882,18 +882,21 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
     for ind in tqdm(conv_layers):
         
-        for vid in range(num_videos):
+        for _i, vid in enumerate(range(num_videos)):
+
+            p2 = os.path.join(intermediary_path, 'vid_%d' % _i, 'conv_%d' % ind)
+            opt_makedirs(p2)
             
-            datapoint = data[vid].copy()
-            og_datapoint = datapoint[vid].copy()
+            datapoint_1 = data[vid].copy()
+            og_datapoint = data[vid].copy()
             # og_datapoint = torch.Tensor(og_datapoint).cuda(device)
             
             channels = []
             
             for ch in range(begin, num_channels):
 
-                datapoint = torch.Tensor(datapoint).cuda(device)
-                datapoint = prepare_data(datapoint, None, dataset)
+                datapoint = torch.Tensor(datapoint_1.copy()).unsqueeze(0).cuda(device)
+                datapoint = remove_imagenet_mean_std(datapoint)
                 datapoint = torch.nn.Parameter(datapoint, requires_grad=True)
                 
                 # get feature map
@@ -926,8 +929,8 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                 print('\n Conv%d: %d Highest unit value of %f found at channel %d\n' % (ind, ch, highest_value, ind_0))
                 channels.append(ind_0)
                 
-                p2 = os.path.join(intermediary_path, 'rank_%d_channel_%d' % (ch, ind_0))
-                opt_makedirs(p2)
+                p3 = os.path.join(p2, 'rank_%d_channel_%d' % (ch, ind_0))
+                opt_mkdir(p3)
 
                 # calculate d(max(feature_map)) / d(data)
                 feature_map[0, ind_0, ind_1, ind_2, ind_3].backward()
@@ -960,35 +963,36 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                     final = grad_x_frame(frame_gradient, most_notable_frame, og_datapoint)
 
                     # save the image and the original
-                    path = os.path.join(p2, 'grad_x_frame_%d.jpg' % most_notable_frame)
+                    path = os.path.join(p3, 'grad_x_frame_%d.jpg' % most_notable_frame)
                     save_image(final, path)
 
-                    path = os.path.join(p2, 'og_frame_%d.jpg' % most_notable_frame)
+                    path = os.path.join(p3, 'og_frame_%d.jpg' % most_notable_frame)
                     save_image(og_datapoint[0, :, most_notable_frame], path)
 
                 elif mode == 'volume':
                     if og_datapoint.dtype == np.uint8:
                         og_datapoint = og_datapoint.astype(np.float32)
 
-                    frames, og_channels, h, w = image_grad.shape
+                    og_channels, frames, h, w = image_grad[0].shape
                     for _f in range(frames):
                         frame_gradient = image_grad[0, :, _f].data.cpu()
                         final = grad_x_frame(frame_gradient, _f, og_datapoint)
 
                         # save the image and the original
-                        path = os.path.join(p2, 'grad_x_frame_%d.jpg' % _f)
+                        path = os.path.join(p3, 'grad_x_frame_%d.jpg' % _f)
                         save_image(final, path)
 
-                        path = os.path.join(p2, 'og_frame_%d.jpg' % _f)
-                        save_image(og_datapoint[0, :, _f], path)
-
+                        path = os.path.join(p3, 'og_frame_%d.jpg' % _f)
+                        save_image(og_datapoint[:, _f], path)
 
                 my_model.zero_grad()
+    print('THE END')
 
 
+# save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
+# save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
+#
+# save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
+# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
 
-    print('asdf')
-
-
-save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=1)
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
