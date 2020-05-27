@@ -457,10 +457,90 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [31, 20, 8, 0])
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=0)
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=1, channel=2)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=57)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=298)
 
 
-def make_distribution_plots(scales, rotations, xs, ys, layer=None):
-    pass
+
+
+def make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=None):
+    x_axis = np.arange(len(scales)+1)
+    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(ncols=5, figsize=(15, 3))
+    # plt.setp(ax3, adjustable='box', aspect='equal')
+    gs = gridspec.GridSpec(1, 5, width_ratios=[1, 1, 1, 1, 1])
+
+    fontsize_label = 9
+    fontsize_title = 11
+    fontsize_suptitle = 12
+    fontsize_ticks = 7
+    fontsize_anno = 10
+    markersize = 4
+    linewidth = 1.1
+    linecolor = 'b'
+    bins = 50
+
+    if dataset == 'jester':
+        h, w = 150, 224
+    elif dataset == 'ucf101':
+        h, w = 168, 224
+
+    # new_scales = [1.]
+    # new_rotations = [0.]
+    new_xs = [0.]
+    new_ys = [0.]
+
+    for i in range(len(scales)):
+        # new_scales.append(scales[i] * new_scales[-1])
+        # new_rotations.append(rotations[i] + new_rotations[-1])
+        new_xs.append(xs[i]*w + new_xs[-1])
+        new_ys.append(ys[i]*h + new_ys[-1])
+
+    print('SCALE    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(scales))), float(np.std(np.abs(scales))), float(np.var(np.abs(scales)))))
+    print('ROTATE    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations))), float(np.var(np.abs(rotations)))))
+    print('X    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(new_xs))), float(np.std(np.abs(new_xs))), float(np.var(np.abs(new_xs)))))
+    print('Y    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(new_ys))), float(np.std(np.abs(new_ys))), float(np.var(np.abs(new_ys)))))
+
+
+    ax1 = plt.subplot(gs[0])
+    ax1.hist(scales, bins=bins)
+    ax1.set_title('relative scale', fontsize=fontsize_title)
+
+    ax2 = plt.subplot(gs[1])
+    ax2.hist(rotations, bins=bins)
+    ax2.set_title('rotation in degrees', fontsize=fontsize_title)
+
+    ax3 = plt.subplot(gs[2])
+    # ax3.scatter(new_xs, new_ys, s=0.5)
+    ax3.hist2d(new_xs, new_ys, bins=bins)
+    ax3.set_title('x and y translations', fontsize=fontsize_title)
+
+    ax4 = plt.subplot(gs[3])
+    ax4.hist(new_xs, bins=bins)
+    ax4.set_title('x translations', fontsize=fontsize_title)
+
+    ax5 = plt.subplot(gs[4])
+    ax5.hist(new_ys, bins=bins)
+    ax5.set_title('y translations', fontsize=fontsize_title)
+
+
+    fig.tight_layout()
+    # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=True)
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+
+    if mode == 'model':
+        p2 = 'model_distribution.jpg'
+    elif mode == 'layer':
+        assert layer is not None
+        p2 = 'layer_%d_distribution.jpg' % layer
+
+    save_location = os.path.join(PP.distributions, p1, p2)
+
+    intermediary_path = os.path.join(PP.distributions, p1)
+    opt_makedirs(intermediary_path)
+
+    plt.savefig(save_location)
+
 
 
 def distribution_plots(dataset, model, mode='model', convlayer=None):
@@ -487,7 +567,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
         xs = []
         ys = []
 
-        for ind in tqdm(conv_layers):
+        for ind in conv_layers:
             start = 0
             end = getattr(my_model, 'conv%d' % ind)
             end = end.weight.shape[0]
@@ -519,7 +599,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
                     xs.append(x)
                     ys.append(y)
 
-        make_distribution_plots(scales, rotations, xs, ys)
+        make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=None)
 
     elif mode == 'layer':
         assert convlayer is not None
@@ -527,7 +607,6 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
             conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
         else: # googlenet
             conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
-
 
 
         for ind in tqdm(conv_layers):
@@ -567,9 +646,36 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
                     xs.append(x)
                     ys.append(y)
 
-            make_distribution_plots(scales, rotations, xs, ys, layer)
+            make_distribution_plots(scales, rotations, xs, ys, dataset, model, model, layer=ind)
 
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3D | 26, 21, 45 | 1000, 21, 40 |
+# +---------+------------+--------------+
+# | RN18 3T |  31, 20, 8 | 1001, 20, 45 |
+# +---------+------------+--------------+
+# | GN 3D   | 28, 25, 25 | 1002, 25, 54 |
+# +---------+------------+--------------+
+# | GN 3T   | 30, 23, 28 | 1003, 23, 12 |
+# +---------+------------+--------------+
 
+# +---------+------------+--------------+
+# |         |   Jester   |    UCF101    |
+# +---------+------------+--------------+
+# | RN18 3T | 36, 20, 13 | 1008, 20, 11 |
+# +---------+------------+--------------+
+# | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
+# +---------+------------+--------------+
+
+# distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
 def visualize_all_first_layer_filters(dataset, model):
@@ -768,7 +874,7 @@ def save_output(output, mode, p2, ch, me):
             img.save(path)
 
 
-def activation_maximization_single_channels(dataset, model, begin=0, num_channels=1, seed=6, steps=500, mode='image', gpunum=0, layer_begin=None):
+def activation_maximization_single_channels(dataset, model, begin=0, num_channels=1, seed=6, steps=500, mode='image', gpunum=0, layer_begin=None, single_layer=False):
     assert mode in ['image', 'volume']
     print('\nMODEL %s\n' % (str(model)))
     proj_var = init1(dataset, model)
@@ -791,6 +897,9 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
     if layer_begin is not None:
         ind = conv_layers.index(layer_begin)
         conv_layers = conv_layers[ind:]
+        if single_layer:
+            conv_layers = [conv_layers[0]]
+
 
     for ind in conv_layers:
         print('conv layer %d' % ind)
@@ -840,11 +949,14 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                 optimizer.step()
                 my_model.zero_grad()
 
-                liist = [0, 499]
+                liist = [499]
                 if me in liist:
                     output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
 
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=22, num_channels=23, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=12, single_layer=True)
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=438, num_channels=439, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=31, single_layer=True)
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=426, num_channels=427, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=50, single_layer=True)
 
 # RN18 3T
 # DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
@@ -1124,6 +1236,8 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
                 my_model.zero_grad()
     print('THE END')
+
+save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=5, gpunum=0)
 
 # 3D convs
 # save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)

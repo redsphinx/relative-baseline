@@ -209,7 +209,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 6
         h2 = self.conv6(h2, device) # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn6(h2)
         h3 = self.conv7(h)          # branch 3.0
         h3 = self.bn7(h3)
@@ -217,7 +217,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 8
         h3 = self.conv8(h3, device) # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn8(h3)
         h4 = self.maxpool3(h)       # branch 4.0
         h4 = self.conv9(h4)         # branch 4.1
@@ -234,7 +234,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 12
         h2 = self.conv12(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn12(h2)
         h3 = self.conv13(h)  # branch 3.0
         h3 = self.bn13(h3)
@@ -242,7 +242,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 14
         h3 = self.conv14(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn14(h3)
         h4 = self.maxpool4(h)  # branch 4.0
         h4 = self.conv15(h4)  # branch 4.1
@@ -260,7 +260,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 18
         h2 = self.conv18(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn18(h2)
         h3 = self.conv19(h)  # branch 3.0
         h3 = self.bn19(h3)
@@ -268,7 +268,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 20
         h3 = self.conv20(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn20(h3)
         h4 = self.maxpool6(h)  # branch 4.0
         h4 = self.conv21(h4)  # branch 4.1
@@ -285,7 +285,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 24
         h2 = self.conv24(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn24(h2)
         h3 = self.conv25(h)  # branch 3.0
         h3 = self.bn25(h3)
@@ -293,7 +293,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 26
         h3 = self.conv26(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn26(h3)
         h4 = self.maxpool7(h)  # branch 4.0
         h4 = self.conv27(h4)  # branch 4.1
@@ -325,7 +325,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 31
         h2 = self.conv31(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn31(h2)
         h3 = self.conv32(h)  # branch 3.0
         h3 = self.bn32(h3)
@@ -333,7 +333,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 33
         h3 = self.conv33(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn33(h3)
         h4 = self.maxpool8(h)  # branch 4.0
         h4 = self.conv34(h4)  # branch 4.1
@@ -350,7 +350,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 37
         h2 = self.conv37(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn37(h2)
         h3 = self.conv38(h)  # branch 3.0
         h3 = self.bn38(h3)
@@ -358,7 +358,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 39
         h3 = self.conv39(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn39(h3)
         h4 = self.maxpool9(h)  # branch 4.0
         h4 = self.conv40(h4)  # branch 4.1
@@ -375,7 +375,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 43
         h2 = self.conv43(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn43(h2)
         h3 = self.conv44(h)  # branch 3.0
         h3 = self.bn44(h3)
@@ -383,7 +383,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 45
         h3 = self.conv45(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn45(h3)
         h4 = self.maxpool10(h)  # branch 4.0
         h4 = self.conv46(h4)  # branch 4.1
@@ -416,7 +416,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 50
         h2 = self.conv50(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn50(h2)
         h3 = self.conv51(h)  # branch 3.0
         h3 = self.bn51(h3)
@@ -424,7 +424,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 52
         h3 = self.conv52(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn52(h3)
         h4 = self.maxpool12(h)  # branch 4.0
         h4 = self.conv53(h4)  # branch 4.1
@@ -441,7 +441,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 56
         h2 = self.conv56(h2, device)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn56(h2)
         h3 = self.conv57(h)  # branch 3.0
         h3 = self.bn57(h3)
@@ -449,7 +449,7 @@ class Googlenet3TConv_explicit(torch.nn.Module):
         num = 58
         h3 = self.conv58(h3, device)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn58(h3)
         h4 = self.maxpool13(h)  # branch 4.0
         h4 = self.conv59(h4)  # branch 4.1
@@ -669,7 +669,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 6
         h2 = self.conv6(h2) # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn6(h2)
         h3 = self.conv7(h)          # branch 3.0
         h3 = self.bn7(h3)
@@ -677,7 +677,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 8
         h3 = self.conv8(h3) # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn8(h3)
         h4 = self.maxpool3(h)       # branch 4.0
         h4 = self.conv9(h4)         # branch 4.1
@@ -694,7 +694,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 12
         h2 = self.conv12(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn12(h2)
         h3 = self.conv13(h)  # branch 3.0
         h3 = self.bn13(h3)
@@ -702,7 +702,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 14
         h3 = self.conv14(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn14(h3)
         h4 = self.maxpool4(h)  # branch 4.0
         h4 = self.conv15(h4)  # branch 4.1
@@ -720,7 +720,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 18
         h2 = self.conv18(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn18(h2)
         h3 = self.conv19(h)  # branch 3.0
         h3 = self.bn19(h3)
@@ -728,7 +728,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 20
         h3 = self.conv20(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn20(h3)
         h4 = self.maxpool6(h)  # branch 4.0
         h4 = self.conv21(h4)  # branch 4.1
@@ -745,7 +745,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 24
         h2 = self.conv24(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn24(h2)
         h3 = self.conv25(h)  # branch 3.0
         h3 = self.bn25(h3)
@@ -753,7 +753,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 26
         h3 = self.conv26(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn26(h3)
         h4 = self.maxpool7(h)  # branch 4.0
         h4 = self.conv27(h4)  # branch 4.1
@@ -785,7 +785,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 31
         h2 = self.conv31(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn31(h2)
         h3 = self.conv32(h)  # branch 3.0
         h3 = self.bn32(h3)
@@ -793,7 +793,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 33
         h3 = self.conv33(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn33(h3)
         h4 = self.maxpool8(h)  # branch 4.0
         h4 = self.conv34(h4)  # branch 4.1
@@ -810,7 +810,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 37
         h2 = self.conv37(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn37(h2)
         h3 = self.conv38(h)  # branch 3.0
         h3 = self.bn38(h3)
@@ -818,7 +818,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 39
         h3 = self.conv39(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn39(h3)
         h4 = self.maxpool9(h)  # branch 4.0
         h4 = self.conv40(h4)  # branch 4.1
@@ -835,7 +835,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 43
         h2 = self.conv43(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn43(h2)
         h3 = self.conv44(h)  # branch 3.0
         h3 = self.bn44(h3)
@@ -843,7 +843,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 45
         h3 = self.conv45(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn45(h3)
         h4 = self.maxpool10(h)  # branch 4.0
         h4 = self.conv46(h4)  # branch 4.1
@@ -876,7 +876,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 50
         h2 = self.conv50(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn50(h2)
         h3 = self.conv51(h)  # branch 3.0
         h3 = self.bn51(h3)
@@ -884,7 +884,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 52
         h3 = self.conv52(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn52(h3)
         h4 = self.maxpool12(h)  # branch 4.0
         h4 = self.conv53(h4)  # branch 4.1
@@ -901,7 +901,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 56
         h2 = self.conv56(h2)  # branch 2.1
         if stop_at == num:
-            return h
+            return h2
         h2 = self.bn56(h2)
         h3 = self.conv57(h)  # branch 3.0
         h3 = self.bn57(h3)
@@ -909,7 +909,7 @@ class Googlenet3DConv_explicit(torch.nn.Module):
         num = 58
         h3 = self.conv58(h3)  # branch 3.1
         if stop_at == num:
-            return h
+            return h3
         h3 = self.bn58(h3)
         h4 = self.maxpool13(h)  # branch 4.0
         h4 = self.conv59(h4)  # branch 4.1
