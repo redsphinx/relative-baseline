@@ -2,7 +2,7 @@ from matplotlib.colors import LogNorm
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
+from matplotlib import gridspec, transforms
 import os
 import numpy as np
 from PIL import Image
@@ -468,97 +468,46 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
 
 
-
-def make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=None):
-    x_axis = np.arange(len(scales)+1)
-    fig, (ax1, ax2, ax3, ax4, ax5) = plt.subplots(ncols=5, figsize=(15, 3))
-    # plt.setp(ax3, adjustable='box', aspect='equal')
-    gs = gridspec.GridSpec(1, 5, width_ratios=[1, 1, 1, 1, 1])
-
-    fontsize_label = 9
+def make_scale_rot_plot(scales, rotations, model, mode, layer):
     fontsize_title = 11
-    fontsize_suptitle = 12
-    fontsize_ticks = 7
-    fontsize_anno = 10
-    markersize = 4
-    linewidth = 1.1
-    linecolor = 'b'
+    fontsize_ticks = 9
     bins = 50
+    linestyle = '--'
+    gridcolor = 'lightslategray'
+    # barcolor = 'royalblue'
+    barcolor = 'darkblue'
 
-    if dataset == 'jester':
-        h, w = 150, 224
-    elif dataset == 'ucf101':
-        h, w = 168, 224
+    fig1 = plt.figure(figsize=(8, 4))
+    gs1 = fig1.add_gridspec(1, 2, width_ratios=[1, 1])
+    # gs.update(wspace=0.025, hspace=0.05)
 
-    # new_scales = [1.]
-    # new_rotations = [0.]
-    new_xs = [0.]
-    new_ys = [0.]
-
-    # for i in range(len(scales)):
-        # new_scales.append(scales[i] * new_scales[-1])
-        # new_rotations.append(rotations[i] + new_rotations[-1])
-        # new_xs.append(xs[i]*w)
-        # new_ys.append(ys[i]*h)
-
-    _scales = np.abs(1-np.abs(scales))
-    print('\n%f,%f' % (float(np.mean(_scales)), float(np.std(_scales))))
-    print('%f,%f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations)))))
-    print('%f,%f' % (float(np.mean(np.abs(xs))), float(np.std(np.abs(xs)))))
-    print('%f,%f\n' % (float(np.mean(np.abs(ys))), float(np.std(np.abs(ys)))))
-
-
-    ax1 = plt.subplot(gs[0])
-    ax1.grid(True)
-    ax1.hist(scales, bins=bins)
-    ax1.set_title('relative scale', fontsize=fontsize_title)
+    f1_ax1 = fig1.add_subplot(gs1[0, 0])
+    # f1_ax1.grid(True)
+    f1_ax1.set_axisbelow(True)
+    f1_ax1.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+    f1_ax1.hist(scales, bins=bins, color=barcolor)
+    f1_ax1.set_title('scale', fontsize=fontsize_title)
+    f1_ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     plt.yscale('log')
 
-
-    ax2 = plt.subplot(gs[1])
-    ax2.grid(True)
-    ax2.hist(rotations, bins=bins)
-    ax2.set_title('rotation in degrees', fontsize=fontsize_title)
+    f1_ax2 = fig1.add_subplot(gs1[0, 1])
+    f1_ax2.set_axisbelow(True)
+    f1_ax2.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+    # f1_ax2.grid(True)
+    f1_ax2.hist(rotations, bins=bins, color=barcolor)
+    f1_ax2.set_title('rotation', fontsize=fontsize_title)
+    f1_ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     plt.yscale('log')
 
-
-    ax3 = plt.subplot(gs[2])
-    ax3.grid(True)
-    # ax3.scatter(new_xs, new_ys, s=0.5)
-    plt.hist2d(xs, ys, bins=bins, norm=LogNorm())
-    plt.colorbar()
-
-    ax3.set_title('x and y translations', fontsize=fontsize_title)
-
-    # plt.yscale('log')
-    # plt.xscale('log')
-
-
-    ax4 = plt.subplot(gs[3])
-    ax4.grid(True)
-    ax4.hist(xs, bins=bins)
-    ax4.set_title('x translations', fontsize=fontsize_title)
-    plt.yscale('log')
-
-
-    ax5 = plt.subplot(gs[4])
-    ax5.grid(True)
-    ax5.hist(ys, bins=bins)
-    ax5.set_title('y translations', fontsize=fontsize_title)
-    plt.yscale('log')
-
-
-
-    fig.tight_layout()
-    # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=True)
+    fig1.tight_layout()
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
 
     if mode == 'model':
-        p2 = 'model_distribution.jpg'
+        p2 = 'model_distribution_SR.jpg'
     elif mode == 'layer':
         assert layer is not None
-        p2 = 'layer_%d_distribution.jpg' % layer
+        p2 = 'layer_%d_distribution_SR.jpg' % layer
 
     save_location = os.path.join(PP.distributions, p1, p2)
 
@@ -566,6 +515,83 @@ def make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, lay
     opt_makedirs(intermediary_path)
 
     plt.savefig(save_location)
+
+
+def make_xy_plot(xs, ys, model, mode, layer):
+    fontsize_title = 11
+    fontsize_ticks = 9
+    linestyle = '--'
+    gridcolor = 'lightslategray'
+    # barcolor = 'royalblue'
+    barcolor = 'darkblue'
+
+    bins = 50
+
+    fig2 = plt.figure(figsize=(4, 4))
+    gs2 = fig2.add_gridspec(2, 2, width_ratios=[3, 1], height_ratios=[1, 3], wspace=0.025, hspace=0.025)
+
+    f2_ax1 = fig2.add_subplot(gs2[1, 0])
+    f2_ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
+    plt.set_cmap('magma')
+    plt.hist2d(xs, ys, bins=bins, norm=LogNorm())
+    f2_ax1.set_axisbelow(True)
+    f2_ax1.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+
+
+    f2_ax2 = fig2.add_subplot(gs2[0, 0])
+    # f2_ax2.grid(True)
+    f2_ax2.set_axisbelow(True)
+    f2_ax2.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+    f2_ax2.hist(xs, bins=bins, color=barcolor)
+    f2_ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
+    # f2_ax2.get_xaxis().set_visible(False)
+    f2_ax2.set_xticklabels([])
+    plt.yscale('log')
+
+    f2_ax3 = fig2.add_subplot(gs2[1, 1])
+    # f2_ax3.grid(True)
+    f2_ax3.set_axisbelow(True)
+    f2_ax3.hist(ys, bins=bins, orientation='horizontal', color=barcolor)
+    f2_ax3.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+    f2_ax3.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
+    # f2_ax3.get_yaxis().set_visible(False)
+    f2_ax3.set_yticklabels([])
+    plt.xscale('log')
+    plt.colorbar()
+
+    fig2.tight_layout()
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+
+    if mode == 'model':
+        p2 = 'model_distribution_XY.jpg'
+    elif mode == 'layer':
+        assert layer is not None
+        p2 = 'layer_%d_distribution_XY.jpg' % layer
+
+    save_location = os.path.join(PP.distributions, p1, p2)
+
+    intermediary_path = os.path.join(PP.distributions, p1)
+    opt_makedirs(intermediary_path)
+
+    plt.savefig(save_location)
+
+
+def make_distribution_plots(scales, rotations, xs, ys, model, mode, layer=None):
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+
+    intermediary_path = os.path.join(PP.distributions, p1)
+    opt_makedirs(intermediary_path)
+
+    make_scale_rot_plot(scales, rotations, model, mode, layer)
+    make_xy_plot(xs, ys, model, mode, layer)
+
+    _scales = np.abs(1-np.abs(scales))
+    print('\n%f,%f' % (float(np.mean(_scales)), float(np.std(_scales))))
+    print('%f,%f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations)))))
+    print('%f,%f' % (float(np.mean(np.abs(xs))), float(np.std(np.abs(xs)))))
+    print('%f,%f\n' % (float(np.mean(np.abs(ys))), float(np.std(np.abs(ys)))))
 
 
 
@@ -626,7 +652,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
                     xs.append(x)
                     ys.append(y)
 
-        make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=None)
+        make_distribution_plots(scales, rotations, xs, ys, model, mode, layer=None)
 
     elif mode == 'layer':
 
@@ -677,7 +703,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
                     xs.append(x)
                     ys.append(y)
 
-            make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=ind)
+            make_distribution_plots(scales, rotations, xs, ys, model, mode, layer=ind)
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
@@ -699,8 +725,13 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
-distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
-distribution_plots('jester', [30, 23, 28, 0], mode='layer', convlayer=[1, 12, 31, 50])
+# distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [30, 23, 28, 0], mode='layer', convlayer=None)
+distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+
+
 
 
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
