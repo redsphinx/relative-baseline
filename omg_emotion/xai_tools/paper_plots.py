@@ -1,3 +1,4 @@
+from matplotlib.colors import LogNorm
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -306,7 +307,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax1.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
     ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # ax.tick_params(axis='both', which='minor', labelsize=8)
-    ax1.set_title('cumulative scale', fontsize=fontsize_title)
+    # ax1.set_title('cumulative scale', fontsize=fontsize_title)
     # ax1.set_aspect('equal')
     # ax1.set(adjustable='box')
     ax1.grid(True)
@@ -323,7 +324,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax2.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
     ax2.xaxis.set_ticks(x_axis)
     ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
-    ax2.set_title('cumulative rotation', fontsize=fontsize_title)
+    # ax2.set_title('cumulative rotation', fontsize=fontsize_title)
     # ax2.set_aspect('equal', 'box')
     # ax2.set(adjustable='box')
     ax2.grid(True)
@@ -332,7 +333,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     txt = [str(i) for i in range(len(new_scales))]
     ax3 = plt.subplot(gs[2])
     ax3.plot(new_xs, new_ys, 'o-', linewidth=linewidth, markersize=markersize, color=linecolor)
-    ax3.set_title('x and y location in pixels', fontsize=fontsize_title)
+    # ax3.set_title('x and y location in pixels', fontsize=fontsize_title)
     ax3.set_ylabel('y', fontsize=fontsize_label)
     ax3.set_xlabel('x', fontsize=fontsize_label)
     # eps_x = (max(new_xs) - min(new_xs)) / 10
@@ -369,7 +370,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=True)
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
-    p2 = 'layer_%d_channel_%d.jpg' % (conv, ch+1)
+    p2 = 'layer_%d_channel_%d.jpg' % (conv, ch)
     save_location = os.path.join(PP.srxy_plots, p1, p2)
 
     intermediary_path = os.path.join(PP.srxy_plots, p1)
@@ -454,12 +455,17 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # +---------+------------+--------------+
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
+
+# >>> channel count from 1 <<<
+
 # plot_all_srxy('jester', [31, 20, 8, 0])
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=0)
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=1, channel=2)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=57)
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=298)
-
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=141)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=141)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=105)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
 
 
 
@@ -489,38 +495,58 @@ def make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, lay
     new_xs = [0.]
     new_ys = [0.]
 
-    for i in range(len(scales)):
+    # for i in range(len(scales)):
         # new_scales.append(scales[i] * new_scales[-1])
         # new_rotations.append(rotations[i] + new_rotations[-1])
-        new_xs.append(xs[i]*w + new_xs[-1])
-        new_ys.append(ys[i]*h + new_ys[-1])
+        # new_xs.append(xs[i]*w)
+        # new_ys.append(ys[i]*h)
 
-    print('SCALE    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(scales))), float(np.std(np.abs(scales))), float(np.var(np.abs(scales)))))
-    print('ROTATE    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations))), float(np.var(np.abs(rotations)))))
-    print('X    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(new_xs))), float(np.std(np.abs(new_xs))), float(np.var(np.abs(new_xs)))))
-    print('Y    mean: %f, std: %f, var: %f' % (float(np.mean(np.abs(new_ys))), float(np.std(np.abs(new_ys))), float(np.var(np.abs(new_ys)))))
+    _scales = np.abs(1-np.abs(scales))
+    print('\n%f,%f' % (float(np.mean(_scales)), float(np.std(_scales))))
+    print('%f,%f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations)))))
+    print('%f,%f' % (float(np.mean(np.abs(xs))), float(np.std(np.abs(xs)))))
+    print('%f,%f\n' % (float(np.mean(np.abs(ys))), float(np.std(np.abs(ys)))))
 
 
     ax1 = plt.subplot(gs[0])
+    ax1.grid(True)
     ax1.hist(scales, bins=bins)
     ax1.set_title('relative scale', fontsize=fontsize_title)
+    plt.yscale('log')
+
 
     ax2 = plt.subplot(gs[1])
+    ax2.grid(True)
     ax2.hist(rotations, bins=bins)
     ax2.set_title('rotation in degrees', fontsize=fontsize_title)
+    plt.yscale('log')
+
 
     ax3 = plt.subplot(gs[2])
+    ax3.grid(True)
     # ax3.scatter(new_xs, new_ys, s=0.5)
-    ax3.hist2d(new_xs, new_ys, bins=bins)
+    plt.hist2d(xs, ys, bins=bins, norm=LogNorm())
+    plt.colorbar()
+
     ax3.set_title('x and y translations', fontsize=fontsize_title)
 
+    # plt.yscale('log')
+    # plt.xscale('log')
+
+
     ax4 = plt.subplot(gs[3])
-    ax4.hist(new_xs, bins=bins)
+    ax4.grid(True)
+    ax4.hist(xs, bins=bins)
     ax4.set_title('x translations', fontsize=fontsize_title)
+    plt.yscale('log')
+
 
     ax5 = plt.subplot(gs[4])
-    ax5.hist(new_ys, bins=bins)
+    ax5.grid(True)
+    ax5.hist(ys, bins=bins)
     ax5.set_title('y translations', fontsize=fontsize_title)
+    plt.yscale('log')
+
 
 
     fig.tight_layout()
@@ -562,6 +588,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
         else: # googlenet
             conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
 
+
         scales = []
         rotations = []
         xs = []
@@ -602,11 +629,15 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
         make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=None)
 
     elif mode == 'layer':
-        assert convlayer is not None
-        if model[1] in [21, 20]: # resnet18
-            conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
-        else: # googlenet
-            conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+
+        if convlayer is None:
+            if model[1] in [21, 20]: # resnet18
+                conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+            else: # googlenet
+                conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
+        else:
+            conv_layers = []
+            conv_layers.extend(convlayer)
 
 
         for ind in tqdm(conv_layers):
@@ -646,7 +677,7 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
                     xs.append(x)
                     ys.append(y)
 
-            make_distribution_plots(scales, rotations, xs, ys, dataset, model, model, layer=ind)
+            make_distribution_plots(scales, rotations, xs, ys, dataset, model, mode, layer=ind)
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |
@@ -668,7 +699,10 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
-# distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+distribution_plots('jester', [30, 23, 28, 0], mode='layer', convlayer=[1, 12, 31, 50])
+
+
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
 # distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
 # distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
@@ -857,12 +891,12 @@ def save_output(output, mode, p2, ch, me):
         img = normalize(img)
         img = np.array(img.transpose(1, 2, 0), dtype=np.uint8)
         img = Image.fromarray(img, mode='RGB')
-        name = 'chan_%d_step_%d.jpg' % (ch+1, me)
+        name = 'chan_%d_step_%d.jpg' % (ch, me)
         path = os.path.join(p2, name)
         img.save(path)
 
     elif mode == 'volume':
-        p3 = os.path.join(p2, 'frames_chan_%d_step_%d' % (ch+1, me))
+        p3 = os.path.join(p2, 'frames_chan_%d_step_%d' % (ch, me))
         opt_mkdir(p3)
         for _f in range(30):
             img = add_imagenet_mean_std(output[:, _f])
@@ -954,9 +988,15 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                     output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
 
-# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=22, num_channels=23, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=12, single_layer=True)
-# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=438, num_channels=439, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=31, single_layer=True)
-# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=426, num_channels=427, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=50, single_layer=True)
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=11, num_channels=12, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=12, single_layer=True)
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=140, num_channels=141, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=31, single_layer=True)
+# activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=186, num_channels=187, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=50, single_layer=True)
+
+# activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=140, num_channels=141, seed=666, steps=500, mode='image', gpunum=0, layer_begin=12, single_layer=True)
+# activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=140, num_channels=141, seed=666, steps=500, mode='image', gpunum=0, layer_begin=31, single_layer=True)
+# activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=104, num_channels=105, seed=666, steps=500, mode='image', gpunum=0, layer_begin=50, single_layer=True)
+
+
 
 # RN18 3T
 # DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
@@ -1237,7 +1277,13 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                 my_model.zero_grad()
     print('THE END')
 
-save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=5, gpunum=0)
+# save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+# save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+# save_gradients('ucf101', [1003, 23, 12, 0], mode='image', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+# save_gradients('ucf101', [1005, 23, 28, 0], mode='image', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
+
 
 # 3D convs
 # save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
