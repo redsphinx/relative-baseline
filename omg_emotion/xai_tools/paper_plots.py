@@ -469,6 +469,11 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 
 
 def make_scale_rot_plot(scales, rotations, model, mode, layer):
+    scale_xmin, scale_xmax = 0.5, 2.0
+    scale_ymin, scale_ymax = 0, 10e3
+    rot_xmin, rot_xmax = -0.3, 0.3
+    rot_ymin, rot_ymax = 0, 10e3
+
     fontsize_title = 11
     fontsize_ticks = 9
     bins = 50
@@ -489,6 +494,9 @@ def make_scale_rot_plot(scales, rotations, model, mode, layer):
     f1_ax1.set_title('scale', fontsize=fontsize_title)
     f1_ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     plt.yscale('log')
+    f1_ax1.set_xlim([scale_xmin, scale_xmax])
+    f1_ax1.set_ylim([scale_ymin, scale_ymax])
+
 
     f1_ax2 = fig1.add_subplot(gs1[0, 1])
     f1_ax2.set_axisbelow(True)
@@ -498,6 +506,9 @@ def make_scale_rot_plot(scales, rotations, model, mode, layer):
     f1_ax2.set_title('rotation', fontsize=fontsize_title)
     f1_ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     plt.yscale('log')
+    f1_ax2.set_xlim([rot_xmin, rot_xmax])
+    f1_ax2.set_ylim([rot_ymin, rot_ymax])
+
 
     fig1.tight_layout()
 
@@ -525,6 +536,9 @@ def make_xy_plot(xs, ys, model, mode, layer):
     # barcolor = 'royalblue'
     barcolor = 'darkblue'
 
+    xmin, xmax = -0.1, 0.3
+    ymin, ymax = -0.2, 0.1
+
     bins = 50
 
     fig2 = plt.figure(figsize=(4, 4))
@@ -536,27 +550,34 @@ def make_xy_plot(xs, ys, model, mode, layer):
     plt.hist2d(xs, ys, bins=bins, norm=LogNorm())
     f2_ax1.set_axisbelow(True)
     f2_ax1.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
+    f2_ax1.set_xlim([xmin, xmax])
+    f2_ax1.set_ylim([ymin, ymax])
 
 
     f2_ax2 = fig2.add_subplot(gs2[0, 0])
-    # f2_ax2.grid(True)
     f2_ax2.set_axisbelow(True)
     f2_ax2.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
     f2_ax2.hist(xs, bins=bins, color=barcolor)
     f2_ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
-    # f2_ax2.get_xaxis().set_visible(False)
     f2_ax2.set_xticklabels([])
     plt.yscale('log')
+    f2_ax2.set_xlim([xmin, xmax])
+    # f2_ax2.set_ylim([ymin, ymax])
+
 
     f2_ax3 = fig2.add_subplot(gs2[1, 1])
     # f2_ax3.grid(True)
     f2_ax3.set_axisbelow(True)
     f2_ax3.hist(ys, bins=bins, orientation='horizontal', color=barcolor)
+
     f2_ax3.grid(b=True, which='major', color=gridcolor, linestyle=linestyle)
     f2_ax3.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # f2_ax3.get_yaxis().set_visible(False)
     f2_ax3.set_yticklabels([])
     plt.xscale('log')
+    # f2_ax3.set_xlim([xmin, xmax])
+    f2_ax3.set_ylim([ymin, ymax])
+
     plt.colorbar()
 
     fig2.tight_layout()
@@ -725,13 +746,17 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
-# distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
-# distribution_plots('jester', [30, 23, 28, 0], mode='layer', convlayer=None)
+# 3T jester
+distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
 distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
 distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
 distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
-
-
+#
+# # 3T ucf101
+distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
