@@ -31,6 +31,7 @@ project_variable.model_number
 23  googlenet 3TConv
 24  VGG16 3TConv
 25  googlenet 3DConv
+26  googlenet 3TConv with special final layer
 
 
 # +---------+------------+--------------+
@@ -53,3 +54,12 @@ project_variable.model_number
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
+jester pret gn		3t	7419121
+jester pret gn		3d	14078833
+jester pret rn18	3t	11222619
+jester pret rn18	3d	33217755
+
+ucf101 pret gn		3t	7646671
+ucf101 pret gn		3d	14306383
+ucf101 pret rn18	3t	11260581
+ucf101 pret rn18	3d	33255717

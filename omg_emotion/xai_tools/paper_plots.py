@@ -747,15 +747,21 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # +---------+------------+--------------+
 
 # 3T jester
-distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
-distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+# #
+# # # 3T ucf101
+# distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
+
+# scratch
 distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
-distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
-#
-# # 3T ucf101
-distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
 distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
 distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
@@ -1363,3 +1369,14 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
 
 
+
+def quick_load_model(dataset, model, gpunum):
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = gpunum
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
+    device = setup.get_device(proj_var)
+    my_model.cuda(device)
+
+
+quick_load_model('jester', [30, 23, 28, 0], 0)
