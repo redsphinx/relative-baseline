@@ -23,7 +23,7 @@ import relative_baseline.omg_emotion.project_paths as PP
 from relative_baseline.omg_emotion.utils import opt_mkdir, opt_makedirs
 from relative_baseline.omg_emotion.xai_tools.layer_visualization import create_next_frame, normalize
 import relative_baseline.omg_emotion.xai_tools.feature_visualization as FV
-
+import relative_baseline.omg_emotion.utils as U
 
 from relative_baseline.omg_emotion.xai_tools.misc_functions import preprocess_image, recreate_image, save_clip
 from relative_baseline.omg_emotion.models import deconv_3DTTN, deconv_3D
@@ -759,10 +759,10 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 # scratch
-distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
-distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
@@ -1372,11 +1372,17 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
 def quick_load_model(dataset, model, gpunum):
     proj_var = init1(dataset, model)
+    proj_var.model_number = 26
     my_model = setup.get_model(proj_var)
+
     proj_var.device = gpunum
     wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
     device = setup.get_device(proj_var)
     my_model.cuda(device)
+    video = ['/fast/gabras/jester/data_150_224_avi/48467.avi']
+    data = load_videos(video)
+    datapoint = torch.Tensor(data).cuda(device)
+    aux1, aux2, prediction = my_model(datapoint, proj_var.device, None, False)
 
 
-quick_load_model('jester', [30, 23, 28, 0], 0)
+# quick_load_model('jester', [30, 23, 28, 0], 0)

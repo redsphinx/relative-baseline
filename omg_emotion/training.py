@@ -73,8 +73,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
 
             my_optimizer.zero_grad()
 
-            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23, 24]:
-                if project_variable.model_number == 23:
+            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 17, 18, 19, 20, 23, 24, 26]:
+                if project_variable.model_number in [23, 26]:
                     aux1, aux2, predictions = my_model(data, device)
                     assert aux1 is not None and aux2 is not None
                     # https://discuss.pytorch.org/t/why-auxiliary-logits-set-to-false-in-train-mode/40705
@@ -92,7 +92,7 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
                 predictions = my_model(data)
 
 
-            if project_variable.model_number in [23, 25]:
+            if project_variable.model_number in [23, 25, 26]:
                 loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
             else:
                 loss = U.calculate_loss(project_variable, predictions, labels)

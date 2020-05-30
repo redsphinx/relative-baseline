@@ -1275,11 +1275,11 @@ def e37_conv3T_jester():
     project_variable.model_number = 26 # GN 3T dynamic
     project_variable.experiment_number = 37
     project_variable.sheet_number = 22
-    project_variable.device = 1
+    project_variable.device = 0
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
-    project_variable.batch_size = 20
-    project_variable.batch_size_val_test = 20
+    project_variable.batch_size = 13
+    project_variable.batch_size_val_test = 13
 
     project_variable.load_model = [30, 23, 28, 0]
     project_variable.load_from_fast = True
@@ -1297,12 +1297,12 @@ def e37_conv3T_jester():
     project_variable.use_adaptive_lr = True
     project_variable.num_out_channels = [0]
 
-    wait_for_gpu(wait=True, device_num=project_variable.device)
+    # wait_for_gpu(wait=True, device_num=project_variable.device)
     main_file.run(project_variable)
 
 
-# project_variable = ProjectVariable(debug_mode=False)
-project_variable = ProjectVariable(debug_mode=True)
+project_variable = ProjectVariable(debug_mode=False)
+# project_variable = ProjectVariable(debug_mode=True)
 
 # e6_conv3DTTN_jester()
 # e7_conv3DTTN_jester()

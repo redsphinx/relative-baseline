@@ -522,36 +522,22 @@ def get_model(project_variable):
         model = Googlenet3TConv_explicit_dyn(project_variable)
         if type(project_variable.load_model) != bool and not project_variable.load_model is None:
             the_state_dict = torch.load(path, map_location=torch.device('cpu'))
+            copy_keys = list(the_state_dict.keys())[:-2]
+            new_dict = {k:the_state_dict[k] for k in copy_keys}
 
-            model.load_state_dict(the_state_dict)
+            _ = model.load_state_dict(new_dict, strict=False)
 
             print('check the loading, do not load the last layer')
 
             # freeze layers except the last one
+            convs = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
             for i in range(1, 60):
                 layer = getattr(model, 'conv%d' % i)
-                layer.first_weight.requires_grad = False
+                if i in convs:
+                    layer.first_weight.requires_grad = False
+                else:
+                    layer.weight.requires_grad = False
 
-            # model.conv1.first_weight.requires_grad = False
-            # model.conv3.first_weight.requires_grad = False
-            # model.conv6.first_weight.requires_grad = False
-            # model.conv8.first_weight.requires_grad = False
-            # model.conv12.first_weight.requires_grad = False
-            # model.conv14.first_weight.requires_grad = False
-            # model.conv18.first_weight.requires_grad = False
-            # model.conv20.first_weight.requires_grad = False
-            # model.conv24.first_weight.requires_grad = False
-            # model.conv26.first_weight.requires_grad = False
-            # model.conv31.first_weight.requires_grad = False
-            # model.conv33.first_weight.requires_grad = False
-            # model.conv37.first_weight.requires_grad = False
-            # model.conv39.first_weight.requires_grad = False
-            # model.conv43.first_weight.requires_grad = False
-            # model.conv45.first_weight.requires_grad = False
-            # model.conv50.first_weight.requires_grad = False
-            # model.conv52.first_weight.requires_grad = False
-            # model.conv56.first_weight.requires_grad = False
-            # model.conv58.first_weight.requires_grad = False
 
         elif project_variable.load_model:
             # load googlenet from pytorch
