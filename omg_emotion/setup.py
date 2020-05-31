@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from relative_baseline.omg_emotion import project_paths as PP
 import os
+from relative_baseline.omg_emotion import utils as U
 from relative_baseline.omg_emotion import models as M
 from relative_baseline.omg_emotion import factorized_convolution as C3D
 from relative_baseline.omg_emotion.evolution.model_maker import ModularConv
@@ -521,23 +522,27 @@ def get_model(project_variable):
     elif project_variable.model_number == 26:
         model = Googlenet3TConv_explicit_dyn(project_variable)
         if type(project_variable.load_model) != bool and not project_variable.load_model is None:
-            the_state_dict = torch.load(path, map_location=torch.device('cpu'))
-            copy_keys = list(the_state_dict.keys())[:-2]
-            new_dict = {k:the_state_dict[k] for k in copy_keys}
 
-            _ = model.load_state_dict(new_dict, strict=False)
+            if project_variable.load_model[1] == project_variable.model_number:
+                model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+            else:
+                the_state_dict = torch.load(path, map_location=torch.device('cpu'))
+                copy_keys = list(the_state_dict.keys())[:-2]
+                new_dict = {k:the_state_dict[k] for k in copy_keys}
 
-            print('check the loading, do not load the last layer')
+                _ = model.load_state_dict(new_dict, strict=False)
 
-            # freeze layers except the last one
-            convs = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
-            for i in range(1, 60):
-                layer = getattr(model, 'conv%d' % i)
-                if i in convs:
-                    layer.first_weight.requires_grad = False
-                else:
-                    layer.weight.requires_grad = False
+                # freeze layers except the last one
 
+                # freeze everything
+                for i in model.parameters():
+                    i.requires_grad = False
+
+                model.conv60.first_weight.requires_grad = True
+                model.conv60.scale.requires_grad = True
+                model.conv60.rotate.requires_grad = True
+                model.conv60.translate_x.requires_grad = True
+                model.conv60.translate_y.requires_grad = True
 
         elif project_variable.load_model:
             # load googlenet from pytorch

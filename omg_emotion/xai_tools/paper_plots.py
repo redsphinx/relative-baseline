@@ -388,6 +388,8 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
     if convlayer is None:
         if model[1] in [21, 20]: # resnet18
             conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+        elif model[1] in [26]:
+            conv_layers = [60]
         else: # googlenet
             conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
     else:
@@ -466,6 +468,8 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=141)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=105)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
+# plot_all_srxy('jester', [37, 26, 5, 0])
+
 
 
 def make_scale_rot_plot(scales, rotations, model, mode, layer):
@@ -987,6 +991,8 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
     if model[1] in [21, 20]: # resnet18
         conv_layers = [i+1 for i in range(20) if (i+1) not in [6, 11, 16]]
+    elif model[1] in [26]: # googlenet with special last layer
+        conv_layers = [60]
     else: # googlenet
         conv_layers = [1, 3, 6, 8, 12, 14, 18, 20, 24, 26, 31, 33, 37, 39, 43, 45, 50, 52, 56, 58]
 
@@ -1032,7 +1038,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                 my_model.eval()
                 if proj_var.model_number == 20:
                     prediction = my_model(random_input, proj_var.device, stop_at=ind)
-                elif proj_var.model_number == 23:
+                elif proj_var.model_number in [23, 26]:
                     prediction = my_model(random_input, proj_var.device, ind, False)
                 elif proj_var.model_number == 21:
                     prediction = my_model(random_input, stop_at=ind)
@@ -1045,7 +1051,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                 optimizer.step()
                 my_model.zero_grad()
 
-                liist = [499]
+                liist = [steps-1]
                 if me in liist:
                     output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
@@ -1058,7 +1064,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=140, num_channels=141, seed=666, steps=500, mode='image', gpunum=0, layer_begin=31, single_layer=True)
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=104, num_channels=105, seed=666, steps=500, mode='image', gpunum=0, layer_begin=50, single_layer=True)
 
-
+# activation_maximization_single_channels('jester', [37, 26, 5, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 
 # RN18 3T
 # DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
@@ -1385,4 +1391,4 @@ def quick_load_model(dataset, model, gpunum):
     aux1, aux2, prediction = my_model(datapoint, proj_var.device, None, False)
 
 
-# quick_load_model('jester', [30, 23, 28, 0], 0)
+quick_load_model('jester', [30, 23, 28, 0], 2)
