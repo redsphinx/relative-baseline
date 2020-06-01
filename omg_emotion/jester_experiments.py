@@ -1309,7 +1309,7 @@ def e38_conv3T_jester():
     project_variable.device = 0
     project_variable.end_epoch = 100
     project_variable.repeat_experiments = 1
-    project_variable.batch_size = 27
+    project_variable.batch_size = 21
     project_variable.batch_size_val_test = 27
 
     project_variable.load_model = [30, 23, 28, 0]
@@ -1329,6 +1329,38 @@ def e38_conv3T_jester():
     project_variable.num_out_channels = [0]
 
     wait_for_gpu(wait=True, device_num=project_variable.device)
+    main_file.run(project_variable)
+
+
+def e39_conv3T_jester():
+    set_init_1()
+    project_variable.model_number = 26 # GN 3T dynamic
+    project_variable.experiment_number = 39
+    project_variable.sheet_number = 22
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 1
+    project_variable.batch_size = 27
+    project_variable.batch_size_val_test = 27
+
+    project_variable.load_model = [38, 26, 31, 0]
+    project_variable.load_from_fast = True
+    project_variable.only_theta_final_layer = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    # wait_for_gpu(wait=True, device_num=project_variable.device)
     main_file.run(project_variable)
 
 
@@ -1369,4 +1401,5 @@ project_variable = ProjectVariable(debug_mode=False)
 # e33_conv3T_jester()
 # e36_conv3DTTN_jester()
 # e37_conv3T_jester()
-e38_conv3T_jester()
+# e38_conv3T_jester()
+e39_conv3T_jester()

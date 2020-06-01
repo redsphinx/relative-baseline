@@ -176,6 +176,8 @@ class ProjectVariable(object):
         self._max_pool_temporal = 2
         # height=width dimension of the convolutional kernels
         self._conv_k_hw = 3
+        # train only the temporal parameters in the last layer
+        self._only_theta_final_layer = False
         # ----------------------------------------------------------------------------------------------------------
         # setting for video datasets
         # ----------------------------------------------------------------------------------------------------------
@@ -801,6 +803,14 @@ class ProjectVariable(object):
     @conv1_k_t.setter
     def conv1_k_t(self, value):
         self._conv1_k_t = value
+        
+    @property
+    def only_theta_final_layer(self):
+        return self._only_theta_final_layer
+
+    @only_theta_final_layer.setter
+    def only_theta_final_layer(self, value):
+        self._only_theta_final_layer = value
 
     @property
     def do_batchnorm(self):

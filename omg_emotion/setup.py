@@ -525,6 +525,17 @@ def get_model(project_variable):
 
             if project_variable.load_model[1] == project_variable.model_number:
                 model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+                if project_variable.only_theta_final_layer:
+                    for i in model.parameters():
+                        i.requires_grad = False
+
+                    model.conv60.scale.requires_grad = True
+                    model.conv60.rotate.requires_grad = True
+                    model.conv60.translate_x.requires_grad = True
+                    model.conv60.translate_y.requires_grad = True
+                    print('training only the theta params')
+
             else:
                 the_state_dict = torch.load(path, map_location=torch.device('cpu'))
                 copy_keys = list(the_state_dict.keys())[:-2]

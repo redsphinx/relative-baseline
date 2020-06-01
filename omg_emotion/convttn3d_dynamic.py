@@ -100,7 +100,7 @@ class ConvTTN3d_dynamic(conv._ConvNd):
         return grid
 
     # replace out_channels with transformation_groups <- remove in a bit
-    def forward(self, input, device):
+    def forward(self, the_input, device):
         # replace transformation_groups with out_channels
         # replace transformations_per_filter with kernel_size[0]-1
 
@@ -145,5 +145,5 @@ class ConvTTN3d_dynamic(conv._ConvNd):
 
         self.weight = torch.nn.Parameter(new_weight)
 
-        y = F.conv3d(input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
+        y = F.conv3d(the_input, new_weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
         return y

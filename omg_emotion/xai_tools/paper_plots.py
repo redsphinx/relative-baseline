@@ -469,6 +469,8 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=105)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
 # plot_all_srxy('jester', [37, 26, 5, 0])
+# plot_all_srxy('jester', [38, 26, 31, 0])
+plot_all_srxy('jester', [39, 26, 0, 0])
 
 
 
@@ -1065,6 +1067,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=104, num_channels=105, seed=666, steps=500, mode='image', gpunum=0, layer_begin=50, single_layer=True)
 
 # activation_maximization_single_channels('jester', [37, 26, 5, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
+# activation_maximization_single_channels('jester', [38, 26, 1, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 
 # RN18 3T
 # DONE activation_maximization_single_channels('jester', [31, 20, 8, 0], begin=1, num_channels=5, mode='image', gpunum=0, seed=66)
@@ -1391,4 +1394,4 @@ def quick_load_model(dataset, model, gpunum):
     aux1, aux2, prediction = my_model(datapoint, proj_var.device, None, False)
 
 
-quick_load_model('jester', [30, 23, 28, 0], 2)
+# quick_load_model('jester', [30, 23, 28, 0], 2)
