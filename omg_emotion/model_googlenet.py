@@ -1387,12 +1387,15 @@ class Googlenet3TConv_explicit_dyn(torch.nn.Module):
         h = torch.cat((h1, h2, h3, h4), dim=1)
         h = relu(h)  # torch.Size([1, 1024, 3, 3, 6])
 
-        h = self.avgpool3(h)
-        h = self.dropout3(h)
-        num = 60
+
         y = self.conv60(h, device)
-        if stop_at == num:
-            return y
+
+        # h = self.avgpool3(h)
+        # h = self.dropout3(h)
+        # num = 60
+        # y = self.conv60(h, device)
+        # if stop_at == num:
+        #     return y
         _shape = y.shape
         y = y.view(_shape[0], _shape[1])
         return aux1, aux2, y

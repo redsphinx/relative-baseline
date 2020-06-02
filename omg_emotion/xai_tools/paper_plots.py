@@ -265,17 +265,19 @@ def find_best_videos(dataset, model, device):
 
 def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     x_axis = np.arange(len(scales)+1)
-    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(9, 3))
+    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=(10.5, 3))
     # plt.setp(ax3, adjustable='box', aspect='equal')
     gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])
 
-    fontsize_label = 9
-    fontsize_title = 11
-    fontsize_suptitle = 12
-    fontsize_ticks = 7
-    fontsize_anno = 10
-    markersize = 4
-    linewidth = 1.1
+    fontsize_label = 17
+    fontsize_title = 18
+    fontsize_ticks = 18
+    fontsize_anno = 12
+    markersize = 7
+    markercolor_start = 'b'
+    markercolor_end = 'r'
+    markercolor_between = 'w'
+    linewidth = 1.6
     linecolor = 'b'
 
     if dataset == 'jester':
@@ -307,7 +309,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax1.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
     ax1.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
     # ax.tick_params(axis='both', which='minor', labelsize=8)
-    # ax1.set_title('cumulative scale', fontsize=fontsize_title)
+    ax1.set_title('cumulative scale', fontsize=fontsize_title)
     # ax1.set_aspect('equal')
     # ax1.set(adjustable='box')
     ax1.grid(True)
@@ -324,16 +326,30 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax2.set_xticks(x_axis, tuple([str(i) for i in x_axis]))
     ax2.xaxis.set_ticks(x_axis)
     ax2.tick_params(axis='both', which='major', labelsize=fontsize_ticks)
-    # ax2.set_title('cumulative rotation', fontsize=fontsize_title)
+    ax2.set_title('cumulative rotation', fontsize=fontsize_title)
     # ax2.set_aspect('equal', 'box')
     # ax2.set(adjustable='box')
     ax2.grid(True)
 
     # txt = ['t'+str(i) for i in range(len(new_scales))]
-    txt = [str(i) for i in range(len(new_scales))]
     ax3 = plt.subplot(gs[2])
+    txt = [str(i) for i in range(len(new_scales))]
+    mcolors = []
+    for i in range(len(new_scales)):
+        if i == 0:
+            mcolors.append(markercolor_start)
+        elif i == len(new_scales)-1:
+            mcolors.append(markercolor_end)
+        else:
+            mcolors.append(markercolor_between)
+
     ax3.plot(new_xs, new_ys, 'o-', linewidth=linewidth, markersize=markersize, color=linecolor)
-    # ax3.set_title('x and y location in pixels', fontsize=fontsize_title)
+
+    for i in range(len(new_scales)):
+        ax3.plot(new_xs[i], new_ys[i], 'o-', linewidth=linewidth, markersize=markersize+2, color=linecolor, markerfacecolor=mcolors[i],
+                 markeredgewidth=1)
+
+    ax3.set_title('location x, y in pixels', fontsize=fontsize_title)
     ax3.set_ylabel('y', fontsize=fontsize_label)
     ax3.set_xlabel('x', fontsize=fontsize_label)
     # eps_x = (max(new_xs) - min(new_xs)) / 10
@@ -346,10 +362,10 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # ax3.set(adjustable='box')
     ax3.grid(True)
     # ax3.axis('square')
-    eps = 0
-    for i, j in enumerate(txt):
-        ax3.annotate(j, xy=(new_xs[i]-eps, new_ys[i]-eps), xytext=(new_xs[i], new_ys[i]), fontsize=fontsize_anno,
-                     horizontalalignment='left', verticalalignment='bottom')
+    # eps = 0
+    # for i, j in enumerate(txt):
+    #     ax3.annotate(j, xy=(new_xs[i]-eps, new_ys[i]-eps), xytext=(new_xs[i], new_ys[i]), fontsize=fontsize_anno,
+    #                  horizontalalignment='left', verticalalignment='bottom')
 
     # ax3.quiver(new_xs[:-1], new_ys[:-1], np.array(new_xs[1:])-np.array(new_xs[:-1]),
     #            np.array(new_ys[1:])-np.array(new_ys[:-1]), scale_units='xy', angles='xy', scale=2,
@@ -370,7 +386,7 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     # plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=True)
 
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
-    p2 = 'layer_%d_channel_%d.jpg' % (conv, ch)
+    p2 = 'layer_%d_channel_%d_v2.jpg' % (conv, ch)
     save_location = os.path.join(PP.srxy_plots, p1, p2)
 
     intermediary_path = os.path.join(PP.srxy_plots, p1)
@@ -463,14 +479,19 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [31, 20, 8, 0])
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=0)
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=1, channel=2)
+
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=57)
+
+# HERE
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=141)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=141)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=105)
 # plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
+# HERE
+
 # plot_all_srxy('jester', [37, 26, 5, 0])
 # plot_all_srxy('jester', [38, 26, 31, 0])
-plot_all_srxy('jester', [39, 26, 0, 0])
+# plot_all_srxy('jester', [39, 26, 0, 0])
 
 
 
@@ -480,8 +501,8 @@ def make_scale_rot_plot(scales, rotations, model, mode, layer):
     rot_xmin, rot_xmax = -0.3, 0.3
     rot_ymin, rot_ymax = 0, 10e3
 
-    fontsize_title = 11
-    fontsize_ticks = 9
+    fontsize_title = 21
+    fontsize_ticks = 19
     bins = 50
     linestyle = '--'
     gridcolor = 'lightslategray'
@@ -521,7 +542,7 @@ def make_scale_rot_plot(scales, rotations, model, mode, layer):
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
 
     if mode == 'model':
-        p2 = 'model_distribution_SR.jpg'
+        p2 = 'model_distribution_SR_v2.jpg'
     elif mode == 'layer':
         assert layer is not None
         p2 = 'layer_%d_distribution_SR.jpg' % layer
@@ -535,8 +556,8 @@ def make_scale_rot_plot(scales, rotations, model, mode, layer):
 
 
 def make_xy_plot(xs, ys, model, mode, layer):
-    fontsize_title = 11
-    fontsize_ticks = 9
+    fontsize_title = 16
+    fontsize_ticks = 19
     linestyle = '--'
     gridcolor = 'lightslategray'
     # barcolor = 'royalblue'
@@ -591,7 +612,7 @@ def make_xy_plot(xs, ys, model, mode, layer):
     p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
 
     if mode == 'model':
-        p2 = 'model_distribution_XY.jpg'
+        p2 = 'model_distribution_XY_v2.jpg'
     elif mode == 'layer':
         assert layer is not None
         p2 = 'layer_%d_distribution_XY.jpg' % layer
@@ -611,14 +632,15 @@ def make_distribution_plots(scales, rotations, xs, ys, model, mode, layer=None):
     intermediary_path = os.path.join(PP.distributions, p1)
     opt_makedirs(intermediary_path)
 
+    # print('PLOTS NOT PLOTTING (on purpose)')
     make_scale_rot_plot(scales, rotations, model, mode, layer)
     make_xy_plot(xs, ys, model, mode, layer)
 
-    _scales = np.abs(1-np.abs(scales))
-    print('\n%f,%f' % (float(np.mean(_scales)), float(np.std(_scales))))
-    print('%f,%f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations)))))
-    print('%f,%f' % (float(np.mean(np.abs(xs))), float(np.std(np.abs(xs)))))
-    print('%f,%f\n' % (float(np.mean(np.abs(ys))), float(np.std(np.abs(ys)))))
+    # _scales = np.abs(1-np.abs(scales))
+    # print('\n%f,%f' % (float(np.mean(_scales)), float(np.std(_scales))))
+    # print('%f,%f' % (float(np.mean(np.abs(rotations))), float(np.std(np.abs(rotations)))))
+    # print('%f,%f' % (float(np.mean(np.abs(xs))), float(np.std(np.abs(xs)))))
+    # print('%f,%f\n' % (float(np.mean(np.abs(ys))), float(np.std(np.abs(ys)))))
 
 
 
@@ -759,16 +781,20 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
 # #
 # # # 3T ucf101
-# distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
-# distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
 # distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
 # distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
-# scratch
-# distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
-# distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
-# distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
-# distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
+# pre-trained
+distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
+#
+# # scratch
+distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)

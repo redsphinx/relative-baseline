@@ -1,3 +1,6 @@
+# code originally obtained at:
+# https://github.com/elichen/Feature-visualization
+
 import numpy as np
 import torch
 from torch import tensor
