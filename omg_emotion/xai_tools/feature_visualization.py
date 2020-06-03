@@ -183,42 +183,6 @@ def lucid_transforms(img, device, jitter=None, scale=.5, degrees=45):
     return fastai_image.data[None,:]
 
 
-# def lucid_transforms_vol(vol, jitter=None, scale=.5, degrees=45):
-#
-#     d,h,w = vol.shape[-3], vol.shape[-2], vol.shape[-1]
-#     if jitter is None:
-#         jitter = min(d,h,w)//2
-#     fastai_vol = vision.Image(vol.squeeze())
-#
-#     # pad
-#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)  # (30, 150, 224)
-#     vision.transform.pad()(fastai_vol, jitter)
-#
-#     # jitter
-#     first_jitter = int((jitter*(2/3)))
-#     vision.transform.crop_pad()(fastai_vol,
-#                                 (h+first_jitter,w+first_jitter),
-#                                 row_pct=np.random.rand(), col_pct=np.random.rand())
-#
-#     # scale
-#     percent = scale * 100 # scale up to integer to avoid float repr errors
-#     scale_factors = [(100 - percent + percent/5. * i)/100 for i in range(11)]
-#     rand_scale = scale_factors[int(np.random.rand()*len(scale_factors))]
-#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)
-#     vision.transform.zoom()(fastai_vol, rand_scale)
-#
-#     # rotate
-#     rotate_factors = list(range(-degrees, degrees+1)) + degrees//2 * [0]
-#     rand_rotate = rotate_factors[int(np.random.rand()*len(rotate_factors))]
-#     fastai_vol._flow = gpu_affine_grid(fastai_vol.shape)
-#     vision.transform.rotate()(fastai_vol, rand_rotate)
-#
-#     # jitter
-#     vision.transform.crop_pad()(fastai_vol, (h,w), row_pct=np.random.rand(), col_pct=np.random.rand())
-#
-#     return fastai_vol.data[None,:]
-
-
 def tensor_stats(t, label=""):
     if len(label) > 0: label += " "
     return("%smean:%.2f std:%.2f max:%.2f min:%.2f" % (label, t.mean().item(),t.std().item(),t.max().item(),t.min().item()))
@@ -230,59 +194,59 @@ def cossim(act0, act1, cosim_weight=0):
     cossim = cosim_weight*dot/(mag0*mag1)
     return cossim
 
-# def visualize_feature(model, layer, feature, start_image=None, last_hook_out=None,
-#                       size=200, steps=500, lr=0.004, weight_decay=0.1, grad_clip=1,
-#                       debug=False, frames=10, show=True):
-#     h,w = size if type(size) is tuple else (size,size)
-#     if start_image is not None:
-#         fastai_image = vision.Image(start_image.squeeze())
-#         fastai_image._flow = gpu_affine_grid((3,h,w)) # resize
-#         img_buf = fastai_image.data[None,:]
-#         img_buf = normalize(img_buf)
-#         img_buf = rgb_to_lucid_colorspace(img_buf)
-#         img_buf = rgb_to_fft(h, w, img_buf)
-#     else:
-#         img_buf = init_fft_buf(h, w)
-#     img_buf.requires_grad_()
-#     opt = torch.optim.AdamW([img_buf], lr=lr, weight_decay=weight_decay)
-#
-#     hook_out = None
-#     def callback(m, i, o):
-#         nonlocal hook_out
-#         hook_out = o
-#     hook = layer.register_forward_hook(callback)
-#
-#     for i in range(1,steps+1):
-#         opt.zero_grad()
-#
-#         img = fft_to_rgb(h, w, img_buf)
-#         img = lucid_colorspace_to_rgb(img)
-#         stats = tensor_stats(img)
-#         img = torch.sigmoid(img)
-#         img = normalize(img)
-#         img = lucid_transforms(img)
-#         model(img.cuda(device))
-#         if feature is None:
-#             loss = -1 * hook_out[0].pow(2).mean()
-#         else:
-#             loss = -1 * hook_out[0][feature].mean()
-#         if last_hook_out is not None:
-#             simularity = cossim(hook_out[0], last_hook_out)
-#             loss = loss + loss * simularity
-#
-#         loss.backward()
-#         torch.nn.utils.clip_grad_norm_(img_buf,grad_clip)
-#         opt.step()
-#
-#         if debug and (i)%(int(steps/frames))==0:
-#             # clear_output(wait=True)
-#             label = f"step: {i} loss: {loss:.2f} stats:{stats}"
-#             show_rgb(image_buf_to_rgb(h, w, img_buf),
-#                      label=label)
-#
-#     hook.remove()
-#
-#     retval = image_buf_to_rgb(h, w, img_buf)
-#     if show:
-#         if not debug: show_rgb(retval)
-#     return retval, hook_out[0].clone().detach()
+def visualize_feature(model, layer, feature, start_image=None, last_hook_out=None,
+                      size=200, steps=500, lr=0.004, weight_decay=0.1, grad_clip=1,
+                      debug=False, frames=10, show=True):
+    h,w = size if type(size) is tuple else (size,size)
+    if start_image is not None:
+        fastai_image = vision.Image(start_image.squeeze())
+        fastai_image._flow = gpu_affine_grid((3,h,w)) # resize
+        img_buf = fastai_image.data[None,:]
+        img_buf = normalize(img_buf)
+        img_buf = rgb_to_lucid_colorspace(img_buf)
+        img_buf = rgb_to_fft(h, w, img_buf)
+    else:
+        img_buf = init_fft_buf(h, w)
+    img_buf.requires_grad_()
+    opt = torch.optim.AdamW([img_buf], lr=lr, weight_decay=weight_decay)
+
+    hook_out = None
+    def callback(m, i, o):
+        nonlocal hook_out
+        hook_out = o
+    hook = layer.register_forward_hook(callback)
+
+    for i in range(1,steps+1):
+        opt.zero_grad()
+
+        img = fft_to_rgb(h, w, img_buf)
+        img = lucid_colorspace_to_rgb(img)
+        stats = tensor_stats(img)
+        img = torch.sigmoid(img)
+        img = normalize(img)
+        img = lucid_transforms(img)
+        model(img.cuda(device))
+        if feature is None:
+            loss = -1 * hook_out[0].pow(2).mean()
+        else:
+            loss = -1 * hook_out[0][feature].mean()
+        if last_hook_out is not None:
+            simularity = cossim(hook_out[0], last_hook_out)
+            loss = loss + loss * simularity
+
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(img_buf,grad_clip)
+        opt.step()
+
+        if debug and (i)%(int(steps/frames))==0:
+            # clear_output(wait=True)
+            label = f"step: {i} loss: {loss:.2f} stats:{stats}"
+            show_rgb(image_buf_to_rgb(h, w, img_buf),
+                     label=label)
+
+    hook.remove()
+
+    retval = image_buf_to_rgb(h, w, img_buf)
+    if show:
+        if not debug: show_rgb(retval)
+    return retval, hook_out[0].clone().detach()

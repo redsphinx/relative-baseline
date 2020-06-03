@@ -530,6 +530,7 @@ def get_model(project_variable):
                     for i in model.parameters():
                         i.requires_grad = False
 
+                    model.conv60.first_weight.requires_grad = True
                     model.conv60.scale.requires_grad = True
                     model.conv60.rotate.requires_grad = True
                     model.conv60.translate_x.requires_grad = True

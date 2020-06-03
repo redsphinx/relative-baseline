@@ -1103,9 +1103,9 @@ class Googlenet3TConv_explicit_dyn(torch.nn.Module):
         self.conv59 = Conv3d(in_channels=832, out_channels=128, kernel_size=1, padding=0, stride=1, bias=False)
         self.bn59 = BatchNorm3d(128)
 
-        self.avgpool3 = AdaptiveAvgPool3d((3, 1, 1))
-        self.dropout3 = Dropout3d(p=0.4)
-        self.conv60 = ConvTTN3d_dynamic(in_channels=1024, out_channels=pv.label_size, kernel_size=(3, 1, 1),
+        # self.avgpool3 = AdaptiveAvgPool3d((3, 1, 1))
+        # self.dropout3 = Dropout3d(p=0.4)
+        self.conv60 = ConvTTN3d_dynamic(in_channels=1024, out_channels=pv.label_size, kernel_size=(3, 3, 6),
                                         padding=0, stride=1, project_variable=pv, bias=False)
 
 
@@ -1387,8 +1387,10 @@ class Googlenet3TConv_explicit_dyn(torch.nn.Module):
         h = torch.cat((h1, h2, h3, h4), dim=1)
         h = relu(h)  # torch.Size([1, 1024, 3, 3, 6])
 
-
+        num = 60
         y = self.conv60(h, device)
+        if stop_at == num:
+            return y
 
         # h = self.avgpool3(h)
         # h = self.dropout3(h)

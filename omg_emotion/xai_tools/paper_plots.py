@@ -492,6 +492,7 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [37, 26, 5, 0])
 # plot_all_srxy('jester', [38, 26, 31, 0])
 # plot_all_srxy('jester', [39, 26, 0, 0])
+# plot_all_srxy('jester', [40, 26, 4, 0])
 
 
 
@@ -785,16 +786,16 @@ def distribution_plots(dataset, model, mode='model', convlayer=None):
 # distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 # pre-trained
-distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
-distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [30, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [31, 20, 8, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1003, 23, 12, 0], mode='model', convlayer=None)
 #
 # # scratch
-distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
-distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
-distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [36, 20, 13, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1008, 20, 11, 0], mode='model', convlayer=None)
+# distribution_plots('jester', [33, 23, 33, 0], mode='model', convlayer=None)
+# distribution_plots('ucf101', [1005, 23, 28, 0], mode='model', convlayer=None)
 
 
 # distribution_plots('ucf101', [1001, 20, 45, 0], mode='model', convlayer=None)
@@ -938,7 +939,7 @@ def preprocess(the_input, h, w, mode, device):
         img = FV.lucid_colorspace_to_rgb(img, device)  # torch.Size([1, 3, 150, 224])
         img = torch.sigmoid(img)
         img = FV.normalize(img, device)
-        img = FV.lucid_transforms(img, device)
+        img = FV.lucid_transforms(img, device, jitter=100)
         img = img.unsqueeze(2)  # torch.Size([1, 3, 1, 150, 224])
         random_video = img.repeat(1, 1, 30, 1, 1)  #torch.Size([1, 3, 30, 150, 224])
     elif mode == 'volume':
@@ -1073,9 +1074,18 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                 elif proj_var.model_number == 25:
                     prediction = my_model(random_input, ind, False)
 
-                loss = -1 * torch.mean(prediction[0, ch])
-                # loss = -1 * torch.mean(prediction[0, ch]**2)
+                if steps == 0:
+                    loss = -1 * torch.mean(prediction[0, ch]**2)
+                    # loss = -1 * torch.mean(prediction[0, ch])
+                else:
+                    loss = -1 * torch.mean(prediction[0, ch])
+                    # simularity = FV.cossim(prediction[0, ch], prediction[0, ch])
+                    # simularity = FV.cossim(random_input, random_input)
+                    # loss = loss + loss * simularity
+
+
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(random_input, 1)
                 optimizer.step()
                 my_model.zero_grad()
 
@@ -1092,6 +1102,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=140, num_channels=141, seed=666, steps=500, mode='image', gpunum=0, layer_begin=31, single_layer=True)
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=104, num_channels=105, seed=666, steps=500, mode='image', gpunum=0, layer_begin=50, single_layer=True)
 
+activation_maximization_single_channels('jester', [40, 26, 4, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=1)
 # activation_maximization_single_channels('jester', [37, 26, 5, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 # activation_maximization_single_channels('jester', [38, 26, 1, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 
