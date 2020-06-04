@@ -493,6 +493,8 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # plot_all_srxy('jester', [38, 26, 31, 0])
 # plot_all_srxy('jester', [39, 26, 0, 0])
 # plot_all_srxy('jester', [40, 26, 4, 0])
+# plot_all_srxy('jester', [40, 26, 11, 0])
+# plot_all_srxy('jester', [41, 26, 8, 0])
 
 
 
@@ -1102,7 +1104,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=140, num_channels=141, seed=666, steps=500, mode='image', gpunum=0, layer_begin=31, single_layer=True)
 # activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=104, num_channels=105, seed=666, steps=500, mode='image', gpunum=0, layer_begin=50, single_layer=True)
 
-activation_maximization_single_channels('jester', [40, 26, 4, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=1)
+# activation_maximization_single_channels('jester', [40, 26, 4, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=1)
 # activation_maximization_single_channels('jester', [37, 26, 5, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 # activation_maximization_single_channels('jester', [38, 26, 1, 0], seed=42, num_channels=None, steps=700, mode='image', gpunum=2)
 
@@ -1430,5 +1432,16 @@ def quick_load_model(dataset, model, gpunum):
     datapoint = torch.Tensor(data).cuda(device)
     aux1, aux2, prediction = my_model(datapoint, proj_var.device, None, False)
 
+
+def check_outputs(inp, target, num_classes=27):
+    the_input = np.zeros(num_classes)
+    the_input[inp] = 1
+    the_input = torch.from_numpy(the_input)
+    the_input = the_input.unsqueeze(0)
+    target = torch.from_numpy(np.array([target]))
+
+    loss_function = torch.nn.CrossEntropyLoss(weight=None)
+    loss = loss_function(the_input, target)
+    return loss
 
 # quick_load_model('jester', [30, 23, 28, 0], 2)

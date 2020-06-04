@@ -204,7 +204,7 @@ def standardize_clips(b, e, he, wi, loc):
         vid_path = os.path.join(base_path, all_videos[vid])
         new_vid_path = os.path.join(new_path, all_videos[vid])
 
-        # to fix specific things
+        # to fi_x specific videos
         # vid_path = os.path.join(base_path, str(vid))
         # new_vid_path = os.path.join(new_path, str(vid))
         if not os.path.exists(new_vid_path):
@@ -455,7 +455,7 @@ def create_file_list(which, dest, jester_data_path):
 
 
 # create_file_list('test', dest='224_336_fast', jester_data_path=PP.fast_jester_data_224_336_avi)
-create_file_list('test', dest='150_224_fast', jester_data_path=PP.fast_jester_data_150_224_avi)
+# create_file_list('test', dest='150_224_fast', jester_data_path=PP.fast_jester_data_150_224_avi)
 
 
 
