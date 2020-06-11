@@ -1,3 +1,4 @@
+import shutil
 from matplotlib.colors import LogNorm
 import matplotlib
 matplotlib.use('agg')
@@ -474,28 +475,53 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
-# >>> channel count from 1 <<<
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=94)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=82)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=19)
+#
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=1)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=125)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=81)
+#
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=352)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=298)
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=319)
 
-# plot_all_srxy('jester', [31, 20, 8, 0])
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=0)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=1, channel=2)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=77)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=93)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=79)
+#
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=81)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=116)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=157)
+#
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=105)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=288)
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=177)
 
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=57)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=116)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=42)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=17)
+#
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=188)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=196)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=131)
+#
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=129)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=484)
+# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=385)
 
-# HERE
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=141)
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=141)
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=105)
-# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=1, channel=None)
-# HERE
-
-# plot_all_srxy('jester', [37, 26, 5, 0])
-# plot_all_srxy('jester', [38, 26, 31, 0])
-# plot_all_srxy('jester', [39, 26, 0, 0])
-# plot_all_srxy('jester', [40, 26, 4, 0])
-# plot_all_srxy('jester', [40, 26, 11, 0])
-# plot_all_srxy('jester', [41, 26, 8, 0])
-
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=24)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=69)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=45)
+#
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=128)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=150)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=171)
+#
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=132)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=56)
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=196)
 
 
 def make_scale_rot_plot(scales, rotations, model, mode, layer):
@@ -1096,6 +1122,48 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                     output = postprocess(h, w, the_input, mode, device)  # (3, 30, 150, 224)
                     save_output(output, mode, p2, ch, me)
 
+
+# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=77)
+# activation_maximization_single_channels('ucf101', [1003, 23, 12, 0], begin=77, num_channels=78, mode='image', gpunum=2,
+#                                         seed=6666, layer_begin=12, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=24)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=24, num_channels=25, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=12, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=69)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=69, num_channels=70, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=12, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=45)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=45, num_channels=46, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=12, single_layer=True)
+#
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=128)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=128, num_channels=129, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=31, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=150)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=150, num_channels=151, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=31, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=171)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=171, num_channels=172, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=31, single_layer=True)
+#
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=132)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=132, num_channels=133, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=50, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=56)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=56, num_channels=57, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=50, single_layer=True)
+
+# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=196)
+activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=196, num_channels=197, mode='image', gpunum=2,
+                                        seed=66666666, layer_begin=50, single_layer=True)
+
+
 # activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=11, num_channels=12, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=12, single_layer=True)
 # activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=140, num_channels=141, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=31, single_layer=True)
 # activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=186, num_channels=187, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=50, single_layer=True)
@@ -1396,23 +1464,21 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
 
 # 3D convs
-# save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
-# save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20)
-# save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
-# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=5, num_channels=20, gpunum=1)
+# save_gradients('jester', [26, 21, 45, 0], mode='volume', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('ucf101', [1000, 21, 40, 0], mode='volume', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('ucf101', [1002, 25, 54, 0], mode='volume', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
 
 # 3T convs
-# save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
 # save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [31, 20, 8, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('ucf101', [1001, 20, 45, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('ucf101', [1003, 23, 12, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
 #
-# save_gradients('ucf101', [1001, 20, 45, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
-# save_gradients('ucf101', [1003, 23, 12, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
-#
-# save_gradients('jester', [36, 20, 13, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=0)
-# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=0)
-#
-# save_gradients('ucf101', [1008, 20, 11, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
-# save_gradients('ucf101', [1005, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=5, gpunum=1)
+# save_gradients('jester', [36, 20, 13, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=1)
+# save_gradients('jester', [33, 23, 33, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=2)
+# save_gradients('ucf101', [1008, 20, 11, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=2)
+# save_gradients('ucf101', [1005, 23, 28, 0], mode='image', prediction_type='correct', num_videos=10, num_channels=10, gpunum=2)
 
 # save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0)
 
@@ -1445,3 +1511,99 @@ def check_outputs(inp, target, num_classes=27):
     return loss
 
 # quick_load_model('jester', [30, 23, 28, 0], 2)
+
+
+def make_srxy_actmax_animation(dataset, model, layer, channel_from_zero):
+
+    # get the actmax image
+    path = os.path.join(PP.act_max, 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2]), 
+                        'conv_%d' % layer, 'chan_%d_step_499.jpg' % channel_from_zero)
+    if os.path.exists(path):
+        actmax_image = Image.open(path)
+    else:
+        print('path does not exist: %s' % path)
+        return -1
+        
+    actmax_image = torch.Tensor(np.array(actmax_image))  # torch.Size([150, 224, 3])
+
+    # get the srxy params and apply
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = None
+    device = setup.get_device(proj_var)
+
+    params = getattr(my_model, 'conv%d' % layer)
+    
+    s = params.scale.data  # torch.Size([2, 128])
+    r = params.rotate.data
+    x = params.translate_x.data
+    y = params.translate_y.data
+
+    num_transformations = s.shape[0]
+
+    try:
+        assert channel_from_zero < s.shape[1]
+    except AssertionError:
+        print('Error: number of channels chosen is higher than total number of channels in this layer')
+        return -1
+
+    # copy the original image
+    channel_path = os.path.join(PP.act_max, 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2]),
+                                'conv_%d' % layer, 'chan_%d' % channel_from_zero)
+    opt_mkdir(channel_path)
+    dest = os.path.join(channel_path, 'slice_0.jpg')
+    shutil.copy(path, dest)
+
+    _s, _r, _x, _y = s[0, channel_from_zero], r[0, channel_from_zero], \
+                     x[0, channel_from_zero], y[0, channel_from_zero]
+    
+    k0 = actmax_image.clone()
+    for i in range(num_transformations):
+        # apply them on the final image
+        if i == 0:
+            next_k = create_next_frame(_s, _r, _x, _y, k0, device)
+        else:
+            _s = _s * s[i, channel_from_zero]
+            _r = _r + r[i, channel_from_zero]
+            _x = _x + x[i, channel_from_zero]
+            _y = _y + y[i, channel_from_zero]
+            next_k = create_next_frame(_s, _r, _x, _y, k0, device)
+
+        # next_k = next_k.transpose(1, 2, 0)
+        next_k = normalize(np.array(next_k).transpose(2, 0, 1))
+        next_k = np.array(next_k.transpose(1, 2, 0), dtype=np.uint8)
+
+        img = Image.fromarray(next_k, mode='RGB')
+        channel_path = os.path.join(PP.act_max, 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2]),
+                                    'conv_%d' % layer, 'chan_%d' % channel_from_zero)
+
+        name = 'slice_%d.jpg' % (i+1)
+        save_path = os.path.join(channel_path, name)
+        img.save(save_path)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=94)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 7, 94)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=82)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 7, 82)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=19)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 7, 19)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=1)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 12, 1)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=125)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 12, 125)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=81)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 12, 81)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=352)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 17, 352)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=298)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 17, 298)
+
+# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=319)
+# make_srxy_actmax_animation('jester', [31, 20, 8, 0], 17, 319)
