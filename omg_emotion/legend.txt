@@ -33,6 +33,8 @@ project_variable.model_number
 25  googlenet 3DConv
 26  googlenet 3TConv with special final layer
 
+60  r(2+1)d
+
 
 # +---------+------------+--------------+
 # |         |   Jester   |    UCF101    |

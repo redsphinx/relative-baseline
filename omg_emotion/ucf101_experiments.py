@@ -249,6 +249,34 @@ def e1008_3T_ucf101():
 
     main_file.run(project_variable)
 
+# R2+1D
+def e1009_3T_ucf101():
+    set_init_1()
+    project_variable.model_number = 60
+    project_variable.experiment_number = 1009
+    project_variable.sheet_number = 23
+    project_variable.device = 0
+    project_variable.end_epoch = 100
+    project_variable.batch_size = 3
+    project_variable.batch_size_val_test = 3
+
+    # load from 23, model 24 might be corrupted
+    project_variable.load_model = False
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+
+    main_file.run(project_variable)
 
 project_variable = ProjectVariable(debug_mode=False)
 # project_variable = ProjectVariable(debug_mode=True)
@@ -263,3 +291,4 @@ project_variable = ProjectVariable(debug_mode=False)
 # e1005_3T_ucf101()
 
 # e1008_3T_ucf101()
+e1009_3T_ucf101()

@@ -1,4 +1,5 @@
 from torchvision.models import resnet18, googlenet, vgg19_bn, vgg16_bn
+from torchvision.models.video import r2plus1d_18
 from torch.optim.adam import Adam
 from torch.optim.sgd import SGD
 import torch
@@ -18,13 +19,17 @@ def prepare_model(project_variable, model):
     if project_variable.model_number == 0:
         model.fc = nn.Linear(in_features=512, out_features=project_variable.label_size, bias=True)
 
+    elif project_variable.model_number == 60:
+        model.fc = nn.Linear(in_features=512, out_features=project_variable.label_size, bias=True)
+
     return model
 
 
 def get_model(project_variable):
     # project_variable = ProjectVariable()
     if type(project_variable.load_model) == bool:
-        print('loading weights from torchvision model')
+        if project_variable.load_model:
+            print('loading weights from torchvision model')
     elif project_variable.load_model is not None:
         if len(project_variable.load_model) == 3:
             ex, mo, ep = project_variable.load_model
@@ -648,6 +653,18 @@ def get_model(project_variable):
         model.conv56.weight.requires_grad = False
         model.conv58.weight.requires_grad = False
         model.conv60.weight.requires_grad = False
+
+    # R2plus1D
+    elif project_variable.model_number == 60:
+        model = r2plus1d_18(pretrained=False)
+        model = prepare_model(project_variable, model)
+
+        if project_variable.load_model:
+            # load resnet18 from pytorch & transfer weights
+            tmp_rn18 = resnet18(pretrained=True)
+            print('asdf')
+
+
 
     else:
         print('ERROR: model_number=%d not supported' % project_variable.model_number)

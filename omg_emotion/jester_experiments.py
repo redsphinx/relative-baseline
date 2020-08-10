@@ -1428,44 +1428,38 @@ def e41_conv3T_jester():
     main_file.run(project_variable)
 
 
+def e50_conv3T_jester():
+    set_init_1()
+    project_variable.model_number = 60 # r2+1d
+    project_variable.experiment_number = 50
+    project_variable.sheet_number = 22
+    project_variable.device = 1
+    project_variable.end_epoch = 100
+    project_variable.repeat_experiments = 1
+    project_variable.batch_size = 3
+    project_variable.batch_size_val_test = 3
+
+    project_variable.load_model = False
+    project_variable.load_from_fast = True
+
+    project_variable.use_dali = True
+    project_variable.dali_workers = 32
+    project_variable.dali_iterator_size = ['all', 'all', 0]
+    project_variable.nas = False
+
+    project_variable.stop_at_collapse = True
+    project_variable.early_stopping = True
+
+    project_variable.optimizer = 'adam'
+    project_variable.learning_rate = 0.00005
+    project_variable.use_adaptive_lr = True
+    project_variable.num_out_channels = [0]
+
+    # wait_for_gpu(wait=True, device_num=project_variable.device)
+    main_file.run(project_variable)
+
+
 project_variable = ProjectVariable(debug_mode=False)
 # project_variable = ProjectVariable(debug_mode=True)
 
-# e6_conv3DTTN_jester()
-# e7_conv3DTTN_jester()
-# e8_conv3DTTN_jester()
-# eRESNET_jester()
-# e9_conv3DTTN_jester()
-# e10_conv3DTTN_jester()
-# vis_conv3DTTN_jester()
-# e11_conv3DTTN_jester()
-# e12_conv3DTTN_jester()
-# e13_conv3DTTN_jester()
-# e14_conv3DTTN_jester()
-# e15_conv3DTTN_jester()
-# e16_conv3D_jester()
-# e17_conv3DTTN_jester()
-# e18_conv3D_jester()
-# e19_conv3Dreduced_jester()
-# e20_conv3Dreducedpretrained_jester()
-# e20_conv3DTTN_jester()
-# e21_conv3DTTN_jester()
-# e22_conv3DTTN_jester()
-# e23_conv3DTTN_jester()
-# e24_conv3DTTN_jester()
-# e22_conv3DTTN_jester()
-# e25_conv3DTTN_jester()
-# e26_conv3D_jester()
-# e27_conv3T_jester()
-# e28_conv3D_jester()
-# e29_conv3DTTN_jester()
-# e30_conv3T_jester()
-# e31_conv3DTTN_jester()
-# e32_conv3DTTN_jester()
-# e33_conv3T_jester()
-# e36_conv3DTTN_jester()
-# e37_conv3T_jester()
-# e38_conv3T_jester()
-# e39_conv3T_jester()
-# e40_conv3T_jester()
-e41_conv3T_jester()
+e50_conv3T_jester()

@@ -37,6 +37,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             the_iterator = DL.get_jester_iter('train', project_variable)
         elif project_variable.dataset == 'ucf101':
             the_iterator = DL.get_ucf101_iter('train', project_variable)
+        elif project_variable.dataset == 'kinetics400':
+            the_iterator = iter(DL.kinetics400_loader('train', project_variable))
         else:
             the_iterator = None
 
@@ -45,8 +47,8 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         for i, data_and_labels in tqdm(enumerate(the_iterator)):
 
             # print('\n'
-            #       '\n'
-            #       '\n'
+            #       '\n' 120165
+            #       '\n' 120862  4616553
             #       'STEP %d'
             #       '\n'
             #       '\n'
@@ -54,22 +56,25 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             data = data_and_labels[0]['data']
             labels = data_and_labels[0]['labels']
 
-            # transpose data
-            data = data.permute(0, 4, 1, 2, 3)
-            # convert to floattensor
-            data = data.type(torch.float32)
+            if project_variable.dataset == 'kinetics':
+                print('kinetics')
+            else:
+                # transpose data
+                data = data.permute(0, 4, 1, 2, 3)
+                # convert to floattensor
+                data = data.type(torch.float32)
 
-            # data shape: b, c, d, h, w
-            data = data / 255
-            data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
-            data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
-            data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
+                # data shape: b, c, d, h, w
+                data = data / 255
+                data[:, 0, :, :, :] = (data[:, 0, :, :, :] - 0.485) / 0.229
+                data[:, 1, :, :, :] = (data[:, 1, :, :, :] - 0.456) / 0.224
+                data[:, 2, :, :, :] = (data[:, 2, :, :, :] - 0.406) / 0.225
 
-            # data = (data/255 - project_variable.imnet_mean) / project_variable.imnet_stds
-            labels = labels.type(torch.long)
-            labels = labels.flatten()
-            if project_variable.dataset == 'jester':
-                labels = labels - 1
+                # data = (data/255 - project_variable.imnet_mean) / project_variable.imnet_stds
+                labels = labels.type(torch.long)
+                labels = labels.flatten()
+                if project_variable.dataset == 'jester':
+                    labels = labels - 1
 
             my_optimizer.zero_grad()
 
@@ -116,41 +121,45 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
             steps = steps + 1
 
     else:
-        assert steps is not None
-        for ts in tqdm(range(steps)):
-            data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
+        if project_variable.dataset == 'kinetics400':
+            pass
 
-            my_optimizer.zero_grad()
+        else:
+            assert steps is not None
+            for ts in tqdm(range(steps)):
+                data, labels = DL.prepare_data(project_variable, full_data, full_labels, device, ts, steps, nice_div)
 
-            if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16, 20, 23]:
-                if project_variable.model_number == 23:
-                    aux1, aux2, predictions = my_model(data, device)
-                    assert aux1 is not None and aux2 is not None
+                my_optimizer.zero_grad()
+
+                if project_variable.model_number in [3, 6, 71, 72, 73, 74, 75, 76, 77, 8, 10, 11, 14, 15, 16, 20, 23]:
+                    if project_variable.model_number == 23:
+                        aux1, aux2, predictions = my_model(data, device)
+                        assert aux1 is not None and aux2 is not None
+                    else:
+                        predictions = my_model(data, device)
                 else:
-                    predictions = my_model(data, device)
-            else:
-                predictions = my_model(data)
+                    predictions = my_model(data)
 
-            if project_variable.model_number == 23:
-                loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
-            else:
-                loss = U.calculate_loss(project_variable, predictions, labels)
-            # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
-            loss.backward()
+                if project_variable.model_number == 23:
+                    loss = U.googlenet_loss(project_variable, aux1, aux2, predictions, labels)
+                else:
+                    loss = U.calculate_loss(project_variable, predictions, labels)
+                # THCudaCheck FAIL file=/pytorch/aten/src/THC/THCGeneral.cpp line=383 error=11 : invalid argument
+                loss.backward()
 
-            my_optimizer.step()
+                my_optimizer.step()
 
-            if project_variable.use_clr:
-                clr_scheduler.step()
-                # print('CLR LR: ', clr_scheduler.get_lr())
+                if project_variable.use_clr:
+                    clr_scheduler.step()
+                    # print('CLR LR: ', clr_scheduler.get_lr())
 
-            # my_optimizer.step()
+                # my_optimizer.step()
 
-            accuracy = U.calculate_accuracy(predictions, labels)
-            confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
+                accuracy = U.calculate_accuracy(predictions, labels)
+                confusion_epoch = U.confusion_matrix(confusion_epoch, predictions, labels)
 
-            loss_epoch.append(float(loss))
-            accuracy_epoch.append(float(accuracy))
+                loss_epoch.append(float(loss))
+                accuracy_epoch.append(float(accuracy))
 
     # save data
     loss = float(np.mean(loss_epoch))

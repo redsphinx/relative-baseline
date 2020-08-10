@@ -8,6 +8,8 @@ from PIL import Image
 import cv2
 # from time import time
 import torch
+from torch.utils.data import DataLoader
+# import torchvision.transforms as transforms
 from multiprocessing import Pool, Queue
 from tqdm import tqdm
 # temporary for debugging
@@ -1052,6 +1054,32 @@ def get_mean_std_train_mov_mnist():
     return mean, std
 
 
+def kinetics400_loader(which, project_variable):
+    assert which in ['train', 'test', 'val']
+
+    workers = project_variable.dali_workers
+
+    if which == 'train':
+        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_train,
+                                                    frames_per_clip=project_variable.load_num_frames)
+        loader = DataLoader(dataset, batch_size=project_variable.batch_size, shuffle=True, num_workers=workers)
+
+    elif which == 'val':
+        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_val,
+                                                   frames_per_clip=project_variable.load_num_frames)
+        loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
+
+    elif which == 'test':
+        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_test,
+                                                   frames_per_clip=project_variable.load_num_frames)
+        loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
+
+    else:
+        loader = None
+
+    return loader
+
+
 def load_data(project_variable, seed):
     if project_variable.dataset == 'omg_emotion':
         return load_omg_emotion(project_variable, seed)
@@ -1146,7 +1174,7 @@ def get_jester_iter(which, project_variable):
         # else:
         #     file_list = os.path.join(PP.jester_location, 'filelist_test_500perclass.txt')
     else:
-        if project_variable.model_number in [20, 21, 22, 23, 24, 25, 26]:
+        if project_variable.model_number in [20, 21, 22, 23, 24, 25, 26, 60]:
             print('fetching 150 224...')
             # default is to load from fast
             file_list = os.path.join(PP.jester_location, 'filelist_%s_150_224_fast.txt' % which)
