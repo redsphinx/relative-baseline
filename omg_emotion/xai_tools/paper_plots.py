@@ -1123,6 +1123,13 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
                     save_output(output, mode, p2, ch, me)
 
 
+# --- rebuttal ---
+
+
+
+# --- rebuttal ---
+
+
 # plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=77)
 # activation_maximization_single_channels('ucf101', [1003, 23, 12, 0], begin=77, num_channels=78, mode='image', gpunum=2,
 #                                         seed=6666, layer_begin=12, single_layer=True)
@@ -1200,7 +1207,6 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
 
 # combines the results for the relevant categories to produce a ranking of videos
-# Note: has not been debugged
 def combine_results(list_videos, dataset):
         vid_sets = []
         list_vid_dicts = []
@@ -1273,13 +1279,22 @@ def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
 
     return top_videos
 
-# HERE
-# HERE
-vids = find_top_xai_videos('jester', 'correct', combine=True, model=[23, 25])
-for i, name  in enumerate(vids):
-    print(i+1, name)
-    if i == 10:
-        break
+# vids = find_top_xai_videos('jester', 'correct', combine=True, model=[23, 25])
+# for i, name  in enumerate(vids):
+#     print(i+1, name)
+#     if i == 10:
+#         break
+# 1 /fast/gabras/jester/data_150_224_avi/9199.avi
+# 2 /fast/gabras/jester/data_150_224_avi/9223.avi
+# 3 /fast/gabras/jester/data_150_224_avi/109233.avi
+# 4 /fast/gabras/jester/data_150_224_avi/106485.avi
+# 5 /fast/gabras/jester/data_150_224_avi/44676.avi
+# 6 /fast/gabras/jester/data_150_224_avi/57277.avi
+# 7 /fast/gabras/jester/data_150_224_avi/78605.avi
+# 8 /fast/gabras/jester/data_150_224_avi/48467.avi
+# 9 /fast/gabras/jester/data_150_224_avi/132905.avi
+# 10 /fast/gabras/jester/data_150_224_avi/121413.avi
+# 11 /fast/gabras/jester/data_150_224_avi/119487.avi
 
 
 # has not been made for the combined mode
@@ -1333,7 +1348,9 @@ def grad_x_frame(frame_gradient, most_notable_frame, og_datapoint):
     return final
 
 
-def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0):
+def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0,
+                   videoname=None, rebuttal=False):
+    assert type(videoname) == None or type(videoname) == int
     assert mode in ['image', 'volume']
     assert prediction_type in ['correct', 'wrong']
 
@@ -1349,8 +1366,12 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
     intermediary_path = os.path.join(PP.gradient, p1)
     opt_makedirs(intermediary_path)
 
-    top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
-    top_videos = top_videos[:num_videos]
+    if videoname is None:
+        top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
+        top_videos = top_videos[:num_videos]
+    else:
+        top_videos = ['/fast/gabras/jester/data_150_224_avi/%d.avi' % videoname]
+        num_videos = 1
 
     data = load_videos(top_videos)
 
@@ -1363,14 +1384,18 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
     for ind in tqdm(conv_layers):
         
         for vid in range(num_videos):
+            if rebuttal:
+                folder_name = 'rebuttal_%d' % videoname
+            else:
+                folder_name = 'vid_%d' % vid
 
-            p2 = os.path.join(intermediary_path, 'vid_%d' % vid, 'conv_%d' % ind)
+            p2 = os.path.join(intermediary_path, folder_name, 'conv_%d' % ind)
             opt_makedirs(p2)
             datapoint_1 = data[vid].copy()
             og_datapoint = data[vid].copy()
 
             if mode == 'volume':
-                vid_path = os.path.join(intermediary_path, 'vid_%d' % vid, 'video')
+                vid_path = os.path.join(intermediary_path, folder_name, 'video')
                 opt_mkdir(vid_path)
                 for _f in range(30):
                     path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
@@ -1472,6 +1497,22 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 
                 my_model.zero_grad()
     print('THE END')
+
+# --- rebuttal ---
+# 3DConv
+# save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
+#                videoname=9199, rebuttal=True)
+videonames_all = [9199, 9223, 109233, 106485, 44676, 57277, 78605, 48467, 132905, 121413, 119487]
+
+for vname in tqdm(videonames_all):
+    save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
+                   videoname=vname, rebuttal=True)
+    save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
+                   videoname=vname, rebuttal=True)
+
+
+
+# --- rebuttal ---
 
 # save_gradients('jester', [28, 25, 25, 0], mode='volume', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
 # save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=4, num_channels=5, gpunum=0)
