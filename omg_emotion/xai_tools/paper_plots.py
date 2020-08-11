@@ -1160,8 +1160,8 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 #                                         seed=66666666, layer_begin=50, single_layer=True)
 
 # plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=196)
-activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=196, num_channels=197, mode='image', gpunum=2,
-                                        seed=66666666, layer_begin=50, single_layer=True)
+# activation_maximization_single_channels('ucf101', [1005, 23, 28, 0], begin=196, num_channels=197, mode='image', gpunum=2,
+#                                         seed=66666666, layer_begin=50, single_layer=True)
 
 
 # activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=11, num_channels=12, seed=111, steps=500, mode='volume', gpunum=0, layer_begin=12, single_layer=True)
@@ -1248,11 +1248,21 @@ def combine_results(list_videos, dataset):
 
 
 def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
+    # if combine: model=[model_number] else, model=[exp, mo, run, ep]
+
     video_files = os.listdir(PP.xai_metadata)
 
     if combine:
         which_file = 'high_act_vids-%s_pred-%s' % (prediction_type, dataset)
         chosen_files = [i for i in video_files if which_file in i]
+        if type(model) == list:
+            filter_list = []
+            for i in chosen_files:
+                if int(i.split('mod_')[-1][0:2]) in model:
+                    filter_list.append(i)
+
+            chosen_files = filter_list
+
         top_videos = combine_results(chosen_files, dataset)
     else:
         assert model is not None
@@ -1262,6 +1272,14 @@ def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
         top_videos = np.genfromtxt(os.path.join(PP.xai_metadata, which_file), dtype=str, delimiter=' ')[:, 0]
 
     return top_videos
+
+# HERE
+# HERE
+vids = find_top_xai_videos('jester', 'correct', combine=True, model=[23, 25])
+for i, name  in enumerate(vids):
+    print(i+1, name)
+    if i == 10:
+        break
 
 
 # has not been made for the combined mode

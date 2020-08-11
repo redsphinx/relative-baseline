@@ -659,7 +659,14 @@ def get_model(project_variable):
         model = r2plus1d_18(pretrained=False)
         model = prepare_model(project_variable, model)
 
-        if project_variable.load_model:
+        if type(project_variable.load_model) != bool and not project_variable.load_model is None:
+
+            if project_variable.load_model[1] == project_variable.model_number:
+                model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+                print('loaded model weights: %s successful' % str(project_variable.load_model))
+
+        elif project_variable.load_model:
             # load resnet18 from pytorch & transfer weights
             tmp_rn18 = resnet18(pretrained=True)
             print('asdf')
