@@ -1031,7 +1031,8 @@ def save_output(output, mode, p2, ch, me):
             img.save(path)
 
 
-def activation_maximization_single_channels(dataset, model, begin=0, num_channels=1, seed=6, steps=500, mode='image', gpunum=0, layer_begin=None, single_layer=False):
+def activation_maximization_single_channels(dataset, model, begin=0, num_channels=1, seed=6, steps=500, mode='image', gpunum=0, layer_begin=None, single_layer=False,
+                                            rebuttal=False):
     assert mode in ['image', 'volume']
     print('\nMODEL %s\n' % (str(model)))
     proj_var = init1(dataset, model)
@@ -1068,7 +1069,10 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
         else:
             end = num_channels
 
-        p2 = os.path.join(intermediary_path, 'conv_%d' % ind)
+        if rebuttal:
+            p2 = os.path.join(intermediary_path, 'rebuttal_conv_%d' % ind)
+        else:
+            p2 = os.path.join(intermediary_path, 'conv_%d' % ind)
         opt_mkdir(p2)
         
         if dataset == 'jester':
@@ -1124,7 +1128,41 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
 
 # --- rebuttal ---
+# rebuttal_seed = 172108
+# conv3t_channels_conv12 = [77, 151, 166, 121, 82, 141, 13, 56, 97, 182]
+# conv3t_channels_conv31 = [83, 12, 116, 81, 146, 141, 3, 79, 119, 17]
+# conv3t_channels_conv50 = [105, 65, 60, 67, 32, 232, 171, 313, 269, 14]
+# gpu = 0
 
+#3TTTTTTTTTT
+# for i in conv3t_channels_conv12:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=12, single_layer=True, rebuttal=True)
+
+# for i in conv3t_channels_conv31:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=31, single_layer=True, rebuttal=True)
+#
+# for i in conv3t_channels_conv50:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=50, single_layer=True, rebuttal=True)
+#
+# # 3DDDDDDDDDD
+# conv3d_channels_conv12 = [77, 30, 141, 151, 157, 41, 93, 182, 102, 183]
+# conv3d_channels_conv31 = [19, 17, 12, 236, 146, 100, 81, 3, 141, 194]
+# conv3d_channels_conv50 = [105, 300, 38, 171, 191, 162, 313, 60, 101, 35]
+# gpu = 2
+# for i in conv3d_channels_conv12:
+#     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=12, single_layer=True, rebuttal=True)
+#
+# for i in conv3d_channels_conv31:
+#     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=31, single_layer=True, rebuttal=True)
+#
+# for i in conv3d_channels_conv50:
+#     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=50, single_layer=True, rebuttal=True)
 
 
 # --- rebuttal ---
@@ -1350,6 +1388,7 @@ def grad_x_frame(frame_gradient, most_notable_frame, og_datapoint):
 
 def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0,
                    videoname=None, rebuttal=False):
+
     assert type(videoname) == None or type(videoname) == int
     assert mode in ['image', 'volume']
     assert prediction_type in ['correct', 'wrong']
@@ -1502,12 +1541,13 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 # 3DConv
 # save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
 #                videoname=9199, rebuttal=True)
-videonames_all = [9199, 9223, 109233, 106485, 44676, 57277, 78605, 48467, 132905, 121413, 119487]
-
+# videonames_all = [9199, 9223, 109233, 106485, 44676, 57277, 78605, 48467, 132905, 121413, 119487]
+videonames_all = [9199]
+#
 for vname in tqdm(videonames_all):
-    save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
+    save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
                    videoname=vname, rebuttal=True)
-    save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
+    save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
                    videoname=vname, rebuttal=True)
 
 
