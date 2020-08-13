@@ -1128,7 +1128,25 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
 
 # --- rebuttal ---
-# rebuttal_seed = 172108
+rebuttal_seed = 172108
+gpu = 0
+
+channels_overall = [3, 5, 7, 9, 11]
+layers = [12, 31, 50]
+
+# # 3T
+# for i in channels_overall:
+#     for j in layers:
+#         activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                                 layer_begin=j, single_layer=True, rebuttal=True)
+
+# 3D
+for i in channels_overall:
+    for j in layers:
+        activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+                                                layer_begin=j, single_layer=True, rebuttal=True)
+
+
 # conv3t_channels_conv12 = [77, 151, 166, 121, 82, 141, 13, 56, 97, 182]
 # conv3t_channels_conv31 = [83, 12, 116, 81, 146, 141, 3, 79, 119, 17]
 # conv3t_channels_conv50 = [105, 65, 60, 67, 32, 232, 171, 313, 269, 14]
@@ -1542,13 +1560,13 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
 # save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=10, gpunum=0,
 #                videoname=9199, rebuttal=True)
 # videonames_all = [9199, 9223, 109233, 106485, 44676, 57277, 78605, 48467, 132905, 121413, 119487]
-videonames_all = [9199]
-#
-for vname in tqdm(videonames_all):
-    save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
-                   videoname=vname, rebuttal=True)
-    save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
-                   videoname=vname, rebuttal=True)
+# videonames_all = [9199]
+# #
+# for vname in tqdm(videonames_all):
+#     save_gradients('jester', [28, 25, 25, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
+#                    videoname=vname, rebuttal=True)
+#     save_gradients('jester', [30, 23, 28, 0], mode='image', prediction_type='correct', num_videos=1, num_channels=30, gpunum=0,
+#                    videoname=vname, rebuttal=True)
 
 
 
@@ -1706,3 +1724,54 @@ def make_srxy_actmax_animation(dataset, model, layer, channel_from_zero):
 
 # plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=319)
 # make_srxy_actmax_animation('jester', [31, 20, 8, 0], 17, 319)
+
+
+def find_same_frame_best_act_accross_models(model1, model2, video, rebuttal=True):
+    p1 = '/huge/gabras/omg_emotion/saving_data/xai/gradient/exp_%d_mod_%d_ep_%d/rebuttal_%d' % (model1[0], model1[1], model1[2], video)
+    p2 = '/huge/gabras/omg_emotion/saving_data/xai/gradient/exp_%d_mod_%d_ep_%d/rebuttal_%d' % (model2[0], model2[1], model2[2], video)
+
+    convs = os.listdir(p1)
+    convs.sort()
+
+    def get_info(the_path):
+        result = []
+        frame_only = []
+        for c in convs:
+            tmp_results = []
+            frm_results = []
+            p_c = os.path.join(the_path, c)
+            ranks = os.listdir(p_c)
+            ranks.sort()
+            for r in ranks:
+                channel = r.split('channel_')[-1]
+                p_r = os.path.join(p_c, r)
+                frame = os.listdir(p_r)
+                frame = frame[0].split('frame_')[-1].split('.jpg')[0]
+                tmp_results.append([frame, channel])
+                frm_results.append(frame)
+
+            frame_only.append(frm_results)
+            result.append(tmp_results)
+
+        return result, frame_only
+
+    result_p1, frames_p1 = get_info(p1)
+    result_p2, frames_p2 = get_info(p2)
+
+    c12_1 = set(frames_p1[0])
+    c31_1 = set(frames_p1[1])
+    c50_1 = set(frames_p1[2])
+
+    c12_2 = set(frames_p2[0])
+    c31_2 = set(frames_p2[1])
+    c50_2 = set(frames_p2[2])
+    
+    r12 = c12_1.intersection(c12_2)
+    r31 = c31_1.intersection(c31_2)
+    r50 = c50_1.intersection(c50_2)
+
+    present_for_all = r12.intersection(r31).intersection(r50)
+
+    print('asdf')
+
+# find_same_frame_best_act_accross_models([28, 25, 25], [30, 23, 28], 9199)
