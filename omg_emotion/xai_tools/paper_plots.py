@@ -1129,51 +1129,19 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
 # --- rebuttal ---
 rebuttal_seed = 172108
-gpu = 0
-
-channels_overall = [3, 5, 7, 9, 11]
-layers = [12, 31, 50]
-
-# # 3T
-# for i in channels_overall:
-#     for j in layers:
-#         activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-#                                                 layer_begin=j, single_layer=True, rebuttal=True)
-
-# 3D
-for i in channels_overall:
-    for j in layers:
-        activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-                                                layer_begin=j, single_layer=True, rebuttal=True)
 
 
-# conv3t_channels_conv12 = [77, 151, 166, 121, 82, 141, 13, 56, 97, 182]
-# conv3t_channels_conv31 = [83, 12, 116, 81, 146, 141, 3, 79, 119, 17]
-# conv3t_channels_conv50 = [105, 65, 60, 67, 32, 232, 171, 313, 269, 14]
+
+# 3DDDDDDDDDD
+# conv3d_channels_conv12 = [141, 92, 142]
+# conv3d_channels_conv31 = [79, 49, 116]
+# conv3d_channels_conv50 = [177, 76, 287]
+#
 # gpu = 0
-
-#3TTTTTTTTTT
-# for i in conv3t_channels_conv12:
-#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-#                                             layer_begin=12, single_layer=True, rebuttal=True)
-
-# for i in conv3t_channels_conv31:
-#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-#                                             layer_begin=31, single_layer=True, rebuttal=True)
-#
-# for i in conv3t_channels_conv50:
-#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-#                                             layer_begin=50, single_layer=True, rebuttal=True)
-#
-# # 3DDDDDDDDDD
-# conv3d_channels_conv12 = [77, 30, 141, 151, 157, 41, 93, 182, 102, 183]
-# conv3d_channels_conv31 = [19, 17, 12, 236, 146, 100, 81, 3, 141, 194]
-# conv3d_channels_conv50 = [105, 300, 38, 171, 191, 162, 313, 60, 101, 35]
-# gpu = 2
 # for i in conv3d_channels_conv12:
-#     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-#                                             layer_begin=12, single_layer=True, rebuttal=True)
-#
+    # activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+    #                                         layer_begin=12, single_layer=True, rebuttal=True)
+
 # for i in conv3d_channels_conv31:
 #     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
 #                                             layer_begin=31, single_layer=True, rebuttal=True)
@@ -1181,6 +1149,29 @@ for i in channels_overall:
 # for i in conv3d_channels_conv50:
 #     activation_maximization_single_channels('jester', [28, 25, 25, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
 #                                             layer_begin=50, single_layer=True, rebuttal=True)
+
+
+
+
+conv3t_channels_conv12 = [152, 121, 26]
+conv3t_channels_conv31 = [134, 55, 243]
+conv3t_channels_conv50 = [120, 88, 67]
+gpu = 0
+
+# #3TTTTTTTTTT
+# for i in conv3t_channels_conv12:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=12, single_layer=True, rebuttal=True)
+#
+# for i in conv3t_channels_conv31:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=31, single_layer=True, rebuttal=True)
+#
+for i in conv3t_channels_conv50:
+    activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+                                            layer_begin=50, single_layer=True, rebuttal=True)
+
+
 
 
 # --- rebuttal ---
