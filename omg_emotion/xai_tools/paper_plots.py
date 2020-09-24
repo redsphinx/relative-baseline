@@ -16,6 +16,7 @@ import skvideo.io as skvid
 
 import torch
 from torch.optim import AdamW
+from torch.nn.functional import interpolate
 
 from relative_baseline.omg_emotion.settings import ProjectVariable as pv
 from relative_baseline.omg_emotion import setup
@@ -1458,6 +1459,7 @@ def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=
                 datapoint = torch.nn.Parameter(datapoint, requires_grad=True)
                 
                 # get feature map
+                my_model.eval()
                 if proj_var.model_number == 20:
                     feature_map = my_model(datapoint, proj_var.device, stop_at=ind)
                 elif proj_var.model_number == 23:
@@ -1766,3 +1768,261 @@ def find_same_frame_best_act_accross_models(model1, model2, video, rebuttal=True
     print('asdf')
 
 # find_same_frame_best_act_accross_models([28, 25, 25], [30, 23, 28], 9199)
+
+def grad_cam(dataset, model, videoname, desired_class, type_contribution, prediction_type, num_videos=5, gpunum=0,
+             iclr=True):
+    assert type_contribution in ['pos', 'neg']
+    assert prediction_type in ['correct', 'wrong']
+
+
+    print('\nRunning function grad_cam for MODEL %s\n' % (str(model)))
+    proj_var = init1(dataset, model)
+    my_model = setup.get_model(proj_var)
+    proj_var.device = gpunum
+    wait_for_gpu(wait=True, device_num=proj_var.device, threshold=9000)
+    device = setup.get_device(proj_var)
+    my_model.cuda(device)
+
+    p1 = 'exp_%d_mod_%d_ep_%d' % (model[0], model[1], model[2])
+    intermediary_path = os.path.join(PP.gradcam, p1)
+    opt_makedirs(intermediary_path)
+
+    if videoname is None:
+        top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
+        top_videos = top_videos[:num_videos]
+    else:
+        if dataset == 'jester':
+            # top_videos = ['/fast/gabras/jester/data_150_224_avi/%d.avi' % videoname]
+            vpath = os.path.join(PP.fast_jester_data_150_224_avi, '%s.avi' % str(videoname))
+        elif  dataset == 'ucf101':
+            vpath = os.path.join(PP.ucf101_168_224_xai, desired_class, '%s.avi' % str(videoname))
+        else:
+            vpath = ''
+            print("Error: cannot set path for dataset '%s' " % dataset)
+            return
+
+        top_videos = [vpath]
+        num_videos = 1
+
+    data = load_videos(top_videos)
+
+
+    # TODO: get the correct layers
+    if model[1] in [21, 20]: # resnet18
+        conv_layers = [7, 12, 17]
+    else:  # googlenet
+        conv_layers = [12, 31, 50]
+
+
+    for ind in tqdm(conv_layers):
+
+        for vid in range(num_videos):
+            folder_name = 'iclr_%s' % str(videoname)
+
+            p2 = os.path.join(intermediary_path, folder_name, 'conv_%d' % ind)
+            opt_makedirs(p2)
+            datapoint_1 = data[vid].copy()
+            og_datapoint = data[vid].copy()
+
+            # save the OG video
+            vid_path = os.path.join(intermediary_path, folder_name, 'video')
+            opt_mkdir(vid_path)
+            for _f in range(30):
+                path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
+                save_image(og_datapoint[:, _f], path)
+
+
+            # pass input through model AND get score before softmax
+            # softmax happens at the loss
+            # PASS 1
+            my_model.eval()
+            if proj_var.model_number == 20: #3Tresnet
+                feature_map, extra_thing  = my_model(datapoint, proj_var.device, gradcam=True, which_pass=1)
+            elif proj_var.model_number == 23: #3Tgoogle
+                feature_map, extra_thing = my_model(datapoint, proj_var.device, aux=False, gradcam=True, which_pass=1)
+            elif proj_var.model_number == 21:
+                feature_map, extra_thing = my_model(datapoint, gradcam=True, which_pass=1)
+            elif proj_var.model_number == 25:
+                feature_map, extra_thing = my_model(datapoint, aux=False, gradcam=True, which_pass=1)
+
+            # TODO: make sure gradients are zero
+            # PASS 2
+            # TODO: set featuremaps as parameters in order to take gradient
+            if proj_var.model_number == 20: #3Tresnet
+                score  = my_model(datapoint, proj_var.device, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+            elif proj_var.model_number == 23: #3Tgoogle
+                score = my_model(datapoint, proj_var.device, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+            elif proj_var.model_number == 21:
+                score = my_model(datapoint, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+            elif proj_var.model_number == 25:
+                score = my_model(datapoint, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+            
+            # calculate alpha weights
+            fm_shape = feature_map.shape() # N, C, H, W, D
+
+            # TODO: choose the specific class
+            # alpha_k^c = 1/Z * \sum_i \sum_j \frac{\partial y^c}{\partial A^k_{i,j}}
+            score[desired_class].backward()
+            feature_map_grad = feature_map.grad
+
+            # L_c = ReLU(\sum_k \alpha_k^c A^k)
+            L_full = np.zeros(fm_shape)
+
+            for k in range(fm_shape[1]):
+                alpha = np.mean(feature_map_grad[0, k, :])
+
+                alpha_x_fm = alpha * feature_map[0, k, :]
+
+                L_full[k] = alpha_x_fm
+
+            L_c = np.mean(L_full, axis=0)
+            # do the ReLU to obtain coarse heatmap
+            L_c[L_c < 0] = 0
+
+            # TODO: get the temporal parameters
+            # TODO: sort frames on time appearance: how to balance frequency and intensity??
+
+            # interpolate
+            CAM = interpolate(L_c, size=datapoint_1.shape, mode='linear')
+
+            # TODO: map CAM to colormap
+            # TODO: overlay CAM on OG data
+            # TODO: add temporal param info
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            # ----------
+            # ----------
+
+            channels = []
+# def save_gradients(dataset, model, mode, prediction_type, begin=0, num_channels=1, num_videos=5, gpunum=0,
+            for ch in range(begin, num_channels):
+
+                datapoint = torch.Tensor(datapoint_1.copy()).unsqueeze(0).cuda(device)
+                datapoint = remove_imagenet_mean_std(datapoint)
+                datapoint = torch.nn.Parameter(datapoint, requires_grad=True)
+
+                # get feature map
+                if proj_var.model_number == 20:
+                    feature_map = my_model(datapoint, proj_var.device, stop_at=ind)
+                elif proj_var.model_number == 23:
+                    feature_map = my_model(datapoint, proj_var.device, ind, False)
+                elif proj_var.model_number == 21:
+                    feature_map = my_model(datapoint, stop_at=ind)
+                elif proj_var.model_number == 25:
+                    feature_map = my_model(datapoint, ind, False)
+
+                _, chan, d, h, w = feature_map.shape
+
+                # find the channel with the highest activation
+                feature_map_arr = np.array(feature_map[0].clone().data.cpu())
+                highest_value = 0
+                ind_0, ind_1, ind_2, ind_3 = 0, 0, 0, 0
+
+                for k in range(chan):
+                    if k not in channels:
+                        # for l in range(d):
+                        max_index = feature_map_arr[k].argmax()
+                        indices = np.unravel_index(max_index, (d, h, w))
+                        if feature_map_arr[k, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = feature_map_arr[k, indices[0], indices[1], indices[2]]
+                            ind_0 = k
+                            ind_1, ind_2, ind_3 = indices
+
+                print('\n Conv%d: %d Highest unit value of %f found at channel %d\n' % (ind, ch, highest_value, ind_0))
+                channels.append(ind_0)
+
+                p3 = os.path.join(p2, 'rank_%d_channel_%d' % (ch, ind_0))
+                opt_mkdir(p3)
+
+                # calculate d(max(feature_map)) / d(data)
+                feature_map[0, ind_0, ind_1, ind_2, ind_3].backward()
+                image_grad = datapoint.grad
+
+                # if in image mode, find the frame with the greatest gradient
+                if mode == 'image':
+                    copy_image_grad = image_grad[0].clone()
+                    copy_image_grad = 255 * copy_image_grad
+                    copy_image_grad = torch.nn.functional.relu(copy_image_grad)
+                    copy_image_grad = np.array(copy_image_grad.data.cpu(), dtype=np.uint8)
+
+                    copy_image_grad = copy_image_grad.transpose(1, 0, 2, 3)
+                    frames, og_channels, h, w = copy_image_grad.shape
+
+                    highest_value = 0
+                    ind_1 = 0
+                    for l in range(frames):
+                        max_index = copy_image_grad[l].argmax()
+                        indices = np.unravel_index(max_index, (og_channels, h, w))
+                        if copy_image_grad[l, indices[0], indices[1], indices[2]] > highest_value:
+                            highest_value = copy_image_grad[l, indices[0], indices[1], indices[2]]
+                            ind_1 = l
+                    most_notable_frame = ind_1
+
+                    if og_datapoint.dtype == np.uint8:
+                        og_datapoint = og_datapoint.astype(np.float32)
+
+                    frame_gradient = image_grad[0, :, most_notable_frame].data.cpu()
+                    final = grad_x_frame(frame_gradient, most_notable_frame, og_datapoint)
+
+                    # save the image and the original
+                    path = os.path.join(p3, 'grad_x_frame_%d.jpg' % most_notable_frame)
+                    save_image(final, path)
+
+                    path = os.path.join(p3, 'og_frame_%d.jpg' % most_notable_frame)
+                    save_image(og_datapoint[:, most_notable_frame], path)
+
+                elif mode == 'volume':
+                    if og_datapoint.dtype == np.uint8:
+                        og_datapoint = og_datapoint.astype(np.float32)
+
+                    og_channels, frames, h, w = image_grad[0].shape
+                    for _f in range(frames):
+                        frame_gradient = image_grad[0, :, _f].data.cpu()
+                        final = grad_x_frame(frame_gradient, _f, og_datapoint)
+
+                        # save the image and the original
+                        path = os.path.join(p3, 'grad_x_frame_%d.jpg' % _f)
+                        save_image(final, path)
+
+                        # path = os.path.join(p3, 'og_frame_%d.jpg' % _f)
+                        # save_image(og_datapoint[:, _f], path)
+
+                my_model.zero_grad()
+    print('THE END')
+
+
+    '''
+    give: model, input, desired class, type of contribution
+
+    pass input to model
+    calculate the alpha weights
+    get featuremap from last conv layer
+    sort the featuremaps on time
+    for each out channel:
+        get the temporal parameters
+
+    create heatmap
+    upscale the heatmap by interpolation
+    for each heatmap/featuremap:
+        add temporal symbols with value information
+
+    overlay heatmap on top of OG input
+
+    make final explanation frame sequence
+
+    '''

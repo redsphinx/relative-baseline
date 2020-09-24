@@ -127,7 +127,7 @@ class ResNet18(torch.nn.Module):
         y = self.fc(h)
         return y
 
-
+# model_number = 20
 class ResNet18Explicit(torch.nn.Module):
     def __init__(self, pv):
         super(ResNet18Explicit, self).__init__()
@@ -194,156 +194,179 @@ class ResNet18Explicit(torch.nn.Module):
         self.avgpool = AdaptiveAvgPool3d(output_size=1)
         self.fc = torch.nn.Linear(512, pv.label_size)
 
-    def forward(self, x, device, stop_at=None):
-        # h = self.conv1_relu(x, device)
+    def forward(self, x, device, stop_at=None, gradcam=False, which_pass=1, extra_pass_2=None):
+        # ---
+        # things for gradcam to be able to take gradient of score wrt activaitons of last conv layer
+        condition_1 = not gradcam  # no gradcam, do normal network things
+        condition_2 = gradcam and which_pass==1  # gradcam and first pass, return feature_map
+        condition_3 = gradcam and which_pass==2  # gradcam and second pass, return
+        if condition_3:
+            assert extra_pass_2 is not None
+        # ---
 
-        num = 1
-        h = self.conv1(x, device)
-        if stop_at == num:
-            return h
-        h = self.bn1(h)
-        h = relu(h)
+        if condition_1 or condition_2:
 
-        h = self.maxpool(h)
-        
-        # h = self.res2a_relu(h, device)
-        num = 2
-        h1 = self.conv2(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn2(h1)
-        h1 = relu(h1)
-        num = 3
-        h1 = self.conv3(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn3(h1)
-        h = h1 + h
-        h = relu(h)
-        
-        # h = self.res2b_relu(h, device)
-        num = 4
-        h1 = self.conv4(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn4(h1)
-        h1 = relu(h1)
-        num = 5
-        h1 = self.conv5(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn5(h1)
-        h = h1 + h
-        h = relu(h)
-        
-        # h = self.res3a_relu(h, device)
-        temp = self.conv6(h)
-        temp = self.bn6(temp)
-        num = 7
-        h1 = self.conv7(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn7(h1)
-        h1 = relu(h1)
-        num = 8
-        h1 = self.conv8(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn8(h1)
-        h = temp + h1
-        h = relu(h)
-        
-        # h = self.res3b_relu(h, device)
-        num = 9
-        h1 = self.conv9(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn9(h1)
-        h1 = relu(h1)
-        num = 10
-        h1 = self.conv10(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn10(h1)
-        h = h1 + h
-        h = relu(h)
-        
-        # h = self.res4a_relu(h, device)
-        temp = self.conv11(h)
-        temp = self.bn11(temp)
-        num = 12
-        h1 = self.conv12(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn12(h1)
-        h1 = relu(h1)
-        num = 13
-        h1 = self.conv13(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn13(h1)
-        h = temp + h1
-        h = relu(h)
-        
-        # h = self.res4b_relu(h, device)
-        num = 14
-        h1 = self.conv14(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn14(h1)
-        h1 = relu(h1)
-        num = 15
-        h1 = self.conv15(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn15(h1)
-        h = h1 + h
-        h = relu(h)
-        
-        # h = self.res5a_relu(h, device)
-        temp = self.conv16(h)
-        temp = self.bn16(temp)
-        num = 17
-        h1 = self.conv17(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn17(h1)
-        h1 = relu(h1)
-        num = 18
-        h1 = self.conv18(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn18(h1)
-        h = temp + h1
-        h = relu(h)
-        
-        # h = self.res5b_relu(h, device)
-        num = 19
-        h1 = self.conv19(h, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn19(h1)
-        h1 = relu(h1)
-        num = 20
-        h1 = self.conv20(h1, device)
-        if stop_at == num:
-            return h1
-        h1 = self.bn20(h1)
-        h = h1 + h
-        h = relu(h)
-        
-        h = self.avgpool(h)
-        _shape = h.shape
-        h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        y = self.fc(h)
-        return y
+            num = 1
+            h = self.conv1(x, device)
+            if stop_at == num:
+                return h
+            h = self.bn1(h)
+            h = relu(h)
+
+            h = self.maxpool(h)
+
+            # h = self.res2a_relu(h, device)
+            num = 2
+            h1 = self.conv2(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn2(h1)
+            h1 = relu(h1)
+            num = 3
+            h1 = self.conv3(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn3(h1)
+            h = h1 + h
+            h = relu(h)
+
+            # h = self.res2b_relu(h, device)
+            num = 4
+            h1 = self.conv4(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn4(h1)
+            h1 = relu(h1)
+            num = 5
+            h1 = self.conv5(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn5(h1)
+            h = h1 + h
+            h = relu(h)
+
+            # h = self.res3a_relu(h, device)
+            temp = self.conv6(h)
+            temp = self.bn6(temp)
+            num = 7
+            h1 = self.conv7(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn7(h1)
+            h1 = relu(h1)
+            num = 8
+            h1 = self.conv8(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn8(h1)
+            h = temp + h1
+            h = relu(h)
+
+            # h = self.res3b_relu(h, device)
+            num = 9
+            h1 = self.conv9(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn9(h1)
+            h1 = relu(h1)
+            num = 10
+            h1 = self.conv10(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn10(h1)
+            h = h1 + h
+            h = relu(h)
+
+            # h = self.res4a_relu(h, device)
+            temp = self.conv11(h)
+            temp = self.bn11(temp)
+            num = 12
+            h1 = self.conv12(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn12(h1)
+            h1 = relu(h1)
+            num = 13
+            h1 = self.conv13(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn13(h1)
+            h = temp + h1
+            h = relu(h)
+
+            # h = self.res4b_relu(h, device)
+            num = 14
+            h1 = self.conv14(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn14(h1)
+            h1 = relu(h1)
+            num = 15
+            h1 = self.conv15(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn15(h1)
+            h = h1 + h
+            h = relu(h)
+
+            # h = self.res5a_relu(h, device)
+            temp = self.conv16(h)
+            temp = self.bn16(temp)
+            num = 17
+            h1 = self.conv17(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn17(h1)
+            h1 = relu(h1)
+            num = 18
+            h1 = self.conv18(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn18(h1)
+            h = temp + h1
+            h = relu(h)
+
+            # h = self.res5b_relu(h, device)
+            num = 19
+            h1 = self.conv19(h, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn19(h1)
+            h1 = relu(h1)
+            num = 20
+            h1 = self.conv20(h1, device)
+            if stop_at == num:
+                return h1
+            h1 = self.bn20(h1)
+            if gradcam:
+                p1 = h1
+                p2 = h
+                return p1, p2
+            h = h1 + h
+            h = relu(h)
+
+            h = self.avgpool(h)
+            _shape = h.shape
+            h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+            y = self.fc(h)
+            return y
+
+        elif condition_3:
+            h = x + extra_pass_2
+            h = relu(h)
+
+            h = self.avgpool(h)
+            _shape = h.shape
+            h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+            y = self.fc(h)
+            return y
 
 # ------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------
 # resnet18 3DConv
 # ------------------------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------------------------
-
+# model_number = 21
 class ResNet18Explicit3DConv(torch.nn.Module):
     def __init__(self, pv):
         super(ResNet18Explicit3DConv, self).__init__()
@@ -411,149 +434,173 @@ class ResNet18Explicit3DConv(torch.nn.Module):
         self.fc = torch.nn.Linear(512, pv.label_size)
 
 
-    def forward(self, x, stop_at=None):
-        # h = self.conv1_relu(x, device)
+    def forward(self, x, stop_at=None, gradcam=False, which_pass=1, extra_pass_2=None):
+        # ---
+        # things for gradcam to be able to take gradient of score wrt activaitons of last conv layer
+        condition_1 = not gradcam  # no gradcam, do normal network things
+        condition_2 = gradcam and which_pass==1  # gradcam and first pass, return feature_map
+        condition_3 = gradcam and which_pass==2  # gradcam and second pass, return
+        if condition_3:
+            assert extra_pass_2 is not None
+        # ---
 
-        num = 1
-        h = self.conv1(x)
-        if stop_at == num:
-            return h
-        h = self.bn1(h)
-        h = relu(h)
+        if condition_1 or condition_2:
 
-        h = self.maxpool(h)
+            num = 1
+            h = self.conv1(x)
+            if stop_at == num:
+                return h
+            h = self.bn1(h)
+            h = relu(h)
 
-        # h = self.res2a_relu(h)
-        num = 2
-        h1 = self.conv2(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn2(h1)
-        h1 = relu(h1)
-        num = 3
-        h1 = self.conv3(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn3(h1)
-        h = h1 + h
-        h = relu(h)
+            h = self.maxpool(h)
 
-        # h = self.res2b_relu(h)
-        num = 4
-        h1 = self.conv4(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn4(h1)
-        h1 = relu(h1)
-        num = 5
-        h1 = self.conv5(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn5(h1)
-        h = h1 + h
-        h = relu(h)
+            # h = self.res2a_relu(h)
+            num = 2
+            h1 = self.conv2(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn2(h1)
+            h1 = relu(h1)
+            num = 3
+            h1 = self.conv3(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn3(h1)
+            h = h1 + h
+            h = relu(h)
 
-        # h = self.res3a_relu(h)
-        temp = self.conv6(h)
-        temp = self.bn6(temp)
-        num = 7
-        h1 = self.conv7(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn7(h1)
-        h1 = relu(h1)
-        num = 8
-        h1 = self.conv8(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn8(h1)
-        h = temp + h1
-        h = relu(h)
+            # h = self.res2b_relu(h)
+            num = 4
+            h1 = self.conv4(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn4(h1)
+            h1 = relu(h1)
+            num = 5
+            h1 = self.conv5(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn5(h1)
+            h = h1 + h
+            h = relu(h)
 
-        # h = self.res3b_relu(h)
-        num = 9
-        h1 = self.conv9(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn9(h1)
-        h1 = relu(h1)
-        num = 10
-        h1 = self.conv10(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn10(h1)
-        h = h1 + h
-        h = relu(h)
+            # h = self.res3a_relu(h)
+            temp = self.conv6(h)
+            temp = self.bn6(temp)
+            num = 7
+            h1 = self.conv7(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn7(h1)
+            h1 = relu(h1)
+            num = 8
+            h1 = self.conv8(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn8(h1)
+            h = temp + h1
+            h = relu(h)
 
-        # h = self.res4a_relu(h)
-        temp = self.conv11(h)
-        temp = self.bn11(temp)
-        num = 12
-        h1 = self.conv12(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn12(h1)
-        h1 = relu(h1)
-        num = 13
-        h1 = self.conv13(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn13(h1)
-        h = temp + h1
-        h = relu(h)
+            # h = self.res3b_relu(h)
+            num = 9
+            h1 = self.conv9(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn9(h1)
+            h1 = relu(h1)
+            num = 10
+            h1 = self.conv10(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn10(h1)
+            h = h1 + h
+            h = relu(h)
 
-        # h = self.res4b_relu(h)
-        num = 14
-        h1 = self.conv14(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn14(h1)
-        h1 = relu(h1)
-        num = 15
-        h1 = self.conv15(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn15(h1)
-        h = h1 + h
-        h = relu(h)
+            # h = self.res4a_relu(h)
+            temp = self.conv11(h)
+            temp = self.bn11(temp)
+            num = 12
+            h1 = self.conv12(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn12(h1)
+            h1 = relu(h1)
+            num = 13
+            h1 = self.conv13(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn13(h1)
+            h = temp + h1
+            h = relu(h)
 
-        # h = self.res5a_relu(h)
-        temp = self.conv16(h)
-        temp = self.bn16(temp)
-        num = 17
-        h1 = self.conv17(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn17(h1)
-        h1 = relu(h1)
-        num = 18
-        h1 = self.conv18(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn18(h1)
-        h = temp + h1
-        h = relu(h)
+            # h = self.res4b_relu(h)
+            num = 14
+            h1 = self.conv14(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn14(h1)
+            h1 = relu(h1)
+            num = 15
+            h1 = self.conv15(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn15(h1)
+            h = h1 + h
+            h = relu(h)
 
-        # h = self.res5b_relu(h)
-        num = 19
-        h1 = self.conv19(h)
-        if stop_at == num:
-            return h1
-        h1 = self.bn19(h1)
-        h1 = relu(h1)
-        num = 20
-        h1 = self.conv20(h1)
-        if stop_at == num:
-            return h1
-        h1 = self.bn20(h1)
-        h = h1 + h
-        h = relu(h)
+            # h = self.res5a_relu(h)
+            temp = self.conv16(h)
+            temp = self.bn16(temp)
+            num = 17
+            h1 = self.conv17(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn17(h1)
+            h1 = relu(h1)
+            num = 18
+            h1 = self.conv18(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn18(h1)
+            h = temp + h1
+            h = relu(h)
 
-        h = self.avgpool(h)
-        _shape = h.shape
-        h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
-        y = self.fc(h)
-        return y
+            # h = self.res5b_relu(h)
+            num = 19
+            h1 = self.conv19(h)
+            if stop_at == num:
+                return h1
+            h1 = self.bn19(h1)
+            h1 = relu(h1)
+            num = 20
+            h1 = self.conv20(h1)
+            if stop_at == num:
+                return h1
+            h1 = self.bn20(h1)
+            if gradcam:
+                p1 = h1
+                p2 = h
+                return p1, p2
+
+            h = h1 + h
+            h = relu(h)
+
+            h = self.avgpool(h)
+            _shape = h.shape
+            h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+            y = self.fc(h)
+            return y
+
+        elif condition_3:
+            h = x + extra_pass_2
+            h = relu(h)
+
+            h = self.avgpool(h)
+            _shape = h.shape
+            h = h.view(-1, _shape[1] * _shape[2] * _shape[3] * _shape[4])
+            y = self.fc(h)
+            return y
 
 
 class ResNet18Explicit3DConvReduced(torch.nn.Module):

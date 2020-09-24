@@ -92,6 +92,7 @@ filters_conv1 = '/huge/gabras/omg_emotion/saving_data/xai/filters_conv1'
 act_max = '/huge/gabras/omg_emotion/saving_data/xai/act_max'
 gradient = '/huge/gabras/omg_emotion/saving_data/xai/gradient'
 distributions = '/huge/gabras/omg_emotion/saving_data/xai/distributions'
+gradcam = '/huge/gabras/omg_emotion/saving_data/xai/gradcam'
 
 # NAS saving location
 nas_location = '/huge/gabras/omg_emotion/saving_data/nas'
