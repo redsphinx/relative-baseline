@@ -397,6 +397,40 @@ def save_as_plot(scales, rotations, xs, ys, model, conv, ch, dataset):
     plt.savefig(save_location)
 
 
+def get_transformations_from_conv(model, layername, channel):
+    transformations = getattr(getattr(model, layername), 'scale')
+    num_transformations = transformations.shape[0]
+    transformations = getattr(model, layername)
+
+    scales = []
+    rotations = []
+    xs = []
+    ys = []
+
+    for trafo in range(num_transformations):
+        s = getattr(transformations, 'scale')[trafo, channel]
+        r = getattr(transformations, 'rotate')[trafo, channel]
+        x = getattr(transformations, 'translate_x')[trafo, channel]
+        y = getattr(transformations, 'translate_y')[trafo, channel]
+
+        # translate parameters to interpretable things
+        # scale -> 1/s
+        # rotation -> degrees counterclockwise
+        # x, y -> half of size image
+
+        s = 1 / float(s)
+        r = -1 * float(r)
+        x = -0.5 * float(x)
+        y = 0.5 * float(y)
+
+        scales.append(s)
+        rotations.append(r)
+        xs.append(x)
+        ys.append(y)
+
+    return scales, rotations, xs, ys
+
+
 def plot_all_srxy(dataset, model, convlayer=None, channel=None):
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
@@ -425,35 +459,36 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 
         for ch in range(start, end):
             _conv_name = 'conv%d' % ind
-            transformations = getattr(getattr(my_model, _conv_name), 'scale')
-            num_transformations = transformations.shape[0]
-            transformations = getattr(my_model, _conv_name)
-
-            scales = []
-            rotations = []
-            xs = []
-            ys = []
-
-            for trafo in range(num_transformations):
-                s = getattr(transformations, 'scale')[trafo, ch]
-                r = getattr(transformations, 'rotate')[trafo, ch]
-                x = getattr(transformations, 'translate_x')[trafo, ch]
-                y = getattr(transformations, 'translate_y')[trafo, ch]
-                
-                # translate parameters to interpretable things
-                # scale -> 1/s
-                # rotation -> degrees counterclockwise
-                # x, y -> half of size image
-
-                s = 1 / float(s)
-                r = -1 * float(r)
-                x = -0.5 * float(x)
-                y = 0.5 * float(y)
-                
-                scales.append(s)
-                rotations.append(r)
-                xs.append(x)
-                ys.append(y)
+            scales, rotations, xs, ys = get_transformations_from_conv(my_model, _conv_name, ch)
+            # transformations = getattr(getattr(my_model, _conv_name), 'scale')
+            # num_transformations = transformations.shape[0]
+            # transformations = getattr(my_model, _conv_name)
+            #
+            # scales = []
+            # rotations = []
+            # xs = []
+            # ys = []
+            #
+            # for trafo in range(num_transformations):
+            #     s = getattr(transformations, 'scale')[trafo, ch]
+            #     r = getattr(transformations, 'rotate')[trafo, ch]
+            #     x = getattr(transformations, 'translate_x')[trafo, ch]
+            #     y = getattr(transformations, 'translate_y')[trafo, ch]
+            #
+            #     # translate parameters to interpretable things
+            #     # scale -> 1/s
+            #     # rotation -> degrees counterclockwise
+            #     # x, y -> half of size image
+            #
+            #     s = 1 / float(s)
+            #     r = -1 * float(r)
+            #     x = -0.5 * float(x)
+            #     y = 0.5 * float(y)
+            #
+            #     scales.append(s)
+            #     rotations.append(r)
+            #     xs.append(x)
+            #     ys.append(y)
 
             save_as_plot(scales, rotations, xs, ys, model, ind, ch, dataset)
 
@@ -1806,14 +1841,14 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
 
     data = load_videos(top_videos)
 
+    #
+    # # TODO: get the correct layers
+    # if model[1] in [21, 20]: # resnet18
+    #     conv_layers = [7, 12, 17]
+    # else:  # googlenet
+    #     conv_layers = [12, 31, 50]
 
-    # TODO: get the correct layers
-    if model[1] in [21, 20]: # resnet18
-        conv_layers = [7, 12, 17]
-    else:  # googlenet
-        conv_layers = [12, 31, 50]
-
-
+    # TODO: change loop, we don't need to loop over conv_layers
     for ind in tqdm(conv_layers):
 
         for vid in range(num_videos):
@@ -1831,10 +1866,13 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
                 path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
                 save_image(og_datapoint[:, _f], path)
 
+            # for models pretrained on imagenet
+            datapoint = torch.Tensor(datapoint_1.copy()).unsqueeze(0).cuda(device)
+            datapoint = remove_imagenet_mean_std(datapoint)
 
+            # PASS 1 --------------------------------------------------------------
             # pass input through model AND get score before softmax
             # softmax happens at the loss
-            # PASS 1
             my_model.eval()
             if proj_var.model_number == 20: #3Tresnet
                 feature_map, extra_thing  = my_model(datapoint, proj_var.device, gradcam=True, which_pass=1)
@@ -1844,29 +1882,44 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
                 feature_map, extra_thing = my_model(datapoint, gradcam=True, which_pass=1)
             elif proj_var.model_number == 25:
                 feature_map, extra_thing = my_model(datapoint, aux=False, gradcam=True, which_pass=1)
+            # PASS 1 --------------------------------------------------------------
 
-            # TODO: make sure gradients are zero
-            # PASS 2
-            # TODO: set featuremaps as parameters in order to take gradient
+            # make sure gradients are zero
+            my_model.zero_grad()
+
+            # PASS 2 --------------------------------------------------------------
+            # set featuremaps as parameters in order to take gradient
+            feature_map = torch.nn.Parameter(feature_map, requires_grad=True)
+
+
             if proj_var.model_number == 20: #3Tresnet
-                score  = my_model(datapoint, proj_var.device, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+                score  = my_model(feature_map, proj_var.device, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
             elif proj_var.model_number == 23: #3Tgoogle
-                score = my_model(datapoint, proj_var.device, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+                score = my_model(feature_map, proj_var.device, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
             elif proj_var.model_number == 21:
-                score = my_model(datapoint, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+                score = my_model(feature_map, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
             elif proj_var.model_number == 25:
-                score = my_model(datapoint, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+                score = my_model(feature_map, aux=False, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
+            # PASS 2 --------------------------------------------------------------
             
             # calculate alpha weights
             fm_shape = feature_map.shape() # N, C, H, W, D
-
-            # TODO: choose the specific class
             # alpha_k^c = 1/Z * \sum_i \sum_j \frac{\partial y^c}{\partial A^k_{i,j}}
-            score[desired_class].backward()
+
+            # get mapping from desired_class to index
+            # datasets = ucf101, jester (maybe hmdb51?)
+            class_index = DL.get_class_map(dataset, desired_class)
+
+            score[class_index].backward()
             feature_map_grad = feature_map.grad
 
             # L_c = ReLU(\sum_k \alpha_k^c A^k)
             L_full = np.zeros(fm_shape)
+
+            if proj_var.model_number in [20, 21]: # resnet
+                conv_name = 'conv20' 
+            elif proj_var.model_number in [23, 25]: # googlenet
+                conv_name = 'conv58'
 
             for k in range(fm_shape[1]):
                 alpha = np.mean(feature_map_grad[0, k, :])
@@ -1874,12 +1927,15 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
                 alpha_x_fm = alpha * feature_map[0, k, :]
 
                 L_full[k] = alpha_x_fm
+                
+                # get the temporal parameters
+                scales, rotations, xs, ys = get_transformations_from_conv(my_model, conv_name, k)
+
 
             L_c = np.mean(L_full, axis=0)
             # do the ReLU to obtain coarse heatmap
             L_c[L_c < 0] = 0
 
-            # TODO: get the temporal parameters
             # TODO: sort frames on time appearance: how to balance frequency and intensity??
 
             # interpolate

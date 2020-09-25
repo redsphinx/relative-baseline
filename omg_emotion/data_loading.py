@@ -1288,3 +1288,27 @@ def get_ucf101_iter(which, project_variable):
                                                project_variable.dali_iterator_size[1], True, project_variable.device)
 
     return the_iter
+
+
+def get_ucf101_labels_only():
+    all_labels = np.genfromtxt(PP.ucf101_annotations, 'str', delimiter=' ', skip_header=False)
+    all_labels = all_labels[:, 1]
+    return all_labels.tolist()
+
+
+def get_jester_labels_only():
+    all_labels = np.genfromtxt(PP.jester_labels, 'str', skip_header=False)
+    return all_labels.tolist()
+
+
+def get_class_map(dataset, class_name):
+    if dataset == 'jester':
+        class_list = get_jester_labels_only()
+    elif dataset == 'ucf101':
+        class_list = get_ucf101_labels_only()
+    else:
+        print('error, function not implemented for dataset %s' % dataset)
+        return
+
+    the_index = class_list.index(class_name)
+    return the_index
