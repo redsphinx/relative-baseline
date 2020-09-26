@@ -1164,7 +1164,7 @@ def activation_maximization_single_channels(dataset, model, begin=0, num_channel
 
 
 # --- rebuttal ---
-rebuttal_seed = 172108
+# rebuttal_seed = 172108
 
 
 
@@ -1189,10 +1189,10 @@ rebuttal_seed = 172108
 
 
 
-conv3t_channels_conv12 = [152, 121, 26]
-conv3t_channels_conv31 = [134, 55, 243]
-conv3t_channels_conv50 = [120, 88, 67]
-gpu = 0
+# conv3t_channels_conv12 = [152, 121, 26]
+# conv3t_channels_conv31 = [134, 55, 243]
+# conv3t_channels_conv50 = [120, 88, 67]
+# gpu = 0
 
 # #3TTTTTTTTTT
 # for i in conv3t_channels_conv12:
@@ -1203,9 +1203,9 @@ gpu = 0
 #     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
 #                                             layer_begin=31, single_layer=True, rebuttal=True)
 #
-for i in conv3t_channels_conv50:
-    activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
-                                            layer_begin=50, single_layer=True, rebuttal=True)
+# for i in conv3t_channels_conv50:
+#     activation_maximization_single_channels('jester', [30, 23, 28, 0], begin=i, num_channels=i+1, seed=rebuttal_seed, steps=500, mode='image', gpunum=gpu,
+#                                             layer_begin=50, single_layer=True, rebuttal=True)
 
 
 
@@ -1805,9 +1805,7 @@ def find_same_frame_best_act_accross_models(model1, model2, video, rebuttal=True
 # find_same_frame_best_act_accross_models([28, 25, 25], [30, 23, 28], 9199)
 
 # 3D grad-cam with temporal parameters
-def grad_cam(dataset, model, videoname, desired_class, type_contribution, prediction_type, num_videos=5, gpunum=0,
-             iclr=True):
-    assert type_contribution in ['pos', 'neg']
+def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_class='same', num_videos=5, gpunum=0, iclr=True):
     assert prediction_type in ['correct', 'wrong']
 
     '''
@@ -1817,7 +1815,7 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
     .... exp_%d_mod_%d_ep_%d
     ...... iclr_video_1
     ........ og_video
-    ........ processed
+    ........ processed 
     .
     .
     '''
@@ -1837,6 +1835,10 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
     if videoname is None:
         top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
         top_videos = top_videos[:num_videos]
+        videoname = []
+        for v in top_videos:
+            _tmp = v.split('/')[-1].split('.')[0]
+            videoname.append(_tmp)
     else:
         if dataset == 'jester':
             # top_videos = ['/fast/gabras/jester/data_150_224_avi/%d.avi' % videoname]
@@ -1850,10 +1852,18 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
         top_videos = [vpath]
         num_videos = 1
 
+
     data = load_videos(top_videos)
 
     for vid in range(num_videos):
-        folder_name = 'iclr_%s' % str(videoname)
+        og_class = DL.get_label_from_name(dataset, videoname[vid])  # the actual class
+
+        if desired_class == 'same':
+            info_class = og_class
+        else:
+            info_class = DL.get_class_map(dataset, desired_class)  # the class we want info about
+
+        folder_name = '%s_%s_og-%s_info-%s' % (dataset, str(videoname[vid]), str(og_class), str(info_class))
 
         # make folder for each video
         p2 = os.path.join(intermediary_path, folder_name)
@@ -1862,11 +1872,12 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
         og_datapoint = data[vid].copy()
 
         # save the OG video
-        vid_path = os.path.join(intermediary_path, folder_name, 'og_video_%s' % (str(vid)))
+        vid_path = os.path.join(intermediary_path, folder_name, 'og_video_%s' % (str(videoname[vid])))
         opt_mkdir(vid_path)
         for _f in range(30):
             path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
-            save_image(og_datapoint[:, _f], path)
+            if not os.path.exists(path):
+                save_image(og_datapoint[:, _f], path)
 
         # for models pretrained on imagenet
         datapoint = torch.Tensor(datapoint_1.copy()).unsqueeze(0).cuda(device)
@@ -1893,7 +1904,7 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
         # set featuremaps as parameters in order to take gradient
         feature_map = torch.nn.Parameter(feature_map, requires_grad=True)
 
-
+        # TODO: verify the correctness of this by comparing with normal pass through model
         if proj_var.model_number == 20: #3Tresnet
             score  = my_model(feature_map, proj_var.device, gradcam=True, which_pass=2, extra_pass_2=extra_thing)
         elif proj_var.model_number == 23: #3Tgoogle
@@ -1905,18 +1916,17 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
         # PASS 2 --------------------------------------------------------------
 
         # calculate alpha weights
-        fm_shape = feature_map.shape() # N, C, H, W, D
+        fm_shape = feature_map.shape # N, C, H, W, D
         # alpha_k^c = 1/Z * \sum_i \sum_j \frac{\partial y^c}{\partial A^k_{i,j}}
 
-        # get mapping from desired_class to index
-        # datasets = ucf101, jester (maybe hmdb51?)
-        class_index = DL.get_class_map(dataset, desired_class)
-
-        score[class_index].backward()
+        score[0, info_class].backward()
         feature_map_grad = feature_map.grad
+        # convert to numpy
+        feature_map_grad = feature_map_grad.cpu().numpy()
+        feature_map = feature_map.detach().cpu().numpy()
 
         # L_c = ReLU(\sum_k \alpha_k^c A^k)
-        L_full = np.zeros(fm_shape)
+        L_full = np.zeros(fm_shape[1:])
 
         if proj_var.model_number in [20, 21]: # resnet
             conv_name = 'conv20'
@@ -1924,9 +1934,9 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
             conv_name = 'conv58'
 
         for k in range(fm_shape[1]):
-            alpha = np.mean(feature_map_grad[0, k, :])
+            alpha = np.mean(feature_map_grad[0, k])
 
-            alpha_x_fm = alpha * feature_map[0, k, :]
+            alpha_x_fm = alpha * feature_map[0, k]
 
             L_full[k] = alpha_x_fm
 
@@ -1954,7 +1964,7 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
         for f in range(cam_shape[0]):
             normalized_cam_slice = U.normalize_between(cam_shape[i], min_value, max_value, 1, 10)
             heatmap_img = cv.applyColorMap(normalized_cam_slice, cv.COLORMAP_JET)
-            final_slice = cv.addWeighted(heatmap_img, 0.5, datapoint_1[i], 0.5, 0)
+            final_slice = cv.addWeighted(heatmap_img, 0.5, datapoint_1[f], 0.5, 0)
 
             processed_path = os.path.join(p2, 'processed')
             opt_mkdir(processed_path)
@@ -1965,24 +1975,7 @@ def grad_cam(dataset, model, videoname, desired_class, type_contribution, predic
 
     print('THE END')
 
+dataset = 'jester'
+model = [31, 20, 8, 0]
+grad_cam(dataset, model, num_videos=1, gpunum=2)
 
-    '''
-    give: model, input, desired class, type of contribution
-
-    pass input to model
-    calculate the alpha weights
-    get featuremap from last conv layer
-    sort the featuremaps on time
-    for each out channel:
-        get the temporal parameters
-
-    create heatmap
-    upscale the heatmap by interpolation
-    for each heatmap/featuremap:
-        add temporal symbols with value information
-
-    overlay heatmap on top of OG input
-
-    make final explanation frame sequence
-
-    '''

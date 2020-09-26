@@ -1,4 +1,5 @@
 import os
+import subprocess
 import numpy as np
 # from relative_baseline.omg_emotion.project_paths import Paths
 import relative_baseline.omg_emotion.project_paths as PP
@@ -1312,3 +1313,19 @@ def get_class_map(dataset, class_name):
 
     the_index = class_list.index(class_name)
     return the_index
+
+
+def get_label_from_name(dataset, videoname):
+
+    if dataset == 'jester':
+        path = PP.jester_xai_videos_classes
+        command = "cat %s | grep %s | awk '{print $2}'" % (path, str(videoname))
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = proc.communicate()
+        stdout = stdout.decode('utf-8')
+        stdout = stdout.strip()
+        the_label = int(stdout)
+        return the_label
+    else:
+        print('ERROR: function not implemented for chosen dataset %s' % dataset)
+        return
