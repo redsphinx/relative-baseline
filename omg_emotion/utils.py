@@ -403,3 +403,14 @@ def opt_mkdir(the_path):
 def opt_makedirs(the_path):
     if not os.path.exists(the_path):
         os.makedirs(the_path)
+
+
+def normalize_between(value, vmin, vmax, low, high):
+    if isinstance(value, np.ndarray):
+        vmin = np.tile(vmin, value.shape)
+        vmax = np.tile(vmax, value.shape)
+        low = np.tile(low, value.shape)
+        high = np.tile(high, value.shape)
+    
+    result = (value - vmin) / (vmax - vmin) * (high - low) + low
+    return result
