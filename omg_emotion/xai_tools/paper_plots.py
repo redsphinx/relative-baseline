@@ -1401,11 +1401,12 @@ def load_videos(list_paths, combine=False):
     return data
     
 
-def save_image(nparray, path):
+def save_image(nparray, path, do_transpose=True):
     if nparray.dtype != np.uint8:
         nparray = nparray.astype(np.uint8)
 
-    nparray = nparray.transpose(1, 2, 0)
+    if do_transpose:
+        nparray = nparray.transpose(1, 2, 0)
     nparray = Image.fromarray(nparray, mode='RGB')
     nparray.save(path)
 
@@ -1958,7 +1959,8 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         # CAM = upsample(L_c, size=datapoint_1.shape, mode='linear')
         CAM = upsample(L_c_1, size=datapoint_1.shape, mode='trilinear')
         CAM = np.array(CAM.data.cpu())[0,0]
-        datapoint_1 = np.array(datapoint_1.data.cpu())
+        og_image = data[vid].copy().astype(np.uint8)
+        og_image = np.transpose(og_image, (1, 2, 3, 0))
 
         # normalize
         max_value = CAM.max()
@@ -1969,20 +1971,19 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         # overlay CAM on OG data
         # TODO: add temporal param info
         for f in range(cam_shape[0]):
-            normalized_cam_slice = U.normalize_between(CAM[f], min_value, max_value, 0, 9)
-            # convert to cv image
-            normalized_cam_slice = cv.fromarray(normalized_cam_slice)
-            datapoint_cv = cv.fromarray(datapoint_1[f])
+            normalized_cam_slice = U.normalize_between(CAM[f], min_value, max_value, 0, 255)
+            normalized_cam_slice = normalized_cam_slice.astype(np.uint8)
 
             heatmap_img = cv.applyColorMap(normalized_cam_slice, cv.COLORMAP_JET)
+            # heatmap_img = cv.cvtColor(heatmap_img, cv.COLOR_RGB2GRAY)
 
-
-            final_slice = cv.addWeighted(heatmap_img, 0.5, datapoint_cv, 0.5, 0)
+            final_slice = cv.addWeighted(heatmap_img, 0.5, og_image[f], 0.5, 0)
 
             processed_path = os.path.join(p2, 'processed')
             opt_mkdir(processed_path)
             slice_path = os.path.join(processed_path, 'cam_plus_frame_%d.jpg' % f)
-            save_image(final_slice, slice_path)
+            cv.imwrite(slice_path, final_slice)
+            # save_image(final_slice, slice_path)
 
         my_model.zero_grad()
 
