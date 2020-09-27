@@ -16,7 +16,7 @@ import cv2 as cv
 
 import torch
 from torch.optim import AdamW
-from torch.nn.functional import interpolate
+from torch.nn.functional import interpolate, upsample
 
 from relative_baseline.omg_emotion.settings import ProjectVariable as pv
 from relative_baseline.omg_emotion import setup
@@ -1946,25 +1946,38 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         L_c = np.mean(L_full, axis=0)
         # do the ReLU to obtain coarse heatmap
         L_c[L_c < 0] = 0
+        # to Tensor
+        L_c_1 = torch.Tensor(L_c).unsqueeze(0).unsqueeze(0).cuda(device)
+        datapoint_1 = torch.Tensor(datapoint_1[0]).cuda(device)
 
         # TODO: match cam heatmap with temporal parameters
 
         # interpolate
         # assuming cam is np array
-        CAM = interpolate(L_c, size=datapoint_1.shape, mode='linear')
+        # CAM = interpolate(L_c, size=datapoint_1.shape, mode='linear')
+        # CAM = upsample(L_c, size=datapoint_1.shape, mode='linear')
+        CAM = upsample(L_c_1, size=datapoint_1.shape, mode='trilinear')
+        CAM = np.array(CAM.data.cpu())[0,0]
+        datapoint_1 = np.array(datapoint_1.data.cpu())
 
         # normalize
-        max_value = max(CAM)
-        min_value = min(CAM)
+        max_value = CAM.max()
+        min_value = CAM.min()
         cam_shape = CAM.shape
 
         # map CAM to colormap
         # overlay CAM on OG data
         # TODO: add temporal param info
         for f in range(cam_shape[0]):
-            normalized_cam_slice = U.normalize_between(cam_shape[i], min_value, max_value, 1, 10)
+            normalized_cam_slice = U.normalize_between(CAM[f], min_value, max_value, 0, 9)
+            # convert to cv image
+            normalized_cam_slice = cv.fromarray(normalized_cam_slice)
+            datapoint_cv = cv.fromarray(datapoint_1[f])
+
             heatmap_img = cv.applyColorMap(normalized_cam_slice, cv.COLORMAP_JET)
-            final_slice = cv.addWeighted(heatmap_img, 0.5, datapoint_1[f], 0.5, 0)
+
+
+            final_slice = cv.addWeighted(heatmap_img, 0.5, datapoint_cv, 0.5, 0)
 
             processed_path = os.path.join(p2, 'processed')
             opt_mkdir(processed_path)

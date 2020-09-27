@@ -238,7 +238,7 @@ class ResNet18Explicit(torch.nn.Module):
             h1 = self.bn4(h1)
             h1 = relu(h1)
             num = 5
-            h1 = self.conv5(h1, device)
+            h1 = self.conv5(h1, device)  # torch.Size([1, 64, 8, 38, 56])
             if stop_at == num:
                 return h1
             h1 = self.bn5(h1)
@@ -249,7 +249,7 @@ class ResNet18Explicit(torch.nn.Module):
             temp = self.conv6(h)
             temp = self.bn6(temp)
             num = 7
-            h1 = self.conv7(h, device)
+            h1 = self.conv7(h, device)  # torch.Size([1, 128, 4, 19, 28])
             if stop_at == num:
                 return h1
             h1 = self.bn7(h1)
@@ -270,7 +270,7 @@ class ResNet18Explicit(torch.nn.Module):
             h1 = self.bn9(h1)
             h1 = relu(h1)
             num = 10
-            h1 = self.conv10(h1, device)
+            h1 = self.conv10(h1, device)  # torch.Size([1, 128, 4, 19, 28])
             if stop_at == num:
                 return h1
             h1 = self.bn10(h1)
@@ -281,13 +281,13 @@ class ResNet18Explicit(torch.nn.Module):
             temp = self.conv11(h)
             temp = self.bn11(temp)
             num = 12
-            h1 = self.conv12(h, device)
+            h1 = self.conv12(h, device)  # # torch.Size([1, 256, 2, 10, 14])
             if stop_at == num:
                 return h1
             h1 = self.bn12(h1)
             h1 = relu(h1)
             num = 13
-            h1 = self.conv13(h1, device)
+            h1 = self.conv13(h1, device)  # torch.Size([1, 256, 2, 10, 14])
             if stop_at == num:
                 return h1
             h1 = self.bn13(h1)
@@ -296,13 +296,13 @@ class ResNet18Explicit(torch.nn.Module):
 
             # h = self.res4b_relu(h, device)
             num = 14
-            h1 = self.conv14(h, device)
+            h1 = self.conv14(h, device)  # torch.Size([1, 256, 2, 10, 14])
             if stop_at == num:
                 return h1
             h1 = self.bn14(h1)
             h1 = relu(h1)
             num = 15
-            h1 = self.conv15(h1, device)
+            h1 = self.conv15(h1, device)  # # torch.Size([1, 256, 2, 10, 14])
             if stop_at == num:
                 return h1
             h1 = self.bn15(h1)
@@ -313,7 +313,7 @@ class ResNet18Explicit(torch.nn.Module):
             temp = self.conv16(h)
             temp = self.bn16(temp)
             num = 17
-            h1 = self.conv17(h, device)
+            h1 = self.conv17(h, device) # torch.Size([1, 512, 1, 5, 7])
             if stop_at == num:
                 return h1
             h1 = self.bn17(h1)
