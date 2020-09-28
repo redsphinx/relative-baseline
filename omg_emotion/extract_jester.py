@@ -11,6 +11,7 @@ import subprocess
 import tqdm
 
 from relative_baseline.omg_emotion import project_paths as PP
+from relative_baseline.omg_emotion.xai_tools.paper_plots import find_top_xai_videos
 
 
 def get_label_mapping():
@@ -119,7 +120,8 @@ def get_information():
           'min number of frames:        %d\n'
           % (int(avg_frames), frames[:, 1].max(), frames[:, 1].min()))
 
-    less_than = 30
+    # less_than = 30
+    less_than = 60
 
     frames = frames[:, 1]
     num_frames_less_than = sum(frames < less_than)
@@ -181,20 +183,28 @@ def adjust_frame(image, h, w, c):
     return image
 
 
-def standardize_clips(b, e, he, wi, loc):
+def standardize_clips(b, e, he, wi, loc, video_list=None, frames=30, base_path=None):
     print(b, e)
     height = he # 50
     width = wi  # 75
     channels = 3
-    frames = 30
+    # frames = 30
 
-    base_path = PP.jester_data
     new_path = os.path.join(PP.jester_location, loc)  # 'data_50_75')
+    if base_path is None:
+        base_path = PP.jester_data
 
     if not os.path.exists(new_path):
         os.mkdir(new_path)
 
-    all_videos = os.listdir(base_path)
+    if video_list is not None:
+        b = 0
+        e = len(video_list)
+        all_videos = video_list
+
+    else:
+        all_videos = os.listdir(base_path)
+
     all_videos.sort()
 
     for vid in tqdm.tqdm(range(b, e)):
@@ -360,12 +370,12 @@ def redo_folders_with_few_frames():
         cntr = cntr + 1
 
 
-def fix_file_names_in_folder(folder_path):
+def fix_file_names_in_folder(folder_path, num_frames=30):
 
     list_files = os.listdir(folder_path)
     list_files.sort()
 
-    good_list = ['%05d.jpg' % i for i in range(1, 31)]
+    good_list = ['%05d.jpg' % i for i in range(1, num_frames+1)]
 
     if list_files != good_list:
         for i in range(1, len(list_files) + 1):
@@ -385,28 +395,36 @@ def jpg_to_avi(jpg_folder, avi_dest):
 
 def to_avi(which, b, e):
     print('start and finish: ', b, e)
-    assert which in ['test', 'val', 'train']
+    assert which in ['test', 'val', 'train', 'xai']
 
-    jpg_path = PP.fast_jester_data_150_224
-    avi_path = PP.fast_jester_data_150_224_avi
+    if which == 'xai':
+        jpg_path = PP.fast_jester_data_150_224_65_frames
+        avi_path = PP.fast_jester_data_150_224_65_avi
+
+        list_files_to_convert = os.listdir(jpg_path)
+        list_files_to_convert = [os.path.join(jpg_path, i) for i in list_files_to_convert]
+        b = 0
+        e = len(list_files_to_convert)
+    else:
+        jpg_path = PP.fast_jester_data_150_224
+        avi_path = PP.fast_jester_data_150_224_avi
+
+        labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
+        labels = np.load(labels_path)
+        labels = labels[b:e]
+
+        list_files_to_convert = [os.path.join(jpg_path, i) for i in labels[:, 0]]
 
     if not os.path.exists(avi_path):
         os.mkdir(avi_path)
 
-    labels_path = os.path.join(PP.jester_location, 'labels_%s.npy' % which)
-    labels = np.load(labels_path)
-    labels = labels[b:e]
-
-    list_files_to_convert = [os.path.join(jpg_path, i) for i in labels[:, 0]]
-
     for file_path in tqdm.tqdm(list_files_to_convert):
 
-        fix_file_names_in_folder(file_path)
-
+        fix_file_names_in_folder(file_path, num_frames=65)
         dest = os.path.join(avi_path, '%s.avi' % (file_path.split('/')[-1]))
-
         jpg_to_avi(file_path, dest)
 
+# to_avi('xai', 0, 0)
 
 # to_avi('val', 0, 3)
 # to_avi('val', 3, 10000)  # 7393
@@ -606,4 +624,30 @@ def xai_150_224_selection():
             # print(line)
             my_file.write(line)
 
-# xai_150_224_selection()
+
+def longer_videos(dataset, number_videos=20, total_frames=65, prediction_type='correct'):
+    '''
+    get list of og videos locations
+    only choose the xai ones
+    standardize clip to (total_frames, 150, 224)
+    save them
+    '''
+
+    xai_videos = find_top_xai_videos(dataset, prediction_type, combine=True, model=[23, 25])
+    xai_videos = [i for i in xai_videos.keys()]
+    xai_video_list = []
+
+    if number_videos == 'all':
+        number_videos = len(xai_videos)
+
+    for v in range(number_videos):
+        name = xai_videos[v].split('/')[-1].split('.')[0]
+        # og_vid_path = os.path.join(base_path, name)
+        xai_video_list.append(name)
+
+    # save as frames
+    standardize_clips(b=0, e=0, he=150, wi=224, video_list=xai_video_list,
+                      loc='data_xai_150_224_%d_frames' % total_frames, frames=total_frames)
+
+# longer_videos(dataset='jester', number_videos='all')
+

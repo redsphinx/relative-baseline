@@ -1336,7 +1336,7 @@ def combine_results(list_videos, dataset):
                 return vid_score_class
 
 
-def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
+def find_top_xai_videos(dataset, prediction_type, model=None, combine=False, use_long_videos=False):
     # if combine: model=[model_number] else, model=[exp, mo, run, ep]
 
     video_files = os.listdir(PP.xai_metadata)
@@ -1362,6 +1362,7 @@ def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
 
     return top_videos
 
+# rebuttal
 # vids = find_top_xai_videos('jester', 'correct', combine=True, model=[23, 25])
 # for i, name  in enumerate(vids):
 #     print(i+1, name)
@@ -1381,7 +1382,7 @@ def find_top_xai_videos(dataset, prediction_type, model=None, combine=False):
 
 
 # has not been made for the combined mode
-def load_videos(list_paths, combine=False):
+def load_videos(list_paths, combine=False, long_videos=False):
     data = None
     
     if not combine:
@@ -1391,7 +1392,11 @@ def load_videos(list_paths, combine=False):
         elif dataset == 'ucf101':
             h, w = 168, 224
 
-        data = np.zeros(shape=(len(list_paths), 3, 30, h, w), dtype=np.float32)
+        if long_videos:
+            frames = 65
+        else:
+            frames = 30
+        data = np.zeros(shape=(len(list_paths), 3, frames, h, w), dtype=np.float32)
 
         for i, _path in enumerate(list_paths):
             videodata = skvid.vread(_path)
@@ -1806,7 +1811,8 @@ def find_same_frame_best_act_accross_models(model1, model2, video, rebuttal=True
 # find_same_frame_best_act_accross_models([28, 25, 25], [30, 23, 28], 9199)
 
 # 3D grad-cam with temporal parameters
-def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_class='same', num_videos=5, gpunum=0, iclr=True):
+def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_class='same', num_videos=5, gpunum=0,
+             iclr=True, use_long_video=True):
     assert prediction_type in ['correct', 'wrong']
 
     '''
@@ -1821,6 +1827,11 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
     .
     '''
 
+    if use_long_video:
+        frames = 65
+    else:
+        frames = 30
+
     print('\nRunning function grad_cam for MODEL %s\n' % (str(model)))
     proj_var = init1(dataset, model)
     my_model = setup.get_model(proj_var)
@@ -1834,16 +1845,31 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
     opt_makedirs(intermediary_path)
 
     if videoname is None:
-        top_videos = find_top_xai_videos(dataset, prediction_type, model, combine=False)
+        top_videos = find_top_xai_videos(dataset, prediction_type, model=[23, 25], combine=True)
+        top_videos = [i for i in top_videos.keys()]
+
         top_videos = top_videos[:num_videos]
+
         videoname = []
         for v in top_videos:
             _tmp = v.split('/')[-1].split('.')[0]
             videoname.append(_tmp)
+
+        if use_long_video:
+            new_top_videos = []
+            # replace the source path
+            for v in top_videos:
+                new_path = os.path.join(PP.fast_jester_data_150_224_65_avi, v.split('/')[-1])
+                new_top_videos.append(new_path)
+
+            top_videos = new_top_videos
+            del new_top_videos
+
     else:
         if dataset == 'jester':
             # top_videos = ['/fast/gabras/jester/data_150_224_avi/%d.avi' % videoname]
-            vpath = os.path.join(PP.fast_jester_data_150_224_avi, '%s.avi' % str(videoname))
+            # vpath = os.path.join(PP.fast_jester_data_150_224_avi, '%s.avi' % str(videoname))
+            vpath = os.path.join(PP.fast_jester_data_150_224_65_avi, '%s.avi' % str(videoname))
         elif  dataset == 'ucf101':
             vpath = os.path.join(PP.ucf101_168_224_xai, desired_class, '%s.avi' % str(videoname))
         else:
@@ -1854,7 +1880,7 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         num_videos = 1
 
 
-    data = load_videos(top_videos)
+    data = load_videos(top_videos, long_videos=True)
 
     for vid in range(num_videos):
         og_class = DL.get_label_from_name(dataset, videoname[vid])  # the actual class
@@ -1875,7 +1901,7 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         # save the OG video
         vid_path = os.path.join(intermediary_path, folder_name, 'og_video_%s' % (str(videoname[vid])))
         opt_mkdir(vid_path)
-        for _f in range(30):
+        for _f in range(frames):
             path = os.path.join(vid_path, 'og_frame_%d.jpg' % _f)
             if not os.path.exists(path):
                 save_image(og_datapoint[:, _f], path)
@@ -1988,8 +2014,9 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
         my_model.zero_grad()
 
     print('THE END')
-
+#
 dataset = 'jester'
+# model = [30, 23, 28, 0]
 model = [31, 20, 8, 0]
-grad_cam(dataset, model, num_videos=1, gpunum=2)
+grad_cam(dataset, model, num_videos=10, gpunum=2)
 

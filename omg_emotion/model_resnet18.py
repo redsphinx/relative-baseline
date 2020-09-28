@@ -207,7 +207,7 @@ class ResNet18Explicit(torch.nn.Module):
         if condition_1 or condition_2:
 
             num = 1
-            h = self.conv1(x, device)
+            h = self.conv1(x, device) # torch.Size([1, 64, 15, 75, 112])
             if stop_at == num:
                 return h
             h = self.bn1(h)
@@ -217,7 +217,7 @@ class ResNet18Explicit(torch.nn.Module):
 
             # h = self.res2a_relu(h, device)
             num = 2
-            h1 = self.conv2(h, device)
+            h1 = self.conv2(h, device) # torch.Size([1, 64, 8, 38, 56])
             if stop_at == num:
                 return h1
             h1 = self.bn2(h1)
