@@ -1054,7 +1054,7 @@ def get_mean_std_train_mov_mnist():
 
     return mean, std
 
-
+# UNUSED: making a DALI loader for kinetics400 dataset
 def kinetics400_loader(which, project_variable):
     assert which in ['train', 'test', 'val']
 
@@ -1287,6 +1287,97 @@ def get_ucf101_iter(which, project_variable):
         the_iter = ucf101_create_dali_iterator(project_variable.batch_size_val_test,
                                                PP.ucf101_168_224_xai, project_variable.dali_workers, False, 0,
                                                project_variable.dali_iterator_size[1], True, project_variable.device)
+
+    return the_iter
+
+
+
+# TODO: sequence length?
+class Kinetics400VideoPipe(Pipeline):
+    def __init__(self, batch_size,
+                 num_threads=6,
+                 device_id=0,
+                 file_root='',
+                 shuffle=False,
+                 sequence_length=30,
+                 step=-1,
+                 stride=1,
+                 initial_fill=1024,
+                 # initial_fill=512,
+                 # initial_fill=256,
+                 seed=0):
+
+        super(Kinetics400VideoPipe, self).__init__(batch_size, num_threads, device_id, seed=seed)
+
+        self.input = ops.VideoReader(device='gpu',
+                                     file_root=file_root,
+                                     sequence_length=sequence_length,
+                                     step=step,
+                                     stride=stride,
+                                     shard_id=0,
+                                     num_shards=1,
+                                     random_shuffle=shuffle,
+                                     initial_fill=initial_fill)
+
+        self.normalize = ops.Normalize(device='gpu',
+                                       )
+
+    def define_graph(self):
+        output, labels = self.input(name="Reader")
+        return output, labels
+
+
+def kinetics400_create_dali_iterator(batch_size, file_root, num_workers, do_shuffle, the_seed, iterator_size, reset, device):
+    pipe = UCF101VideoPipe(batch_size=batch_size,
+                           file_root=file_root,
+                           shuffle=do_shuffle,
+                           initial_fill=batch_size,
+                           num_threads=num_workers,
+                           seed=the_seed,
+                           device_id=device
+                           )
+    pipe.build()
+
+    if iterator_size == 'all':
+        it_size = pipe.epoch_size("Reader")
+    else:
+        it_size = iterator_size
+
+    dali_iter = DALIGenericIterator([pipe], ['data', 'labels'], size=it_size, auto_reset=reset,
+                                    fill_last_batch=True, last_batch_padded=False)
+
+    return dali_iter
+
+
+def get_kinetics400_iter(which, project_variable):
+    if not project_variable.xai_only_mode:
+        assert which in ['train', 'val', 'test']
+
+    if which in ['val']:
+        print('Loading validation/test iterator...')
+        the_iter = kinetics400_create_dali_iterator(project_variable.batch_size_val_test,
+                                                    PP.kinetics400_val,
+                                                    project_variable.dali_workers, False, 0,
+                                                    project_variable.dali_iterator_size[1], True,
+                                                    project_variable.device)
+    if which in ['test']:
+        print('Loading validation/test iterator...')
+        the_iter = kinetics400_create_dali_iterator(project_variable.batch_size_val_test,
+                                                    PP.kinetics400_test,
+                                                    project_variable.dali_workers, False, 0,
+                                                    project_variable.dali_iterator_size[1], True,
+                                                    project_variable.device)
+    elif which == 'train':
+        print('Loading training iterator...')
+        the_iter = kinetics400_create_dali_iterator(project_variable.batch_size,
+                                                    PP.ucf101_168_224_train,
+                                                    project_variable.dali_workers,
+                                                    project_variable.randomize_training_data, 6,
+                                                    project_variable.dali_iterator_size[0], True,
+                                                    project_variable.device)
+    else:
+        print('Error: which %s is not recognized' % which)
+        return
 
     return the_iter
 

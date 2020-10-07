@@ -71,9 +71,11 @@ jester_xai_videos_classes = '/fast/gabras/jester/filelist_test_xai_150_224.txt'
 jester_frames = '/scratch/users/gabras/jester/frames.txt'
 jester_zero = '/scratch/users/gabras/jester/zero.txt'
 jester_labels = '/fast/gabras/jester/label_number.txt'
-kinetics400_train = '/fast/gabras/kinetics400/train'
-kinetics400_val = '/fast/gabras/kinetics400/val'
-kinetics400_test = '/fast/gabras/kinetics400/test'
+
+# Kinetics400
+kinetics400_train = '/fast/gabras/kinetics400_downloader/dataset/train'
+kinetics400_val = '/fast/gabras/kinetics400_downloader/dataset/valid'
+kinetics400_test = '/fast/gabras/kinetics400_downloader/dataset/test'
 
 
 # UCF101

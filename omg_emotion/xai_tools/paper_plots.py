@@ -511,53 +511,17 @@ def plot_all_srxy(dataset, model, convlayer=None, channel=None):
 # | GN 3T   | 33, 23, 33 | 1005, 23, 28 |
 # +---------+------------+--------------+
 
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=94)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=82)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=7, channel=19)
-#
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=1)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=125)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=12, channel=81)
-#
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=352)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=298)
-# plot_all_srxy('jester', [31, 20, 8, 0], convlayer=17, channel=319)
+# plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=152)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=121)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=12, channel=26)
 
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=77)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=93)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=12, channel=79)
-#
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=81)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=116)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=31, channel=157)
-#
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=105)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=288)
-# plot_all_srxy('ucf101', [1003, 23, 12, 0], convlayer=50, channel=177)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=134)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=55)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=31, channel=243)
 
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=116)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=42)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=7, channel=17)
-#
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=188)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=196)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=12, channel=131)
-#
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=129)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=484)
-# plot_all_srxy('jester', [36, 20, 13, 0], convlayer=17, channel=385)
-
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=24)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=69)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=12, channel=45)
-#
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=128)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=150)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=31, channel=171)
-#
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=132)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=56)
-# plot_all_srxy('ucf101', [1005, 23, 28, 0], convlayer=50, channel=196)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=120)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=88)
+plot_all_srxy('jester', [30, 23, 28, 0], convlayer=50, channel=67)
 
 
 def make_scale_rot_plot(scales, rotations, model, mode, layer):
@@ -2015,8 +1979,8 @@ def grad_cam(dataset, model, videoname=None, prediction_type='correct', desired_
 
     print('THE END')
 #
-dataset = 'jester'
-# model = [30, 23, 28, 0]
-model = [31, 20, 8, 0]
-grad_cam(dataset, model, num_videos=10, gpunum=2)
+# dataset = 'jester'
+# # model = [30, 23, 28, 0]
+# model = [31, 20, 8, 0]
+# grad_cam(dataset, model, num_videos=10, gpunum=2)
 
