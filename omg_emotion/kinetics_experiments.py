@@ -75,10 +75,12 @@ def e001_3T_kinetics():
     project_variable.model_number = 23 # googlenet
     project_variable.experiment_number = 2000
     project_variable.sheet_number = 23
-    project_variable.device = 2
+    project_variable.device = 1
     project_variable.end_epoch = 200
     project_variable.batch_size = 1
     project_variable.batch_size_val_test = 1
+
+    project_variable.inference_only_mode = True
 
     project_variable.load_model = False
     project_variable.load_from_fast = True

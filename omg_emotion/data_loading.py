@@ -1055,30 +1055,30 @@ def get_mean_std_train_mov_mnist():
     return mean, std
 
 # UNUSED: making a DALI loader for kinetics400 dataset
-def kinetics400_loader(which, project_variable):
-    assert which in ['train', 'test', 'val']
-
-    workers = project_variable.dali_workers
-
-    if which == 'train':
-        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_train,
-                                                    frames_per_clip=project_variable.load_num_frames)
-        loader = DataLoader(dataset, batch_size=project_variable.batch_size, shuffle=True, num_workers=workers)
-
-    elif which == 'val':
-        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_val,
-                                                   frames_per_clip=project_variable.load_num_frames)
-        loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
-
-    elif which == 'test':
-        dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_test,
-                                                   frames_per_clip=project_variable.load_num_frames)
-        loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
-
-    else:
-        loader = None
-
-    return loader
+# def kinetics400_loader(which, project_variable):
+#     assert which in ['train', 'test', 'val']
+#
+#     workers = project_variable.dali_workers
+#
+#     if which == 'train':
+#         dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_train,
+#                                                     frames_per_clip=project_variable.load_num_frames)
+#         loader = DataLoader(dataset, batch_size=project_variable.batch_size, shuffle=True, num_workers=workers)
+#
+#     elif which == 'val':
+#         dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_val,
+#                                                    frames_per_clip=project_variable.load_num_frames)
+#         loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
+#
+#     elif which == 'test':
+#         dataset = torchvision.datasets.Kinetics400(root=PP.kinetics400_test,
+#                                                    frames_per_clip=project_variable.load_num_frames)
+#         loader = DataLoader(dataset, batch_size=project_variable.batch_size_val_test, shuffle=False, num_workers=workers)
+#
+#     else:
+#         loader = None
+#
+#     return loader
 
 
 def load_data(project_variable, seed):
@@ -1292,7 +1292,6 @@ def get_ucf101_iter(which, project_variable):
 
 
 
-# TODO: sequence length?
 class Kinetics400VideoPipe(Pipeline):
     def __init__(self, batch_size,
                  num_threads=6,
@@ -1360,7 +1359,7 @@ def get_kinetics400_iter(which, project_variable):
                                                     project_variable.dali_workers, False, 0,
                                                     project_variable.dali_iterator_size[1], True,
                                                     project_variable.device)
-    if which in ['test']:
+    elif which in ['test']:
         print('Loading validation/test iterator...')
         the_iter = kinetics400_create_dali_iterator(project_variable.batch_size_val_test,
                                                     PP.kinetics400_test,

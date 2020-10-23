@@ -73,9 +73,9 @@ jester_zero = '/scratch/users/gabras/jester/zero.txt'
 jester_labels = '/fast/gabras/jester/label_number.txt'
 
 # Kinetics400
-kinetics400_train = '/fast/gabras/kinetics400_downloader/dataset/train'
-kinetics400_val = '/fast/gabras/kinetics400_downloader/dataset/valid'
-kinetics400_test = '/fast/gabras/kinetics400_downloader/dataset/test'
+kinetics400_train = '/fast/gabras/kinetics400_downloader/dataset_150_224/train'
+kinetics400_val = '/fast/gabras/kinetics400_downloader/dataset_150_224/valid'
+kinetics400_test = '/fast/gabras/kinetics400_downloader/dataset_150_224/test'
 
 
 # UCF101
