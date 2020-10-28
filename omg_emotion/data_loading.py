@@ -1327,14 +1327,14 @@ class Kinetics400VideoPipe(Pipeline):
 
 
 def kinetics400_create_dali_iterator(batch_size, file_root, num_workers, do_shuffle, the_seed, iterator_size, reset, device):
-    pipe = UCF101VideoPipe(batch_size=batch_size,
-                           file_root=file_root,
-                           shuffle=do_shuffle,
-                           initial_fill=batch_size,
-                           num_threads=num_workers,
-                           seed=the_seed,
-                           device_id=device
-                           )
+    pipe = Kinetics400VideoPipe(batch_size=batch_size,
+                                file_root=file_root,
+                                shuffle=do_shuffle,
+                                initial_fill=batch_size,
+                                num_threads=num_workers,
+                                seed=the_seed,
+                                device_id=device
+                                )
     pipe.build()
 
     if iterator_size == 'all':

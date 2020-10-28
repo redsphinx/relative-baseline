@@ -38,7 +38,6 @@ def run(project_variable, all_data, my_model, my_optimizer, device):
         elif project_variable.dataset == 'ucf101':
             the_iterator = DL.get_ucf101_iter('train', project_variable)
         elif project_variable.dataset == 'kinetics400':
-            # the_iterator = iter(DL.kinetics400_loader('train', project_variable))
             the_iterator = DL.get_kinetics400_iter('train', project_variable)
         else:
             the_iterator = None
